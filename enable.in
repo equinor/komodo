@@ -1,0 +1,6 @@
+# General environment variables
+export PATH=komodo_prefix/bin${PATH:+:${PATH}}
+export MANPATH=komodo_prefix/share/man:${MANPATH}
+export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+# duplicate python site.py logic for sitepackages
+export PYTHONPATH=komodo_prefix/lib64/python`'komodo_pyver`'/site-packages:komodo_prefix/lib/python`'komodo_pyver`'/site-packages${PYTHONPATH:+:${PYTHONPATH}}
