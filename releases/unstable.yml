@@ -13,5 +13,4 @@ seaborn: 0.8.1
 segyio: 1.3.5
 setuptools: 36.2.7
 uptime: 3.0.1
-well2seis: v1.2.0
 wheel: 0.30.0
