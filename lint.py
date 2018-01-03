@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import yaml as yml
+import logging
 
 from collections import namedtuple
 
@@ -40,6 +41,8 @@ def lint_maintainers(pkgs, repo):
 def lint_dependencies(pkgs, repo):
     errs = []
     for pkg, ver in pkgs.items():
+        if isinstance(ver, float):
+            logging.warn('dangerous version for %s (float interpretable)' % pkg)
         pv = repo[pkg][ver]
         maintainer = pv['maintainer']
         if 'depends' not in pv:
