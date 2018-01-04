@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import argparse
-import distutils.version
 from pkg_resources import parse_version
 import logging
 import yaml as yml
@@ -42,6 +41,10 @@ def lint_maintainers(pkgs, repo):
     return [_validate(pkg, ver, repo) for pkg, ver in pkgs.items()]
 
 
+def __reg_version_err(errs, pkg, ver, maintainer, err=MALFORMED_VERSION):
+    errs.append(_kerr(pkg=pkg, version=ver, maintainer=maintainer, err=err))
+
+
 def lint_version_numbers(pkgs, repo):
     errs = []
     for pkg, ver in pkgs.items():
@@ -51,32 +54,16 @@ def lint_version_numbers(pkgs, repo):
         pv = repo[pkg][ver]
         maintainer = pv.get('maintainer', MISSING_MAINTAINER)
         if isinstance(ver, float):
-            errs.append(
-                _kerr(
-                    pkg=pkg,
-                    version=ver,
-                    maintainer=maintainer,
-                    err=FLOAT_VERSION))
+            __reg_version_err(errs, pkg, ver, maintainer, FLOAT_VERSION)
+            continue
         try:
-            if ver == 'master':
-                logging.warn('Building %s on master' % pkg)
-                continue
-            elif ver == '4':
-                logging.warn('Please update version numbering of %s' % pkg)
-                continue
             v = parse_version(ver)
-            logging.info('Using %s %s' % (pkg, v))
-            if ver.startswith('v') and len(ver) > 1 and '0' <= ver[1] <= '9':
-                v = distutils.version.StrictVersion(ver[1:])
-            else:
-                v = distutils.version.StrictVersion(ver)
+            if 'Legacy' in repr(
+                    v):  # don't know if possible to check otherwise
+                __reg_version_err(errs, pkg, ver, maintainer)
+                logging.info('Using %s %s' % (pkg, v))
         except:
-            errs.append(
-                _kerr(
-                    pkg=pkg,
-                    version=ver,
-                    maintainer=maintainer,
-                    err=MALFORMED_VERSION))
+            __reg_version_err(errs, pkg, ver, maintainer)
     return errs
 
 
