@@ -45,6 +45,9 @@ def lint_maintainers(pkgs, repo):
 def lint_version_numbers(pkgs, repo):
     errs = []
     for pkg, ver in pkgs.items():
+        if ver not in repo[pkg]:
+            continue  # error caught in maintainer
+
         pv = repo[pkg][ver]
         maintainer = pv.get('maintainer', MISSING_MAINTAINER)
         if isinstance(ver, float):
@@ -55,6 +58,12 @@ def lint_version_numbers(pkgs, repo):
                     maintainer=maintainer,
                     err=FLOAT_VERSION))
         try:
+            if ver == 'master':
+                logging.warn('Building %s on master' % pkg)
+                continue
+            elif ver == '4':
+                logging.warn('Please update version numbering of %s' % pkg)
+                continue
             v = parse_version(ver)
             logging.info('Using %s %s' % (pkg, v))
             if ver.startswith('v') and len(ver) > 1 and '0' <= ver[1] <= '9':
@@ -74,6 +83,8 @@ def lint_version_numbers(pkgs, repo):
 def lint_dependencies(pkgs, repo):
     errs = []
     for pkg, ver in pkgs.items():
+        if ver not in repo[pkg]:
+            continue  # error caught in maintainer
         pv = repo[pkg][ver]
         maintainer = pv.get('maintainer', MISSING_MAINTAINER)
         if 'depends' not in pv:
@@ -129,4 +140,8 @@ if __name__ == '__main__':
             ver = err.version if err.version else ''
             dep = ': %s' % ', '.join(err.depends) if err.depends else ''
             print('%s for %s %s%s' % (err.err, err.pkg, ver, dep))
+
+    if not any([err.err for err in mns + deps]):
+        exit(0)  # currently we allow erronous version numbers
+
     exit('Error in komodo configuration.')
