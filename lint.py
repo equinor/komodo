@@ -15,6 +15,7 @@ MISSING_VERSION = 'missing version'
 MISSING_DEPENDENCY = 'missing dependency'
 MISSING_MAINTAINER = 'missing maintainer'
 MALFORMED_VERSION = 'malformed version'
+MASTER_VERSION = 'dangerous version (master branch)'
 FLOAT_VERSION = 'dangerous version (float interpretable)'
 
 
@@ -48,20 +49,23 @@ def __reg_version_err(errs, pkg, ver, maintainer, err=MALFORMED_VERSION):
 def lint_version_numbers(pkgs, repo):
     errs = []
     for pkg, ver in pkgs.items():
-        if ver not in repo[pkg]:
-            continue  # error caught in maintainer
+        if pkg not in repo or ver not in repo[pkg]:
+            continue  # error caught previously
 
         pv = repo[pkg][ver]
         maintainer = pv.get('maintainer', MISSING_MAINTAINER)
         if isinstance(ver, float):
             __reg_version_err(errs, pkg, ver, maintainer, FLOAT_VERSION)
             continue
+
         try:
+            logging.info('Using %s %s' % (pkg, ver))
+            if 'master' in ver:
+                __reg_version_err(errs, pkg, ver, maintainer, err=MASTER_VERSION)
+                continue
             v = parse_version(ver)
-            if 'Legacy' in repr(
-                    v):  # don't know if possible to check otherwise
+            if 'Legacy' in repr(v):  # don't know if possible to check otherwise
                 __reg_version_err(errs, pkg, ver, maintainer)
-                logging.info('Using %s %s' % (pkg, v))
         except:
             __reg_version_err(errs, pkg, ver, maintainer)
     return errs
@@ -70,8 +74,8 @@ def lint_version_numbers(pkgs, repo):
 def lint_dependencies(pkgs, repo):
     errs = []
     for pkg, ver in pkgs.items():
-        if ver not in repo[pkg]:
-            continue  # error caught in maintainer
+        if pkg not in repo or ver not in repo[pkg]:
+            continue  # error caught previously
         pv = repo[pkg][ver]
         maintainer = pv.get('maintainer', MISSING_MAINTAINER)
         if 'depends' not in pv:

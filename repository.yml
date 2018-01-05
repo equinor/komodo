@@ -1,23 +1,5 @@
-matplotlib:
-  2.0.2:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - pyqt4
-
 numpy:
-  1.13.1:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - wheel
-
-pandas:
-  0.20.3:
+  1.13.3:
     source: pypi
     make: pip
     maintainer: jokva@statoil.com
@@ -33,41 +15,12 @@ pyparsing:
     depends:
       - python
 
-pyqt4:
-  4:
-    source: /prog/sdpsoft/python2.7.13
-    fetch: rsync
-    make: rsync
-    makeopts: --include */ --include **sip** --include **PyQt4** --exclude *
-    maintainer: jokva@statoil.com
-
-pytest:
-  3.2:
-    source: pypi
-    make: pip
-    maintainer: pgdr@statoil.com
-    depends:
-      - python
-      - wheel
-      - setuptools
-
 python:
-  2.7.14:
-    source: /project/res/komodo/repository/python-2.7.14/root
-    fetch: nfs
-    make: rsync
-    makeopts: --exclude=site-packages
-    maintainer: jokva@statoil.com
-
-pywhich:
-  v1.0.1:
-    source: git://github.com/Statoil/pywhich
+  v2.7.14:
+    source: git://github.com/python/cpython.git
     make: sh
-    makefile: setup-py.sh
-    maintainer: pgdr@statoil.com
-    depends:
-      - python
-      - setuptools
+    makefile: configure
+    maintainer: jokva@statoil.com
 
 PyYAML:
   3.12:
@@ -85,63 +38,15 @@ requests:
     depends:
       - python
 
-six:
-  1.11.0:
-    source: pypi
-    make: pip
-    maintainer: pgdr@statoil.com
-    depends:
-      - python
-      - wheel
-
-scipy:
-  0.19.1:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - wheel
-
-scikit-learn:
-  0.19.0:
-    source: pypi
-    make: pip
-    maintainer: pgdr@statoil.com
-    depends:
-      - python
-      - wheel
-      - numpy
-      - matplotlib
-
-seaborn:
-  0.8.1:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-
 segyio:
-  1.3.3:
-    source: https://github.com/Statoil/segyio/releases/download/v1.3.3/segyio-1.3.3.tar.gz
-    make: cmake
-    makeopts: -DBUILD_SHARED_LIBS=OFF
+  1.3.9:
+    source: pypi
+    make: pip
+    makeopts: --no-deps
     maintainer: jokva@statoil.com
     depends:
       - python
-      - numpy
-      - setuptools
-
-  1.3.5:
-    source: git://github.com/Statoil/segyio.git
-    make: cmake
-    makeopts: -DBUILD_SHARED_LIBS=ON
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - numpy
-      - setuptools
+      - wheel
 
 setuptools:
   36.2.7:
@@ -159,14 +64,6 @@ uptime:
     maintainer: jokva@statoil.com
     depends:
       - python
-
-qt4:
-  4.8.4:
-    source: /project/res/komodo/repository/qt-4.8.4/root
-    fetch: nfs
-    make: rsync
-    makeopts: --exclude examples --exclude doc --exclude demos
-    maintainer: jokva@statoil.com
 
 wheel:
   0.30.0:
