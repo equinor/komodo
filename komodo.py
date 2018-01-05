@@ -41,11 +41,12 @@ def main(args):
 
     # create the enable script
     release_path = os.path.join(args.prefix, args.release)
-    with open('{}/enable'.format(args.release), 'w') as f:
-        f.write(shell(['m4 enable.m4',
-                            '-D komodo_prefix={}'.format(tmp_prefix),
-                            '-D komodo_pyver={}'.format('2.7'),
-                            'enable.in']))
+    for tmpl,target in [('enable.in','enable'), ('enable.csh.in', 'enable.csh')]:
+        with open('{}/{}'.format(args.release, target), 'w') as f:
+            f.write(shell(['m4 enable.m4',
+                           '-D komodo_prefix={}'.format(tmp_prefix),
+                           '-D komodo_pyver={}'.format('2.7'),
+                           tmpl]))
 
     releasedoc = os.path.join(args.release, args.release)
     with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, 'w') as y:

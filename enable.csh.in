@@ -1,0 +1,46 @@
+# General environment variables
+set KOMODO_PATH=komodo_prefix/bin
+set KOMODO_MANPATH=komodo_prefix/share/man
+set KOMODO_LD_PATH=komodo_prefix/lib:komodo_prefix/lib64
+
+set KOMODO_PYTHONPATH=komodo_prefix/lib64/python`'komodo_pyver`'/site-packages:komodo_prefix/lib/python`'komodo_pyver`'/site-packages
+
+if $?PATH then
+    setenv PATH ${KOMODO_PATH}:$PATH
+else
+    setenv PATH ${KOMODO_PATH}
+endif
+
+if $?MANPATH then
+    setenv MANPATH ${KOMODO_MANPATH}:$MANPATH
+else
+    setenv MANPATH ${KOMODO_MANPATH}
+endif
+
+if $?LD_PATH then
+    setenv LD_LIBRARY_PATH ${KOMODO_LD_PATH}:$LD_LIBRARY_PATH
+else
+    setenv LD_LIBRARY_PATH ${KOMODO_LD_PATH}
+endif
+
+if $?PYTHONPATH then
+    setenv PYTHONPATH ${KOMODO_PYTHONPATH}:$PYTHONPATH
+else
+    setenv PYTHONPATH ${KOMODO_PYTHONPATH}
+endif
+
+# If this is a non-interactive shell we exit without writing the
+# csh deprecation warning.
+if ( $?prompt == 0 || $?VUE != 0) exit
+
+cat <<EOF
+****************************************************************************
+* Warning: csh shell support in komodo will be discontinued at the end of  *
+* Q2 2018, and you are strongly encouraged to switch to bash as your login *
+* shell. If you go to the unix password change page at:                    *
+*                                                                          *
+*         https://unixpassword.statoil.com/cgi/main.cgi                    *
+*                                                                          *
+* you can change your login shell from csh to bash.                        *
+****************************************************************************
+EOF
