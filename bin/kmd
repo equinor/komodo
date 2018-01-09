@@ -1,21 +1,22 @@
+#!/usr/bin/env python
+from __future__ import print_function
+
 import argparse
 import os
 import shutil
 import sys
 import yaml as yml
+import logging
 
-import build
-import fetch
-from shell import shell, pushd
-from build import pypaths
+import komodo
 
 def main(args):
     args.prefix = os.path.abspath(args.prefix)
 
     if args.download or (not args.build and not args.install):
-        fetch.fetch(args.pkgs, args.repo, outdir = args.cache,
-                                          pip = args.pip,
-                                          git = args.git)
+        komodo.fetch(args.pkgs, args.repo, outdir = args.cache,
+                     pip = args.pip,
+                     git = args.git)
 
     if args.download and not args.build:
         sys.exit(0)
@@ -26,14 +27,14 @@ def main(args):
     tmp_prefix = os.path.join(os.path.join(args.prefix), args.release, 'root')
     fakeroot = os.path.abspath(args.release)
     if args.build or not args.install:
-        build.make(args.pkgs, args.repo, prefix   = tmp_prefix,
+        komodo.make(args.pkgs, args.repo, prefix   = tmp_prefix,
                                          dlprefix = args.cache,
                                          builddir = args.tmp,
                                          jobs     = args.jobs,
                                          cmk      = args.cmake,
                                          fakeroot = fakeroot)
-        shell('mv {} {}'.format(args.release + tmp_prefix, args.release))
-        shell('rmdir -p --ignore-fail-on-non-empty {}'.format(
+        komodo.shell('mv {} {}'.format(args.release + tmp_prefix, args.release))
+        komodo.shell('rmdir -p --ignore-fail-on-non-empty {}'.format(
             os.path.dirname(args.release + tmp_prefix)))
 
     if args.build and not args.install:
@@ -42,8 +43,11 @@ def main(args):
     # create the enable script
     release_path = os.path.join(args.prefix, args.release)
     for tmpl,target in [('enable.in','enable'), ('enable.csh.in', 'enable.csh')]:
+        if not os.path.exists(tmpl):
+            logging.warn('Could not find template %s, skipping.' % templ)
+            continue
         with open('{}/{}'.format(args.release, target), 'w') as f:
-            f.write(shell(['m4 enable.m4',
+            f.write(komodo.shell(['m4 enable.m4',
                            '-D komodo_prefix={}'.format(tmp_prefix),
                            '-D komodo_pyver={}'.format('2.7'),
                            tmpl]))
@@ -62,16 +66,16 @@ def main(args):
     print('Installing {} to {}'.format(args.release, args.prefix))
     install_root = os.path.join(args.prefix, args.release, 'root')
 
-    shell('rename {0} .{0} {0}'.format(args.release))
-    shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
+    komodo.shell('rename {0} .{0} {0}'.format(args.release))
+    komodo.shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
 
     if os.path.exists('{1}/{0}'.format(args.release, args.prefix)):
-        shell('rename {0} {0}.delete {1}/{0}'.format(args.release, args.prefix),
+        komodo.shell('rename {0} {0}.delete {1}/{0}'.format(args.release, args.prefix),
                sudo = args.sudo)
 
-    shell('rename .{0} {0} {1}/.{0}'.format(args.release, args.prefix),
+    komodo.shell('rename .{0} {0} {1}/.{0}'.format(args.release, args.prefix),
            sudo = args.sudo)
-    shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
+    komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
            sudo = args.sudo)
 
     # pip hard-codes the interpreter path to whatever interpreter that was used
@@ -83,7 +87,7 @@ def main(args):
                                         os.path.join(install_root, 'lib64'),
                                         os.environ.get('LD_LIBRARY_PATH', '')])
 
-    os.environ['PYTHONPATH'] = pypaths(install_root, pkgs.get('python'))
+    os.environ['PYTHONPATH'] = komodo.pypaths(install_root, pkgs.get('python'))
     os.environ['PATH'] = ':'.join([os.path.join(install_root, 'bin'),
                                    os.environ.get('PATH', '')])
 
@@ -91,7 +95,7 @@ def main(args):
     for pkg, ver in pkgs.items():
         if repo[pkg][ver]['make'] != 'pip': continue
 
-        print(shell(['{}/bin/pip'.format(install_root),
+        print(komodo.shell(['{}/bin/pip'.format(install_root),
                'install {}=={}'.format(pkg, ver),
                '--prefix', os.path.join(args.prefix, args.release, 'root'),
                '--force-reinstall',
@@ -102,7 +106,7 @@ def main(args):
 
     # run any post-install scripts on the release
     if args.postinst:
-        shell([args.postinst, os.path.join(args.prefix, args.release)])
+        komodo.shell([args.postinst, os.path.join(args.prefix, args.release)])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'build distribution')
@@ -136,6 +140,7 @@ if __name__ == '__main__':
         os.mkdir(args.workspace)
         shutil.copy('enable.m4', args.workspace)
         shutil.copy('enable.in', args.workspace)
+        shutil.copy('enable.csh.in', args.workspace)
 
-    with pushd(args.workspace):
+    with komodo.pushd(args.workspace):
         main(args)
