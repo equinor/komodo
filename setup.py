@@ -8,4 +8,5 @@ setup(
     packages=['komodo'],
     package_dir={'komodo' : 'komodo'},
     scripts=['bin/kmd'],
+    test_suite='tests',
 )
