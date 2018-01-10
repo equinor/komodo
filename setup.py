@@ -5,6 +5,7 @@ from setuptools import setup
 
 setup(
     name='Komodo',
+    version='1.0',
     packages=['komodo'],
     package_dir={'komodo' : 'komodo'},
     scripts=['bin/kmd'],

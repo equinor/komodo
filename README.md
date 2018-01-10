@@ -1,4 +1,6 @@
-# Komodo --- Software Innovation Bergen Software Distribution
+# Komodo [![Build Status](https://travis-ci.org/Statoil/komodo.svg?branch=master)](https://travis-ci.org/Statoil/komodo)
+
+## Software Innovation Bergen Software Distribution
 
 Komodo is a software distribution system.
 

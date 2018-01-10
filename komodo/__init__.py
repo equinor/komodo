@@ -6,7 +6,7 @@ from .shell import shell, pushd
 from .lint import lint
 from .maintainer import maintainers
 
-__version__ = '0.0.1'
+__version__ = '1.0'
 __author__ = 'Software Innovation Bergen, Statoil ASA'
 
 __copyright__ = 'Copyright 2017, Statoil ASA'
