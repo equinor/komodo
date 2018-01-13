@@ -31,7 +31,9 @@ RELEASE = {
 class TestLint(unittest.TestCase):
 
     def test_lint(self):
-        pass
+        lint_report = komodo.lint(RELEASE, REPO)
+        self.assertEqual([], lint_report.dependencies)
+        self.assertEqual([], lint_report.versions)
 
 if __name__ == '__main__':
     unittest.main()

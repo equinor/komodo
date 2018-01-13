@@ -1,3 +1,18 @@
+libecl:
+  2.2.7:
+    source: git://github.com/statoil/libecl
+    make: cmake
+    makeopts: -DBUILD_PYTHON=ON
+    maintainer: joaho@statoil.com
+    depends:
+      - cwrap
+
+cwrap:
+  1.2.0:
+    source: pypi
+    make: pip
+    maintainer: pgdr@statoil.com
+
 numpy:
   1.13.3:
     source: pypi

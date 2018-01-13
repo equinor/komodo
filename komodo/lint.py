@@ -10,6 +10,8 @@ from collections import namedtuple
 kerr = namedtuple('KomodoError',
                   ['pkg', 'version', 'maintainer', 'depends', 'err'])
 
+report = namedtuple('LintReport', ['maintainers', 'dependencies', 'versions'])
+
 MISSING_PACKAGE = 'missing package'
 MISSING_VERSION = 'missing version'
 MISSING_DEPENDENCY = 'missing dependency'
@@ -93,13 +95,24 @@ def lint_dependencies(pkgs, repo):
 
 
 def lint(pkgfile, repofile):
-    with open(pkgfile) as p, open(repofile) as r:
-        pkgs, repo = yml.load(p), yml.load(r)
+    if isinstance(pkgfile, dict) and isinstance(repofile, dict):
+        pkgs, repo = pkgfile, repofile
+    else:
+        try:
+            with open(pkgfile, 'r') as p, open(repofile, 'r') as r:
+                pkgs, repo = yml.load(p), yml.load(r)
+        except yml.scanner.ScannerError as err:
+            raise ValueError('Malformed YAML: %s' % str(err))
+
+    if not isinstance(pkgs, dict):
+        raise ValueError('Malformed package file: %s ' % str(type(pkgs)))
+    if not isinstance(repo, dict):
+        raise ValueError('Malformed repository file: %s' % str(type(repo)))
 
     mns = lint_maintainers(pkgs, repo)
     deps = lint_dependencies(pkgs, repo)
     vers = lint_version_numbers(pkgs, repo)
-    return mns, deps, vers
+    return report(maintainers=mns, dependencies=deps, versions=vers)
 
 
 def get_args():
@@ -120,7 +133,11 @@ if __name__ == '__main__':
     args = get_args()
     logging.basicConfig(format='%(message)s', level=args.loglevel)
 
-    mns, deps, vers = lint(args.pkgfile, args.repofile)
+    try:
+        report = lint(args.pkgfile, args.repofile)
+        mns, deps, vers = report.maintainers, report.dependencies, report.versions
+    except ValueError as err:
+        exit(str(err))
     print('%d packages' % len(mns))
     if not any([err.err for err in mns + deps + vers]):
         print('No errors found')

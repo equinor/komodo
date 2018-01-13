@@ -1,12 +1,33 @@
 dist: trusty
 language: python
 
+env:
+  matrix:
+    - UNIT_TEST=1
+    - LINT_TEST=1
+    - INTEGRATION_TEST=1
+
+matrix:
+  allow_failures:
+    - env: INTEGRATION_TEST=1
+
 before_install:
   - pip install -r requirements.txt
-script:
   - export PYTHONPATH=$PWD:$PYTHONPATH
   - echo $PYTHONPATH
+  - mkdir ws
+  - mkdir pfx
+  - export WS=$PWD/ws
+  - export PFX=$PWD/pfx
+
+before_script:
   - ls
   - python -c "import komodo;print(komodo.__file__);print(komodo.__version__)"
-  - python -m komodo.lint examples/releases/unstable.yml examples/repository.yml
-  - ./setup.py test
+
+script:
+  - if [[ ! -z $UNIT_TEST ]]; then ./setup.py test ; fi
+
+  - if [[ ! -z $LINT_TEST ]]; then python -m komodo.lint examples/releases/unstable.yml examples/repository.yml ; fi
+  - if [[ ! -z $LINT_TEST ]]; then python -m komodo.lint examples/releases/ecl.yml examples/repository.yml ; fi
+
+  - if [[ ! -z $INTEGRATION_TEST ]]; then bin/kmd examples/releases/ecl.yml examples/repository.yml --workspace $WS --prefix $PFX --release integration; fi

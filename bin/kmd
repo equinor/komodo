@@ -44,7 +44,7 @@ def main(args):
     release_path = os.path.join(args.prefix, args.release)
     for tmpl,target in [('enable.in','enable'), ('enable.csh.in', 'enable.csh')]:
         if not os.path.exists(tmpl):
-            logging.warn('Could not find template %s, skipping.' % templ)
+            logging.warn('Could not find template %s, skipping.' % str(tmpl))
             continue
         with open('{}/{}'.format(args.release, target), 'w') as f:
             f.write(komodo.shell(['m4 enable.m4',
