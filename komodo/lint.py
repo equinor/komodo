@@ -16,6 +16,7 @@ MISSING_PACKAGE = 'missing package'
 MISSING_VERSION = 'missing version'
 MISSING_DEPENDENCY = 'missing dependency'
 MISSING_MAINTAINER = 'missing maintainer'
+MISSING_MAKE = 'missing make information'
 MALFORMED_VERSION = 'malformed version'
 MASTER_VERSION = 'dangerous version (master branch)'
 FLOAT_VERSION = 'dangerous version (float interpretable)'
@@ -37,6 +38,8 @@ def _validate(pkg, ver, repo):
         return _kerr(pkg=pkg, version=ver, err=MISSING_VERSION)
     if 'maintainer' not in repo[pkg][ver]:
         return _kerr(pkg=pkg, version=ver, err=MISSING_MAINTAINER)
+    if 'make' not in repo[pkg][ver]:
+        return _kerr(pkg=pkg, version=ver, err=MISSING_MAKE)
     return _kerr(pkg=pkg, version=ver, maintainer=repo[pkg][ver]['maintainer'])
 
 

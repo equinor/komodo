@@ -66,14 +66,14 @@ def main(args):
     print('Installing {} to {}'.format(args.release, args.prefix))
     install_root = os.path.join(args.prefix, args.release, 'root')
 
-    komodo.shell('rename {0} .{0} {0}'.format(args.release))
+    komodo.shell('{1} {0} .{0} {0}'.format(args.release, args.renamer))
     komodo.shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
 
     if os.path.exists('{1}/{0}'.format(args.release, args.prefix)):
-        komodo.shell('rename {0} {0}.delete {1}/{0}'.format(args.release, args.prefix),
+        komodo.shell('{2} {0} {0}.delete {1}/{0}'.format(args.release, args.prefix, args.renamer),
                sudo = args.sudo)
 
-    komodo.shell('rename .{0} {0} {1}/.{0}'.format(args.release, args.prefix),
+    komodo.shell('{2} .{0} {0} {1}/.{0}'.format(args.release, args.prefix, args.renamer),
            sudo = args.sudo)
     komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
            sudo = args.sudo)
@@ -130,6 +130,8 @@ if __name__ == '__main__':
     parser.add_argument('--sudo',       action = 'store_true')
     parser.add_argument('--workspace',  type = str, default = None)
     parser.add_argument('--postinst', '-P', type = str)
+
+    parser.add_argument('--renamer', '-R', default = 'rename', type = str)
 
     args = parser.parse_args()
 

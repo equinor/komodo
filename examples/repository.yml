@@ -1,4 +1,4 @@
-libecl:
+eclpy:
   2.2.7:
     source: git://github.com/statoil/libecl
     make: cmake
@@ -6,6 +6,12 @@ libecl:
     maintainer: joaho@statoil.com
     depends:
       - cwrap
+
+libecl:
+  2.2.7:
+    source: git://github.com/statoil/libecl
+    make: cmake
+    maintainer: joaho@statoil.com
 
 cwrap:
   1.2.0:
