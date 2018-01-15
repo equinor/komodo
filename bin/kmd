@@ -10,6 +10,22 @@ import logging
 
 import komodo
 
+
+def filter_site(site_file, prefix):
+    with open(site_file) as f:
+        lines = f.readlines()
+
+    os.unlink(site_file)
+
+    with open(site_file, 'w') as f:
+        for line in lines:
+            if line.startswith('PREFIXES = '):
+                f.write('PREFIXES = ["{0}"]\n'.format(prefix))
+                continue
+            f.write(line)
+
+
+
 def main(args):
     args.prefix = os.path.abspath(args.prefix)
 
@@ -52,6 +68,12 @@ def main(args):
                            '-D komodo_pyver={}'.format('2.7'),
                            tmpl]))
 
+
+    # Make an in-place update of the site.py file, setting PREFIX to current root.
+    install_root = os.path.join(args.prefix, args.release, 'root')
+    site_file = '{release}/root/lib/python{version}/site.py'.format(release=args.release, version='2.7')
+    filter_site(site_file, install_root)
+
     releasedoc = os.path.join(args.release, args.release)
     with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, 'w') as y:
         pkgs, repo = yml.load(p), yml.load(r)
@@ -64,7 +86,6 @@ def main(args):
         yml.dump(release, y, default_flow_style = False)
 
     print('Installing {} to {}'.format(args.release, args.prefix))
-    install_root = os.path.join(args.prefix, args.release, 'root')
 
     komodo.shell('rename {0} .{0} {0}'.format(args.release))
     komodo.shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
