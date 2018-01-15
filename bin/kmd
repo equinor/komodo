@@ -69,11 +69,6 @@ def main(args):
                            tmpl]))
 
 
-    # Make an in-place update of the site.py file, setting PREFIX to current root.
-    install_root = os.path.join(args.prefix, args.release, 'root')
-    site_file = '{release}/root/lib/python{version}/site.py'.format(release=args.release, version='2.7')
-    filter_site(site_file, install_root)
-
     releasedoc = os.path.join(args.release, args.release)
     with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, 'w') as y:
         pkgs, repo = yml.load(p), yml.load(r)
@@ -99,10 +94,12 @@ def main(args):
     komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
            sudo = args.sudo)
 
+
     # pip hard-codes the interpreter path to whatever interpreter that was used
     # to install it. we want this to be whatever's provided by the komodo
     # release in question, so inject the just-sync'd install and re-install
     # everything from pip
+    install_root = os.path.join(args.prefix, args.release, 'root')
     os.environ['LD_LIBRARY_PATH'] = ':'.join([
                                         os.path.join(install_root, 'lib'),
                                         os.path.join(install_root, 'lib64'),
@@ -124,6 +121,11 @@ def main(args):
                '--find-links {}'.format(args.cache),
                repo[pkg][ver].get('makeopts')
               ], sudo = args.sudo))
+
+    # Make an in-place update of the site.py file, setting PREFIX to current root.
+    site_file = '{prefix}/{release}/root/lib/python{version}/site.py'.format(prefix=args.prefix, release=args.release, version='2.7')
+    filter_site(site_file, install_root)
+
 
     # run any post-install scripts on the release
     if args.postinst:
