@@ -38,8 +38,11 @@ def grab(path, filename = None, version = None, protocol = None,
             shell('{} fetch --tags'.format(git))
             shell('{} checkout -q {}'.format(git, version))
 
-    elif protocol in ('nfs'):
+    elif protocol in ('nfs','fs-ln'):
         shell('cp --recursive --symbolic-link {} {}'.format(path, filename))
+
+    elif protocol in ('fs-cp'):
+        shell('cp --recursive {} {}'.format(path, filename))
 
     elif protocol in ('rsync'):
         shell('rsync -a {}/ {}'.format(path, filename))
