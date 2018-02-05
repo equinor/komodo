@@ -36,3 +36,8 @@ cat <<EOF
 * you can change your login shell from csh to bash.                        *
 ****************************************************************************
 EOF
+
+set local_script=komodo_prefix/../local.csh
+if ( -r $local_script) then
+    source $local_script
+endif
