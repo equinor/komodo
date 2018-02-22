@@ -2,6 +2,8 @@
 export PATH=komodo_prefix/bin${PATH:+:${PATH}}
 export MANPATH=komodo_prefix/share/man:${MANPATH}
 export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export KOMODO_RELEASE=komodo_release
+
 
 local_script=komodo_prefix/../local
 if [ -e $local_script ]; then
