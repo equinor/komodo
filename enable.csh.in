@@ -23,6 +23,11 @@ endif
 
 setenv KOMODO_RELEASE komodo_release
 
+set local_script=komodo_prefix/../local.csh
+if ( -r $local_script) then
+    source $local_script
+endif
+
 # If this is a non-interactive shell we exit without writing the
 # csh deprecation warning.
 if ( $?prompt == 0 || $?VUE != 0) exit
@@ -38,8 +43,3 @@ cat <<EOF
 * you can change your login shell from csh to bash.                        *
 ****************************************************************************
 EOF
-
-set local_script=komodo_prefix/../local.csh
-if ( -r $local_script) then
-    source $local_script
-endif
