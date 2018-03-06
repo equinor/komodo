@@ -50,6 +50,7 @@ def main(args):
             f.write(komodo.shell(['m4 enable.m4',
                            '-D komodo_prefix={}'.format(tmp_prefix),
                            '-D komodo_pyver={}'.format('2.7'),
+                           '-D komodo_release={}'.format(args.release),
                            tmpl]))
 
     releasedoc = os.path.join(args.release, args.release)
