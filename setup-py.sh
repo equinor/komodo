@@ -36,11 +36,13 @@ while test $# -gt 0; do
     shift
 done
 
+PYTHONEXECUTABLE=$PREFIX/bin/python
+
 if [ -n "$REQ" ]; then
     pip install \
-        --global-option build --global-option=--executable=$PYTHON \
+        --global-option build --global-option=--executable=$PYTHONEXECUTABLE \
         --root $FAKEROOT \
         --requirement $REQ --prefix $PREFIX
 fi
-python setup.py build --executable $PYTHON \
+python setup.py build --executable $PYTHONEXECUTABLE \
                 install --prefix $PREFIX --root $FAKEROOT
