@@ -32,5 +32,5 @@ while test $# -gt 0; do
     shift
 done
 
-python setup.py build --executable $PYTHON \
+python setup.py build --executable $PREFIX/bin/python \
                 install --prefix $PREFIX --root $FAKEROOT

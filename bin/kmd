@@ -105,6 +105,17 @@ def main(args):
                repo[pkg][ver].get('makeopts')
               ], sudo = args.sudo))
 
+
+    # TODO fix hardcoded fix of ipython, bokeh, pylint
+    python_  = os.path.join(args.prefix, args.release, 'root', 'bin', 'python')
+
+    bins_ = ('ipython', 'bokeh', 'pylint', 'yapf')  # executables with wrong shebang
+    sedfxp = """sed -i 1c#!{0} {1}"""
+    for bin_ in bins_:
+        binpath_ = os.path.join(args.prefix, args.release, 'root', 'bin', bin_)
+        komodo.shell(sedfxp.format(python_, binpath_))
+
+
     # run any post-install scripts on the release
     if args.postinst:
         komodo.shell([args.postinst, os.path.join(args.prefix, args.release)])
