@@ -108,7 +108,7 @@ def main(args):
     python_ = os.path.join(args.prefix, args.release, 'root', 'bin', 'python')
     ipython_ = os.path.join(args.prefix, args.release, 'root', 'bin', 'ipython')
     bokeh_ = os.path.join(args.prefix, args.release, 'root', 'bin', 'bokeh')
-    sedfxp = """sed -i '1c#!{0}' {1}"""
+    sedfxp = """sed -i 1c#!{0} {1}"""
     print('\n'*10)
     print('fixup ipython'.center(30).center(60,'='))
     print()
