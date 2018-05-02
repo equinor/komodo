@@ -28,18 +28,3 @@ if ( -r $local_script) then
     source $local_script
 endif
 
-# If this is a non-interactive shell we exit without writing the
-# csh deprecation warning.
-if ( $?prompt == 0 || $?VUE != 0) exit
-
-cat <<EOF
-****************************************************************************
-* Warning: csh shell support in komodo will be discontinued at the end of  *
-* Q2 2018, and you are strongly encouraged to switch to bash as your login *
-* shell. If you go to the unix password change page at:                    *
-*                                                                          *
-*         https://unixpassword.statoil.com/cgi/main.cgi                    *
-*                                                                          *
-* you can change your login shell from csh to bash.                        *
-****************************************************************************
-EOF
