@@ -29,6 +29,9 @@ def _fixup_python_shebang(args):
     # executables with wrong shebang
     bins_ =  ('ipython', 'bokeh', 'pylint', 'yapf', 'pydoc')
     bins_ += ('sphinx-apidoc', 'sphinx-autogen', 'sphinx-build', 'sphinx-quickstart')
+    bins_ += ('jupyter', 'jupyter-kernelspec', 'jupyter-nbconvert', 'jupyter-run', 'jupyter-trust',
+              'jupyter-kernel', 'jupyter-migrate', 'jupyter-qtconsole', 'jupyter-troubleshoot')
+    bins_ += ('virtualenv',)
 
 
     sedfxp = """sed -i 1c#!{0} {1}"""
