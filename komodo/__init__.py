@@ -9,6 +9,12 @@ from .lint import lint
 from .cleanup import cleanup
 from .maintainer import maintainers
 
+
+def _is_shebang(s):
+    """Checks if the string potentially is a Python shebang."""
+    return s.startswith('#!/') and 'python' in s
+
+
 def fixup_python_shebangs(prefix, release):
     """Fix shebang to $PREFIX/bin/python.
 
@@ -23,26 +29,25 @@ def fixup_python_shebangs(prefix, release):
     This is a hack that should be fixed at some point.
 
     """
-    # TODO fix hardcoded fix of ipython, bokeh, ...
-    binpath = os.path.join(args.prefix, args.release, 'root', 'bin')
+    binpath = os.path.join(prefix, release, 'root', 'bin')
     python_ = os.path.join(binpath, 'python')
 
-    bins = []
+    bins_ = []
     # executables with wrong shebang
-    for bin_ in os.path.walk(binpath):
+    for bin_ in os.listdir(binpath):
         try:
             with open(bin_, 'r') as f:
-                shebang = f.readline()
-            if 'python' in shebang and shebang[2:] != binpath:
+                shebang = f.readline().strip()
+            if _is_shebang(shebang):
                 bins_.append(bin_)
         except:
             pass
 
     sedfxp = """sed -i 1c#!{0} {1}"""
     for bin_ in bins_:
-        binpath_ = os.path.join(args.prefix, args.release, 'root', 'bin', bin_)
+        binpath_ = os.path.join(prefix, release, 'root', 'bin', bin_)
         if os.path.exists(binpath_):
-            komodo.shell(sedfxp.format(python_, binpath_))
+            shell(sedfxp.format(python_, binpath_))
 
 
 __version__ = '1.0'
