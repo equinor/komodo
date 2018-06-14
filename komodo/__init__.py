@@ -36,12 +36,12 @@ def fixup_python_shebangs(prefix, release):
     # executables with wrong shebang
     for bin_ in os.listdir(binpath):
         try:
-            with open(bin_, 'r') as f:
+            with open(os.path.join(binpath, bin_), 'r') as f:
                 shebang = f.readline().strip()
             if _is_shebang(shebang):
                 bins_.append(bin_)
-        except:
-            pass
+        except Exception as err:
+            print('Exception in reading bin: %s' % err)
 
     sedfxp = """sed -i 1c#!{0} {1}"""
     for bin_ in bins_:
