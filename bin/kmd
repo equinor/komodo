@@ -10,37 +10,6 @@ import logging
 
 import komodo
 
-
-def _fixup_python_shebang(args):
-    """Fix shebang to $PREFIX/bin/python.
-
-    Some packages installed with pip do not respect target executable, that is,
-    they set as their shebang executable the Python executabl used to build the
-    komodo distribution with instead of the Python executable that komodo
-    deploys.  This breaks the application since the corresponding Python modules
-    won't be picked up correctly.
-
-    For now, we use sed to rewrite the first line in some executables.
-
-    """
-    # TODO fix hardcoded fix of ipython, bokeh, ...
-    python_ = os.path.join(args.prefix, args.release, 'root', 'bin', 'python')
-
-    # executables with wrong shebang
-    bins_ =  ('ipython', 'bokeh', 'pylint', 'yapf', 'pydoc')
-    bins_ += ('sphinx-apidoc', 'sphinx-autogen', 'sphinx-build', 'sphinx-quickstart')
-    bins_ += ('jupyter', 'jupyter-kernelspec', 'jupyter-nbconvert', 'jupyter-run', 'jupyter-trust',
-              'jupyter-kernel', 'jupyter-migrate', 'jupyter-qtconsole', 'jupyter-troubleshoot')
-    bins_ += ('virtualenv',)
-
-
-    sedfxp = """sed -i 1c#!{0} {1}"""
-    for bin_ in bins_:
-        binpath_ = os.path.join(args.prefix, args.release, 'root', 'bin', bin_)
-        if os.path.exists(binpath_):
-            komodo.shell(sedfxp.format(python_, binpath_))
-
-
 def main(args):
     args.prefix = os.path.abspath(args.prefix)
 
@@ -138,8 +107,7 @@ def main(args):
               ], sudo = args.sudo))
 
 
-    # this is a hack that should be fixed at some point
-    _fixup_python_shebang(args)
+    komodo.fixup_python_shebangs(args.prefix, args.release)
 
     # run any post-install scripts on the release
     if args.postinst:
