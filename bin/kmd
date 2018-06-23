@@ -65,6 +65,9 @@ def main(args):
                            }
         yml.dump(release, y, default_flow_style = False)
 
+    if args.dry_run:
+        return
+
     print('Installing {} to {}'.format(args.release, args.prefix))
     install_root = os.path.join(args.prefix, args.release, 'root')
 
@@ -127,6 +130,7 @@ if __name__ == '__main__':
     parser.add_argument('--download', '-d', action = 'store_true')
     parser.add_argument('--build', '-b',    action = 'store_true')
     parser.add_argument('--install', '-i',  action = 'store_true')
+    parser.add_argument('--dry-run', '-n',  action = 'store_true')
 
     parser.add_argument('--cmake', type = str, default = 'cmake')
     parser.add_argument('--pip',   type = str, default = 'pip')
