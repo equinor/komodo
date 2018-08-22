@@ -10,6 +10,9 @@ while test $# -gt 0; do
             shift
             export CMAKE_EXEC=$1
             ;;
+        --fakeroot)
+            shift
+            ;;
         --jobs)
             shift
             export JOBS=$1
