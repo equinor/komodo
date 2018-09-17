@@ -7,7 +7,6 @@ import shutil
 import sys
 import yaml as yml
 import logging
-
 import komodo
 
 def main(args):
@@ -68,20 +67,16 @@ def main(args):
     if args.dry_run:
         return
 
-    print('Installing {} to {}'.format(args.release, args.prefix))
-    install_root = os.path.join(args.prefix, args.release, 'root')
+    tmp_release = komodo.make_release_link(arg.release)
+    print('Installing {} to {} as {}'.format(args.release, args.prefix, tmp_release))
+    install_root = os.path.join(args.prefix, tmp_release, 'root')
 
-    komodo.shell('{1} {0} .{0} {0}'.format(args.release, args.renamer))
-    komodo.shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
+    komodo.shell('rsync -a {} {}'.format(tmp_release, args.prefix), sudo = args.sudo)
+    with komodo.pushd(args.prefix):
+        if os.path.exists(args.release):
+            os.unlink(args.release)
 
-    if os.path.exists('{1}/{0}'.format(args.release, args.prefix)):
-        komodo.shell('{2} {0} {0}.delete {1}/{0}'.format(args.release, args.prefix, args.renamer),
-               sudo = args.sudo)
-
-    komodo.shell('{2} .{0} {0} {1}/.{0}'.format(args.release, args.prefix, args.renamer),
-           sudo = args.sudo)
-    komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
-           sudo = args.sudo)
+        komodo.shell("ln -sf {target} {link}".format(target=tmp_release, link=args.release))
 
     # pip hard-codes the interpreter path to whatever interpreter that was used
     # to install it. we want this to be whatever's provided by the komodo
@@ -139,8 +134,6 @@ if __name__ == '__main__':
     parser.add_argument('--sudo',       action = 'store_true')
     parser.add_argument('--workspace',  type = str, default = None)
     parser.add_argument('--postinst', '-P', type = str)
-
-    parser.add_argument('--renamer', '-R', default = 'rename', type = str)
 
     args = parser.parse_args()
 

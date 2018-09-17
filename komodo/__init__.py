@@ -1,6 +1,7 @@
 """Komodo software distribution build system."""
 
 import os
+import time
 
 from .build import make, pypaths
 from .fetch import fetch
@@ -61,4 +62,40 @@ __maintainer__ = __author__
 __email__ = 'fg_gpl@statoil.com'
 __status__ = 'Production'
 
-__ALL__ = ['make', 'fetch', 'shell', 'lint', 'maintainers']
+__ALL__ = ['make', 'fetch', 'shell', 'lint', 'maintainers', 'update_links']
+
+
+
+
+# In the filesystem the release 'xxx' is located under the directory
+# $PREFIX/xxx-$timestamp and the actual release is found through a symlink:
+#
+#     $PREFIX/xxx -> xxx-$timestamp
+#
+# The timestamp is unix timestamp - seconds since the 1970 epoch. The functions
+# make_release_name() and split_release_name() will construct and deconstruct
+# such a directory name:
+#
+# make_release_link('2018.03')             -> '2018.03-1537801167'
+# split_release_link('2018.03-1537801167') -> '2018.03', 1537801167
+#
+# Observe that the split_release_link will convert the string represantation to
+# int. If the split_release_link fails it will return None in the second
+# argument.
+
+
+def make_release_name(release):
+    return '{}-{:012}'.format(release, int(time.mktime( time.localtime())) )
+
+
+def split_release_name(name):
+    tmp = name.split('-')
+    if len(tmp) == 0:
+        return name, None
+
+    try:
+        seconds = int(tmp[-1])
+    except ValueError:
+        seconds = None
+
+    return '-'.join(tmp[:-1]), seconds
