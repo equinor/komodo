@@ -24,7 +24,8 @@ def shell(cmd, sudo = False):
 
     if sudo: cmdlist = ['sudo'] + cmdlist
 
-    print('>', ' '.join(cmdlist))
+    prompt = '[{}]>'.format(os.getcwd())
+    print(prompt, ' '.join(cmdlist))
 
     try: 
         return subprocess.check_output(filter(None, cmdlist))
