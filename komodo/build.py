@@ -39,6 +39,15 @@ def rpm(pkg, ver, path, prefix, *args, **kwargs):
         shell('rsync -a usr/* .')
         shell('rm -rf usr')
 
+
+# When running cmake we pass the option -DDEST_PREFIX=fakeroot, this is an
+# absolute hack to be able to build opm-common and sunbeam with the ~fakeroot
+# implementation used by komodo.
+#
+# See sunbeam/CMakeLists.txt for a more detailed description of the issue.
+# When/if the opm project updates the generated opm-common-config.cmake to work
+# with "make DESTDIR=" the DEST_PREFIX cmake flag can be removed.
+
 def cmake(pkg, ver, path, prefix, builddir,
                                   makeopts,
                                   jobs,
@@ -56,7 +65,8 @@ def cmake(pkg, ver, path, prefix, builddir,
              '-DBUILD_SHARED_LIBS=ON',
              '-DCMAKE_PREFIX_PATH={}'.format(fakeprefix),
              '-DCMAKE_MODULE_PATH={}/share/cmake/Modules'.format(fakeprefix),
-             '-DCMAKE_INSTALL_PREFIX={}'.format(prefix)
+             '-DCMAKE_INSTALL_PREFIX={}'.format(prefix),
+             '-DDEST_PREFIX={}'.format(fakeroot)
              ]
 
     mkpath(bdir)
