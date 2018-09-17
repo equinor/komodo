@@ -58,7 +58,7 @@ def cmake(pkg, ver, path, prefix, builddir,
              '-DCMAKE_MODULE_PATH={}/share/cmake/Modules'.format(fakeprefix),
              '-DCMAKE_INSTALL_PREFIX={}'.format(prefix)
              ]
-                
+
     mkpath(bdir)
     with pushd(bdir):
         print('Installing {} ({}) from source with cmake'.format(pkg, ver))
@@ -148,7 +148,7 @@ def make(pkgfile, repofile, prefix = None,
     pkgpaths = ['{}-{}'.format(pkg, pkgs[pkg]) for pkg in pkgorder]
     if dlprefix:
         pkgpaths = [os.path.join(dlprefix, path) for path in pkgpaths]
-    
+
     def resolve(x):
         return x.replace('$(prefix)', prefix)
 
