@@ -9,7 +9,7 @@ from .shell import shell, pushd
 from .lint import lint
 from .cleanup import cleanup
 from .maintainer import maintainers
-
+from .link import update_links
 
 def _is_shebang(s):
     """Checks if the string potentially is a Python shebang."""
@@ -90,7 +90,7 @@ def make_release_name(release):
 
 def split_release_name(name):
     tmp = name.split('-')
-    if len(tmp) == 0:
+    if len(tmp) == 1:
         return name, None
 
     try:
