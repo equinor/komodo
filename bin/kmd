@@ -71,17 +71,23 @@ def main(args):
     print('Installing {} to {}'.format(args.release, args.prefix))
     install_root = os.path.join(args.prefix, args.release, 'root')
 
-    komodo.shell('{1} {0} .{0} {0}'.format(args.release, args.renamer))
-    komodo.shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
+    if args.inplace_deploy:
+        if not komodo.tree_equal(install_root, '{}/root'.format(args.release)):
+            sys.exit('There have been changes in the filesystem layout - in place deploy is not possible.')
 
-    if os.path.exists('{1}/{0}'.format(args.release, args.prefix)):
-        komodo.shell('{2} {0} {0}.delete {1}/{0}'.format(args.release, args.prefix, args.renamer),
-               sudo = args.sudo)
+        komodo.shell('rsync -avc {} {}'.format(args.release, args.prefix), sudo = args.sudo)
+    else:
+        komodo.shell('{1} {0} .{0} {0}'.format(args.release, args.renamer))
+        komodo.shell('rsync -a .{} {}'.format(args.release, args.prefix), sudo = args.sudo)
 
-    komodo.shell('{2} .{0} {0} {1}/.{0}'.format(args.release, args.prefix, args.renamer),
-           sudo = args.sudo)
-    komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
-           sudo = args.sudo)
+        if os.path.exists('{1}/{0}'.format(args.release, args.prefix)):
+            komodo.shell('{2} {0} {0}.delete {1}/{0}'.format(args.release, args.prefix, args.renamer),
+                         sudo = args.sudo)
+
+        komodo.shell('{2} .{0} {0} {1}/.{0}'.format(args.release, args.prefix, args.renamer),
+                     sudo = args.sudo)
+        komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
+                     sudo = args.sudo)
 
     # pip hard-codes the interpreter path to whatever interpreter that was used
     # to install it. we want this to be whatever's provided by the komodo
@@ -131,6 +137,7 @@ if __name__ == '__main__':
     parser.add_argument('--build', '-b',    action = 'store_true')
     parser.add_argument('--install', '-i',  action = 'store_true')
     parser.add_argument('--dry-run', '-n',  action = 'store_true')
+    parser.add_argument('--inplace-deploy', '-u',  action = 'store_true')
 
     parser.add_argument('--cmake', type = str, default = 'cmake')
     parser.add_argument('--pip',   type = str, default = 'pip')
