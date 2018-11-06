@@ -8,6 +8,7 @@ from .shell import shell, pushd
 from .lint import lint
 from .cleanup import cleanup
 from .maintainer import maintainers
+from .versions import pip_latest_versions
 
 
 def _is_shebang(s):
@@ -107,4 +108,4 @@ __maintainer__ = __author__
 __email__ = 'fg_gpl@statoil.com'
 __status__ = 'Production'
 
-__ALL__ = ['make', 'fetch', 'shell', 'lint', 'maintainers']
+__ALL__ = ['make', 'fetch', 'shell', 'lint', 'maintainers', 'pip_latest_versions']
