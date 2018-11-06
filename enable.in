@@ -1,9 +1,17 @@
 # General environment variables
+
+if [[ $KOMODO_RELEASE ]]; then
+    echo "Already set to ${KOMODO_RELEASE}"
+    return
+fi
+
+
 export PATH=komodo_prefix/bin${PATH:+:${PATH}}
 export MANPATH=komodo_prefix/share/man:${MANPATH}
 export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 export KOMODO_RELEASE=komodo_release
 
+export PS1="(${KOMODO_RELEASE}) ${PS1}"
 
 local_script=komodo_prefix/../local
 if [ -e $local_script ]; then
