@@ -132,7 +132,7 @@ def get_args():
     return args
 
 
-if __name__ == '__main__':
+def lint_main():
     args = get_args()
     logging.basicConfig(format='%(message)s', level=args.loglevel)
 
@@ -156,3 +156,7 @@ if __name__ == '__main__':
         exit(0)  # currently we allow erronous version numbers
 
     exit('Error in komodo configuration.')
+    
+if __name__ == '__main__':
+    lint_main()
+    
