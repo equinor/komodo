@@ -1,6 +1,9 @@
 dist: trusty
 language: python
 
+python:
+  - '2.7'
+
 env:
   matrix:
     - UNIT_TEST=1
