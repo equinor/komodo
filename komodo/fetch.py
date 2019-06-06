@@ -33,10 +33,14 @@ def grab(path, filename = None, version = None, protocol = None,
         shell('wget --quiet {} -O {}'.format(path, filename))
         #return urlretrieve(path, filename = filename)
     elif protocol in ('git'):
-        shell('{} clone -q --recursive -- {} {}'.format(git, path, filename))
-        with pushd(filename):
-            shell('{} fetch --tags'.format(git))
-            shell('{} checkout -q {}'.format(git, version))
+        shell(
+            '{git} clone '
+            '-b {version} '
+            '--depth 1 '
+            '-q --recursive '
+            '-- {path} {filename}'
+            ''.format(git=git, version=version, path=path, filename=filename)
+        )
 
     elif protocol in ('nfs', 'fs-ln'):
         shell('cp --recursive --symbolic-link {} {}'.format(path, filename))
