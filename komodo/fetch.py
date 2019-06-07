@@ -36,7 +36,6 @@ def grab(path, filename = None, version = None, protocol = None,
         shell(
             '{git} clone '
             '-b {version} '
-            '--depth 1 '
             '-q --recursive '
             '-- {path} {filename}'
             ''.format(git=git, version=version, path=path, filename=filename)
