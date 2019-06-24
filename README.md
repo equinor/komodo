@@ -1,4 +1,4 @@
-# Komodo [![Build Status](https://travis-ci.org/Statoil/komodo.svg?branch=master)](https://travis-ci.org/Statoil/komodo)
+# Komodo [![Build Status](https://travis-ci.org/equinor/komodo.svg?branch=master)](https://travis-ci.org/equinor/komodo)
 
 ## Software Innovation Bergen Software Distribution
 
