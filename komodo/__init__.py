@@ -50,50 +50,39 @@ def fixup_python_shebangs(prefix, release):
             shell(sedfxp.format(python_, binpath_))
 
 
-def walk(path):
-    directories = {}
+# We are typically comparing the filesystem structure on two different
+# filesystems, then it seems that both the os.walk() and the dnames and fnames
+# lists come in different order, that is the reason we sort everything.
+def tree_hash(path):
+    entries = []
     _, tail = os.path.split(path)
     path_offset = len(path) - len(tail)
-    for d,_,fnames in os.walk(path):
+    for d,dnames,fnames in os.walk(path):
         root = d[path_offset:]
+        # It seems the .dist-info directories from pip installed pacakges are
+        # not equal in the final installation directory and the fakeroot
+        # installation directory. These driectories are therefor skipped here,
+        # otehrwise the tree_equal() function will always return False.
+        if root.endswith(".dist-info"):
+            continue
 
-        directories[root] = set(fnames)
+        if root.endswith(".egg-info"):
+            continue
 
-    return directories
+        if root.endswith("__pycache__"):
+            continue
 
+        if "__pycache__" in dnames:
+            dnames.remove("__pycache__")
+
+
+        entries.append((root , {"files" : sorted(fnames),
+                                "directories" : sorted(dnames)}))
+    return hash(str(sorted(entries)))
 
 
 def tree_equal(path1, path2):
-    dir1 = walk(path1)
-    dir2 = walk(path2)
-    if sorted(dir1.keys()) != sorted(dir2.keys()):
-        print("Directory structure: diff {} {}".format(path1,path2))
-        for key in dir1.keys():
-            if not key in dir2:
-                print("< {}".format(key))
-
-        for key in dir2.keys():
-            if not key in dir1:
-                print("> {}".format(key))
-
-        return False
-
-    for d in dir1.keys():
-        if dir1[d] != dir2[d]:
-            print("Files: diff {} {}".format(os.path.join(path1,d), os.path.join(path2,d)))
-            for f in dir1[d]:
-                if not f in dir2[d]:
-                    print("< {}".format(f))
-
-            for f in dir2[d]:
-                if not f in dir1[d]:
-                    print("> {}".format(f))
-
-            return False
-
-
-    return True
-
+    return tree_hash(path1) == tree_hash(path2)
 
 
 __version__ = '1.0'
