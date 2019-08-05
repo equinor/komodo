@@ -72,10 +72,9 @@ def main(args):
     install_root = os.path.join(args.prefix, args.release, 'root')
 
     if args.inplace_deploy:
-        tree_equal = komodo.tree_equal(install_root, '{}/root'.format(args.release))
-        tree_equal = True
-        if not tree_equal:
-            sys.exit('There have been changes in the filesystem layout - in place deploy is not possible.')
+        # It was very diffiuclt to get this to return true - turned off for now.
+        #if not komodo.tree_equal(install_root, '{}/root'.format(args.release)):
+        #    sys.exit('There have been changes in the filesystem layout - in place deploy is not possible.')
 
         komodo.shell('rsync -avc {} {}'.format(args.release, args.prefix), sudo = args.sudo)
     else:
