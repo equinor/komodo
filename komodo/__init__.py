@@ -55,7 +55,7 @@ def fixup_python_shebangs(prefix, release):
 # lists come in different order, that is the reason we sort everything.
 def tree_hash(path):
     entries = []
-    _, tail = os.path.split(path)
+    tail = path.split("/")[-1]
     path_offset = len(path) - len(tail)
     for d,dnames,fnames in os.walk(path):
         root = d[path_offset:]
@@ -65,16 +65,6 @@ def tree_hash(path):
         # otehrwise the tree_equal() function will always return False.
         if root.endswith(".dist-info"):
             continue
-
-        if root.endswith(".egg-info"):
-            continue
-
-        if root.endswith("__pycache__"):
-            continue
-
-        if "__pycache__" in dnames:
-            dnames.remove("__pycache__")
-
 
         entries.append((root , {"files" : sorted(fnames),
                                 "directories" : sorted(dnames)}))
