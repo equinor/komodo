@@ -50,31 +50,6 @@ def fixup_python_shebangs(prefix, release):
             shell(sedfxp.format(python_, binpath_))
 
 
-# We are typically comparing the filesystem structure on two different
-# filesystems, then it seems that both the os.walk() and the dnames and fnames
-# lists come in different order, that is the reason we sort everything.
-def tree_hash(path):
-    entries = []
-    tail = path.split("/")[-1]
-    path_offset = len(path) - len(tail)
-    for d,dnames,fnames in os.walk(path):
-        root = d[path_offset:]
-        # It seems the .dist-info directories from pip installed pacakges are
-        # not equal in the final installation directory and the fakeroot
-        # installation directory. These driectories are therefor skipped here,
-        # otehrwise the tree_equal() function will always return False.
-        if root.endswith(".dist-info"):
-            continue
-
-        entries.append((root , {"files" : sorted(fnames),
-                                "directories" : sorted(dnames)}))
-    return hash(str(sorted(entries)))
-
-
-def tree_equal(path1, path2):
-    return tree_hash(path1) == tree_hash(path2)
-
-
 __version__ = '1.0'
 __author__ = 'Software Innovation Bergen, Statoil ASA'
 
