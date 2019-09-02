@@ -56,7 +56,7 @@ def main(args):
 
     releasedoc = os.path.join(args.release, args.release)
     with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, 'w') as y:
-        pkgs, repo = yml.load(p), yml.load(r)
+        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
 
         release = {}
         for pkg, ver in pkgs.items():

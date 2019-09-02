@@ -6,11 +6,11 @@ import yaml as yml
 
 def cleanup(repofile, releasefiles):
     with open(repofile, 'r') as r:
-        repo = yml.load(r)
+        repo = yml.safe_load(r)
     rels = []
     for fname in releasefiles:
         with open(fname, 'r') as f:
-            rels.append(yml.load(f))
+            rels.append(yml.safe_load(f))
 
     if not isinstance(repo, dict):
         raise ValueError('Malformed package file: %s ' % str(type(repo)))
