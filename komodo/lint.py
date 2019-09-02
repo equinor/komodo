@@ -103,7 +103,7 @@ def lint(pkgfile, repofile):
     else:
         try:
             with open(pkgfile, 'r') as p, open(repofile, 'r') as r:
-                pkgs, repo = yml.load(p), yml.load(r)
+                pkgs, repo = yml.safe_load(p), yml.safe_load(r)
         except yml.scanner.ScannerError as err:
             raise ValueError('Malformed YAML: %s' % str(err))
 

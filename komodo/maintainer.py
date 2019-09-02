@@ -6,7 +6,7 @@ import yaml as yml
 
 def maintainers(pkgfile, repofile):
     with open(pkgfile) as p, open(repofile) as r:
-        pkgs, repo = yml.load(p), yml.load(r)
+        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
 
     maints = set()
     for pkg, ver in pkgs.items():

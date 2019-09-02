@@ -60,7 +60,7 @@ def grab(path, filename = None, version = None, protocol = None,
 
 def fetch(pkgfile, repofile, outdir = None, pip = 'pip', git = 'git'):
     with open(pkgfile) as p, open(repofile) as r:
-        pkgs, repo = yml.load(p), yml.load(r)
+        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
 
     missingpkg = [pkg for pkg in pkgs if pkg not in repo]
     missingver = [pkg for pkg, ver in pkgs.items()

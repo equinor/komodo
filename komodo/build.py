@@ -126,7 +126,7 @@ def make(pkgfile, repofile, prefix = None,
                             cmk = 'cmake',
                             fakeroot = '.'):
     with open(pkgfile) as p, open(repofile) as r:
-        pkgs, repo = yml.load(p), yml.load(r)
+        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
 
     xs = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
 
