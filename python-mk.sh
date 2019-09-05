@@ -1,13 +1,6 @@
 #!/bin/bash
 
-# Currently we cannot exit on ERROR code 1 - just continue with install
-# When building python from source, 3 tests currently fail due to
-# how our network proxies responds to certain requests generated in
-# in test_ssl, test_urllib2 and test_urllib2_localnet. The tests currently
-# failing is when making requests which should fail, along with requests with
-# invalid certificate.
-# set -e
-
+set -e
 
 JOBS=1
 
@@ -48,6 +41,8 @@ set -x
             --enable-shared             \
             --enable-optimizations      \
             --with-ensurepip=upgrade    \
+            --with-system-ffi           \
+            --with-system-expat         \
             $OPTS
 
 make -j$JOBS
@@ -74,7 +69,7 @@ $PREFIX/bin/pip install \
 # the target paths of komodo, so sed to replace them all with the actual target
 # install path.
 
-if [ -n ${TARGET+x} ]; then
-    find $PREFIX -type f -exec grep -Iq . {} \; -and \
-        -exec sed --in-place --follow-symlinks s,$PREFIX,$TARGET, {} \;
-fi
+#if [ -n ${TARGET+x} ]; then
+#    find $PREFIX -type f -exec grep -Iq . {} \; -and \
+#        -exec sed --in-place --follow-symlinks s,$PREFIX,$TARGET, {} \;
+#fi
