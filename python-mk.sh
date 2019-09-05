@@ -41,16 +41,15 @@ set -x
             --enable-shared             \
             --enable-optimizations      \
             --with-ensurepip=upgrade    \
-            --with-system-ffi           \
             $OPTS
 
 make -j$JOBS
 make -j$JOBS install
 
 # get a fresh pip as a part of the installation
-$PREFIX/bin/pip install \
-    --upgrade --ignore-installed --force-reinstall --prefix $PREFIX \
-    pip
+#$PREFIX/bin/pip install \
+#    --upgrade --ignore-installed --force-reinstall --prefix $PREFIX \
+#    pip
 
 # this is a mega hack
 # the problem arises because of a subtle detail in distutils and sysconfig.
