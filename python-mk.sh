@@ -42,7 +42,6 @@ set -x
             --enable-optimizations      \
             --with-ensurepip=upgrade    \
             --with-system-ffi           \
-            --with-system-expat         \
             $OPTS
 
 make -j$JOBS
