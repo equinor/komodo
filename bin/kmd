@@ -50,9 +50,9 @@ def main(args):
         with open('{}/{}'.format(args.release, target), 'w') as f:
             f.write(komodo.shell(['m4 enable.m4',
                            '-D komodo_prefix={}'.format(tmp_prefix),
-                           '-D komodo_pyver={}'.format('2.7'),
+                           '-D komodo_pyver={}'.format('3.6'),
                            '-D komodo_release={}'.format(args.release),
-                           tmpl]))
+                           tmpl]).decode("utf-8"))
 
     releasedoc = os.path.join(args.release, args.release)
     with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, 'w') as y:

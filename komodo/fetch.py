@@ -10,7 +10,7 @@ import yaml as yml
 try: from urllib.request import urlretrieve
 except ImportError: from urllib import urlretrieve
 
-from shell import shell, pushd
+from .shell import shell, pushd
 
 def eprint(*args, **kwargs):
     return print(*args, file = sys.stderr, **kwargs)

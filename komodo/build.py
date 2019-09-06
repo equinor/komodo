@@ -10,7 +10,7 @@ import subprocess
 import sys
 import yaml as yml
 
-from shell import shell, pushd
+from .shell import shell, pushd
 
 flatten = itr.chain.from_iterable
 
