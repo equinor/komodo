@@ -9,8 +9,9 @@ import os
 import subprocess
 import sys
 import yaml as yml
+import komodo
 
-from shell import shell, pushd
+from .shell import shell, pushd
 
 flatten = itr.chain.from_iterable
 
@@ -102,10 +103,11 @@ def rsync(pkg, ver, pkgpath, prefix, *args, **kwargs):
 
 def pip(pkg, ver, pkgpath, prefix, dlprefix, *args, **kwargs):
     # pip should be in the tmp root, which is already added to PATH
-    cmd = ['pip install {}=={}'.format(pkg, ver),
+    cmd = ['pip install {}=={}'.format(pkg, komodo.strip_version(ver)),
            '--root {}'.format(kwargs['fakeroot']),
            '--prefix {}'.format(prefix),
            '--no-index',
+           '--no-deps',
            '--find-links {}'.format(dlprefix),
            kwargs.get('makeopts', '')]
 

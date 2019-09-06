@@ -41,7 +41,6 @@ def main(args):
         sys.exit(0)
 
     # create the enable script
-    release_path = os.path.join(args.prefix, args.release)
     for tmpl,target in [('enable.in','enable'), ('enable.csh.in', 'enable.csh')]:
         if not os.path.exists(tmpl):
             logging.warn('Could not find template %s, skipping.' % str(tmpl))
@@ -50,9 +49,9 @@ def main(args):
         with open('{}/{}'.format(args.release, target), 'w') as f:
             f.write(komodo.shell(['m4 enable.m4',
                            '-D komodo_prefix={}'.format(tmp_prefix),
-                           '-D komodo_pyver={}'.format('2.7'),
+                           '-D komodo_pyver={}'.format(args.pyver),
                            '-D komodo_release={}'.format(args.release),
-                           tmpl]))
+                           tmpl]).decode("utf-8"))
 
     releasedoc = os.path.join(args.release, args.release)
     with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, 'w') as y:
@@ -97,17 +96,27 @@ def main(args):
                                    os.environ.get('PATH', '')])
 
     print('Fixup #! in pip-provided packages')
+    if 'python' in pkgs.keys():
+        # Currently we need to keep pip to 18.1 due to a bug in pip >=19
+        # https://github.com/pypa/pip/issues/6327
+        print(komodo.shell(['{}/bin/pip'.format(install_root),
+                            'install --upgrade pip==18.1',
+                            '--prefix', os.path.join(args.prefix, args.release, 'root'),
+                            '--force-reinstall']))
+
     for pkg, ver in pkgs.items():
         if repo[pkg][ver]['make'] != 'pip': continue
 
-        print(komodo.shell(['{}/bin/pip'.format(install_root),
-               'install {}=={}'.format(pkg, ver),
-               '--prefix', os.path.join(args.prefix, args.release, 'root'),
-               '--force-reinstall',
-               '--no-index',
-               '--find-links {}'.format(args.cache),
-               repo[pkg][ver].get('makeopts')
-              ], sudo = args.sudo))
+        shell_input = [ '{}/bin/pip'.format(install_root),
+                        'install {}=={}'.format(pkg, komodo.strip_version(ver)),
+                        '--prefix', os.path.join(args.prefix, args.release, 'root'),
+                        '--force-reinstall',
+                        '--no-index',
+                        '--no-deps',
+                        '--find-links {}'.format(args.cache),
+                        repo[pkg][ver].get('makeopts')]
+
+        print(komodo.shell(shell_input, sudo=args.sudo))
 
 
     komodo.fixup_python_shebangs(args.prefix, args.release)
@@ -135,6 +144,7 @@ if __name__ == '__main__':
     parser.add_argument('--cmake', type = str, default = 'cmake')
     parser.add_argument('--pip',   type = str, default = 'pip')
     parser.add_argument('--git',   type = str, default = 'git')
+    parser.add_argument('--pyver', type = str, default = '2.7')
 
     parser.add_argument('--sudo',       action = 'store_true')
     parser.add_argument('--workspace',  type = str, default = None)
