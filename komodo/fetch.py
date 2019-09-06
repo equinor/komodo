@@ -6,11 +6,12 @@ import argparse
 import os
 import sys
 import yaml as yml
+import komodo
 
 try: from urllib.request import urlretrieve
 except ImportError: from urllib import urlretrieve
 
-from shell import shell, pushd
+from .shell import shell, pushd
 
 def eprint(*args, **kwargs):
     return print(*args, file = sys.stderr, **kwargs)
@@ -38,7 +39,7 @@ def grab(path, filename = None, version = None, protocol = None,
             '-b {version} '
             '-q --recursive '
             '-- {path} {filename}'
-            ''.format(git=git, version=version, path=path, filename=filename)
+            ''.format(git=git, version=komodo.strip_version(version), path=path, filename=filename)
         )
 
     elif protocol in ('nfs', 'fs-ln'):
@@ -53,7 +54,7 @@ def grab(path, filename = None, version = None, protocol = None,
     elif protocol in ('pypi'):
         shell([pip, 'download',
                     '--dest .',
-                    normalize_filename(filename)])
+                    normalize_filename(komodo.strip_version(filename))])
 
     else:
         raise NotImplementedError('Unknown protocol {}'.format(protocol))
@@ -107,7 +108,7 @@ def fetch(pkgfile, repofile, outdir = None, pip = 'pip', git = 'git'):
 
             if ext in ['tgz', 'tar.gz', 'tar.bz2', 'tar.xz']:
                 print('Extracting {} ...'.format(dst))
-                topdir = shell(' tar -xvf {}'.format(dst)).split()[0]
+                topdir = shell(' tar -xvf {}'.format(dst)).decode("utf-8").split()[0]
                 normalised_dir = topdir.split('/')[0]
 
                 if not os.path.exists(pkgname):
