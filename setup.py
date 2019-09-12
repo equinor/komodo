@@ -10,6 +10,7 @@ setup(
     package_dir={'komodo' : 'komodo'},
     scripts=['bin/kmd'],
     test_suite='tests',
+    install_requires=['shell', 'PyYAML'],
     entry_points={
         'console_scripts': [
             'komodo-lint = komodo.lint:lint_main',
