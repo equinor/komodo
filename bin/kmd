@@ -100,8 +100,9 @@ def main(args):
     for pkg, ver in pkgs.items():
         if repo[pkg][ver]['make'] != 'pip': continue
 
+        stripped_ver = ver.split("+")[0]
         print(komodo.shell(['{}/bin/pip'.format(install_root),
-               'install {}=={}'.format(pkg, ver),
+               'install {}=={}'.format(pkg, stripped_ver),
                '--prefix', os.path.join(args.prefix, args.release, 'root'),
                '--force-reinstall',
                '--no-index',
