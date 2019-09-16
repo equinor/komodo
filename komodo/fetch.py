@@ -33,12 +33,13 @@ def grab(path, filename = None, version = None, protocol = None,
         shell('wget --quiet {} -O {}'.format(path, filename))
         #return urlretrieve(path, filename = filename)
     elif protocol in ('git'):
+        stripped_version = version.split("+")[0]
         shell(
             '{git} clone '
             '-b {version} '
             '-q --recursive '
             '-- {path} {filename}'
-            ''.format(git=git, version=version, path=path, filename=filename)
+            ''.format(git=git, version=stripped_version, path=path, filename=filename)
         )
 
     elif protocol in ('nfs', 'fs-ln'):
