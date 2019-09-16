@@ -52,9 +52,10 @@ def grab(path, filename = None, version = None, protocol = None,
         shell('rsync -a {}/ {}'.format(path, filename))
 
     elif protocol in ('pypi'):
+        stripped_filename = filename.split("+")[0]
         shell([pip, 'download',
                     '--dest .',
-                    normalize_filename(filename)])
+                    normalize_filename(stripped_filename)])
 
     else:
         raise NotImplementedError('Unknown protocol {}'.format(protocol))
