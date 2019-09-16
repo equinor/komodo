@@ -102,7 +102,8 @@ def rsync(pkg, ver, pkgpath, prefix, *args, **kwargs):
 
 def pip(pkg, ver, pkgpath, prefix, dlprefix, *args, **kwargs):
     # pip should be in the tmp root, which is already added to PATH
-    cmd = ['pip install {}=={}'.format(pkg, ver),
+    stripped_ver = ver.split("+")[0]
+    cmd = ['pip install {}=={}'.format(pkg, stripped_ver),
            '--root {}'.format(kwargs['fakeroot']),
            '--prefix {}'.format(prefix),
            '--no-index',
