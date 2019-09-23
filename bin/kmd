@@ -101,10 +101,11 @@ def main(args):
         if repo[pkg][ver]['make'] != 'pip': continue
 
         stripped_ver = ver.split("+")[0]
+        print(komodo.shell(['{}/bin/pip freeze --local pipfreeze.txt']))
         print(komodo.shell(['{}/bin/pip'.format(install_root),
                'install {}=={}'.format(pkg, stripped_ver),
                '--prefix', os.path.join(args.prefix, args.release, 'root'),
-               '--force-reinstall',
+               '--force-reinstall -r pipfreeze.txt',
                '--no-index',
                '--find-links {}'.format(args.cache),
                repo[pkg][ver].get('makeopts')
