@@ -108,6 +108,7 @@ def pip(pkg, ver, pkgpath, prefix, dlprefix, *args, **kwargs):
            '--prefix {}'.format(prefix),
            '--no-index',
            '--find-links {}'.format(dlprefix),
+           '--no-deps',
            kwargs.get('makeopts', '')]
 
     print('Installing {} ({}) from pip'.format(pkg, ver))
