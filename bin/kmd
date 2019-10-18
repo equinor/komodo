@@ -96,14 +96,6 @@ def main(args):
                                    os.environ.get('PATH', '')])
 
     print('Fixup #! in pip-provided packages')
-    if 'python' in pkgs.keys():
-        # Currently we need to keep pip to 18.1 due to a bug in pip >=19
-        # https://github.com/pypa/pip/issues/6327
-        print(komodo.shell(['{}/bin/pip'.format(install_root),
-                            'install --upgrade pip==18.1',
-                            '--prefix', os.path.join(args.prefix, args.release, 'root'),
-                            '--force-reinstall']))
-
     for pkg, ver in pkgs.items():
         if repo[pkg][ver]['make'] != 'pip': continue
 
@@ -117,7 +109,6 @@ def main(args):
                         repo[pkg][ver].get('makeopts')]
 
         print(komodo.shell(shell_input, sudo=args.sudo))
-
 
     komodo.fixup_python_shebangs(args.prefix, args.release)
 
