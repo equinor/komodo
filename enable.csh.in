@@ -1,3 +1,10 @@
+
+if ( $?KOMODO_RELEASE ) then
+    echo "Already set to $KOMODO_RELEASE"
+    exit
+endif
+
+
 # General environment variables
 set KOMODO_PATH=komodo_prefix/bin
 set KOMODO_MANPATH=komodo_prefix/share/man
@@ -22,6 +29,8 @@ else
 endif
 
 setenv KOMODO_RELEASE komodo_release
+
+set prompt="(${KOMODO_RELEASE}) ${prompt}"
 
 set local_script=komodo_prefix/../local.csh
 if ( -r $local_script) then
