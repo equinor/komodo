@@ -6,6 +6,7 @@ from .build import make, pypaths
 from .fetch import fetch
 from .shell import shell, pushd
 from .lint import lint
+from .prettier import prettier
 from .cleanup import cleanup
 from .maintainer import maintainers
 

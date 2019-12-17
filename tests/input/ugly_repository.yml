@@ -1,0 +1,46 @@
+package_a:  # Comments should be preserved
+  1.2.3:
+    # Here there is/was an unnecessary/ugly space after the key and before the colon:
+    source : pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python
+package_c:  # Originally missing empty line before this package
+  # '' around what would anyway be treated as strings is unnecessary:
+  '3.2.1': 
+    source: pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python
+
+Package_b:  # This package should come before package_c, even though it is capitalized
+  master:
+    source: pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python
+
+
+
+package_d:  # Originally too many empty lines before this package
+  master:
+    source: pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python
+
+  1.0.0: # Originally empty line before new version
+    source: pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python

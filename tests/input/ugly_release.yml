@@ -1,0 +1,6 @@
+
+package_a: 1.2.3  # some comment
+package_d : 1.0.0
+
+Package_b: master  # some other comment
+package_c: '3.2.1'

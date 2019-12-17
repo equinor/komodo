@@ -50,3 +50,11 @@ e.g. `/my/software/center/unstable`.
 
 
 To use, `source /my/software/center/unstable/enable`.
+
+## Auto-formatting configuration files
+
+You can auto-format repository and/or releases by running something like
+```bash
+komodo-prettier repository.yml releases/*
+```
+If you are in e.g CI and only want to check style compliance, add `--check`.

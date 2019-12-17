@@ -14,6 +14,7 @@ setup(
     entry_points={
         'console_scripts': [
             'komodo-lint = komodo.lint:lint_main',
+            'komodo-prettier = komodo.prettier:prettier_main',
             ]
         }
 )

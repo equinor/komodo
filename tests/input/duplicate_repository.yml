@@ -1,0 +1,17 @@
+package_a:
+  1.2.3:
+    source: pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python
+
+package_a:
+  1.2.3:
+    source: pypi
+    make: pip
+    maintainer: someperson
+    depends:
+      - setuptools
+      - python
