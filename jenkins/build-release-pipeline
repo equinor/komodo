@@ -1,0 +1,111 @@
+@Library('komodo@build_pipeline')_
+
+pipeline {
+    agent { label 'st-vlinbuild01.st.statoil.no' }
+    environment {
+        CONFIG_TOKEN = credentials('ertomatic-token')
+        PIPELINE_STEPS = "${env.deploy == "true" ? "--download --build --install" : "--dry-run --download --build"}"
+        PY_VER_MAJOR = "${env.PYTHON_VERSION.split("\\.")[0]}"
+        PY_VER_MINOR = "${env.PYTHON_VERSION.split("\\.")[1]}"
+        RELEASE_NAME = "${env.RELEASE_BASE + "-py" + env.PY_VER_MAJOR + env.PY_VER_MINOR}"
+        RELEASE_FILE = "releases/${env.RELEASE_NAME}.yml"
+        REPOSITORY = "repository.yml"
+        BUILD_PYTHON = "${env.PYTHON_VERSION == "2.7" ? env.BUILD_PYTHON_VERSION_27 : env.BUILD_PYTHON_VERSION_36}"
+        ENV_EXEC = "${env.BUILD_PYTHON + "/bin/" + (env.PY_VER_MAJOR == "2" ? "virtualenv" : "python3 -m venv")}"
+        ENV_ARGS = "${(env.PY_VER_MAJOR == "2" ? "--no-download" : " ")}"
+        BUILD_ENV = "${env.WORKSPACE + "/build-env"}"
+        PYTHON_ENV = "${env.BUILD_ENV + "/bin/activate"}"
+        KOMODO_ROOT = "${env.WORKSPACE}"
+        KOMODO_RELEASES_ROOT = "${env.WORKSPACE + "/komodo-releases"}"
+    }
+    stages {
+        stage('Already deployed') {
+            when {
+                expression {
+                    return env.overwrite != 'true';
+                }
+            }
+            steps {
+                script {
+                    komodo.releaseDeployed(env.PREFIX, env.RELEASE_NAME)
+                }
+            }
+        }
+        stage('Configure git') {
+            steps {
+                script {
+                    komodo.configureGit(env.GIT_EXEC)
+                }
+            }
+        }
+        stage('Checkout Komodo branch') {
+            steps {
+                script {
+                    komodo.checkoutGitBranch(env.GIT_EXEC, env.CODE_GIT_REF)
+                }
+            }
+        }
+        stage('Build Python env') {
+            steps {
+                script {
+                    komodo.buildPythonEnv(env.ENV_EXEC, env.BUILD_ENV, env.ENV_ARGS, env.PIP_EXPRESSION)
+                }
+            }
+        }
+        stage('Install Komodo') {
+            steps {
+                script {
+                    komodo.installKomodo(env.PYTHON_ENV)
+                }
+            }
+        }
+        stage('Clone and checkout Komodo config') {
+            steps {
+                script {
+                    komodo.cloneAndCheckoutKomodoConfig(env.GIT_EXEC, env.CONFIG_GIT_FORK, env.CONFIG_GIT_REF, env.CONFIG_TOKEN)
+                }
+            }
+        }
+        stage('Copy scripts') {
+            steps {
+                script {
+                    komodo.copyScripts(env.KOMODO_ROOT, env.KOMODO_RELEASES_ROOT)
+                }
+            }
+        }
+        stage('Validate release') {
+            steps {
+                script {
+                    komodo.validateRelease(env.PYTHON_ENV, env.KOMODO_RELEASES_ROOT, env.RELEASE_FILE, env.REPOSITORY)
+                }
+            }
+        }
+        stage('Build and Install') {
+            steps {
+                script {
+                    System.setProperty("org.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL", "80000");
+                }
+                script {
+                    komodo.buildAndInstallRelease(env.REPOSITORY, env.RELEASE_FILE, env.RELEASE_NAME, env.KOMODO_RELEASES_ROOT, env.PREFIX, env.PIPELINE_STEPS, env.DEVTOOLSET, env.PYTHON_ENV, env.CMAKE_EXECUTABLE, env.GIT_EXEC, env.PERMISSIONS_EXEC)
+                }
+            }
+        }
+        stage('Copy local files') {
+            when {
+                expression {
+                    return env.deploy == 'true';
+                }
+            }
+            steps {
+                script {
+                    komodo.installLocalFiles(env.KOMODO_RELEASES_ROOT, env.PREFIX, env.RELEASE_NAME, env.PERMISSIONS_EXEC)
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
