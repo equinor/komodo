@@ -1,0 +1,15 @@
+{
+  "root_folder" : "test_dir",
+  "root_links" : [
+    "bleeding",
+    "unstable",
+    "stable"
+  ],
+  "links": {
+    "2012.01": "2012.01.12",
+    "unstable": "2012.01.rc1",
+    "testing": "2012.01",
+    "stable" : "testing",
+    "bleeding": "testing"
+  }
+}
