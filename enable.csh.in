@@ -2,7 +2,6 @@
 set KOMODO_PATH=komodo_prefix/bin
 set KOMODO_MANPATH=komodo_prefix/share/man
 set KOMODO_LD_PATH=komodo_prefix/lib:komodo_prefix/lib64
-set KOMODO_PYTHONPATH=komodo_prefix/lib/python`'komodo_pyver/site-packages
 
 if $?PATH then
     setenv PATH ${KOMODO_PATH}:$PATH
@@ -20,12 +19,6 @@ if $?LD_LIBRARY_PATH then
     setenv LD_LIBRARY_PATH ${KOMODO_LD_PATH}:$LD_LIBRARY_PATH
 else
     setenv LD_LIBRARY_PATH ${KOMODO_LD_PATH}
-endif
-
-if $?PYTHONPATH then
-    setenv PYTHONPATH ${KOMODO_PYTHONPATH}:$PYTHONPATH
-else
-    setenv PYTHONPATH ${KOMODO_PYTHONPATH}
 endif
 
 setenv KOMODO_RELEASE komodo_release
