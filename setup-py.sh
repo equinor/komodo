@@ -38,12 +38,9 @@ done
 
 PYTHONEXECUTABLE=$PREFIX/bin/python
 
-if [ -n "$REQ" ]; then
-    pip install \
-        --global-option build --global-option=--executable=$PYTHONEXECUTABLE \
-        --root $FAKEROOT                                                     \
-        --no-deps                                                            \
-        --requirement $REQ --prefix $PREFIX
-fi
-python setup.py build --executable $PYTHONEXECUTABLE \
-                install --prefix $PREFIX --root $FAKEROOT
+pip install \
+    --global-option build --global-option=--executable=$PYTHONEXECUTABLE \
+    --root $FAKEROOT                                                     \
+    --no-deps                                                            \
+    --prefix $PREFIX
+
