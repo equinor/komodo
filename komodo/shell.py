@@ -28,7 +28,7 @@ def shell(cmd, sudo = False):
     print(prompt, ' '.join(cmdlist))
 
     try: 
-        return subprocess.check_output(filter(None, cmdlist))
+        return subprocess.check_output(tuple(filter(None, cmdlist)))
     except subprocess.CalledProcessError as e:
         print(e.output, file=sys.stderr)
         raise
