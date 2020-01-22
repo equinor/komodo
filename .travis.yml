@@ -15,13 +15,15 @@ matrix:
     - env: INTEGRATION_TEST=1
 
 before_install:
-  - pip install -r requirements.txt
   - export PYTHONPATH=$PWD:$PYTHONPATH
   - echo $PYTHONPATH
   - mkdir ws
   - mkdir pfx
   - export WS=$PWD/ws
   - export PFX=$PWD/pfx
+
+install:
+  - pip install .
 
 before_script:
   - ls
