@@ -1,24 +1,37 @@
-# General environment variables
-set KOMODO_PATH=komodo_prefix/bin
-set KOMODO_MANPATH=komodo_prefix/share/man
-set KOMODO_LD_PATH=komodo_prefix/lib:komodo_prefix/lib64
+changequote(<!,!>)
+
+alias disable_komodo '\\
+    test $?_PRE_KOMODO_PATH != 0 && setenv PATH "$_PRE_KOMODO_PATH" && unsetenv _PRE_KOMODO_PATH;\\
+    test $?_PRE_KOMODO_MANPATH != 0 && setenv MANPATH "$_PRE_KOMODO_MANPATH" && unsetenv _PRE_KOMODO_MANPATH;\\
+    test $?_PRE_KOMODO_LD_PATH != 0 && setenv LD_LIBRARY_PATH "$_PRE_KOMODO_LD_PATH" && unsetenv _PRE_KOMODO_LD_PATH;\\
+    test $?_KOMODO_OLD_PROMPT != 0 && set prompt="$_KOMODO_OLD_PROMPT" && unsetenv _KOMODO_OLD_PROMPT;\\
+    test "\!:*" != "preserve_disable_komodo" && unalias disable_komodo;\\
+    unsetenv KOMODO_RELEASE;\\
+    unsetenv ERT_LSF_SERVER;\\
+    rehash;\\
+    '
+rehash
+disable_komodo preserve_disable_komodo
 
 if $?PATH then
-    setenv PATH ${KOMODO_PATH}:$PATH
+    setenv _PRE_KOMODO_PATH "$PATH"
+    setenv PATH komodo_prefix/bin:$PATH
 else
-    setenv PATH ${KOMODO_PATH}
+    setenv PATH komodo_prefix/bin
 endif
 
 if $?MANPATH then
-    setenv MANPATH ${KOMODO_MANPATH}:$MANPATH
+    setenv _PRE_KOMODO_MANPATH "$MANPATH"
+    setenv MANPATH komodo_prefix/share/man:$MANPATH
 else
-    setenv MANPATH ${KOMODO_MANPATH}
+    setenv MANPATH komodo_prefix/share/man
 endif
 
 if $?LD_LIBRARY_PATH then
-    setenv LD_LIBRARY_PATH ${KOMODO_LD_PATH}:$LD_LIBRARY_PATH
+    setenv _PRE_KOMODO_LD_PATH "$LD_LIBRARY_PATH"
+    setenv LD_LIBRARY_PATH komodo_prefix/lib:komodo_prefix/lib64:$LD_LIBRARY_PATH
 else
-    setenv LD_LIBRARY_PATH ${KOMODO_LD_PATH}
+    setenv LD_LIBRARY_PATH komodo_prefix/lib:komodo_prefix/lib64
 endif
 
 setenv KOMODO_RELEASE komodo_release
@@ -27,3 +40,9 @@ set local_script=komodo_prefix/../local.csh
 if ( -r $local_script) then
     source $local_script
 endif
+
+setenv _KOMODO_OLD_PROMPT "$prompt"
+set prompt = "[$KOMODO_RELEASE] $prompt"
+
+rehash
+changequote()
