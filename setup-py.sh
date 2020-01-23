@@ -38,7 +38,7 @@ done
 
 PYTHONEXECUTABLE=$PREFIX/bin/python
 
-pip install \
+pip install . \
     --global-option build --global-option=--executable=$PYTHONEXECUTABLE \
     --root $FAKEROOT                                                     \
     --no-deps                                                            \
