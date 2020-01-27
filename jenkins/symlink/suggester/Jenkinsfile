@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Suggest') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: "${env.GITHUB_CREDENTIAL}", usernameVariable: 'GH_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+                    sh """
+                        source /project/res/SDP_bashrc
+                        virtualenv env
+                        source env/bin/activate
+                        pip install .
+                        komodo-suggest-symlinks --git-fork ${env.GIT_FORK} --git-repo ${env.GIT_REPO} --git-ref ${env.GIT_REF} ${env.RELEASE} ${env.MODE} ${env.BUILD_URL} ${env.JOB_NAME}
+                    """
+                }
+            }
+        }
+    }
+}
