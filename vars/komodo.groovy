@@ -30,9 +30,6 @@ def checkoutGitBranch(_GIT_EXEC, _GIT_REF) {
 
 def buildPythonEnv(_ENV_EXEC, _TARGET_ENV, _ENV_ARGS, _PIP_EXPRESSION) {
     sh """
-        # The --no-download and pip<20 is a hack to avoid getting pip 20 which
-        # does seem to be broken 21st of January 2020. If this is fixed, both
-        # should be removed
         $_ENV_EXEC $_TARGET_ENV $_ENV_ARGS
         source $_TARGET_ENV/bin/activate
         python -m pip install --upgrade '$_PIP_EXPRESSION'
@@ -90,17 +87,6 @@ def validateRelease(_PYTHON_ENV, _KOMODO_RELEASES_ROOT, _PACKAGES, _REPOSITORY) 
 
 def buildAndInstallRelease(_REPOSITORY, _RELEASE_FILE, _RELEASE_NAME, _KOMODO_RELEASES_ROOT, _PREFIX, _PIPELINE_STEPS, _DEVTOOLSET, _PYTHON_ENV, _CMAKE_EXECUTABLE, _GIT_EXEC, _PERMISSIONS_EXEC) {
     sh """
-        # fix error:
-        # RPC failed; curl 56
-        # SSL read: errno -5961
-        # fatal: The remote end hung up unexpectedly
-        # fatal: early EOF
-        # fatal: index-pack failed
-        ## start git config
-        ## https://stackoverflow.com/questions/6842687
-        $_GIT_EXEC config --global http.postBuffer 1048576000
-        ## end
-
         source $_DEVTOOLSET
         source $_PYTHON_ENV
         set -xe
