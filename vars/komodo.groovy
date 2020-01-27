@@ -39,11 +39,9 @@ def buildPythonEnv(_ENV_EXEC, _TARGET_ENV, _ENV_ARGS, _PIP_EXPRESSION) {
 def installKomodo(_PYTHON_ENV) {
     sh """
         source $_PYTHON_ENV
-        pip install -r requirements.txt
         pip install .
         rm -rf komodo
         rm -rf bin
-        python -c "import ruamel.yaml; print(ruamel.yaml.__file__)"
         python -c "import komodo; print(komodo.__file__)"
     """
 }
