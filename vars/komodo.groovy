@@ -130,3 +130,114 @@ def installLocalFiles(_KOMODO_RELEASES_ROOT, _PREFIX, _RELEASE_NAME, _PERMISSION
         popd
     """
 }
+
+def call(args) {
+    pipeline {
+        agent { label args.agent_labels }
+        environment {
+            CONFIG_TOKEN = credentials("${args.config_token_name}")
+            PIPELINE_STEPS = "${args.deploy == "true" ? "--download --build --install" : "--dry-run --download --build"}"
+            PY_VER_MAJOR = "${args.python_version.split("\\.")[0]}"
+            PY_VER_MINOR = "${args.python_version.split("\\.")[1]}"
+            RELEASE_NAME = "${args.release_base + "-py" + env.PY_VER_MAJOR + env.PY_VER_MINOR}"
+            RELEASE_FILE = "releases/${env.RELEASE_NAME}.yml"
+            REPOSITORY = "repository.yml"
+            ENV_EXEC = "${args.build_python + "/bin/" + (env.PY_VER_MAJOR == "2" ? "virtualenv" : "python3 -m venv")}"
+            ENV_ARGS = "${(env.PY_VER_MAJOR == "2" ? "--no-download" : " ")}"
+            BUILD_ENV = "${env.WORKSPACE + "/build-env"}"
+            PYTHON_ENV = "${env.BUILD_ENV + "/bin/activate"}"
+            KOMODO_ROOT = "${env.WORKSPACE}"
+            KOMODO_RELEASES_ROOT = "${env.WORKSPACE + "/komodo-releases"}"
+        }
+        stages {
+            stage('Already deployed') {
+                when {
+                    expression {
+                        return env.overwrite != 'true';
+                    }
+                }
+                steps {
+                    script {
+                        releaseDeployed(env.PREFIX, env.RELEASE_NAME)
+                    }
+                }
+            }
+            stage('Configure git') {
+                steps {
+                    script {
+                        configureGit(env.GIT_EXEC)
+                    }
+                }
+            }
+            stage('Checkout Komodo branch') {
+                steps {
+                    script {
+                        checkoutGitBranch(env.GIT_EXEC, env.CODE_GIT_REF)
+                    }
+                }
+            }
+            stage('Build Python env') {
+                steps {
+                    script {
+                        buildPythonEnv(env.ENV_EXEC, env.BUILD_ENV, env.ENV_ARGS, env.PIP_EXPRESSION)
+                    }
+                }
+            }
+            stage('Install Komodo') {
+                steps {
+                    script {
+                        installKomodo(env.PYTHON_ENV)
+                    }
+                }
+            }
+            stage('Clone and checkout Komodo config') {
+                steps {
+                    script {
+                        cloneAndCheckoutKomodoConfig(env.GIT_EXEC, env.CONFIG_GIT_FORK, env.CONFIG_GIT_REF, env.CONFIG_TOKEN)
+                    }
+                }
+            }
+            stage('Copy scripts') {
+                steps {
+                    script {
+                        copyScripts(env.KOMODO_ROOT, env.KOMODO_RELEASES_ROOT)
+                    }
+                }
+            }
+            stage('Validate release') {
+                steps {
+                    script {
+                        validateRelease(env.PYTHON_ENV, env.KOMODO_RELEASES_ROOT, env.RELEASE_FILE, env.REPOSITORY)
+                    }
+                }
+            }
+            stage('Build and Install') {
+                steps {
+                    script {
+                        System.setProperty("org.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL", "80000");
+                    }
+                    script {
+                        buildAndInstallRelease(env.REPOSITORY, env.RELEASE_FILE, env.RELEASE_NAME, env.KOMODO_RELEASES_ROOT, env.PREFIX, env.PIPELINE_STEPS, env.DEVTOOLSET, env.PYTHON_ENV, env.CMAKE_EXECUTABLE, env.GIT_EXEC, env.PERMISSIONS_EXEC)
+                    }
+                }
+            }
+            stage('Copy local files') {
+                when {
+                    expression {
+                        return args.deploy == 'true';
+                    }
+                }
+                steps {
+                    script {
+                        installLocalFiles(env.KOMODO_RELEASES_ROOT, env.PREFIX, env.RELEASE_NAME, env.PERMISSIONS_EXEC)
+                    }
+                }
+            }
+        }
+        post {
+            always {
+                cleanWs()
+            }
+        }
+    }
+}
