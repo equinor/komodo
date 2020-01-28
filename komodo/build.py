@@ -101,9 +101,9 @@ def rsync(pkg, ver, pkgpath, prefix, *args, **kwargs):
     shell(['rsync -am', kwargs.get('makeopts'), '{}/'.format(pkgpath), kwargs['fakeroot'] + prefix])
 
 
-def pip(pkg, ver, pkgpath, prefix, dlprefix, *args, **kwargs):
-    # pip should be in the tmp root, which is already added to PATH
-    cmd = ['pip install {}=={}'.format(pkg, komodo.strip_version(ver)),
+def pip_install(pkg, ver, pkgpath, prefix, dlprefix, pip='pip', *args, **kwargs):
+    cmd = [pip,
+           'install {}=={}'.format(pkg, komodo.strip_version(ver)),
            '--root {}'.format(kwargs['fakeroot']),
            '--prefix {}'.format(prefix),
            '--no-index',
@@ -126,6 +126,7 @@ def make(pkgfile, repofile, prefix = None,
                             builddir = None,
                             jobs = 1,
                             cmk = 'cmake',
+                            pip = 'pip',
                             fakeroot = '.'):
     with open(pkgfile) as p, open(repofile) as r:
         pkgs, repo = yml.safe_load(p), yml.safe_load(r)
@@ -164,7 +165,7 @@ def make(pkgfile, repofile, prefix = None,
     def resolve(x):
         return x.replace('$(prefix)', prefix)
 
-    build = { 'rpm': rpm, 'cmake': cmake, 'sh': sh, 'pip': pip, 'rsync': rsync }
+    build = { 'rpm': rpm, 'cmake': cmake, 'sh': sh, 'pip': pip_install, 'rsync': rsync }
 
     for pkg, path in zip(pkgorder, pkgpaths):
         ver = pkgs[pkg]
@@ -184,6 +185,7 @@ def make(pkgfile, repofile, prefix = None,
                                        dlprefix = dlprefix if dlprefix else '.',
                                        jobs     = jobs,
                                        cmake    = cmk,
+                                       pip      = pip,
                                        fakeroot = fakeroot)
 
 

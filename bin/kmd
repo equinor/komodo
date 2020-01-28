@@ -32,6 +32,7 @@ def main(args):
                                          builddir = args.tmp,
                                          jobs     = args.jobs,
                                          cmk      = args.cmake,
+                                         pip      = args.pip,
                                          fakeroot = fakeroot)
         komodo.shell('mv {} {}'.format(args.release + tmp_prefix, args.release))
         komodo.shell('rmdir -p --ignore-fail-on-non-empty {}'.format(
@@ -99,7 +100,7 @@ def main(args):
     for pkg, ver in pkgs.items():
         if repo[pkg][ver]['make'] != 'pip': continue
 
-        shell_input = [ '{}/bin/pip'.format(install_root),
+        shell_input = [ args.pip,
                         'install {}=={}'.format(pkg, komodo.strip_version(ver)),
                         '--prefix', os.path.join(args.prefix, args.release, 'root'),
                         '--force-reinstall',
