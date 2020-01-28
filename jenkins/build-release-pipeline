@@ -1,4 +1,4 @@
-@Library('komodo@build_pipeline')_
+@Library('komodo')_
 
 pipeline {
     agent { label 'st-vlinbuild01.st.statoil.no' }
