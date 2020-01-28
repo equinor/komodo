@@ -84,6 +84,13 @@ def validateRelease(_PYTHON_ENV, _KOMODO_RELEASES_ROOT, _PACKAGES, _REPOSITORY) 
 }
 
 def buildAndInstallRelease(_REPOSITORY, _RELEASE_FILE, _RELEASE_NAME, _KOMODO_RELEASES_ROOT, _PREFIX, _PIPELINE_STEPS, _DEVTOOLSET, _PYTHON_ENV, _CMAKE_EXECUTABLE, _GIT_EXEC, _PERMISSIONS_EXEC) {
+    _PIP = sh(
+        script: """
+            source $_PYTHON_ENV
+            which pip
+        """,
+        returnStdout: true
+    ).trim()
     sh """
         source $_DEVTOOLSET
         source $_PYTHON_ENV
@@ -97,7 +104,7 @@ def buildAndInstallRelease(_REPOSITORY, _RELEASE_FILE, _RELEASE_NAME, _KOMODO_RE
             --cache cache                                     \
             --prefix $_PREFIX                                 \
             --cmake $_CMAKE_EXECUTABLE                        \
-            --pip pip                                         \
+            --pip $_PIP                                       \
             --git $_GIT_EXEC                                  \
             --postinst $_PERMISSIONS_EXEC                     \
             $_PIPELINE_STEPS                                  \
