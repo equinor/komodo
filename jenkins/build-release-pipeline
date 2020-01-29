@@ -1,8 +1,8 @@
 @Library('komodo') _
 
 komodo(
-    agent_labels: 'st-vlinbuild01.st.statoil.no',
-    config_token_name: 'ertomatic-token',
+    agent_labels: env.AGENT_LABELS,
+    config_token_name: env.CONFIG_TOKEN_NAME,
     deploy: env.deploy,
     python_version: env.PYTHON_VERSION,
     release_base: env.RELEASE_BASE,
