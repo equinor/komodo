@@ -1,4 +1,4 @@
-@Library('komodo') _
+library "komodo@${env.CODE_GIT_REF}"
 
 komodo(
     agent_labels: env.AGENT_LABELS,
