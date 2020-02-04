@@ -36,11 +36,7 @@ while test $# -gt 0; do
     shift
 done
 
-PYTHONEXECUTABLE=$PREFIX/bin/python
-
-pip install . \
-    --global-option build --global-option=--executable=$PYTHONEXECUTABLE \
-    --root $FAKEROOT                                                     \
-    --no-deps                                                            \
+pip install .           \
+    --root $FAKEROOT    \
+    --no-deps           \
     --prefix $PREFIX
-
