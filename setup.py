@@ -17,6 +17,7 @@ setup(
             'komodo-prettier = komodo.prettier:prettier_main',
             'komodo-create-symlinks = komodo.symlink.create_links:symlink_main',
             'komodo-check-symlinks = komodo.symlink.sanity_check:sanity_main',
+            'komodo-non-deployed = komodo.deployed:deployed_main',
             ]
         }
 )
