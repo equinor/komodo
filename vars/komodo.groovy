@@ -238,6 +238,12 @@ def call(args) {
             always {
                 cleanWs()
             }
+            success {
+                build job: 'komodo-suggest-symlink', parameters: [
+                    string(name: 'RELEASE', value: "${env.RELEASE_NAME}"),
+                    string(name: 'MODE', value: 'unstable')
+                ], wait: false
+            }
         }
     }
 }
