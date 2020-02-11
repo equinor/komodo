@@ -240,8 +240,11 @@ def call(args) {
             }
             success {
                 build job: 'komodo-suggest-symlink', parameters: [
-                    string(name: 'RELEASE', value: "${env.RELEASE_NAME}"),
+                    string(name: 'RELEASE', value: env.RELEASE_NAME),
                     string(name: 'MODE', value: 'unstable')
+                ], wait: false
+                build job: 'komodo-test', parameters: [
+                    string(name: 'RELEASE', value: env.RELEASE_NAME),
                 ], wait: false
             }
         }
