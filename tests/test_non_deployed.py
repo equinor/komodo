@@ -65,6 +65,26 @@ def test_non_deployed(tmpdir):
         assert sorted(non_deployed_releases) == sorted(non_deployed)
 
 
+def test_pattern_replace(tmpdir):
+    with tmpdir.as_cwd():
+        install_root = "install_root"
+        release_folder = "release_folder"
+        os.makedirs(install_root)
+        os.makedirs(release_folder)
+
+        deployed_releases = ("2019.12.02-py36", "2022.02.01-py36")
+        _create_deployed_releases(deployed_releases, root=install_root)
+        non_deployed_releases = ("2020.02.01-py36", "2040.05.07-py36")
+        release_files = tuple(
+            fn + ".yml" for fn in deployed_releases + non_deployed_releases
+        )
+        _create_release_files(
+            release_files, root=release_folder,
+        )
+        non_deployed = fetch_non_deployed(install_root, release_folder, pattern="-py36$", remove_pattern=True)
+        assert sorted([n[:-5] for n in non_deployed_releases]) == sorted(non_deployed)
+
+
 def test_links_ignored(tmpdir):
     with tmpdir.as_cwd():
         install_root = "install_root"
