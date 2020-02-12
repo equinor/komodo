@@ -247,6 +247,9 @@ def call(args) {
                     string(name: 'RELEASE', value: env.RELEASE_NAME),
                 ], wait: false
             }
+            failure {
+                slackSend color: "#f02e2e", message: "Building komodo release ${env.RELEASE_NAME} failed (<${env.BUILD_URL}|Open>)"
+            }
         }
     }
 }
