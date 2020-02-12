@@ -65,7 +65,6 @@ def _get_repo(token, fork, repo):
     try:
         return client.get_repo("{}/{}".format(fork, repo))
     except UnknownObjectException:
-        print("Obtaining {} via organization {}.".format(repo, fork))
         org = client.get_organization(fork)
         return org.get_repo(repo)
 
@@ -118,7 +117,7 @@ def main():
 
     pull = suggest_symlink_configuration(args, repo)
     if pull is not None:
-        print("Created PR at {}".format(pull.html_url))
+        print(pull.html_url)
 
 
 if __name__ == "__main__":
