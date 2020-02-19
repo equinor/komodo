@@ -23,6 +23,7 @@ setup(
             "komodo-non-deployed = komodo.deployed:deployed_main",
             "komodo-prettier = komodo.prettier:prettier_main",
             "komodo-suggest-symlinks = komodo.symlink.suggester.cli:main",
+            "komodo-extract-dep-graph = komodo.extract_dep_graph:main",
         ]
     },
 )
