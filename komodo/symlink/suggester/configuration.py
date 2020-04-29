@@ -49,6 +49,11 @@ class Configuration(object):
                 else:
                     self.links[link] = repr(release)
         elif mode == "stable":
+            # Add/update deprecated link iff stable exists and has changed
+            if self.links.get(link) != release.month_alias():
+                dlink = link.replace("stable", "deprecated")
+                self.links[dlink] = self.links[link]
+
             self.links[release.month_alias()] = repr(release)
             self.links[link] = release.month_alias()
         else:

@@ -161,6 +161,7 @@ def test_get_concrete_release(conf, link, concrete):
     "links": {
         "2015.12-py27": "2015.12.03-py27",
         "2016.01-py27": "2016.01.00-py27",
+        "deprecated-py27": "2015.12-py27",
         "stable-py27": "2016.01-py27"
     }
 }
@@ -179,6 +180,7 @@ def test_get_concrete_release(conf, link, concrete):
     "links": {
         "2024.12-py27": "2024.12.03-py27",
         "2025.01-py27": "2025.01.00-py27",
+        "deprecated-py27": "2024.12-py27",
         "stable-py27": "2025.01-py27"
     }
 }
@@ -218,6 +220,64 @@ def test_get_concrete_release(conf, link, concrete):
         "stable-py27": "2019.12",
         "testing-py2": "testing-py27",
         "testing-py27": "2020.02-py27"
+    }
+}
+""",
+        ),
+        # update deprecated
+        (
+            """{"links": {
+"2024.11-py27": "2024.11.05-py27",
+"2024.12-py27": "2024.12.03-py27",
+"2025.01-py27": "2025.01.rc3-py27",
+"deprecated-py27": "2024.11-py27",
+"stable-py27" : "2024.12-py27"}}""",
+            "2025.01.00-py27",
+            "stable",
+            "changed",
+            """{
+    "links": {
+        "2024.11-py27": "2024.11.05-py27",
+        "2024.12-py27": "2024.12.03-py27",
+        "2025.01-py27": "2025.01.00-py27",
+        "deprecated-py27": "2024.12-py27",
+        "stable-py27": "2025.01-py27"
+    }
+}
+""",
+        ),
+        # update stable to same value, deprecated doesn't appear
+        (
+            """{"links": {
+"2025.01-py27": "2025.01.rc3-py27",
+"stable-py27" : "2025.01-py27"}}""",
+            "2025.01.00-py27",
+            "stable",
+            "changed",
+            """{
+    "links": {
+        "2025.01-py27": "2025.01.00-py27",
+        "stable-py27": "2025.01-py27"
+    }
+}
+""",
+        ),
+        # update stable to same value, deprecated doesn't change
+        (
+            """{"links": {
+"2024.12-py27": "2024.12.03-py27",
+"2025.01-py27": "2025.01.rc3-py27",
+"deprecated-py27": "2024.12-py27",
+"stable-py27" : "2025.01-py27"}}""",
+            "2025.01.00-py27",
+            "stable",
+            "changed",
+            """{
+    "links": {
+        "2024.12-py27": "2024.12.03-py27",
+        "2025.01-py27": "2025.01.00-py27",
+        "deprecated-py27": "2024.12-py27",
+        "stable-py27": "2025.01-py27"
     }
 }
 """,
