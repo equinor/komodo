@@ -1,6 +1,7 @@
 """Komodo software distribution build system."""
 
 import os
+import glob
 
 from .build import make, pypaths
 from .fetch import fetch
@@ -49,6 +50,24 @@ def fixup_python_shebangs(prefix, release):
         binpath_ = os.path.join(prefix, release, 'root', 'bin', bin_)
         if os.path.exists(binpath_):
             shell(sedfxp.format(python_, binpath_))
+
+
+def fixup_rpaths(prefix, release):
+    """TODO: Explain"""
+    release_root = os.path.join(prefix, release, "root")
+    rpath = "{0}/lib:{0}/lib64".format(release_root)
+
+    for root, _dirs, files in os.walk(release_root):
+        for fn in files:
+            try:
+                with open(fn, "rb") as f:
+                    if f.read(4) != b"\x7fELF":
+                        continue
+            except IOError:
+                continue
+            prog = os.path.join(root, fn)
+            shell("/project/oompf/patchelf/patchelf \"--set-rpath={rpath}\" \"{prog}\"".format(rpath=rpath, prog=prog))
+    
 
 def strip_version(version):
     """
