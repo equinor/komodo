@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -ex
 
 function call_if_defined {
     set +e
