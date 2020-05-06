@@ -1,0 +1,14 @@
+pipeline {
+    agent { label env.AGENT_LABEL }
+
+    parameters {
+        string(name: "KOMODO_ROOT", description: "Root directory for komodo releases")
+        string(name: "RELEASE_NAME", defaultValue: "bleeding-py27", description: "The komodo release to use")
+        string(name: "KOMODO_RELEASES_URL", description: "(optional) Komodo releases git url (location of KOMODO_TEST_SCRIPT)")
+        string(name: "KOMODO_TEST_SCRIPT", description: "(optional) bash script to source prior to running tests")
+
+        string(name: "PROJECT", description: "Project name")
+        string(name: "PROJECT_URL", description: "Project git URL")
+        string(name: "PROJECT_SHA1", description: "(optional) Commit ID to check out and build (eg: origin/pr/9/head)")
+    }
+}
