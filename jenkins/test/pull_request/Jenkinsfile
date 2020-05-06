@@ -8,8 +8,8 @@ pipeline {
         string(name: "KOMODO_TEST_SCRIPT", description: "(optional) bash script to source prior to running tests")
 
         string(name: "PROJECT", description: "Project name")
-        string(name: "PROJECT_URL", description: "Project git URL")
-        string(name: "PROJECT_SHA1", description: "(optional) Commit ID to check out and build (eg: origin/pr/9/head)")
+        string(name: "PROJECT_GIT_URL", description: "Project git URL")
+        string(name: "PROJECT_GIT_SHA1", description: "(optional) Commit ID to check out and build (eg: origin/pr/9/head)")
     }
 
     stages {

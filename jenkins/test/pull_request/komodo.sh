@@ -10,8 +10,8 @@ function call_if_defined {
 
 # Checkout and source pre-test script. This should set up site-local variables.
 # For example, this script should enable RHEL devtoolset if applicable.
-if [ -n "${KOMODO_RELEASES_URL:-}" ] && [ -n "${KOMODO_TEST_SCRIPT:-}" ]; then
-    git clone "${KOMODO_RELEASES_URL}" komodo-releases --init --recurisve
+if [[ -n "${KOMODO_RELEASES_URL:-}" ]] && [[ -n "${KOMODO_TEST_SCRIPT:-}" ]]; then
+    git clone "${KOMODO_RELEASES_URL}" komodo-releases --recurisve
 
     pushd komodo-releases
     source "${KOMODO_TEST_SCRIPT}"
@@ -22,12 +22,12 @@ fi
 source "${KOMODO_ROOT}/${RELEASE_NAME}/enable"
 
 # Clone, checkout and source the project's correct version
-git clone "${PROJECT_GIT_URL}" project --init --recursive
+git clone "${PROJECT_GIT_URL}" project --recursive
 cd project
 
-if [[ -n "${PROJECT_SHA1:-}" ]]; then
+if [[ -n "${PROJECT_GIT_SHA1:-}" ]]; then
     # Checkout PR/specific commit
-    git checkout "${PROJECT_SHA1}"
+    git checkout "${PROJECT_GIT_SHA1}"
 else
     # Checkout komodo's version
     extract_version=$(dirname "$0")/extract_version.py
@@ -37,7 +37,7 @@ fi
 
 source "${PROJECT_TEST_SCRIPT:-ci/jenkins/komodo.sh}"
 
-if [ -n "${PROJECT_SHA1// }" ]; then
+if [ -n "${PROJECT_GIT_SHA1// }" ]; then
     call_if_defined pre_pull_request
 else
     # No SHA1: not a PR build
