@@ -11,7 +11,7 @@ function call_if_defined {
 # Checkout and source pre-test script. This should set up site-local variables.
 # For example, this script should enable RHEL devtoolset if applicable.
 if [[ -n "${KOMODO_RELEASES_URL:-}" ]] && [[ -n "${KOMODO_TEST_SCRIPT:-}" ]]; then
-    git clone "${KOMODO_RELEASES_URL}" komodo-releases --recurisve
+    git clone "${KOMODO_RELEASES_URL}" komodo-releases
 
     pushd komodo-releases
     source "${KOMODO_TEST_SCRIPT}"
