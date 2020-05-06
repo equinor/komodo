@@ -11,4 +11,18 @@ pipeline {
         string(name: "PROJECT_URL", description: "Project git URL")
         string(name: "PROJECT_SHA1", description: "(optional) Commit ID to check out and build (eg: origin/pr/9/head)")
     }
+
+    stages {
+        stage("Unit Test") {
+            steps {
+                sh './jenkins/test/pull_request/komodo.sh'
+            }
+        }
+    }
+
+    post {
+        cleanup {
+            deleteDir()
+        }
+    }
 }
