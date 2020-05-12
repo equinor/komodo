@@ -9,6 +9,7 @@ import yaml as yml
 import logging
 
 import komodo
+from komodo import elf
 
 def main(args):
     args.prefix = os.path.abspath(args.prefix)
@@ -114,7 +115,7 @@ def main(args):
     komodo.fixup_python_shebangs(args.prefix, args.release)
 
     print('Fixup RPATHs in all compatible ELF files')
-    komodo.fixup_rpaths(args.prefix, args.release, args.patchelf)
+    elf.patch_all(os.path.join(args.prefix, args.release), args.patchelf)
 
     # run any post-install scripts on the release
     if args.postinst:
