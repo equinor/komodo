@@ -14,7 +14,7 @@ setup(
     },
     scripts=["bin/kmd"],
     test_suite="tests",
-    install_requires=["shell", "PyYAML", "ruamel.yaml", "PyGithub"],
+    install_requires=["shell", "PyYAML", "ruamel.yaml", "PyGithub", "six"],
     entry_points={
         "console_scripts": [
             "komodo-check-symlinks = komodo.symlink.sanity_check:sanity_main",
