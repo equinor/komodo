@@ -22,6 +22,7 @@ install:
   - ./configure
   - make
   - sudo make install
+  - popd
 
   # Install komodo dependencies
   - pip install pytest
