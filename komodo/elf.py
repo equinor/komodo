@@ -78,7 +78,10 @@ def patch(path, libdir, patchelf="patchelf"):
     proc = subprocess.Popen([patchelf, "--print-rpath", path], stdout=subprocess.PIPE)
     stdout, stderr = proc.communicate()
 
-    old_rpath = str(stdout.strip(), encoding="ascii")
+    if six.PY2:
+        old_rpath = str(stdout.strip(), encoding="ascii")
+    else:
+        old_rpath = stdout.strip()
     if len(old_rpath) > 0:
         rpath = "{}:{}".format(old_rpath, rpath)
 

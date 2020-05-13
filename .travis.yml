@@ -11,6 +11,12 @@ env:
     - LINT_TEST=1
     - INTEGRATION_TEST=1
 
+addons:
+  apt:
+    packages:
+      # This is needed to compile x86 programs in one of the tests
+      - gcc-multilib
+
 matrix:
   allow_failures:
     - env: INTEGRATION_TEST=1
