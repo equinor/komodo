@@ -14,7 +14,6 @@ def _create_links(links, root=""):
         os.symlink(
             os.path.join(root, src),
             os.path.join(root, target),
-            target_is_directory=True,
         )
 
 
