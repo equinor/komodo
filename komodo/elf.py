@@ -56,6 +56,7 @@ def is_valid_elf_file(path):
 
 
 def list_elfs(path):
+    """List all patchable ELF files in a directory and its subdirectories."""
     for root, _dirs, files in os.walk(path):
         for fn in files:
             elf = os.path.join(root, fn)
@@ -64,6 +65,10 @@ def list_elfs(path):
 
 
 def patch(path, libdir, patchelf="patchelf"):
+    """Patch a single ELF file by appending the new RPATH to the old RPATH, if any,
+    using patchelf
+
+    """
     rpath = libdir
     proc = subprocess.Popen([patchelf, "--print-rpath", path], stdout=subprocess.PIPE)
     stdout, stderr = proc.communicate()
@@ -76,5 +81,6 @@ def patch(path, libdir, patchelf="patchelf"):
 
 
 def patch_all(root, libdir, patchelf="patchelf"):
+    """Patch all patchable ELF files so that libdir is part of their RPATH"""
     for path in list_elfs(root):
         patch(path, libdir, patchelf)
