@@ -32,7 +32,7 @@ def _make_text_file(dest):
 
 def test_exec():
     """Check whether Python is a valid executable (Hint: it is)"""
-    assert elf.is_valid_elf_file(sys.executable)
+    assert elf.is_valid_elf_file(os.path.realpath(sys.executable))
 
 
 def test_dyn(tmpdir):

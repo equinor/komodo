@@ -14,25 +14,18 @@ matrix:
   allow_failures:
     - env: INTEGRATION_TEST=1
 
-before_install:
-  - export PYTHONPATH=$PWD:$PYTHONPATH
-  - echo $PYTHONPATH
-  - mkdir ws
-  - mkdir pfx
-  - export WS=$PWD/ws
-  - export PFX=$PWD/pfx
-
 install:
+  - pip install pytest
   - pip install .
 
 before_script:
-  - ls
+  - rm -r komodo
   - python -c "import komodo;print(komodo.__file__);print(komodo.__version__)"
 
 script:
-  - if [[ ! -z $UNIT_TEST ]]; then ./setup.py test ; fi
+  - if [[ ! -z $UNIT_TEST ]]; then pytest tests ; fi
 
   - if [[ ! -z $LINT_TEST ]]; then python -m komodo.lint examples/releases/unstable.yml examples/repository.yml ; fi
   - if [[ ! -z $LINT_TEST ]]; then python -m komodo.lint examples/releases/ecl.yml examples/repository.yml ; fi
 
-  - if [[ ! -z $INTEGRATION_TEST ]]; then bin/kmd examples/releases/ecl.yml examples/repository.yml --workspace $WS --prefix $PFX --release integration --renamer rename.ul; fi
+  - if [[ ! -z $INTEGRATION_TEST ]]; then bin/kmd examples/releases/ecl.yml examples/repository.yml --workspace /tmp/ws --prefix /tmp/pfx --release integration --renamer rename.ul; fi

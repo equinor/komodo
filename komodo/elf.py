@@ -14,25 +14,26 @@ def is_valid_elf_file(path):
     with open(path, "rb") as f:
         # First 16 bytes are the E_IDENT section of the ELF header. The 4 next
         # bytes are two uint16_t's representing E_TYPE and E_MACHINE.
-        head = f.read(20)
+        headstr = f.read(20)
 
     # Check magic string
-    if len(head) != 20 or head[:4] != b"\x7fELF":
+    if len(headstr) != 20 or headstr[:4] != b"\x7fELF":
         return False
 
+    head = tuple(map(int, headstr))
     # EI_CLASS must be ELFCLASS64 = 2 (64-bit registers)
-    if head[4] != b"\x02":
+    if head[4] != 2:
         return False
     # EI_DATA must be ELFDATA2LSB = 1 (Little-Endian, two's complement)
-    if head[5] != b"\x01":
+    if head[5] != 1:
         return False
     # EI_VERSION must be 1 (the only one that exists at time of writing)
-    if head[6] != b"\x01":
+    if head[6] != 1:
         return False
     # EI_OSABI must be either ELFOSABI_SYSV = 0 or ELFOSABI_GNU = 3
     # (GNU/Linux). Seems like some distros prefer SYSV (Debian) while others
     # prefer to specify GNU (RHEL). Either works for us.
-    if head[7] != b"\0" and head[7] != b"\x03":
+    if head[7] != 0 and head[7] != 3:
         return False
     # We ignore EI_ABIVERSION
     # The rest of the E_IDENT section is padding
@@ -40,13 +41,13 @@ def is_valid_elf_file(path):
     # e_type must be either ET_EXEC = 3 (executable binary) or ET_DYN = 4
     # (shared library). These are uint16_t's, and we have assumed ELFDATA2LSB,
     # which is Little-Endian, so these byte-strings are little-endian.
-    e_type    = head[16:18]
+    e_type    = headstr[16:18]
     if e_type != b"\x03\0" and e_type != b"\x04\0":
         return False
 
     # Machine architecture. For safety we allow only EM_X86_64 = 62 (amd64).
     # Again, this is a uint16_t, so bytes are encoded as little-endian.
-    e_machine = head[18:20]
+    e_machine = headstr[18:20]
     if e_machine != b"\x3e\0":
         return False
 
