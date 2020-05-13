@@ -1,5 +1,6 @@
 import os
 import subprocess
+import six
 from komodo.shell import shell
 
 
@@ -20,7 +21,10 @@ def is_valid_elf_file(path):
     if len(headstr) != 20 or headstr[:4] != b"\x7fELF":
         return False
 
-    head = tuple(map(int, headstr))
+    if six.PY2:
+        head = tuple(map(ord, headstr))
+    else:
+        head = headstr
     # EI_CLASS must be ELFCLASS64 = 2 (64-bit registers)
     if head[4] != 2:
         return False

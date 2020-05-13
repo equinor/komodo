@@ -15,6 +15,15 @@ matrix:
     - env: INTEGRATION_TEST=1
 
 install:
+  # Install patchelf
+  - git clone https://github.com/equinor/patchelf
+  - pushd patchelf
+  - ./bootstrap.sh
+  - ./configure
+  - make
+  - sudo make install
+
+  # Install komodo dependencies
   - pip install pytest
   - pip install .
 
