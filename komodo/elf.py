@@ -20,11 +20,11 @@ def is_valid_elf_file(path):
     # Check magic string
     if len(headstr) != 20 or headstr[:4] != b"\x7fELF":
         return False
-
     if six.PY2:
         head = tuple(map(ord, headstr))
     else:
         head = headstr
+
     # EI_CLASS must be ELFCLASS64 = 2 (64-bit registers)
     if head[4] != 2:
         return False
@@ -42,11 +42,11 @@ def is_valid_elf_file(path):
     # We ignore EI_ABIVERSION
     # The rest of the E_IDENT section is padding
 
-    # e_type must be either ET_EXEC = 3 (executable binary) or ET_DYN = 4
+    # e_type must be either ET_EXEC = 2 (executable binary) or ET_DYN = 3
     # (shared library). These are uint16_t's, and we have assumed ELFDATA2LSB,
     # which is Little-Endian, so these byte-strings are little-endian.
     e_type    = headstr[16:18]
-    if e_type != b"\x03\0" and e_type != b"\x04\0":
+    if e_type != b"\x02\0" and e_type != b"\x03\0":
         return False
 
     # Machine architecture. For safety we allow only EM_X86_64 = 62 (amd64).
@@ -78,7 +78,7 @@ def patch(path, libdir, patchelf="patchelf"):
     proc = subprocess.Popen([patchelf, "--print-rpath", path], stdout=subprocess.PIPE)
     stdout, stderr = proc.communicate()
 
-    old_rpath = stdout.strip()
+    old_rpath = str(stdout.strip(), encoding="ascii")
     if len(old_rpath) > 0:
         rpath = "{}:{}".format(old_rpath, rpath)
 

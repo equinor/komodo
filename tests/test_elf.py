@@ -138,8 +138,7 @@ def test_patch_with_existing_rpath(tmpdir):
         assert subprocess.call(["./a.out"], env=env) == 3
 
         # Program succeeds when we patchelf because it prepends the RPATH
-        # elf.patch("a.out", os.getcwd())
-        elf.patch("a.out", "$ORIGIN", os.environ.get("PATCHELF_EXEC", "patchelf"))
+        elf.patch("a.out", os.getcwd(), os.environ.get("PATCHELF_EXEC", "patchelf"))
         assert subprocess.call(["./a.out"]) == 3
 
 
@@ -152,7 +151,7 @@ def test_find_elfs(tmpdir):
 
     with tmpdir.as_cwd():
         # Make directories
-        for path in bins + libs + syms.keys() + txts:
+        for path in bins + libs + list(syms) + txts:
             dir = os.path.dirname(path)
             if not os.path.isdir(dir):
                 os.makedirs(dir)
