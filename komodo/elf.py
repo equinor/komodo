@@ -79,9 +79,9 @@ def patch(path, libdir, patchelf="patchelf"):
     stdout, stderr = proc.communicate()
 
     if six.PY2:
-        old_rpath = str(stdout.strip(), encoding="ascii")
-    else:
         old_rpath = stdout.strip()
+    else:
+        old_rpath = str(stdout.strip(), encoding="ascii")
     if len(old_rpath) > 0:
         rpath = "{}:{}".format(old_rpath, rpath)
 
