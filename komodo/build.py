@@ -156,6 +156,7 @@ def make(pkgfile, repofile, prefix = None,
                                            [os.path.join(fakeprefix, 'lib'),
                                             os.path.join(fakeprefix, 'lib64'),
                                             os.environ.get('LD_LIBRARY_PATH')]))
+    os.environ['LDFLAGS'] = "-Wl,-rpath,{0}/lib:{0}/lib64".format(prefix)
     extra_makeopts = os.environ.get('extra_makeopts')
 
     pkgpaths = ['{}-{}'.format(pkg, pkgs[pkg]) for pkg in pkgorder]
