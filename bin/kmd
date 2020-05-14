@@ -114,11 +114,6 @@ def main(args):
 
     komodo.fixup_python_shebangs(args.prefix, args.release)
 
-    print('Fixup RPATHs in all compatible ELF files')
-    root = os.path.join(args.prefix, args.release, "root")
-    rpath = "{0}/lib:{0}/lib64".format(root)
-    elf.patch_all(root, rpath, args.patchelf)
-
     # run any post-install scripts on the release
     if args.postinst:
         komodo.shell([args.postinst, os.path.join(args.prefix, args.release)])
