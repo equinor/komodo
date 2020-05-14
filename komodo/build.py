@@ -10,6 +10,7 @@ import subprocess
 import sys
 import yaml as yml
 import komodo
+from komodo import elf
 
 from .shell import shell, pushd
 
@@ -156,7 +157,8 @@ def make(pkgfile, repofile, prefix = None,
                                            [os.path.join(fakeprefix, 'lib'),
                                             os.path.join(fakeprefix, 'lib64'),
                                             os.environ.get('LD_LIBRARY_PATH')]))
-    os.environ['LDFLAGS'] = "-Wl,-rpath,{0}/lib:{0}/lib64".format(prefix)
+    rpath = "{0}/lib:{0}/lib64".format(prefix)
+    os.environ['LDFLAGS'] = "-Wl,-rpath," + rpath
     extra_makeopts = os.environ.get('extra_makeopts')
 
     pkgpaths = ['{}-{}'.format(pkg, pkgs[pkg]) for pkg in pkgorder]
@@ -188,6 +190,9 @@ def make(pkgfile, repofile, prefix = None,
                                        cmake    = cmk,
                                        pip      = pip,
                                        fakeroot = fakeroot)
+
+        if current.get("fixup_rpaths", False):
+            elf.patch_all(root, rpath)
 
 
 if __name__ == '__main__':
