@@ -12,7 +12,7 @@ setup(
         "komodo.symlink.suggester": "komodo/symlink/suggester",
     },
     test_suite="tests",
-    install_requires=["shell", "PyYAML", "ruamel.yaml", "PyGithub"],
+    install_requires=["shell", "PyYAML", "ruamel.yaml", "packaging", "PyGithub"],
     entry_points={
         "console_scripts": [
             "kmd = komodo.cli:cli_main",
@@ -24,6 +24,7 @@ setup(
             "komodo-suggest-symlinks = komodo.symlink.suggester.cli:main",
             "komodo-extract-dep-graph = komodo.extract_dep_graph:main",
             "komodo-lint-package-status = komodo.lint_package_status:main",
+            "komodo-lint-maturity = komodo.lint_maturity:main",
         ]
     },
 )
