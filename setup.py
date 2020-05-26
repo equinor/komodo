@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from __future__ import print_function
 
 from setuptools import setup
@@ -12,11 +11,11 @@ setup(
         "komodo.symlink": "komodo/symlink",
         "komodo.symlink.suggester": "komodo/symlink/suggester",
     },
-    scripts=["bin/kmd"],
     test_suite="tests",
     install_requires=["shell", "PyYAML", "ruamel.yaml", "PyGithub"],
     entry_points={
         "console_scripts": [
+            "kmd = komodo.cli:cli_main",
             "komodo-check-symlinks = komodo.symlink.sanity_check:sanity_main",
             "komodo-create-symlinks = komodo.symlink.create_links:symlink_main",
             "komodo-lint = komodo.lint:lint_main",
