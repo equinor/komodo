@@ -1,0 +1,46 @@
+numpy:
+  1.18.4:
+    source: pypi
+    make: pip
+    maintainer: travis
+    depends:
+      - setuptools
+      - python
+  1.16.6:
+    source: pypi
+    make: pip
+    maintainer: travis
+    depends:
+      - setuptools
+      - python
+
+python:
+  3.8.3:
+    source: /tmp/bionic_cp38_3
+    fetch: fs-cp
+    make: rsync
+    makeopts: --exclude=site-packages
+    maintainer: travis
+  2.7.18:
+    source: /tmp/bionic_cp27_18
+    fetch: fs-cp
+    make: rsync
+    makeopts: --exclude=site-packages
+    maintainer: travis
+
+setuptools:
+  41.4.0:
+    source: pypi
+    make: pip
+    maintainer: travis
+    depends:
+      - wheel
+      - python
+
+wheel:
+  0.33.6:
+    source: pypi
+    make: pip
+    maintainer: travis
+    depends:
+      - python

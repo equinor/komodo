@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from __future__ import print_function
 
 import argparse
@@ -10,7 +9,7 @@ import logging
 
 import komodo
 
-def main(args):
+def _main(args):
     args.prefix = os.path.abspath(args.prefix)
 
     if args.download or (not args.build and not args.install):
@@ -117,7 +116,7 @@ def main(args):
     if args.postinst:
         komodo.shell([args.postinst, os.path.join(args.prefix, args.release)])
 
-if __name__ == '__main__':
+def cli_main():
     parser = argparse.ArgumentParser(description = 'build distribution')
     parser.add_argument('pkgs', type = str)
     parser.add_argument('repo', type = str)
@@ -156,4 +155,7 @@ if __name__ == '__main__':
         shutil.copy('enable.csh.in', args.workspace)
 
     with komodo.pushd(args.workspace):
-        main(args)
+        _main(args)
+
+if __name__ == "__main__":
+    cli_main()

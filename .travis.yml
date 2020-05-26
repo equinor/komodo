@@ -1,38 +1,73 @@
-dist: trusty
+dist: bionic
 language: python
 
-python:
-  - '2.7'
+python: 3.6
 
-env:
-  matrix:
-    - UNIT_TEST=1
-    - LINT_TEST=1
-    - INTEGRATION_TEST=1
+addons:
+  apt:
+    packages:
+      - tree
 
 matrix:
-  allow_failures:
-    - env: INTEGRATION_TEST=1
+  fast_finish: true
+  include:
+    - name: Python 2.7.18 target
+      env:
+        - TARGET_PYTHON_URL=https://github.com/equinor/portable-pythons/raw/master/bionic/bionic_cp27_18.tar.xz
+        - TARGET_PYTHON_DIR=bionic_cp27_18
+        - TARGET_PYTHON_VERSION="Python 2.7.18"
+        - RELEASE=release-py27.yml
+
+    - name: Python 3.8.3 target
+      env:
+        - TARGET_PYTHON_URL=https://github.com/equinor/portable-pythons/raw/master/bionic/bionic_cp38_3.tar.xz
+        - TARGET_PYTHON_DIR=bionic_cp38_3
+        - TARGET_PYTHON_VERSION="Python 3.8.3"
+        - RELEASE=release-py38.yml
 
 before_install:
-  - export PYTHONPATH=$PWD:$PYTHONPATH
-  - echo $PYTHONPATH
-  - mkdir ws
-  - mkdir pfx
-  - export WS=$PWD/ws
-  - export PFX=$PWD/pfx
+  # Prepare komodo environment
+  - virtualenv -ppython3 /tmp/kmd-venv
+  - KMD_PYTHON=/tmp/kmd-venv/bin/python
+
+  # Prepare target python
+  - pushd /tmp
+  - wget $TARGET_PYTHON_URL
+  - tar xvf $TARGET_PYTHON_DIR.tar.xz
+  - PIP=/tmp/${TARGET_PYTHON_DIR}/bin/pip
+  - popd
 
 install:
-  - pip install .
+  - $KMD_PYTHON -m pip install . pytest
 
 before_script:
-  - ls
-  - python -c "import komodo;print(komodo.__file__);print(komodo.__version__)"
+  - rm -r komodo
+  - $KMD_PYTHON -c "import komodo;print(komodo.__file__);print(komodo.__version__)"
 
 script:
-  - if [[ ! -z $UNIT_TEST ]]; then ./setup.py test ; fi
+  # Unit tests
+  - $KMD_PYTHON -m pytest tests
 
-  - if [[ ! -z $LINT_TEST ]]; then python -m komodo.lint examples/releases/unstable.yml examples/repository.yml ; fi
-  - if [[ ! -z $LINT_TEST ]]; then python -m komodo.lint examples/releases/ecl.yml examples/repository.yml ; fi
+  # Lint tests
+  - $KMD_PYTHON -m komodo.lint examples/releases/unstable.yml examples/repository.yml
+  - $KMD_PYTHON -m komodo.lint examples/releases/ecl.yml examples/repository.yml
 
-  - if [[ ! -z $INTEGRATION_TEST ]]; then bin/kmd examples/releases/ecl.yml examples/repository.yml --workspace $WS --prefix $PFX --release integration --renamer rename.ul; fi
+  # Full integration test
+  - |
+    $KMD_PYTHON -m komodo.cli ci/travis/${RELEASE} ci/travis/repository.yml \
+                --workspace /tmp/ws                                         \
+                --prefix /tmp/pfx                                           \
+                --release travis                                            \
+                --renamer rename.ul                                         \
+                --pip $PIP
+  - tree /tmp/pfx
+
+  # Use built komodo
+  - source /tmp/pfx/travis/enable
+  - which python
+  - python --version
+  - python -c "import numpy;print(numpy.__file__)"
+
+  # Test that everything makes sense
+  - '[[ "$(which python)" == "/tmp/pfx/travis/root/bin/python" ]]'
+  - '[[ "$(python --version 2>&1)" == "${TARGET_PYTHON_VERSION}" ]]'
