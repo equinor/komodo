@@ -143,8 +143,8 @@ def make(pkgfile, repofile, prefix = None,
 
     fakeprefix = fakeroot + prefix
     shell(['mkdir -p', fakeprefix])
-    os.mkdir(os.join(fakeprefix, "lib"))
-    os.symlink(os.join(fakeprefix, "lib"), os.join(fakeprefix, "lib64"))
+    os.mkdir(os.path.join(fakeprefix, "lib"))
+    os.symlink(os.path.join(fakeprefix, "lib"), os.path.join(fakeprefix, "lib64"))
     prefix = os.path.abspath(prefix)
 
     # assuming there always is a python *and* that python will be installed
@@ -158,7 +158,7 @@ def make(pkgfile, repofile, prefix = None,
     os.environ['LD_LIBRARY_PATH'] = ':'.join(filter(None,
                                            [os.path.join(fakeprefix, 'lib'),
                                             os.environ.get('LD_LIBRARY_PATH')]))
-    rpath = os.join(prefix, "lib")
+    rpath = os.path.join(prefix, "lib")
     os.environ['LDFLAGS'] = "-Wl,-rpath," + rpath
     extra_makeopts = os.environ.get('extra_makeopts')
 
