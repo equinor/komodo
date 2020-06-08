@@ -106,6 +106,7 @@ def pip_install(pkg, ver, pkgpath, prefix, dlprefix, pip='pip', *args, **kwargs)
            'install {}=={}'.format(pkg, komodo.strip_version(ver)),
            '--root {}'.format(kwargs['fakeroot']),
            '--prefix {}'.format(prefix),
+           '--force-reinstall',
            '--no-index',
            '--no-deps',
            '--find-links {}'.format(dlprefix),
