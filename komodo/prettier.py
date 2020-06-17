@@ -59,7 +59,7 @@ def is_repository(config):
     )
 
 
-def prettier(yaml_input_dict):
+def prettier(yaml_input_dict, check_type=True):
     """Takes in a string corresponding to a YAML Komodo configuration, and returns
     the corresponding prettified YAML string."""
 
@@ -69,7 +69,7 @@ def prettier(yaml_input_dict):
     )
     ruamel_instance.width = 1000  # Avoid ruamel wrapping long
 
-    komodo_repository = is_repository(yaml_input_dict)
+    komodo_repository = check_type and is_repository(yaml_input_dict)
 
     # On Python3.6+, sorted_config can just be an
     # ordinary dict as insertion order is then preserved.
@@ -117,10 +117,10 @@ def prettified_yaml(filepath, check_only=True):
     return True
 
 
-def write_to_file(repository, filename):
+def write_to_file(repository, filename, check_type=True):
     if type(repository) == dict:
         repository = ruamel.yaml.comments.CommentedMap(repository)
-    output_str = prettier(repository)
+    output_str = prettier(repository, check_type)
     with open(file=filename, mode="w") as output_file:
         output_file.write(output_str)
 

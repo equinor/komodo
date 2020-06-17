@@ -26,6 +26,7 @@ setup(
             "komodo-lint-package-status = komodo.lint_package_status:main",
             "komodo-lint-maturity = komodo.lint_maturity:main",
             'komodo-clean-repository = komodo.release_cleanup:main',
+            'komodo-transpiler = komodo.release_transpiler:main',
         ]
     },
 )
