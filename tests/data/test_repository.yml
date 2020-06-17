@@ -1,0 +1,40 @@
+lib1:
+  1.2.3:
+    source: pypi
+  0.1.2:
+    source: pypi
+  0.0.2:
+    source: pypi
+    
+lib2:
+  2.3.4:
+    depends:
+    - lib1
+  1.2.3:
+    depends:
+    - lib1
+  0.0.2:
+    depends:
+    - lib1
+    
+lib3:
+  3.4.5:
+    depends:
+    - lib1
+  2.3.4:
+    depends:
+    - lib1
+  master:
+    depends:
+    - lib1
+    
+lib4: # comment to be preserved
+  3.4.5:
+    depends:
+    - lib3
+    - lib2
+
+lib5: # comment should be gone
+  1.2.3:
+    depends:
+    - lib4
