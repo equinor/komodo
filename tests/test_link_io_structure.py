@@ -12,10 +12,7 @@ import sys
 import shutil
 import json
 import pytest
-
-
-def _get_test_root():
-    return os.path.realpath(os.path.dirname(__file__))
+from tests import _get_test_root
 
 
 def test_read_folder_structure(tmpdir):
