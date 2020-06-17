@@ -25,6 +25,7 @@ setup(
             "komodo-extract-dep-graph = komodo.extract_dep_graph:main",
             "komodo-lint-package-status = komodo.lint_package_status:main",
             "komodo-lint-maturity = komodo.lint_maturity:main",
+            'komodo-clean-repository = komodo.release_cleanup:main',
         ]
     },
 )

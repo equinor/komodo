@@ -6,7 +6,7 @@ from .build import make, pypaths
 from .fetch import fetch
 from .shell import shell, pushd
 from .lint import lint
-from .prettier import prettier
+from .prettier import prettier, load_yaml, write_to_file, prettified_yaml
 from .cleanup import cleanup
 from .maintainer import maintainers
 
