@@ -60,13 +60,16 @@ script:
                 --release travis                                            \
                 --renamer rename.ul                                         \
                 --pip $PIP
-  - tree /tmp/pfx
+  # Build libkmd.so for testing
+  - ci/travis/build_lib.sh /tmp/pfx/travis
 
+  - tree /tmp/pfx
   # Use built komodo
   - source /tmp/pfx/travis/enable
   - which python
   - python --version
   - python -c "import numpy;print(numpy.__file__)"
+  - ci/travis/test_import_lib.py
 
   # Test that everything makes sense
   - '[[ "$(which python)" == "/tmp/pfx/travis/root/bin/python" ]]'

@@ -6,8 +6,11 @@ import shutil
 import sys
 import yaml as yml
 import logging
+from textwrap import dedent
 
 import komodo
+from komodo.shim import create_shims
+
 
 def _main(args):
     args.prefix = os.path.abspath(args.prefix)
@@ -111,6 +114,9 @@ def _main(args):
         print(komodo.shell(shell_input, sudo=args.sudo))
 
     komodo.fixup_python_shebangs(args.prefix, args.release)
+
+    # Create shims
+    create_shims(os.path.join(args.prefix, args.release, "root"))
 
     # run any post-install scripts on the release
     if args.postinst:
