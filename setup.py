@@ -20,7 +20,6 @@ setup(
             "komodo-create-symlinks = komodo.symlink.create_links:symlink_main",
             "komodo-lint = komodo.lint:lint_main",
             "komodo-non-deployed = komodo.deployed:deployed_main",
-            "komodo-prettier = komodo.prettier:prettier_main",
             "komodo-suggest-symlinks = komodo.symlink.suggester.cli:main",
             "komodo-extract-dep-graph = komodo.extract_dep_graph:main",
             "komodo-lint-package-status = komodo.lint_package_status:main",
