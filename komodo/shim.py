@@ -6,10 +6,7 @@ shim_template = dedent("""\
     #!/bin/bash -eu
     root=$(dirname $0)/..
     prog=$(basename $0)
-    if [ -z "${_KOMODO_SHIM:-}" ]; then
-        export LD_LIBRARY_PATH=$root/lib:$root/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-        export _KOMODO_SHIM=$prog
-    fi
+    export LD_LIBRARY_PATH=$root/lib:$root/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
     $root/libexec/$prog "$@"
 """)
 
