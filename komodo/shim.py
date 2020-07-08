@@ -3,7 +3,7 @@ from textwrap import dedent
 
 
 shim_template = dedent("""\
-    #!/bin/bash -eu
+    #!/bin/bash
     root=$(dirname $0)/..
     prog=$(basename $0)
     export LD_LIBRARY_PATH=$root/lib:$root/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
