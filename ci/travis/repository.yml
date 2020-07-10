@@ -15,14 +15,14 @@ numpy:
       - python
 
 python:
-  3.8.3:
-    source: /tmp/bionic_cp38_3
+  3.7.7:
+    source: /tmp/target-python
     fetch: fs-cp
     make: rsync
     makeopts: --exclude=site-packages
     maintainer: travis
   2.7.18:
-    source: /tmp/bionic_cp27_18
+    source: /tmp/target-python
     fetch: fs-cp
     make: rsync
     makeopts: --exclude=site-packages

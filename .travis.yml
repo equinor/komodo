@@ -6,43 +6,32 @@ python: 3.6
 addons:
   apt:
     packages:
-      - tree
+      - cmake
 
 matrix:
   fast_finish: true
   include:
     - name: Python 2.7.18 target
       env:
-        - TARGET_PYTHON_URL=https://github.com/equinor/portable-pythons/raw/master/bionic/bionic_cp27_18.tar.xz
-        - TARGET_PYTHON_DIR=bionic_cp27_18
-        - TARGET_PYTHON_VERSION="Python 2.7.18"
+        - TARGET_PYTHON_URL=https://repo.anaconda.com/miniconda/Miniconda2-py27_4.8.3-Linux-x86_64.sh
+        - 'TARGET_PYTHON_VERSION="Python 2.7.18 :: Anaconda, Inc."'
         - RELEASE=release-py27.yml
 
-    - name: Python 3.8.3 target
+    - name: Python 3.7.7 target
       env:
-        - TARGET_PYTHON_URL=https://github.com/equinor/portable-pythons/raw/master/bionic/bionic_cp38_3.tar.xz
-        - TARGET_PYTHON_DIR=bionic_cp38_3
-        - TARGET_PYTHON_VERSION="Python 3.8.3"
-        - RELEASE=release-py38.yml
-
-before_install:
-  # Prepare komodo environment
-  - virtualenv -ppython3 /tmp/kmd-venv
-  - KMD_PYTHON=/tmp/kmd-venv/bin/python
-
-  # Prepare target python
-  - pushd /tmp
-  - wget $TARGET_PYTHON_URL
-  - tar xvf $TARGET_PYTHON_DIR.tar.xz
-  - PIP=/tmp/${TARGET_PYTHON_DIR}/bin/pip
-  - popd
+        - TARGET_PYTHON_URL=https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh
+        - TARGET_PYTHON_VERSION="Python 3.7.7"
+        - RELEASE=release-py37.yml
 
 install:
-  - $KMD_PYTHON -m pip install . pytest
+  # Prepare target python
+  - wget -O miniconda.sh $TARGET_PYTHON_URL
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p/tmp/target-python
 
-before_script:
-  - rm -r komodo
-  - $KMD_PYTHON -c "import komodo;print(komodo.__file__);print(komodo.__version__)"
+  # Bootstrap Komodo environment
+  - ./bootstrap.sh /tmp/target-python/bin/python
+  - KMD_PYTHON=$PWD/boot/kmd-env/bin/python
 
 script:
   # Unit tests
@@ -54,17 +43,15 @@ script:
 
   # Full integration test
   - |
-    $KMD_PYTHON -m komodo.cli ci/travis/${RELEASE} ci/travis/repository.yml \
-                --workspace /tmp/ws                                         \
-                --prefix /tmp/pfx                                           \
-                --release travis                                            \
-                --renamer rename.ul                                         \
-                --pip $PIP
+    ./runkmd.sh ci/travis/${RELEASE} ci/travis/repository.yml \
+                --workspace /tmp/kmd-ws                       \
+                --cache /tmp/kmd-cache                        \
+                --prefix /tmp/pfx                             \
+                --release travis                              \
+                --renamer rename.ul
   # Build libkmd.so for testing
   - ci/travis/build_lib.sh /tmp/pfx/travis
 
-  - tree /tmp/pfx
-  # Use built komodo
   - source /tmp/pfx/travis/enable
   - which python
   - python --version
