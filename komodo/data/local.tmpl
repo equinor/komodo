@@ -1,0 +1,10 @@
+host=$(hostname)
+location=$(echo $host | cut -d "-" -f 1)
+
+case ${location} in
+{%- for loc in locs %}
+   {{ loc.loc }})
+      export ERT_LSF_SERVER={{ loc.srv }}
+        ;;
+{%- endfor %}
+esac

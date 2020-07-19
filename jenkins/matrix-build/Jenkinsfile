@@ -1,0 +1,64 @@
+pipeline {
+    agent { label "!(komodo-deploy || komodo-deploy7)"}
+
+    parameters {
+        string(name: 'MATRIX_FILE_BASE', description: 'The matrix file that is to be built. I.e. bleeding or 2020.06.05. It is expected that there is a matrix file in komodo-release/releases/matrices/{base}.yml.')
+        booleanParam(name: 'overwrite', defaultValue: false, description: 'Whether or not to overwrite if matrix already exist')
+    }
+
+    stages {
+        stage('Checks') {
+            steps {
+                script  {
+                    if (params.MATRIX_FILE_BASE == '') {
+                        currentBuild.result = 'ABORTED'
+                        error('MATRIX_FILE_BASE not set')
+                    }
+                }
+            }
+        }
+        stage('Matrix Build') {
+            matrix {
+                agent { label "!(komodo-deploy || komodo-deploy7)"}
+                axes {
+                    axis {
+                        name 'RH_VERSION'
+                        values '6', '7'
+                    }
+                    axis {
+                        name 'PY_VERSION'
+                        values '2.7', '3.6'
+                    }
+                }
+                stages {
+                    stage('Build') {
+                        steps {
+                            build job: 'x-build-some-other', parameters: [
+                                string(name: 'RH_VERSION', value: RH_VERSION),
+                                string(name: 'PYTHON_VERSION', value: PY_VERSION),
+                                string(name: 'MATRIX_FILE_BASE', value: params.MATRIX_FILE_BASE),
+                                booleanParam(name: 'overwrite', value: params.overwrite)
+                            ], wait: true
+                        }
+                        post {
+                            success {
+                                // build job: 'komodo-suggest-symlink', parameters: [
+                                //     string(name: 'RELEASE', value: "${params.MATRIX_FILE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
+                                //     string(name: 'MODE', value: 'unstable')
+                                // ], wait: false
+                                build job: 'komodo-test', parameters: [
+                                    string(name: 'RELEASE', value: "${params.MATRIX_FILE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
+                                ], wait: false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        failure {
+            slackSend color: "#f02e2e", message: "Building komodo matrix ${params.MATRIX_FILE_BASE} failed (<${env.BUILD_URL}|Open>)"
+        }
+    }
+}

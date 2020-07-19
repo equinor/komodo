@@ -110,14 +110,14 @@ function install_git {
 function install_build_env {
     echo "Using ${python_bin} for target"
     boot/kmd-env/bin/virtualenv --python=${python_bin} boot/build-env
-    boot/build-env/bin/pip install --upgrade pip
+    boot/build-env/bin/pip install --upgrade pip setuptools wheel
     ln -s $PWD/boot/build-env/bin/pip boot/bintools/
 }
 
 function create_runkmd {
     cat << EOF > runkmd.sh
 #!/bin/bash
-export PATH=$PWD/boot/bintools:\$PATH
+export PATH=$PWD/boot/bintools:$PWD/boot/build-env/bin:\$PATH
 $PWD/boot/kmd-env/bin/kmd "\$@"
 EOF
     chmod +x runkmd.sh

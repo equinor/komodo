@@ -1,0 +1,4 @@
+pyqt5:
+  4.19.22-builtin:
+    make: dummy
+    maintainer: jond

@@ -1,0 +1,36 @@
+package_a:
+  1.2.3:
+    source: pypi
+    make: pip
+    maintainer: alice
+    depends:
+      - setuptools
+      - python
+
+setuptools:
+  44.0.1:
+    source: pypi
+    make: pip
+    maintainer: alice
+    depends:
+      - python
+
+hackres:
+  0.0.5289:
+    source: ../hackres # we assume here hackres is copied into cache/..
+    fetch: fs-cp
+    make: sh
+    makefile: test_build_script.sh
+    maintainer: bob
+
+qt5:
+  5.13.6-builtin:
+    make: noop
+    maintainer: alice
+
+python:
+  2.7.5-builtin:
+    make: sh
+    makefile: test_python_builtin.sh
+    maintainer: alice
+    makeopts: --python-version 4.2

@@ -56,8 +56,8 @@ export PATH=komodo_prefix/bin${PATH:+:${PATH}}
 export _PRE_KOMODO_MANPATH="${MANPATH:-}"
 export MANPATH=komodo_prefix/share/man:${MANPATH:-}
 
-export _PRE_KOMODO_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
-unset LD_LIBRARY_PATH
+export _PRE_KOMODO_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 export _PRE_KOMODO_PS1="${PS1:-}"
 export PS1="(${KOMODO_RELEASE}) ${PS1:-}"

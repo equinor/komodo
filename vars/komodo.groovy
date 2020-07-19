@@ -1,254 +1,174 @@
-def releaseDeployed(_PREFIX, _RELEASE_NAME) {
-    sh """
-        if [ -e $_PREFIX/$_RELEASE_NAME ]; then
-            echo ${_RELEASE_NAME} is already deployed at ${_PREFIX}/${_RELEASE_NAME}!
-            exit 1
-        fi
-    """
-}
+import java.util.regex.Pattern
 
-def configureGit(_GIT_EXEC) {
-    sh """
-        # fix error:
-        # RPC failed; curl 56
-        # SSL read: errno -5961
-        # fatal: The remote end hung up unexpectedly
-        # fatal: early EOF
-        # fatal: index-pack failed
-        ## start git config
-        ## https://stackoverflow.com/questions/6842687
-        $_GIT_EXEC config --global http.postBuffer 1048576000
-        ## end
-    """
-}
-
-def checkoutGitBranch(_GIT_EXEC, _GIT_REF) {
-    sh """
-        $_GIT_EXEC checkout $_GIT_REF
-    """
-}
-
-def buildPythonEnv(_ENV_EXEC, _TARGET_ENV, _ENV_ARGS, _PIP_EXPRESSION) {
-    sh """
-        $_ENV_EXEC $_TARGET_ENV $_ENV_ARGS
-        source $_TARGET_ENV/bin/activate
-        python -m pip install --upgrade '$_PIP_EXPRESSION'
-    """
-}
-
-def installKomodo(_PYTHON_ENV) {
-    sh """
-        source $_PYTHON_ENV
-        pip install .
-        rm -rf komodo
-        rm -rf bin
-        python -c "import komodo; print(komodo.__file__)"
-    """
-}
-
-def cloneAndCheckoutKomodoConfig(_GIT_EXEC, _CONFIG_GIT_FORK, _CONFIG_GIT_REF, _TOKEN) {
-    sh """
-        $_GIT_EXEC clone https://${_TOKEN}@github.com/${_CONFIG_GIT_FORK}/komodo-releases.git
-        pushd komodo-releases
-        $_GIT_EXEC checkout $_CONFIG_GIT_REF
-        popd
-    """
-}
-
-def copyScripts(_KOMODO_ROOT, _KOMODO_RELEASES_ROOT) {
-    // NOTE: This is to backwards compatible with the old komodo-releases setup
-    // Should be removed as soon as we have moved all building to the komodo
-    // instance
-    sh """
-        mkdir $_KOMODO_RELEASES_ROOT/src
-        cp $_KOMODO_ROOT/setup-py.sh $_KOMODO_RELEASES_ROOT/src
-        cp $_KOMODO_ROOT/enable.m4 $_KOMODO_RELEASES_ROOT
-        cp $_KOMODO_ROOT/enable.in $_KOMODO_RELEASES_ROOT
-        cp $_KOMODO_ROOT/enable.csh.in $_KOMODO_RELEASES_ROOT
-    """
-}
-
-def validateRelease(_PYTHON_ENV, _KOMODO_RELEASES_ROOT, _PACKAGES, _REPOSITORY) {
-    sh """
-        source $_PYTHON_ENV
-        pushd $_KOMODO_RELEASES_ROOT 
-
-        # lint first
-        python -m komodo.lint $_PACKAGES $_REPOSITORY
-
-        # output maintainers
-        python -m komodo.maintainer $_PACKAGES $_REPOSITORY
-
-        popd
-    """
-}
-
-def buildAndInstallRelease(_REPOSITORY, _RELEASE_FILE, _RELEASE_NAME, _KOMODO_RELEASES_ROOT, _PREFIX, _PIPELINE_STEPS, _DEVTOOLSET, _PYTHON_ENV, _CMAKE_EXECUTABLE, _GIT_EXEC, _PERMISSIONS_EXEC) {
-    _PIP = sh(
-        script: """
-            source $_PYTHON_ENV
-            which pip
-        """,
-        returnStdout: true
-    ).trim()
-    sh """
-        source $_DEVTOOLSET
-        source $_PYTHON_ENV
-        set -xe
-
-        pushd $_KOMODO_RELEASES_ROOT
-        kmd $_RELEASE_FILE $_REPOSITORY                       \
-            --jobs 6                                          \
-            --release $_RELEASE_NAME                          \
-            --tmp tmp                                         \
-            --cache cache                                     \
-            --prefix $_PREFIX                                 \
-            --cmake $_CMAKE_EXECUTABLE                        \
-            --pip $_PIP                                       \
-            --git $_GIT_EXEC                                  \
-            --postinst $_PERMISSIONS_EXEC                     \
-            $_PIPELINE_STEPS                                  \
-
-        popd
-    """
-}
-
-def installLocalFiles(_KOMODO_RELEASES_ROOT, _PREFIX, _RELEASE_NAME, _PERMISSIONS_EXEC) {
-    sh """
-        pushd $_KOMODO_RELEASES_ROOT
-        # Here we *very manually* copy the files local/local and local/local.csh to
-        # the location of the main enable file. Dang - this is quite ugly ....
-        if [ -e local/local ]; then
-           cp local/local $_PREFIX/$_RELEASE_NAME/local
-           $_PERMISSIONS_EXEC $_PREFIX/$_RELEASE_NAME/local
-        fi
-
-        if [ -e local/local.csh ]; then
-           cp local/local.csh $_PREFIX/$_RELEASE_NAME/local.csh
-           $_PERMISSIONS_EXEC $_PREFIX/$_RELEASE_NAME/local.csh
-        fi
-        popd
-    """
-}
-
-def call(args) {
-    pipeline {
-        agent { label args.agent_labels }
-        environment {
-            CONFIG_TOKEN = credentials("${args.config_token_name}")
-            PIPELINE_STEPS = "${args.deploy == "true" ? "--download --build --install" : "--dry-run --download --build"}"
-            PY_VER_MAJOR = "${args.python_version.split("\\.")[0]}"
-            PY_VER_MINOR = "${args.python_version.split("\\.")[1]}"
-            RELEASE_NAME = "${args.release_base + "-py" + env.PY_VER_MAJOR + env.PY_VER_MINOR}"
-            RELEASE_FILE = "releases/${env.RELEASE_NAME}.yml"
-            REPOSITORY = "repository.yml"
-            ENV_EXEC = "${args.build_python + "/bin/" + (env.PY_VER_MAJOR == "2" ? "virtualenv" : "python3 -m venv")}"
-            ENV_ARGS = "${(env.PY_VER_MAJOR == "2" ? "--no-download" : " ")}"
-            BUILD_ENV = "${env.WORKSPACE + "/build-env"}"
-            PYTHON_ENV = "${env.BUILD_ENV + "/bin/activate"}"
-            KOMODO_ROOT = "${env.WORKSPACE}"
-            KOMODO_RELEASES_ROOT = "${env.WORKSPACE + "/komodo-releases"}"
+def getPython() {
+    if(params.RH_VERSION == "6") {
+        if (params.PYTHON_VERSION == "2.7") {
+            return "/prog/sdpsoft/python2.7.14/bin/python"
+        } else {
+            return "/prog/sdpsoft/python3.6.4/bin/python3"
         }
+    } else if (params.RH_VERSION == "7") {
+        return "/usr/bin/python${params.PYTHON_VERSION}"
+    }
+    throw new Exception("Bad RH version " + params.RH_VERSION)
+}
+
+def getAgentLabel() {
+    params.RH_VERSION == "6" ? "komodo-deploy" : "komodo-deploy7"
+}
+
+def getReleaseName() {
+    if (params.PYTHON_VERSION == "2.7") {
+        return "${params.MATRIX_FILE_BASE}-py27-rhel${params.RH_VERSION}"
+    } else if (params.PYTHON_VERSION == "3.6") {
+        return "${params.MATRIX_FILE_BASE}-py36-rhel${params.RH_VERSION}"
+    }
+    throw new Exception("Bad Python version '${params.PYTHON_VERSION}'")
+}
+
+def gitClone(String url, String branchName) {
+    @NonCPS
+    def getTargetDir = { ->
+        def pattern = Pattern.compile("/([^./]+)(?:.git)?\\z")
+        def matcher = pattern.matcher(url)
+        if (!matcher.find()) {
+            throw Exception("Could not extract the repository name from URL: ${url}")
+        }
+        matcher.group(1)
+    }
+
+    checkout([
+        $class: 'GitSCM',
+        branches: [[name: branchName]],
+        doGenerateSubmoduleConfigurations: false,
+        extensions: [
+            [$class: 'RelativeTargetDirectory', relativeTargetDir: getTargetDir()],
+            [$class: 'CloneOption', shallow: true, noTags: true],
+        ],
+        submoduleCfg: [],
+        userRemoteConfigs: [[
+            // ertomatic's ID
+            credentialsId: '5cf748b8-c6d0-4014-8a72-5726b185a7c7',
+            url: url
+        ]]
+    ])
+}
+
+def call(Map args = [:]) {
+    pipeline {
+        agent { label getAgentLabel() }
+
+        parameters {
+            string name: 'RH_VERSION', defaultValue: '6',
+                description: 'Dictates on what Red Hat version the build runs, as well as what version it targets'
+            string name: 'PYTHON_VERSION', defaultValue: '2.7',
+                description: 'The target Python version'
+
+            string name: 'MATRIX_FILE_BASE', defaultValue: 'bleeding',
+                description: 'The matrix file that is to be built. I.e. bleeding or 2020.06.05. It is expected that there is a matrix file in komodo-release/releases/matrices/{base}.yml.'
+
+            string name: 'PREFIX', defaultValue: '/prog/res/komodo',
+                description: 'The install prefix.'
+
+            booleanParam name: 'deploy', defaultValue: true,
+                description: 'Whether or not to deploy'
+            booleanParam name: 'overwrite', defaultValue: false,
+                description: 'Whether or not to overwrite if build already exist'
+
+            string name: 'CODE_GIT_FORK', defaultValue: 'equinor',
+                description: 'The fork to the get the komodo build system from'
+            string name: 'CODE_GIT_REF', defaultValue: 'allow_no_python_package',
+                description: ' The branch to get the komodo build system from'
+            string name: 'CONFIG_GIT_FORK', defaultValue: 'equinor',
+                description: 'The fork to get the the komodo releases from'
+            string name: 'CONFIG_GIT_REF', defaultValue: 'rhel7-py2',
+                description: 'The branch to get the komodo releases from'
+        }
+
+        environment {
+            MATRIX_FILE = "releases/matrices/${params.MATRIX_FILE_BASE}.yml"
+        }
+
         stages {
             stage('Already deployed') {
                 when {
                     expression {
-                        return env.overwrite != 'true';
+                        params.overwrite
                     }
                 }
                 steps {
                     script {
-                        releaseDeployed(env.PREFIX, env.RELEASE_NAME)
+                        if (fileExists("${params.PREFIX}/${env.RELEASE_NAME}")) {
+                            error "${env.RELEASE_NAME} is already deployed at ${params.PREFIX}/${env.RELEASE_NAME}!"
+                        }
                     }
                 }
             }
-            stage('Configure git') {
+            stage('Build') {
                 steps {
                     script {
-                        configureGit(env.GIT_EXEC)
+                        if (params.MATRIX_FILE_BASE == '')
+                            error 'MATRIX_FILE_BASE not set'
+                        if (params.RH_VERSION == '')
+                            error 'RH_VERSION not set'
+                        if (params.PYTHON_VERSION == '')
+                            error 'PYTHON_VERSION not set'
                     }
-                }
-            }
-            stage('Checkout Komodo branch') {
-                steps {
-                    script {
-                        checkoutGitBranch(env.GIT_EXEC, env.CODE_GIT_REF)
-                    }
-                }
-            }
-            stage('Build Python env') {
-                steps {
-                    script {
-                        buildPythonEnv(env.ENV_EXEC, env.BUILD_ENV, env.ENV_ARGS, env.PIP_EXPRESSION)
-                    }
-                }
-            }
-            stage('Install Komodo') {
-                steps {
-                    script {
-                        installKomodo(env.PYTHON_ENV)
-                    }
-                }
-            }
-            stage('Clone and checkout Komodo config') {
-                steps {
-                    script {
-                        cloneAndCheckoutKomodoConfig(env.GIT_EXEC, env.CONFIG_GIT_FORK, env.CONFIG_GIT_REF, env.CONFIG_TOKEN)
-                    }
-                }
-            }
-            stage('Copy scripts') {
-                steps {
-                    script {
-                        copyScripts(env.KOMODO_ROOT, env.KOMODO_RELEASES_ROOT)
-                    }
-                }
-            }
-            stage('Validate release') {
-                steps {
-                    script {
-                        validateRelease(env.PYTHON_ENV, env.KOMODO_RELEASES_ROOT, env.RELEASE_FILE, env.REPOSITORY)
-                    }
-                }
-            }
-            stage('Build and Install') {
-                steps {
-                    script {
-                        System.setProperty("org.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL", "80000");
-                    }
-                    script {
-                        buildAndInstallRelease(env.REPOSITORY, env.RELEASE_FILE, env.RELEASE_NAME, env.KOMODO_RELEASES_ROOT, env.PREFIX, env.PIPELINE_STEPS, env.DEVTOOLSET, env.PYTHON_ENV, env.CMAKE_EXECUTABLE, env.GIT_EXEC, env.PERMISSIONS_EXEC)
-                    }
-                }
-            }
-            stage('Copy local files') {
-                when {
-                    expression {
-                        return args.deploy == 'true';
-                    }
-                }
-                steps {
-                    script {
-                        installLocalFiles(env.KOMODO_RELEASES_ROOT, env.PREFIX, env.RELEASE_NAME, env.PERMISSIONS_EXEC)
+
+                    dir(getReleaseName()) {
+                        script {
+                            if (fileExists("."))
+                                error "Build ${getReleaseName()} is already in progress."
+                        }
+
+                        gitClone "https://github.com/${params.CODE_GIT_FORK}/komodo.git",
+                            params.CODE_GIT_REF
+                        gitClone "https://github.com/${params.CONFIG_GIT_FORK}/komodo-releases.git",
+                            params.CONFIG_GIT_REF
+
+                        script {
+                            def komodoPath = "${env.WORKSPACE}/${getReleaseName()}/komodo"
+                            def configPath = "${env.WORKSPACE}/${getReleaseName()}/komodo-releases"
+                            def releaseFile = "${getReleaseName()}.yml"
+                            def matrixFile = "${configPath}/releases/matrices/${params.MATRIX_FILE_BASE}.yml"
+
+                            // Bootstrap
+                            sh "cd ${komodoPath}; ./bootstrap.sh ${getPython()}"
+
+                            // Transpile
+                            sh "cd ${configPath}; ${komodoPath}/boot/kmd-env/bin/komodo-transpiler transpile --matrix-file=${matrixFile} --output releases"
+
+                            // Lint
+                            sh "cd ${configPath}; ${komodoPath}/boot/kmd-env/bin/komodo-lint releases/${releaseFile} repository.yml"
+
+                            // Run!
+                            withEnv(["TMPDIR=${configPath}/tmp"]) {
+                                sh """
+                            cd ${configPath}
+                            ${komodoPath}/runkmd.sh                                    \
+                                releases/${releaseFile}                                \
+                                repository.yml                                         \
+                                --download                                             \
+                                --build                                                \
+                                ${params.deploy ? '--install' : '--dry-run'}           \
+                                --jobs 6                                               \
+                                --release ${getReleaseName()}                          \
+                                --tmp tmp                                              \
+                                --cache cache                                          \
+                                --prefix ${params.PREFIX}                              \
+                                --pip ${komodoPath}/boot/build-env/bin/pip             \
+                                --virtualenv ${komodoPath}/boot/kmd-env/bin/virtualenv \
+                                --locations-config locations.yml
+                            """
+                            }
+                        }
                     }
                 }
             }
         }
         post {
-            always {
+            cleanup {
                 cleanWs()
-            }
-            success {
-                build job: 'komodo-suggest-symlink', parameters: [
-                    string(name: 'RELEASE', value: env.RELEASE_NAME),
-                    string(name: 'MODE', value: 'unstable')
-                ], wait: false
-                build job: 'komodo-test', parameters: [
-                    string(name: 'RELEASE', value: env.RELEASE_NAME),
-                ], wait: false
-            }
-            failure {
-                slackSend color: "#f02e2e", message: "Building komodo release ${env.RELEASE_NAME} failed (<${env.BUILD_URL}|Open>)"
             }
         }
     }
