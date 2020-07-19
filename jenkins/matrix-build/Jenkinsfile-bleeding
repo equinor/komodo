@@ -1,0 +1,14 @@
+pipeline {
+    agent { label "!(komodo-deploy || komodo-deploy7)"}
+
+    stages {
+        stage('Build') {
+            steps {
+                build job: 'x-build', parameters: [
+                    string(name: 'MATRIX_FILE_BASE', value: "bleeding"),
+                    booleanParam(name: 'overwrite', value: true)
+                ], wait: true
+            }
+        }
+    }
+}

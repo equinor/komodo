@@ -44,7 +44,7 @@ def fixup_python_shebangs(prefix, release):
             if _is_shebang(shebang):
                 bins_.append(bin_)
         except Exception as err:
-            print('Exception in reading bin: %s' % err)
+            print('Exception in reading bin {}: {}'.format(bin_, err))
 
     sedfxp = """sed -i 1c#!{0} {1}"""
     for bin_ in bins_:

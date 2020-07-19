@@ -2,30 +2,33 @@
 
 import argparse
 import os
-import sys
+import itertools
 from argparse import ArgumentError, ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
 from komodo import load_yaml, write_to_file, prettified_yaml
-
+from komodo.matrix import get_matrix, format_release
 
 
 def build_matrix_file(release_base, release_folder, builtins):
-    py27 = load_yaml("{}/{}-py27.yml".format(release_folder, release_base))
+    files = {}
+    py_keys = [py_ver for _, py_ver in get_matrix()]
+    for key in py_keys:
+        files[key] = load_yaml("{}/{}-{}.yml".format(release_folder, release_base, key))
 
-    py36 = load_yaml("{}/{}-py36.yml".format(release_folder, release_base))
-
-    all_packages = set(py36.keys()).union(py27.keys())
-
+    all_packages = set(itertools.chain.from_iterable(files[key].keys() for key in files))
     compiled = {}
 
     for p in all_packages:
         if p in builtins:
             compiled[p] = builtins[p]
-        elif py27.get(p) == py36.get(p):
-            compiled[p] = py27.get(p)
+            continue
+
+        if len(set([files[key].get(p) for key in files])) == 1:
+            compiled[p] = next(iter(files.values()))[p]
         else:
-            compiled[p] = {"py27": py27.get(p), "py36": py36.get(p)}
+            compiled[p] = {key: files[key].get(p) for key in py_keys}
 
     write_to_file(compiled, "{}.yml".format(release_base), False)
+
 
 def _build(packages, py_ver, rhel_ver):
     release_dict = {}
@@ -43,16 +46,13 @@ def _build(packages, py_ver, rhel_ver):
 
 
 def transpile_releases(matrix_file, output_folder):
-    release_base = os.path.basename(matrix_file).strip(".yml")
+    release_base = os.path.splitext(os.path.basename(matrix_file))[0]
     release_folder = os.path.dirname(matrix_file)
     release_matrix = load_yaml("{}.yml".format(os.path.join(release_folder, release_base)))
-    for rhel_ver in ("rhel6", "rhel7"):
-        for py_ver in ("py27", "py36"):
-            release_dict = _build(release_matrix, py_ver, rhel_ver)
-            filename = "{rel}-{pyver}-{rhel_version}.yml".format(
-                rel=release_base, pyver=py_ver, rhel_version=rhel_ver
-            )
-            write_to_file(release_dict, os.path.join(output_folder, filename))
+    for rhel_ver, py_ver in get_matrix():
+        release_dict = _build(release_matrix, py_ver, rhel_ver)
+        filename = "{}.yml".format(format_release(release_base, rhel_ver, py_ver))
+        write_to_file(release_dict, os.path.join(output_folder, filename))
 
 
 def combine(args):

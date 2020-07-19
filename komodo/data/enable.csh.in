@@ -27,9 +27,12 @@ else
     setenv MANPATH komodo_prefix/share/man:
 endif
 
+
 if $?LD_LIBRARY_PATH then
     setenv _PRE_KOMODO_LD_PATH "$LD_LIBRARY_PATH"
-    unsetenv LD_LIBRARY_PATH
+    setenv LD_LIBRARY_PATH komodo_prefix/lib:komodo_prefix/lib64:$LD_LIBRARY_PATH
+else
+    setenv LD_LIBRARY_PATH komodo_prefix/lib:komodo_prefix/lib64
 endif
 
 setenv KOMODO_RELEASE komodo_release

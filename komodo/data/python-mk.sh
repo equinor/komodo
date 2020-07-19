@@ -2,11 +2,16 @@
 
 set -e
 
+JOBS=1
+
 while test $# -gt 0; do
     case "$1" in
         --cmake)
             shift
             export CMAKE_EXEC=$1
+            ;;
+        --fakeroot)
+            shift
             ;;
         --jobs)
             shift
@@ -18,19 +23,28 @@ while test $# -gt 0; do
             ;;
         --python)
             shift
-            export PYTHON=$1
             ;;
-        --fakeroot)
+        --ld-library-path)
             shift
-            export FAKEROOT=$1
+            ;;
+        --target)
+            shift
+            export TARGET=$1
             ;;
         *)
             export OPTS="$OPTS $1"
             ;;
     esac
-
     shift
 done
 
-python setup.py build --executable $PREFIX/bin/python \
-                install --prefix $PREFIX --root $FAKEROOT
+set -x
+
+./configure --prefix=$PREFIX                    \
+            --enable-shared                     \
+            --enable-optimizations              \
+            "LDFLAGS=-Wl,-rpath=$PREFIX/lib"    \
+            $OPTS
+
+make -j$JOBS
+make -j$JOBS install

@@ -12,6 +12,7 @@ while test $# -gt 0; do
             ;;
         --fakeroot)
             shift
+            export FAKEROOT=$1
             ;;
         --jobs)
             shift
@@ -23,10 +24,7 @@ while test $# -gt 0; do
             ;;
         --python)
             shift
-            ;;
-        --target)
-            shift
-            export TARGET=$1
+            export PYTHON=$1
             ;;
         *)
             export OPTS="$OPTS $1"
@@ -35,14 +33,7 @@ while test $# -gt 0; do
     shift
 done
 
-set -x
 
-./configure --prefix=$PREFIX                    \
-            --enable-shared                     \
-            --enable-optimizations              \
-            --with-ensurepip=install            \
-            "LDFLAGS=-Wl,-rpath=$PREFIX/lib"    \
-            $OPTS
-
-make -j$JOBS
-make -j$JOBS install
+./configure --prefix=$PREFIX
+make
+make install

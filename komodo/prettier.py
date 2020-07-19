@@ -7,7 +7,7 @@ import argparse
 import functools
 
 # On Python3, StringIO can come from standard library io:
-from ruamel.yaml.compat import StringIO
+from ruamel.yaml.compat import StringIO, ordereddict
 import ruamel.yaml
 
 
@@ -119,9 +119,10 @@ def prettified_yaml(filepath, check_only=True):
 
 def write_to_file(repository, filename, check_type=True):
     if type(repository) == dict:
+        repository = ordereddict(sorted(repository.items(), key=lambda t: t[0]))
         repository = ruamel.yaml.comments.CommentedMap(repository)
     output_str = prettier(repository, check_type)
-    with open(file=filename, mode="w") as output_file:
+    with open(filename, mode="w") as output_file:
         output_file.write(output_str)
 
 

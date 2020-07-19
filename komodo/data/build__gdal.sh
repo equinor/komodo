@@ -2,11 +2,17 @@
 
 set -e
 
+JOBS=1
+
 while test $# -gt 0; do
     case "$1" in
         --cmake)
             shift
             export CMAKE_EXEC=$1
+            ;;
+        --fakeroot)
+            shift
+            export FAKEROOT=$1
             ;;
         --jobs)
             shift
@@ -20,23 +26,14 @@ while test $# -gt 0; do
             shift
             export PYTHON=$1
             ;;
-        --fakeroot)
-            shift
-            export FAKEROOT=$1
-            ;;
-        --requirement)
-            shift
-            export REQ=$1
-            ;;
         *)
             export OPTS="$OPTS $1"
             ;;
     esac
-
     shift
 done
-
-pip install .           \
-    --root $FAKEROOT    \
-    --no-deps           \
-    --prefix $PREFIX
+pushd gdal
+./configure --prefix $PREFIX --without-libtool --with-odbc=no --with-pcre=no --with-hdf5=no --with-oci=no
+make -j$JOBS
+make install 
+popd

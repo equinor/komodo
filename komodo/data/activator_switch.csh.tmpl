@@ -1,0 +1,11 @@
+setenv KOMODO_ROOT {{ prefix }}
+set KOMODO_RELEASE_REAL = "{{ release }}"
+
+if ( `uname -r` =~ *el7* ) then
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
+else
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel6/enable.csh
+endif
+
+set prompt = "[$KOMODO_RELEASE_REAL] $prompt"
+setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
