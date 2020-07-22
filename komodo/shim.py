@@ -4,10 +4,8 @@ from textwrap import dedent
 
 shim_template = dedent("""\
     #!/bin/bash
-    root=$(dirname $0)/..
-    prog=$(basename $0)
-    export LD_LIBRARY_PATH=$root/lib:$root/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-    $root/libexec/$prog "$@"
+    export LD_LIBRARY_PATH={root}/lib:{root}/lib64${{LD_LIBRARY_PATH:+:${{LD_LIBRARY_PATH}}}}
+    exec -a "$0" "{root}/libexec/{name}" "$@"
 """)
 
 
@@ -27,5 +25,5 @@ def create_shims(root):
         if os.path.isdir(src):
             continue
         with open(dst, "w") as f:
-            f.write(shim_template)
+            f.write(shim_template.format(root=root, name=name))
         os.chmod(dst, 0o755)
