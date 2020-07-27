@@ -60,7 +60,7 @@ def test_bin_are_shims(tmpdir):
         create_shims(str(tmpdir))
         for name in os.listdir(bin_path):
             with open(os.path.join(bin_path, name)) as f:
-                assert shim_template == f.read()
+                assert shim_template.format(root=tmpdir, name=name) == f.read()
 
 
 def test_executable(tmpdir):
