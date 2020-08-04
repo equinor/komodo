@@ -24,7 +24,7 @@ if $?MANPATH then
     setenv _PRE_KOMODO_MANPATH "$MANPATH"
     setenv MANPATH komodo_prefix/share/man:$MANPATH
 else
-    setenv MANPATH komodo_prefix/share/man
+    setenv MANPATH komodo_prefix/share/man:
 endif
 
 if $?LD_LIBRARY_PATH then
