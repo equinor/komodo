@@ -49,3 +49,13 @@ endif
 
 rehash
 changequote()
+
+if ( -d komodo_prefix/../motd/scripts ) then
+    foreach f (komodo_prefix/../motd/scripts/*)
+        $f
+    end
+endif
+
+if ( -d komodo_prefix/../motd/messages ) then
+    cat komodo_prefix/../motd/messages/*
+endif
