@@ -15,6 +15,9 @@ def create_shims(root):
     print("Creating libexec/ and shims in bin/")
 
     bin_path = os.path.join(root, "bin")
+    if not os.path.isdir(bin_path):
+        #No shimming needed
+        return
     libexec_path = os.path.join(root, "libexec")
     os.rename(bin_path, libexec_path)
     os.mkdir(bin_path)

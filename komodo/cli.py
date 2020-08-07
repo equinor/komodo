@@ -98,7 +98,7 @@ def _main(args):
     os.environ['PATH'] = ':'.join([os.path.join(install_root, 'bin'),
                                    os.environ.get('PATH', '')])
 
-    print('Fixup #! in pip-provided packages')
+    print('Fixup #! in pip-provided packages if bin exist')
     for pkg, ver in pkgs.items():
         if repo[pkg][ver]['make'] != 'pip': continue
 
@@ -121,6 +121,7 @@ def _main(args):
     # run any post-install scripts on the release
     if args.postinst:
         komodo.shell([args.postinst, os.path.join(args.prefix, args.release)])
+
 
 def cli_main():
     parser = argparse.ArgumentParser(description = 'build distribution')
