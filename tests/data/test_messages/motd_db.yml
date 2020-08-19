@@ -1,0 +1,15 @@
+"*py27*":
+  scripts:
+    - script1
+"*py36*":
+  messages:
+    - message1
+"no-message":
+  messages:
+    - not-existing
+"*":
+  inline:
+    - "This is an inline message\nOn two lines."
+"stable":
+  inline:
+    - "only for stable"
