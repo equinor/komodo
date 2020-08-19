@@ -26,6 +26,7 @@ setup(
             "komodo-lint-maturity = komodo.lint_maturity:main",
             'komodo-clean-repository = komodo.release_cleanup:main',
             'komodo-transpiler = komodo.release_transpiler:main',
+            'komodo-post-messages = komodo.post_messages:main',
         ]
     },
 )
