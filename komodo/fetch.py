@@ -53,6 +53,7 @@ def grab(path, filename = None, version = None, protocol = None,
 
     elif protocol in ('pypi'):
         shell([pip, 'download',
+                    '--no-deps',
                     '--dest .',
                     normalize_filename(komodo.strip_version(filename))])
 
