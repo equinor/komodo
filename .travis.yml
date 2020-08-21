@@ -56,6 +56,7 @@ script:
   - which python
   - python --version
   - python -c "import numpy;print(numpy.__file__)"
+  - python -c "import colors;print(colors.__file__)"  # ansicolors package
   - ci/travis/test_import_lib.py
 
   # Test that everything makes sense

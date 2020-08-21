@@ -44,3 +44,12 @@ wheel:
     maintainer: travis
     depends:
       - python
+
+
+this-package-name-doesnt-exist-i-checked:
+  1.1.8:
+    package-name: ansicolors
+    source: pypi
+    maintainer: travis
+    depends:
+      - python

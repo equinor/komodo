@@ -83,7 +83,7 @@ def fetch(pkgfile, repofile, outdir = None, pip = 'pip', git = 'git'):
     for pkg, ver in pkgs.items():
         print(pkg, ver)
         url = repo[pkg][ver]['source']
-        pkgname = '{}-{}'.format(pkg, ver)
+        pkgname = '{}-{}'.format(repo[pkg][ver].get("package-name", pkg), ver)
         dst = pkgname
 
         spliturl = url.split('?')[0].split('.')
