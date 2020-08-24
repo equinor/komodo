@@ -85,6 +85,11 @@ def _main(args):
     komodo.shell('rm -rf {1}/{0}.delete'.format(args.release, args.prefix),
            sudo = args.sudo)
 
+    if args.tmp:
+        # Allows e.g. pip to use this folder as tmpfolder, instead of in some
+        # cases falling back to /tmp, which is undesired when building on nfs.
+        os.environ["TMPDIR"] = args.tmp
+
     # pip hard-codes the interpreter path to whatever interpreter that was used
     # to install it. we want this to be whatever's provided by the komodo
     # release in question, so inject the just-sync'd install and re-install
