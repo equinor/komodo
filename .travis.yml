@@ -48,6 +48,7 @@ script:
                 --cache /tmp/kmd-cache                        \
                 --prefix /tmp/pfx                             \
                 --release travis                              \
+                --locations-config ci/travis/locations.yml    \
                 --renamer rename.ul
   # Build libkmd.so for testing
   - ci/travis/build_lib.sh /tmp/pfx/travis

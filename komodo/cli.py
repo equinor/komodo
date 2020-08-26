@@ -56,9 +56,6 @@ def _main(args):
 
     # create the enable script
     for tmpl, target in [("enable.in", "enable"), ("enable.csh.in", "enable.csh")]:
-        # if not os.path.exists(tmpl):
-        #     logging.warn('Could not find template %s, skipping.' % str(tmpl))
-        #     continue
         # TODO should args.release be release_path?
         with open("{}/{}".format(args.release, target), "w") as f:
             f.write(
