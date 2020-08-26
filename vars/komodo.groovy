@@ -77,11 +77,11 @@ def call(Map args = [:]) {
 
             string name: 'CODE_GIT_FORK', defaultValue: 'equinor',
                 description: 'The fork to the get the komodo build system from'
-            string name: 'CODE_GIT_REF', defaultValue: 'allow_no_python_package',
+            string name: 'CODE_GIT_REF', defaultValue: 'master',
                 description: ' The branch to get the komodo build system from'
             string name: 'CONFIG_GIT_FORK', defaultValue: 'equinor',
                 description: 'The fork to get the the komodo releases from'
-            string name: 'CONFIG_GIT_REF', defaultValue: 'rhel7-py2',
+            string name: 'CONFIG_GIT_REF', defaultValue: 'master',
                 description: 'The branch to get the komodo releases from'
         }
 
