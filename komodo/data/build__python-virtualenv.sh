@@ -27,4 +27,4 @@ while test $# -gt 0; do
     shift
 done
 
- $VIRTUALENV -p $VIRTUALENV_INTEPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}${PREFIX} 1>&2
+ $VIRTUALENV -p $VIRTUALENV_INTEPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}/${PREFIX} 1>&2
