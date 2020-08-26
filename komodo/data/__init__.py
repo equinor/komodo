@@ -7,6 +7,9 @@ class Data(object):
         Takes a list of extra_data_dirs to search."""
         self._dirs = [os.path.dirname(__file__)]
         if extra_data_dirs is not None:
+            for extra_dir in extra_data_dirs:
+                if not os.path.exists(extra_dir):
+                    raise IOError("Extra data directory {} does not exist".format(extra_dir))
             self._dirs.extend(extra_data_dirs)
 
     def get(self, file_name):
