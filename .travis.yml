@@ -43,12 +43,12 @@ script:
 
   # Full integration test
   - |
-    ./runkmd.sh ci/travis/${RELEASE} ci/travis/repository.yml \
-                --workspace /tmp/kmd-ws                       \
-                --cache /tmp/kmd-cache                        \
-                --prefix /tmp/pfx                             \
-                --release travis                              \
-                --locations-config ci/travis/locations.yml    \
+    ./runkmd.sh ci/travis/${RELEASE} ci/travis/repository.yml          \
+                --workspace /tmp/kmd-ws                                \
+                --cache /tmp/kmd-cache                                 \
+                --prefix /tmp/pfx                                      \
+                --release travis                                       \
+                --locations-config $(realpath ci/travis/locations.yml) \
                 --renamer rename.ul
   # Build libkmd.so for testing
   - ci/travis/build_lib.sh /tmp/pfx/travis
