@@ -27,7 +27,7 @@ def test_build_release_matrix(tmpdir):
         assert os.path.isfile(new_release_file)
         with open(new_release_file) as f:
             release_matrix = yaml.safe_load(f)
-            print(release_matrix)
+
         assert release_matrix["lib1"] == builtins["lib1"]
         assert release_matrix["lib2"]["py27"] == "1.2.3"
         assert release_matrix["lib2"]["py36"] == "2.3.4"
