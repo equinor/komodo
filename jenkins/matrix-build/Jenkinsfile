@@ -42,10 +42,10 @@ pipeline {
                         }
                         post {
                             success {
-                                // build job: 'komodo-suggest-symlink', parameters: [
-                                //     string(name: 'RELEASE', value: "${params.MATRIX_FILE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
-                                //     string(name: 'MODE', value: 'unstable')
-                                // ], wait: false
+                                build job: 'komodo-suggest-symlink', parameters: [
+                                    string(name: 'RELEASE', value: "${params.MATRIX_FILE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
+                                    string(name: 'MODE', value: 'unstable')
+                                ], wait: false
                                 build job: 'komodo-test', parameters: [
                                     string(name: 'RELEASE', value: "${params.MATRIX_FILE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
                                 ], wait: false
