@@ -58,3 +58,20 @@ You can auto-format repository and/or releases by running something like
 komodo-prettier repository.yml releases/*
 ```
 If you are in e.g CI and only want to check style compliance, add `--check`.
+
+## Finding reverse dependecies
+
+You can show reverse dependencies of a package by running the komodo/reverse_dep_graph.py
+Example of use:
+```bash
+python komodo/reverse_dep_graph.py releases/2020.08.01-py36.yml repository.yml --pkg libres 
+```
+If --pkg is not specified, the program will prompt for it.
+
+### Render graph
+
+Can also output a graph of the reverse dependencies in dot format which can then be rendered using 
+the dot program from the ImageMagick package. As a convenience can also render it automatically 
+using dot and display. To use this convenience you must have installed these tools, which are 
+distributed with the Graphwiz and ImageMagick packages.
+
