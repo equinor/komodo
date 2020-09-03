@@ -80,7 +80,11 @@ def main():
     parser = argparse.ArgumentParser(
         description=(
             "Extracts dependencies from a given set of packages where "
-            "versions will be resolved from a complete release file. "
+            "versions will be resolved from a complete release file. Outputs a yaml description. "
+            ""
+            "Alternatively can write a graph in the dot format. As a convenience can directly "
+            "display the graph as an image, but in that case needs dot (from Graphwiz) and display "
+            "(from ImageMagick) installed."
         )
     )
     parser.add_argument(
@@ -111,13 +115,14 @@ def main():
         "--dot",
         "-d",
         action="store_true",
-        help="Write a dot graph file to be rendered with dot",
+        help="Write a dot graph file that can be rendered with dot (from ImageMagick)",
     )
     parser.add_argument(
         "--display_dot",
         "-l",
         action="store_true",
-        help="Try to display graph with dot and eog.",
+        help="Try to display graph with dot and display. You need to have installed these tools, "
+        "distibuted with the Graphwiz and ImageMagick packages respectively",
     )
 
     args = parser.parse_args()
@@ -132,14 +137,22 @@ def main():
         with open(args.out, "w") as out:
             run(args.base_pkgs, args.repo, args.dot, pkg, out)
     elif args.display_dot:
-        dot_proc = subprocess.Popen(
-            ["dot", "-Tpng", "-o"], stdout=subprocess.PIPE, stdin=subprocess.PIPE
-        )
-        display_proc = subprocess.Popen(["display"], stdin=dot_proc.stdout)
-        out = io.TextIOWrapper(dot_proc.stdin, encoding="utf-8", line_buffering=True,)
-        run(args.base_pkgs, args.repo, True, pkg, out)
-        out.close()
-        dot_proc.stdin.close()
+        try:
+            dot_proc = subprocess.Popen(
+                ["dots", "-Tpng", "-o"], stdout=subprocess.PIPE, stdin=subprocess.PIPE
+            )
+            display_proc = subprocess.Popen(["displays"], stdin=dot_proc.stdout)
+            out = io.TextIOWrapper(
+                dot_proc.stdin, encoding="utf-8", line_buffering=True,
+            )
+            run(args.base_pkgs, args.repo, True, pkg, out)
+            out.close()
+            dot_proc.stdin.close()
+        except FileNotFoundError:
+            print(
+                "When using --display-dot You need to have the executables dot and display on "
+                "your path"
+            )
     else:
         run(args.base_pkgs, args.repo, args.dot, pkg, sys.stdout)
 
