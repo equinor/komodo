@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 from __future__ import print_function
+
+import os
 import argparse
-from pkg_resources import parse_version
 import logging
 import yaml as yml
+from pkg_resources import parse_version
 
 from collections import namedtuple
 
 kerr = namedtuple('KomodoError',
                   ['pkg', 'version', 'maintainer', 'depends', 'err'])
 
-report = namedtuple('LintReport', ['maintainers', 'dependencies', 'versions'])
+report = namedtuple('LintReport', ['release_name', 'maintainers', 'dependencies', 'versions'])
 
 MISSING_PACKAGE = 'missing package'
 MISSING_VERSION = 'missing version'
@@ -41,6 +43,20 @@ def _validate(pkg, ver, repo):
     if 'make' not in repo[pkg][ver]:
         return _kerr(pkg=pkg, version=ver, err=MISSING_MAKE)
     return _kerr(pkg=pkg, version=ver, maintainer=repo[pkg][ver]['maintainer'])
+
+
+def lint_release_name(pkgfile):
+    relname = os.path.basename(pkgfile)
+    found = False
+    for py_suffix in "-py27", "-py36":
+        for rh_suffix in "", "-rhel6", "-rhel7":
+            if relname.endswith(py_suffix + rh_suffix + ".yml"):
+                found = True
+                break
+    if not found:
+        return [_kerr(pkg=pkgfile, err="Invalid release name suffix. Must be of the most -pyXX or -pyXX-rhelY")]
+
+    return []
 
 
 def lint_maintainers(pkgs, repo):
@@ -99,8 +115,10 @@ def lint_dependencies(pkgs, repo):
 
 def lint(pkgfile, repofile):
     if isinstance(pkgfile, dict) and isinstance(repofile, dict):
+        release_name = []
         pkgs, repo = pkgfile, repofile
     else:
+        release_name = lint_release_name(pkgfile)
         try:
             with open(pkgfile, 'r') as p, open(repofile, 'r') as r:
                 pkgs, repo = yml.safe_load(p), yml.safe_load(r)
@@ -115,7 +133,7 @@ def lint(pkgfile, repofile):
     mns = lint_maintainers(pkgs, repo)
     deps = lint_dependencies(pkgs, repo)
     vers = lint_version_numbers(pkgs, repo)
-    return report(maintainers=mns, dependencies=deps, versions=vers)
+    return report(release_name=release_name, maintainers=mns, dependencies=deps, versions=vers)
 
 
 def get_args():
