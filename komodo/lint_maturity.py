@@ -189,11 +189,13 @@ def get_files_to_lint(release_folder, release_file):
     if release_folder is None:
         files_to_lint = [release_file]
     else:
-        files_to_lint = [
-            os.path.join(release_folder, file_in_dir)
-            for file_in_dir in os.listdir(release_folder)
-        ]
-
+        files_to_lint = filter(
+            lambda file: os.path.isfile(file),
+            map(
+                lambda file: os.path.join(release_folder, file),
+                os.listdir(release_folder),
+            ),
+        )
     return files_to_lint
 
 
