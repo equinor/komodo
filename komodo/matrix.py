@@ -4,8 +4,8 @@ handling an arbitrary large and funky matrix, without having to guess and/or
 repeat itself."""
 import itertools
 
-RH_VERSIONS = ["6", "7"]
-PY_VERSIONS = ["2.7", "3.6"]
+RH_VERSIONS = ["7"]
+PY_VERSIONS = ["3.6"]
 
 
 def get_matrix():
