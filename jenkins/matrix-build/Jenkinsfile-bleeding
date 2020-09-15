@@ -1,6 +1,8 @@
 pipeline {
     agent { label "!(komodo-deploy || komodo-deploy7)"}
-
+    triggers {
+        cron('@midnight')
+    }
     stages {
         stage('Build') {
             steps {
