@@ -29,8 +29,8 @@ def test_build_release_matrix(tmpdir):
             release_matrix = yaml.safe_load(f)
 
         assert release_matrix["lib1"] == builtins["lib1"]
-        assert release_matrix["lib2"]["py27"] == "1.2.3"
-        assert release_matrix["lib2"]["py36"] == "2.3.4"
+        assert "py27" not in release_matrix["lib2"]
+        assert release_matrix["lib2"] == "2.3.4"
 
 
 def test_transpile(tmpdir):
@@ -38,6 +38,6 @@ def test_transpile(tmpdir):
     release_base = os.path.basename(release_file).strip(".yml")
     with tmpdir.as_cwd():
         transpile_releases(release_file, os.getcwd())
-        for rhel_ver in ("rhel6", "rhel7"):
-            for py_ver in ("py27", "py36"):
+        for rhel_ver in ("rhel7",):
+            for py_ver in ("py36",):
                 assert os.path.isfile("{}-{}-{}.yml".format(release_base, py_ver, rhel_ver))
