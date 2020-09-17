@@ -23,7 +23,7 @@ def test_write_activator_switches(tmpdir):
     export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 else
-    echo "{migration_warning}"
+    echo -e "{migration_warning}"
 fi
 """.format(
             release=expected_release,
@@ -45,7 +45,7 @@ fi
     set prompt = "[$KOMODO_RELEASE_REAL] $prompt"
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else
-    echo "{migration_warning}"
+    echo -e "{migration_warning}"
 endif
 """.format(
             release=expected_release,
