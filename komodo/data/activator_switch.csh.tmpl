@@ -6,5 +6,5 @@ if ( `uname -r` =~ *el7* ) then
     set prompt = "[$KOMODO_RELEASE_REAL] $prompt"
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else
-    echo "{{ migration_warning }}"
+    echo -e "{{ migration_warning }}"
 endif
