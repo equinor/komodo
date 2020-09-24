@@ -6,23 +6,31 @@
 # komodo_job_dispatch in ert-statoil and ert-configurations
 
 disable_komodo () {
-    if [ -n "${_PRE_KOMODO_PATH:-}" ]
+    if [[ -v _PRE_KOMODO_PATH ]]
     then
         PATH="${_PRE_KOMODO_PATH:-}"
         export PATH
         unset _PRE_KOMODO_PATH
     fi
-    if [ -n "${_PRE_KOMODO_MANPATH:-}" ]
+
+    if [[ -v _PRE_KOMODO_MANPATH ]]
     then
         MANPATH="${_PRE_KOMODO_MANPATH:-}"
         export MANPATH
         unset _PRE_KOMODO_MANPATH
+        if [[ -z $MANPATH ]]; then
+            unset MANPATH
+        fi
     fi
-    if [ -n "${_PRE_KOMODO_LD_LIBRARY_PATH:-}" ]
+
+    if [[ -v _PRE_KOMODO_LD_LIBRARY_PATH ]]
     then
         LD_LIBRARY_PATH="${_PRE_KOMODO_LD_LIBRARY_PATH:-}"
         export LD_LIBRARY_PATH
         unset _PRE_KOMODO_LD_LIBRARY_PATH
+        if [[ -z $LD_LIBRARY_PATH ]]; then
+            unset LD_LIBRARY_PATH
+        fi
     fi
 
     if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ]
@@ -30,12 +38,16 @@ disable_komodo () {
         hash -r
     fi
 
-    if [ -n "${_PRE_KOMODO_PS1:-}" ]
+    if [[ -v _PRE_KOMODO_PS1 ]]
     then
         PS1="${_PRE_KOMODO_PS1:-}"
         export PS1
         unset _PRE_KOMODO_PS1
+        if [[ -z $PS1 ]]; then
+            unset PS1
+        fi
     fi
+
 
     unset KOMODO_RELEASE
     unset ERT_LSF_SERVER
