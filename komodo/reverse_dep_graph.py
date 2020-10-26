@@ -139,9 +139,9 @@ def main():
     elif args.display_dot:
         try:
             dot_proc = subprocess.Popen(
-                ["dots", "-Tpng", "-o"], stdout=subprocess.PIPE, stdin=subprocess.PIPE
+                ["dot", "-Tpng", "-o"], stdout=subprocess.PIPE, stdin=subprocess.PIPE
             )
-            display_proc = subprocess.Popen(["displays"], stdin=dot_proc.stdout)
+            display_proc = subprocess.Popen(["display"], stdin=dot_proc.stdout)
             out = io.TextIOWrapper(
                 dot_proc.stdin, encoding="utf-8", line_buffering=True,
             )
