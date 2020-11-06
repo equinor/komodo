@@ -51,6 +51,7 @@ while test $# -gt 0; do
     shift
 done
 
+unset DESTDIR
 $PIP install .           \
     --ignore-installed   \
     --root $FAKEROOT     \
