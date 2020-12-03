@@ -10,6 +10,7 @@ import komodo
 import komodo.local as local
 import komodo.switch as switch
 from komodo.data import Data
+from komodo.yaml_file_type import YamlFile
 
 
 def _main(args):
@@ -79,12 +80,13 @@ def _main(args):
         local.write_local_activators(data, defs, local_activator, local_csh_activator)
 
     releasedoc = os.path.join(args.release, args.release)
-    with open(args.pkgs) as p, open(args.repo) as r, open(releasedoc, "w") as y:
-        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
-
+    with open(releasedoc, "w") as y:
         release = {}
-        for pkg, ver in pkgs.items():
-            release[pkg] = {"version": ver, "maintainer": repo[pkg][ver]["maintainer"]}
+        for pkg, ver in args.pkgs.items():
+            release[pkg] = {
+                "version": ver,
+                "maintainer": args.repo[pkg][ver]["maintainer"],
+            }
         yml.dump(release, y, default_flow_style=False)
 
     if args.dry_run:
@@ -120,8 +122,8 @@ def _main(args):
     print('Fixup #! in pip-provided packages if bin exist')
     release_path = os.path.join(args.prefix, args.release)
     release_root = os.path.join(release_path, "root")
-    for pkg, ver in pkgs.items():
-        current = repo[pkg][ver]
+    for pkg, ver in args.pkgs.items():
+        current = args.repo[pkg][ver]
         if current["make"] != "pip":
             continue
 
@@ -158,8 +160,8 @@ def _main(args):
 
 def cli_main():
     parser = argparse.ArgumentParser(description="build distribution")
-    parser.add_argument("pkgs", type=str)
-    parser.add_argument("repo", type=str)
+    parser.add_argument("pkgs", type=YamlFile())
+    parser.add_argument("repo", type=YamlFile())
     parser.add_argument("--prefix", "-p", type=str, required=True)
     parser.add_argument("--release", "-r", type=str, required=True)
 
@@ -203,9 +205,6 @@ def cli_main():
     parser.add_argument("--renamer", "-R", default="rename", type=str)
 
     args = parser.parse_args()
-
-    args.pkgs = os.path.abspath(args.pkgs)
-    args.repo = os.path.abspath(args.repo)
 
     if args.workspace and not os.path.exists(args.workspace):
         os.mkdir(args.workspace)

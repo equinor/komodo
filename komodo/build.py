@@ -2,19 +2,14 @@
 
 from __future__ import print_function
 
-import argparse
-from distutils.dir_util import mkpath
 import itertools as itr
 import os
-import subprocess
 import sys
-import yaml as yml
+from distutils.dir_util import mkpath
+
 import komodo
-import sys
 
-from .shell import shell, pushd
-from komodo.data import Data
-
+from .shell import pushd, shell
 
 flatten = itr.chain.from_iterable
 
@@ -145,17 +140,19 @@ def pypaths(prefix, version):
                       '{0}/lib64/{1}/site-packages'.format(prefix, pyver) ])
 
 
-def make(pkgfile, repofile, data,
-         prefix=None,
-         dlprefix=None,
-         builddir=None,
-         jobs=1,
-         cmk='cmake',
-         pip='pip',
-         virtualenv=None,
-         fakeroot='.',):
-    with open(pkgfile) as p, open(repofile) as r:
-        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
+def make(
+    pkgs,
+    repo,
+    data,
+    prefix,
+    dlprefix=None,
+    builddir=None,
+    jobs=1,
+    cmk="cmake",
+    pip="pip",
+    virtualenv=None,
+    fakeroot=".",
+):
 
     xs = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
 
