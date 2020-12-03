@@ -30,6 +30,7 @@ def getVersion(project) {
 
 def call(Map args = [:]) {
     def project = args.project
+    def pkg = args.pkg
     def isPullRequest = args.pullRequest
     def gitCredentialsID = args.gitCredentialsID
     def agentLabel = params.KOMODO_RELEASE.contains("rhel7") ? "scout-ci7" : "scout-ci"
@@ -95,7 +96,7 @@ def call(Map args = [:]) {
                         }
                         else {
                             checkout([$class: 'GitSCM',
-                                    branches: [[name: getVersion(project)]],
+                                    branches: [[name: getVersion(pkg)]],
                                     extensions: [
                                     [$class: 'RelativeTargetDirectory', relativeTargetDir: 'source-root'],
                                 ],
