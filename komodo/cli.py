@@ -121,12 +121,14 @@ def _main(args):
     release_path = os.path.join(args.prefix, args.release)
     release_root = os.path.join(release_path, "root")
     for pkg, ver in pkgs.items():
-        if repo[pkg][ver]["make"] != "pip":
+        current = repo[pkg][ver]
+        if current["make"] != "pip":
             continue
 
+        package_name = current.get("pypi_package_name", pkg)
         shell_input = [
             args.pip,
-            "install {}=={}".format(pkg, komodo.strip_version(ver)),
+            "install {}=={}".format(package_name, komodo.strip_version(ver)),
             "--prefix",
             release_root,
             "--no-index",
@@ -135,7 +137,7 @@ def _main(args):
             "--cache-dir {}".format(args.cache),
             "--find-links {}".format(args.cache),
         ]
-        shell_input.append(repo[pkg][ver].get("makeopts"))
+        shell_input.append(current.get("makeopts"))
 
         print(komodo.shell(shell_input, sudo=args.sudo))
 
