@@ -197,23 +197,32 @@ def make(pkgfile, repofile, data,
         current = repo[pkg][ver]
         make = current['make']
         pkgpath = os.path.abspath(path)
+        if "pypi_package_name" in current and make != "pip":
+            raise ValueError("pypi_package_name is only valid when building with pip")
+
+        package_name = current.get("pypi_package_name", pkg)
 
         if extra_makeopts:
-            oldopts = current.get('makeopts', '')
-            current['makeopts'] = ' '.join((oldopts, extra_makeopts))
+            oldopts = current.get("makeopts", "")
+            current["makeopts"] = " ".join((oldopts, extra_makeopts))
 
-        current['makeopts'] = resolve(current.get('makeopts', ''))
-        build[make](pkg, ver, pkgpath, data,
-                    prefix=prefix,
-                    builddir=builddir,
-                    makeopts=current.get('makeopts'),
-                    makefile=current.get('makefile'),
-                    dlprefix=dlprefix if dlprefix else '.',
-                    jobs=jobs,
-                    cmake=cmk,
-                    pip=pip,
-                    virtualenv=virtualenv,
-                    fakeroot=fakeroot,
-                    pythonpath=build_pythonpath,
-                    binpath=build_path,
-                    ld_lib_path=build_ld_lib_path,)
+        current["makeopts"] = resolve(current.get("makeopts", ""))
+        build[make](
+            package_name,
+            ver,
+            pkgpath,
+            data,
+            prefix=prefix,
+            builddir=builddir,
+            makeopts=current.get("makeopts"),
+            makefile=current.get("makefile"),
+            dlprefix=dlprefix if dlprefix else ".",
+            jobs=jobs,
+            cmake=cmk,
+            pip=pip,
+            virtualenv=virtualenv,
+            fakeroot=fakeroot,
+            pythonpath=build_pythonpath,
+            binpath=build_path,
+            ld_lib_path=build_ld_lib_path,
+        )

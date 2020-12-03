@@ -79,11 +79,18 @@ def fetch(pkgfile, repofile, outdir = '.', pip = 'pip', git = 'git'):
 
     with pushd(outdir):
         for pkg, ver in pkgs.items():
-            print(pkg, ver)
-            url = repo[pkg][ver].get('source')
-            protocol = repo[pkg][ver].get('fetch')
-            name = '{} ({}): {}'.format(pkg, ver, url)
-            pkgname = '{}-{}'.format(pkg, ver)
+
+            current = repo[pkg][ver]
+            if "pypi_package_name" in current and current["make"] != "pip":
+                raise ValueError(
+                    "pypi_package_name is only valid when building with pip"
+                )
+
+            url = current.get("source")
+            protocol = current.get("fetch")
+            pkg_alias = current.get("pypi_package_name", pkg)
+            name = "{} ({}): {}".format(pkg_alias, ver, url)
+            pkgname = "{}-{}".format(pkg_alias, ver)
 
             if url is None and protocol is None:
                 package_folder = os.path.abspath(pkgname)
