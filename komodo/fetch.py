@@ -5,8 +5,9 @@ from __future__ import print_function
 import argparse
 import os
 import sys
-import yaml as yml
+
 import komodo
+from komodo.yaml_file_type import YamlFile
 
 from .shell import shell, pushd
 
@@ -52,10 +53,7 @@ def grab(path, filename = None, version = None, protocol = None,
         raise NotImplementedError('Unknown protocol {}'.format(protocol))
 
 
-def fetch(pkgfile, repofile, outdir = '.', pip = 'pip', git = 'git'):
-    with open(pkgfile) as p, open(repofile) as r:
-        pkgs, repo = yml.safe_load(p), yml.safe_load(r)
-
+def fetch(pkgs, repo, outdir=".", pip="pip", git="git"):
     missingpkg = [pkg for pkg in pkgs if pkg not in repo]
     missingver = [pkg for pkg, ver in pkgs.items()
                                    if pkg in repo and ver not in repo[pkg]]
@@ -132,13 +130,13 @@ def fetch(pkgfile, repofile, outdir = '.', pip = 'pip', git = 'git'):
         shell([pip, 'download', '--no-deps', '--dest .', " ".join(pypi_packages)])
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'fetch packages')
-    parser.add_argument('pkgfile',  type=str)
-    parser.add_argument('repofile', type=str)
-    parser.add_argument('--output', '-o', type=str)
-    parser.add_argument('--pip', type=str, default = 'pip')
-    parser.add_argument('--git', type=str, default = 'git')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="fetch packages")
+    parser.add_argument("pkgfile", type=YamlFile())
+    parser.add_argument("repofile", type=YamlFile())
+    parser.add_argument("--output", "-o", type=str)
+    parser.add_argument("--pip", type=str, default="pip")
+    parser.add_argument("--git", type=str, default="git")
     args = parser.parse_args()
     fetch(args.pkgfile, args.repofile, outdir = args.output,
                                        pip = args.pip,

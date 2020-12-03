@@ -6,6 +6,7 @@ import sys
 
 import yaml
 
+from komodo.yaml_file_type import YamlFile
 
 VALID_VISIBILITY = ["public", "private"]
 VALID_IMPORTANCE = ["low", "medium", "high"]
@@ -59,16 +60,12 @@ def get_parser():
     parser = argparse.ArgumentParser(description=("Lint the package status file."))
     parser.add_argument(
         "package_status",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        type=YamlFile(),
         help="File with all package statuses.",
     )
     parser.add_argument(
         "repository",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        type=YamlFile(),
         help="Repository file with all packages listed with dependencies.",
     )
     return parser
@@ -78,13 +75,9 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    with open(args.package_status) as ps, open(args.repository) as r:
-        package_status, repository = yaml.safe_load(ps), yaml.safe_load(r)
-
-    run(package_status, repository)
+    run(args.package_status, args.repository)
     print("Package status file is valid!")
 
 
 if __name__ == "__main__":
     main()
-
