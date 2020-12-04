@@ -1,8 +1,8 @@
 import os
 import sys
 from argparse import ArgumentError, ArgumentParser, ArgumentTypeError
-from komodo import load_yaml, write_to_file, prettified_yaml
-from komodo.prettier import prettier
+
+from komodo.prettier import load_yaml, prettier, prettified_yaml, write_to_file
 
 
 def load_all_releases(files):

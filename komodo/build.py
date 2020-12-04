@@ -7,9 +7,8 @@ import os
 import sys
 from distutils.dir_util import mkpath
 
-import komodo
-
-from .shell import pushd, shell
+from komodo.package_version import strip_version
+from komodo.shell import pushd, shell
 
 flatten = itr.chain.from_iterable
 
@@ -107,20 +106,28 @@ def sh(pkg, ver, pkgpath, data, prefix, makefile, *args, **kwargs):
 def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
     print('Installing {} ({}) with rsync'.format(pkg, ver))
     # assume a root-like layout in the pkgpath dir, and just copy it
-    shell(['rsync -am', kwargs.get('makeopts'), '{}/'.format(pkgpath), kwargs['fakeroot'] + prefix])
+    shell(
+        [
+            "rsync -am",
+            kwargs.get("makeopts"),
+            "{}/".format(pkgpath),
+            kwargs["fakeroot"] + prefix,
+        ]
+    )
 
 
-def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip='pip', *args, **kwargs):
-    cmd = [pip,
-           'install {}=={}'.format(pkg, komodo.strip_version(ver)),
-           '--root {}'.format(kwargs['fakeroot']),
-           '--prefix {}'.format(prefix),
-           '--no-index',
-           '--no-deps',
-           '--ignore-installed',
-           '--cache-dir {}'.format(dlprefix),
-           '--find-links {}'.format(dlprefix),
-           kwargs.get('makeopts', ''),
+def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip="pip", *args, **kwargs):
+    cmd = [
+        pip,
+        "install {}=={}".format(pkg, strip_version(ver)),
+        "--root {}".format(kwargs["fakeroot"]),
+        "--prefix {}".format(prefix),
+        "--no-index",
+        "--no-deps",
+        "--ignore-installed",
+        "--cache-dir {}".format(dlprefix),
+        "--find-links {}".format(dlprefix),
+        kwargs.get("makeopts", ""),
     ]
 
     print('Installing {} ({}) from pip'.format(pkg, ver))

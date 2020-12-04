@@ -5,8 +5,7 @@ import unittest
 
 from ruamel.yaml.constructor import DuplicateKeyError
 
-import komodo
-
+from komodo.prettier import load_yaml, prettier
 
 INPUT_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), "input")
 
@@ -20,30 +19,24 @@ class TestPrettier(unittest.TestCase):
     def test_repository_prettifying(self):
         pretty_repository = TestPrettier.get_yaml_string("pretty_repository.yml")
         self.assertEqual(
-            komodo.prettier(
-                komodo.load_yaml(os.path.join(INPUT_FOLDER, "ugly_repository.yml"))
-            ),
+            prettier(load_yaml(os.path.join(INPUT_FOLDER, "ugly_repository.yml"))),
             pretty_repository,
         )
 
     def test_release_prettifying(self):
         pretty_release = TestPrettier.get_yaml_string("pretty_release.yml")
         self.assertEqual(
-            komodo.prettier(
-                komodo.load_yaml(os.path.join(INPUT_FOLDER, "ugly_release.yml"))
-            ),
+            prettier(load_yaml(os.path.join(INPUT_FOLDER, "ugly_release.yml"))),
             pretty_release,
         )
 
     def test_duplicate_entries(self):
         with self.assertRaises(SystemExit):
-            komodo.load_yaml(os.path.join(INPUT_FOLDER, "duplicate_repository.yml"))
+            load_yaml(os.path.join(INPUT_FOLDER, "duplicate_repository.yml"))
 
     def test_inconsistent_config(self):
         with self.assertRaises(ValueError):
-            komodo.prettier(
-                komodo.load_yaml(os.path.join(INPUT_FOLDER, "inconsistent_config.yml"))
-            )
+            prettier(load_yaml(os.path.join(INPUT_FOLDER, "inconsistent_config.yml")))
 
 
 if __name__ == "__main__":

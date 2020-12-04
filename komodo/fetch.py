@@ -6,10 +6,9 @@ import argparse
 import os
 import sys
 
-import komodo
+from komodo.package_version import strip_version
+from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
-
-from .shell import shell, pushd
 
 
 def eprint(*args, **kwargs):
@@ -33,12 +32,17 @@ def grab(path, filename = None, version = None, protocol = None,
         shell('wget --quiet {} -O {}'.format(path, filename))
     elif protocol in ('git'):
         shell(
-            '{git} clone '
-            '--depth 50 '
-            '-b {version} '
-            '-q --recursive '
-            '-- {path} {filename}'
-            ''.format(git=git, version=komodo.strip_version(version), path=path, filename=filename)
+            "{git} clone "
+            "--depth 50 "
+            "-b {version} "
+            "-q --recursive "
+            "-- {path} {filename}"
+            "".format(
+                git=git,
+                version=strip_version(version),
+                path=path,
+                filename=filename,
+            )
         )
 
     elif protocol in ('nfs', 'fs-ln'):
@@ -107,9 +111,9 @@ def fetch(pkgs, repo, outdir=".", pip="pip", git="git"):
             if ext in ['rpm', 'tar', 'gz', 'tgz', 'tar.gz', 'tar.bz2', 'tar.xz']:
                 dst = '{}.{}'.format(dst, ext)
 
-            if url == 'pypi':
-                print('Defering download of {}'.format(name))
-                pypi_packages.append(normalize_filename(komodo.strip_version(dst)))
+            if url == "pypi":
+                print("Defering download of {}".format(name))
+                pypi_packages.append(normalize_filename(strip_version(dst)))
                 continue
 
             print('Downloading {}'.format(name))

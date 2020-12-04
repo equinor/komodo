@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 
 import argparse
-import os
 import itertools
-from argparse import ArgumentError, ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
-from komodo import load_yaml, write_to_file, prettified_yaml
-from komodo.matrix import get_matrix, format_release
+import os
+from argparse import (
+    ArgumentError,
+    ArgumentParser,
+    ArgumentTypeError,
+    RawTextHelpFormatter,
+)
+
+from komodo.matrix import format_release, get_matrix
+from komodo.prettier import load_yaml, write_to_file
 
 
 def build_matrix_file(release_base, release_folder, builtins):
