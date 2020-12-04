@@ -1,7 +1,8 @@
-import komodo
-import os
 import json
+import os
+
 from komodo.data import Data
+from komodo.shell import shell
 
 
 def _create_script(kmd_prefix, kmd_pyver, kmd_release, target, template):
@@ -9,7 +10,7 @@ def _create_script(kmd_prefix, kmd_pyver, kmd_release, target, template):
     os.mkdir(kmd_release)
     with open("{}/{}".format(kmd_release, target), "w") as f:
         f.write(
-            komodo.shell(
+            shell(
                 [
                     "m4 {}".format(data.get("enable.m4")),
                     "-D komodo_prefix={}".format(kmd_prefix),
@@ -61,7 +62,7 @@ def test_enable_bash_nopresets(tmpdir):
                 )
             )
 
-        komodo.shell(["bash test_enable.sh"])
+        shell(["bash test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
 
         assert "LD_LIBRARY_PATH" not in pre_env
@@ -92,7 +93,7 @@ def test_enable_csh_no_presets(tmpdir):
                 )
             )
 
-        komodo.shell(["csh test_enable.sh"])
+        shell(["csh test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
 
         assert "LD_LIBRARY_PATH" not in pre_env
@@ -121,7 +122,7 @@ def test_enable_bash_with_presets(tmpdir):
                 )
             )
 
-        komodo.shell(["bash test_enable.sh"])
+        shell(["bash test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
         assert pre_env["LD_LIBRARY_PATH"] == "/some/path"
         assert sourced_env["LD_LIBRARY_PATH"] == "prefix/lib:prefix/lib64:/some/path"
@@ -151,7 +152,7 @@ def test_enable_csh_with_presets(tmpdir):
                 )
             )
 
-        komodo.shell(["csh test_enable.sh"])
+        shell(["csh test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
 
         assert pre_env["LD_LIBRARY_PATH"] == "/some/path"

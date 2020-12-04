@@ -6,10 +6,14 @@ import sys
 
 import yaml as yml
 
-import komodo
 import komodo.local as local
 import komodo.switch as switch
+from komodo.build import make
 from komodo.data import Data
+from komodo.fetch import fetch
+from komodo.package_version import strip_version
+from komodo.shebang import fixup_python_shebangs
+from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
 
 
@@ -19,9 +23,7 @@ def _main(args):
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
     if args.download or (not args.build and not args.install):
-        komodo.fetch(
-            args.pkgs, args.repo, outdir=args.cache, pip=args.pip, git=args.git
-        )
+        fetch(args.pkgs, args.repo, outdir=args.cache, pip=args.pip, git=args.git)
 
     if args.download and not args.build:
         sys.exit(0)
@@ -32,7 +34,7 @@ def _main(args):
     tmp_prefix = os.path.join(os.path.join(args.prefix), args.release, "root")
     fakeroot = os.path.abspath(args.release)
     if args.build or not args.install:
-        komodo.make(
+        make(
             args.pkgs,
             args.repo,
             data,
@@ -45,8 +47,8 @@ def _main(args):
             virtualenv=args.virtualenv,
             fakeroot=fakeroot,
         )
-        komodo.shell("mv {} {}".format(args.release + tmp_prefix, args.release))
-        komodo.shell(
+        shell("mv {} {}".format(args.release + tmp_prefix, args.release))
+        shell(
             "rmdir -p --ignore-fail-on-non-empty {}".format(
                 os.path.dirname(args.release + tmp_prefix)
             )
@@ -60,7 +62,7 @@ def _main(args):
         # TODO should args.release be release_path?
         with open("{}/{}".format(args.release, target), "w") as f:
             f.write(
-                komodo.shell(
+                shell(
                     [
                         "m4 {}".format(data.get("enable.m4")),
                         "-D komodo_prefix={}".format(tmp_prefix),
@@ -95,24 +97,22 @@ def _main(args):
     print("Installing {} to {}".format(args.release, args.prefix))
     install_root = os.path.join(args.prefix, args.release, "root")
 
-    komodo.shell("{1} {0} .{0} {0}".format(args.release, args.renamer))
-    komodo.shell("rsync -a .{} {}".format(args.release, args.prefix), sudo=args.sudo)
+    shell("{1} {0} .{0} {0}".format(args.release, args.renamer))
+    shell("rsync -a .{} {}".format(args.release, args.prefix), sudo=args.sudo)
 
     if os.path.exists("{1}/{0}".format(args.release, args.prefix)):
-        komodo.shell(
+        shell(
             "{2} {0} {0}.delete {1}/{0}".format(
                 args.release, args.prefix, args.renamer
             ),
             sudo=args.sudo,
         )
 
-    komodo.shell(
+    shell(
         "{2} .{0} {0} {1}/.{0}".format(args.release, args.prefix, args.renamer),
         sudo=args.sudo,
     )
-    komodo.shell(
-        "rm -rf {1}/{0}.delete".format(args.release, args.prefix), sudo=args.sudo
-    )
+    shell("rm -rf {1}/{0}.delete".format(args.release, args.prefix), sudo=args.sudo)
 
     if args.tmp:
         # Allows e.g. pip to use this folder as tmpfolder, instead of in some
@@ -130,7 +130,7 @@ def _main(args):
         package_name = current.get("pypi_package_name", pkg)
         shell_input = [
             args.pip,
-            "install {}=={}".format(package_name, komodo.strip_version(ver)),
+            "install {}=={}".format(package_name, strip_version(ver)),
             "--prefix",
             release_root,
             "--no-index",
@@ -141,21 +141,21 @@ def _main(args):
         ]
         shell_input.append(current.get("makeopts"))
 
-        print(komodo.shell(shell_input, sudo=args.sudo))
+        print(shell(shell_input, sudo=args.sudo))
 
-    komodo.fixup_python_shebangs(args.prefix, args.release)
+    fixup_python_shebangs(args.prefix, args.release)
 
     switch.create_activator_switch(data, args.prefix, args.release)
 
     # run any post-install scripts on the release
     if args.postinst:
-        komodo.shell([args.postinst, release_path])
+        shell([args.postinst, release_path])
 
     print("running", "find {} -name '*.pyc' -delete".format(release_root))
-    komodo.shell("find {} -name '*.pyc' -delete".format(release_root))
+    shell("find {} -name '*.pyc' -delete".format(release_root))
 
     print("Setting permissions", [data.get("set_permissions.sh"), release_path])
-    komodo.shell([data.get("set_permissions.sh"), release_path])
+    shell([data.get("set_permissions.sh"), release_path])
 
 
 def cli_main():
@@ -209,7 +209,7 @@ def cli_main():
     if args.workspace and not os.path.exists(args.workspace):
         os.mkdir(args.workspace)
 
-    with komodo.pushd(args.workspace):
+    with pushd(args.workspace):
         _main(args)
 
 

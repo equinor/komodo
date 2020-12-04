@@ -1,6 +1,9 @@
-import pytest  # noqa
 import os
+
+import pytest  # noqa
+
 import komodo
+from komodo.shebang import fixup_python_shebangs
 
 
 def test_fixup_python_shebangs(tmpdir):
@@ -12,7 +15,7 @@ def test_fixup_python_shebangs(tmpdir):
     with open(os.path.join(bindir, "bad_shebang"), "w") as f:
         f.write("#!/wildly/wrong/path/to\xe7\x8e\xa9/python\n")
 
-    komodo.fixup_python_shebangs(prefix, "release")
+    fixup_python_shebangs(prefix, "release")
 
     target = "#!{}".format(os.path.join(bindir, "python\n"))
     with open(os.path.join(bindir, "bad_shebang")) as f:
