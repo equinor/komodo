@@ -1,0 +1,61 @@
+name: Testing
+
+on: [pull_request]
+
+jobs:
+  build:
+
+    env:
+      RELEASE: release-py37.yml
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install csh
+      
+    - name: Setup Komodo
+      run: |
+        ./bootstrap.sh `which python`
+
+    - name: Unit tests
+      run: boot/kmd-env/bin/python -m pytest tests
+
+    - name: Lint tests
+      run: |
+        boot/kmd-env/bin/python -m komodo.lint examples/releases/unstable.yml examples/repository.yml
+        boot/kmd-env/bin/python -m komodo.lint examples/releases/ecl.yml examples/repository.yml
+
+    - name: Full integration test
+      run: |
+        ./runkmd.sh ci/travis/${RELEASE} ci/travis/repository.yml --workspace /tmp/kmd-ws --cache /tmp/kmd-cache --prefix /tmp/pfx --release travis --locations-config $(realpath ci/travis/locations.yml) --renamer rename.ul
+    - name: Build libkmd.so for testing
+      run: |
+        ci/travis/build_lib.sh /tmp/pfx/travis
+
+        source /tmp/pfx/travis/enable
+        which python
+        python --version
+        python -c "import numpy;print(numpy.__file__)"
+        ci/travis/test_import_lib.py
+
+    - name: Test that everything makes sense
+      run: |
+        source /tmp/pfx/travis/enable
+        [[ "$(which python)" == "/tmp/pfx/travis/root/bin/python" ]]
