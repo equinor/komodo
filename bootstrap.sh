@@ -30,9 +30,9 @@ function install_komodo {
 
     python3_bin=/usr/bin/python3
 
-    if [[ -n "${TRAVIS:-}" ]]; then
+    if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
         # Travis provides Python via a virtualenv, lets respect that
-        python3_bin=/opt/python/${TRAVIS_PYTHON_VERSION}/bin/python3
+        python3_bin=`which python`
     fi
     if [[ ! -f "${python3_bin}" ]]; then
         # Lets assume we're on an Equinor machine
@@ -54,8 +54,8 @@ function install_devtoolset {
     # we don't need to use LD_LIBRARY_PATH or any other environment variables to
     # get this to work.
 
-    if [[ -n "${TRAVIS:-}" ]]; then
-        # Travis uses Ubuntu which doesn't have devtoolset, but the build tools
+    if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+        # Github Actions uses Ubuntu which doesn't have devtoolset, but the build tools
         # are new enough
         return
     fi
@@ -76,9 +76,9 @@ function install_cmake {
     # Use /usr/bin/cmake3 instead.
 
     cmake_bin=/usr/bin/cmake3
-    if [[ -n "${TRAVIS:-}" ]]; then
+    if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
         # On Ubuntu 18.04 (bionic), the 'cmake' package is CMake 3.10
-        cmake_bin=/usr/bin/cmake
+        cmake_bin=/usr/local/bin/cmake
     fi
     if [[ ! -f "${cmake_bin}" ]]; then
         echo "Couldn't find a CMake3 executable"
@@ -110,7 +110,7 @@ function install_git {
 function install_build_env {
     echo "Using ${python_bin} for target"
     boot/kmd-env/bin/virtualenv --python=${python_bin} boot/build-env
-    boot/build-env/bin/pip install --upgrade pip setuptools wheel
+    boot/build-env/bin/pip install --upgrade pip setuptools wheel virtualenv
     ln -s $PWD/boot/build-env/bin/pip boot/bintools/
 }
 
