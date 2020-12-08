@@ -136,7 +136,6 @@ def call(Map args = [:]) {
                         source ${env.WORKSPACE}/ci_helper.sh
 
                         set -x
-                        git log -n 1
                         if [ -f "${env.CI_SOURCE_ROOT}/ci/jenkins/testkomodo.sh" ]; then
                             source ${env.CI_SOURCE_ROOT}/ci/jenkins/testkomodo.sh
                         fi
