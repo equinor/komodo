@@ -42,7 +42,9 @@ fi
     set KOMODO_RELEASE_REAL = "{release}"
 
     source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
-    set prompt = "[$KOMODO_RELEASE_REAL] $prompt"
+    if ( $?prompt ) then
+        set prompt = "[$KOMODO_RELEASE_REAL] $prompt"
+    endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else
     echo -e "{migration_warning}"
