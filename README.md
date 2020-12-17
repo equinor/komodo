@@ -6,12 +6,12 @@ Komodo is a software distribution system.
 
 The purpose of Komodo is to be able to automatically, reproducibly, testably
 create a software distribution containing all systems Software Innovation Bergen
-is responsible for.  Automatic deploy of new releases as well as nightly deploy
+is responsible for. Automatic deploy of new releases as well as nightly deploy
 and the option of automatically moving the testing stage will be supported.
 
 ## Overall goal
 
-We have a repository of packages.  Each package contains
+We have a repository of packages. Each package contains
 * a list of versions
 * dependencies
 * source
@@ -21,9 +21,10 @@ We have a repository of packages.  Each package contains
 The repository.yml may look like this:
 
 ```yml
-boost:
-  version: 1.60
-  rpm: path
+ert:
+  version: 2.17
+  source: pypi
+  make: pip
 opm-parser:
   version: 1.2.0
   depends:
@@ -34,7 +35,6 @@ ecl:
   version: 2.3
   git: git@github.com:statoil/libecl
 ```
-
 
 Then a release, e.g. _unstable_ is defined as another YAML file,
 e.g. `unstable.yml`, containing
@@ -47,7 +47,6 @@ ecl: 2.3
 
 A full software distribution can then be built and deployed to a specified path,
 e.g. `/my/software/center/unstable`.
-
 
 To use, `source /my/software/center/unstable/enable`.
 
@@ -71,7 +70,21 @@ If --pkg is not specified, the program will prompt for it.
 ### Render graph
 
 Can also output a graph of the reverse dependencies in dot format which can then be rendered using 
-the dot program from the ImageMagick package. As a convenience can also render it automatically 
+the dot program from the `ImageMagick` package. As a convenience can also render it automatically 
 using dot and display. To use this convenience you must have installed these tools, which are 
 distributed with the Graphwiz and ImageMagick packages.
 
+## Install
+
+```bash
+pip install git+https://github.com/equinor/komodo.git
+```
+
+## Run tests
+
+```bash
+git clone https://github.com/equinor/komodo.git
+cd komodo
+pip install -r dev-requirements.txt
+pytest tests
+```
