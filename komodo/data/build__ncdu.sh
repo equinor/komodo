@@ -31,6 +31,6 @@ done
 
 
 export CFLAGS="-ltinfo"
-./configure --prefix=$PREFIX
+./configure --disable-dependency-tracking --prefix=$PREFIX
 make
 make install
