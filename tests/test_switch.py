@@ -43,7 +43,7 @@ fi
 
     source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
     if ( $?prompt ) then
-        set prompt = "[$KOMODO_RELEASE_REAL] $prompt"
+        set prompt = "[$KOMODO_RELEASE_REAL] $_PRE_KOMODO_PS1"
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else
