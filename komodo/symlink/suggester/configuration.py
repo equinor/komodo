@@ -38,7 +38,7 @@ class Configuration(object):
             # ripe is when stable is -1 month ago, ours is that the handle
             # already points to a release in the same month
             # if no stable, then it is ripe
-            handle_ripe = stable.monthly_diff(release) == -1 if stable else True
+            handle_ripe = stable.monthly_diff(release) <= -1 if stable else True
             handle_ours = link_exists and linked_release.monthly_diff(release) == 0
             if handle_ripe or handle_ours:
 
