@@ -222,6 +222,32 @@ def test_get_concrete_release(conf, link, concrete):
 }
 """,
         ),
+        # suggest testing update after skipped month
+        (
+            """{"links": {
+        "2020.11-py37": "2020.11.04-py37",
+        "2020.12-py37": "2020.12.rc2-py37",
+        "stable-py3": "stable-py37",
+        "stable-py37": "2020.11-py37",
+        "testing-py3": "testing-py37",
+        "testing-py37": "2020.12-py37"
+    }}""",
+            "2021.01.rc3-py37",
+            "testing",
+            "changed",
+            """{
+    "links": {
+        "2020.11-py37": "2020.11.04-py37",
+        "2020.12-py37": "2020.12.rc2-py37",
+        "2021.01-py37": "2021.01.rc3-py37",
+        "stable-py3": "stable-py37",
+        "stable-py37": "2020.11-py37",
+        "testing-py3": "testing-py37",
+        "testing-py37": "2021.01-py37"
+    }
+}
+""",
+        ),
     ],
 )
 def test_update(json_in, release_id, mode, changed, json_out):
