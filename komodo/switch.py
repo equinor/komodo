@@ -1,4 +1,5 @@
 import os
+import shutil
 from jinja2 import Template
 
 
@@ -18,8 +19,7 @@ def create_activator_switch(data, prefix, release):
 
     release_path = os.path.join(prefix, release_py)
     if os.path.exists(release_path):
-        print("{} existed, doing nothing".format(release_path))
-        return
+        shutil.rmtree(release_path)
 
     os.makedirs(release_path)
 
