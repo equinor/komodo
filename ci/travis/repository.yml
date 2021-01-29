@@ -20,18 +20,6 @@ python:
     makefile: build__python-virtualenv.sh
     maintainer: ci
     makeopts: --virtualenv-interpreter python3
-  # 3.7.7:
-  #   source: /tmp/target-python
-  #   fetch: fs-cp
-  #   make: rsync
-  #   makeopts: --exclude=site-packages
-  #   maintainer: travis
-  # 2.7.18:
-  #   source: /tmp/target-python
-  #   fetch: fs-cp
-  #   make: rsync
-  #   makeopts: --exclude=site-packages
-  #   maintainer: travis
 
 setuptools:
   41.4.0:
