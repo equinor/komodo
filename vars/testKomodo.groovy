@@ -76,7 +76,7 @@ def call(Map args = [:]) {
                     sh 'komodoenv-venv/bin/pip install git+https://github.com/equinor/komodoenv.git'
 
                     // Use komodoenv to generate a komodoenv
-                    sh "komodoenv-venv/bin/komodoenv -r${env.CI_KOMODO_RELEASE} test-kenv"
+                    sh "komodoenv-venv/bin/komodoenv -r${env.CI_KOMODO_RELEASE} --no-update test-kenv"
 
                     // Git clone
                     script {
