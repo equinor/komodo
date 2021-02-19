@@ -21,6 +21,7 @@ setup(
         "packaging",
         "PyGithub",
         "jinja2",
+        "pysnyk; python_version >= '3.7'",
     ],
     entry_points={
         "console_scripts": [
@@ -36,6 +37,7 @@ setup(
             'komodo-clean-repository = komodo.release_cleanup:main',
             'komodo-transpiler = komodo.release_transpiler:main',
             'komodo-post-messages = komodo.post_messages:main',
+            'komodo-snyk-test = komodo.snyk_reporting:main',
         ]
     },
 )
