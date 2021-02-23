@@ -77,7 +77,7 @@ def test_make_pip_package_from_latest(captured_shell_commands, tmpdir):
     with patch("komodo.build.latest_pypi_version") as mock_latest_version:
         mock_latest_version.return_value = "1.0.0"
         make(packages, repositories, {}, str(tmpdir))
-
+        mock_latest_version.assert_called_once_with("PyYaml")
     assert len(captured_shell_commands) == 2
     assert "mkdir" in " ".join(captured_shell_commands[0])
     assert "pip install PyYaml==1.0.0" in " ".join(captured_shell_commands[1])

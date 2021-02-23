@@ -96,4 +96,5 @@ def test_fetch_pip_with_latest_version(captured_shell_commands, tmpdir):
     with patch("komodo.fetch.latest_pypi_version") as mock_latest_ver:
         mock_latest_ver.return_value = "1.0.0"
         fetch(packages, repositories, str(tmpdir))
+        mock_latest_ver.assert_called_once_with("ert3")
         assert "ert3==1.0.0" in captured_shell_commands[0]

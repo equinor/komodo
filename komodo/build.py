@@ -119,7 +119,7 @@ def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
 def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip="pip", *args, **kwargs):
     ver = strip_version(ver)
     if ver == LATEST_PACKAGE_ALIAS:
-        ver = latest_pypi_version(ver)
+        ver = latest_pypi_version(pkg)
     cmd = [
         pip,
         "install {}=={}".format(pkg, strip_version(ver)),
