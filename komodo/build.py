@@ -7,7 +7,7 @@ import os
 import sys
 from distutils.dir_util import mkpath
 
-from komodo.package_version import strip_version
+from komodo.package_version import LATEST_PACKAGE_ALIAS, latest_pypi_version, strip_version
 from komodo.shell import pushd, shell
 
 flatten = itr.chain.from_iterable
@@ -117,6 +117,9 @@ def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
 
 
 def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip="pip", *args, **kwargs):
+    ver = strip_version(ver)
+    if ver == LATEST_PACKAGE_ALIAS:
+        ver = latest_pypi_version(ver)
     cmd = [
         pip,
         "install {}=={}".format(pkg, strip_version(ver)),

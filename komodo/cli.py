@@ -11,7 +11,7 @@ import komodo.switch as switch
 from komodo.build import make
 from komodo.data import Data
 from komodo.fetch import fetch
-from komodo.package_version import strip_version
+from komodo.package_version import LATEST_PACKAGE_ALIAS, latest_pypi_version, strip_version
 from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
@@ -128,6 +128,8 @@ def _main(args):
             continue
 
         package_name = current.get("pypi_package_name", pkg)
+        if ver == LATEST_PACKAGE_ALIAS:
+            ver = latest_pypi_version(package_name)
         shell_input = [
             args.pip,
             "install {}=={}".format(package_name, strip_version(ver)),

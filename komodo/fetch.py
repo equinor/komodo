@@ -6,7 +6,7 @@ import argparse
 import os
 import sys
 
-from komodo.package_version import strip_version
+from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version, latest_pypi_version
 from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
 
@@ -91,6 +91,10 @@ def fetch(pkgs, repo, outdir=".", pip="pip", git="git"):
             url = current.get("source")
             protocol = current.get("fetch")
             pkg_alias = current.get("pypi_package_name", pkg)
+
+            if url == "pypi" and ver == LATEST_PACKAGE_ALIAS:
+                ver = latest_pypi_version(pkg_alias)
+
             name = "{} ({}): {}".format(pkg_alias, ver, url)
             pkgname = "{}-{}".format(pkg_alias, ver)
 

@@ -1,6 +1,8 @@
-import pytest
+from unittest.mock import patch
 
+import pytest
 from komodo.build import make
+from komodo.package_version import LATEST_PACKAGE_ALIAS
 
 
 @pytest.fixture
@@ -56,6 +58,29 @@ def test_make_one_pip_package_different_name(captured_shell_commands, tmpdir):
     assert len(captured_shell_commands) == 2
     assert "mkdir" in " ".join(captured_shell_commands[0])
     assert "pip install PyYaml==20.4.0" in " ".join(captured_shell_commands[1])
+
+
+def test_make_pip_package_from_latest(captured_shell_commands, tmpdir):
+    packages = {"yaml": LATEST_PACKAGE_ALIAS}
+    repositories = {
+        "yaml": {
+            LATEST_PACKAGE_ALIAS: {
+                "source": "pypi",
+                "pypi_package_name": "PyYaml",
+                "make": "pip",
+                "maintainer": "someone",
+                "depends": [],
+            }
+        }
+    }
+
+    with patch("komodo.build.latest_pypi_version") as mock_latest_version:
+        mock_latest_version.return_value = "1.0.0"
+        make(packages, repositories, {}, str(tmpdir))
+
+    assert len(captured_shell_commands) == 2
+    assert "mkdir" in " ".join(captured_shell_commands[0])
+    assert "pip install PyYaml==1.0.0" in " ".join(captured_shell_commands[1])
 
 
 def test_make_sh_does_not_accept_pypi_package_name(captured_shell_commands, tmpdir):
