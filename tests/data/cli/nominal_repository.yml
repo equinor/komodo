@@ -23,6 +23,13 @@ hackres:
     makefile: test_build_script.sh
     maintainer: bob
 
+ert:
+  '*':
+    source: pypi
+    fetch: pip
+    make: pip
+    maintainer: vladimir_harkonnen
+
 qt5:
   5.13.6-builtin:
     make: noop

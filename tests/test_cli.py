@@ -5,6 +5,7 @@ import os
 from komodo.cli import cli_main
 from tests import _get_test_root
 import shutil
+from komodo.package_version import LATEST_PACKAGE_ALIAS
 
 
 @pytest.mark.parametrize(
@@ -56,7 +57,8 @@ def test_main(args, tmpdir):
 
     cli_main()
 
-    release_path = os.path.join(tmpdir, "prefix", args[10])  # release name
+    release_name = args[10]
+    release_path = os.path.join(tmpdir, "prefix", release_name)
 
     assert os.path.exists(os.path.join(release_path, "root/lib/hackres.so"))
     assert os.path.exists(os.path.join(release_path, "root/lib/python4.2.so"))
@@ -65,3 +67,9 @@ def test_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "enable.csh"))
     assert os.path.exists(os.path.join(release_path, "local"))
     assert os.path.exists(os.path.join(release_path, "local.csh"))
+
+    # test specifically for the regression introduced by
+    # https://github.com/equinor/komodo/issues/190 where if you provided ert
+    # with version '*', it would then show up in the releasedoc.
+    with open(os.path.join(release_path, release_name)) as releasedoc:
+        assert f"version: '{LATEST_PACKAGE_ALIAS}'" not in releasedoc.read()

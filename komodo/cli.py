@@ -85,9 +85,12 @@ def _main(args):
     with open(releasedoc, "w") as y:
         release = {}
         for pkg, ver in args.pkgs.items():
+            maintainer = args.repo[pkg][ver]["maintainer"]
+            if ver == LATEST_PACKAGE_ALIAS:
+                ver = latest_pypi_version(pkg)
             release[pkg] = {
                 "version": ver,
-                "maintainer": args.repo[pkg][ver]["maintainer"],
+                "maintainer": maintainer,
             }
         yml.dump(release, y, default_flow_style=False)
 
