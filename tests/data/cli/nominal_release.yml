@@ -3,3 +3,4 @@ setuptools: 44.0.1
 hackres: 0.0.5289
 python: 2.7.5-builtin
 qt5: 5.13.6-builtin
+ert: '*'
