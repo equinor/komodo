@@ -85,9 +85,10 @@ def _main(args):
     with open(releasedoc, "w") as y:
         release = {}
         for pkg, ver in args.pkgs.items():
+            entry = args.repo[pkg][ver]
             maintainer = args.repo[pkg][ver]["maintainer"]
             if ver == LATEST_PACKAGE_ALIAS:
-                ver = latest_pypi_version(pkg)
+                ver = latest_pypi_version(entry.get("pypi_package_name", pkg))
             release[pkg] = {
                 "version": ver,
                 "maintainer": maintainer,

@@ -68,8 +68,13 @@ def test_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "local"))
     assert os.path.exists(os.path.join(release_path, "local.csh"))
 
-    # test specifically for the regression introduced by
-    # https://github.com/equinor/komodo/issues/190 where if you provided ert
-    # with version '*', it would then show up in the releasedoc.
     with open(os.path.join(release_path, release_name)) as releasedoc:
-        assert f"version: '{LATEST_PACKAGE_ALIAS}'" not in releasedoc.read()
+        releasedoc_content = releasedoc.read()
+
+        # test specifically for the regression introduced by
+        # https://github.com/equinor/komodo/issues/190 where if you provided ert
+        # with version '*', it would then show up in the releasedoc.
+        assert f"version: '{LATEST_PACKAGE_ALIAS}'" not in releasedoc_content
+
+        # ensure the alias is used when resolving the version
+        assert "version: null" not in releasedoc_content

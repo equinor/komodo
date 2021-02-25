@@ -23,9 +23,10 @@ hackres:
     makefile: test_build_script.sh
     maintainer: bob
 
-ert:
+ert42:
   '*':
     source: pypi
+    pypi_package_name: ert
     fetch: pip
     make: pip
     maintainer: vladimir_harkonnen
