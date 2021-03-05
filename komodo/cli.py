@@ -23,7 +23,7 @@ def _main(args):
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
     if args.download or (not args.build and not args.install):
-        fetch(args.pkgs, args.repo, outdir=args.cache, pip=args.pip, git=args.git)
+        fetch(args.pkgs, args.repo, outdir=args.cache, pip=args.pip)
 
     if args.download and not args.build:
         sys.exit(0)
@@ -182,7 +182,6 @@ def cli_main():
 
     parser.add_argument("--cmake", type=str, default="cmake")
     parser.add_argument("--pip", type=str, default="pip")
-    parser.add_argument("--git", type=str, default="git")
     parser.add_argument(
         "--virtualenv",
         type=str,
