@@ -90,23 +90,6 @@ function install_cmake {
     boot/bintools/cmake --version
 }
 
-function install_git {
-    # git is too old for both RHEL6 and RHEL7, prefer the one from SDPSoft
-    git_bin=/prog/sdpsoft/git-2.8.0/bin/git
-    if [[ ! -f "${git_bin}" ]]; then
-        echo "Couldn't find SDPSoft git, falling back to system git"
-        git_bin=/usr/bin/git
-    fi
-    if [[ ! -f "${git_bin}" ]]; then
-        echo "Couldn't find system git either, failing"
-        exit 1
-    fi
-
-    echo "Using git"
-    ln -s ${git_bin} boot/bintools/git
-    boot/bintools/git --version
-}
-
 function install_build_env {
     echo "Using ${python_bin} for target"
     boot/kmd-env/bin/virtualenv --python=${python_bin} boot/build-env
@@ -129,5 +112,4 @@ install_komodo
 install_build_env
 install_devtoolset
 install_cmake
-install_git
 create_runkmd

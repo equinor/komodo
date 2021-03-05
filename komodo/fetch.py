@@ -22,8 +22,7 @@ def normalize_filename(filename):
     return '-'.join(segments[:-1]) + "==" + segments[-1]
 
 def grab(path, filename = None, version = None, protocol = None,
-                                                pip = 'pip',
-                                                git = 'git'):
+                                                pip = 'pip'):
     # guess protocol if it's obvious from the url (usually is)
     if protocol is None:
         protocol = path.split(':')[0]
@@ -32,13 +31,12 @@ def grab(path, filename = None, version = None, protocol = None,
         shell('wget --quiet {} -O {}'.format(path, filename))
     elif protocol in ('git'):
         shell(
-            "{git} clone "
+            "git clone "
             "--depth 50 "
             "-b {version} "
             "-q --recursive "
             "-- {path} {filename}"
             "".format(
-                git=git,
                 version=strip_version(version),
                 path=path,
                 filename=filename,
@@ -57,7 +55,7 @@ def grab(path, filename = None, version = None, protocol = None,
         raise NotImplementedError('Unknown protocol {}'.format(protocol))
 
 
-def fetch(pkgs, repo, outdir=".", pip="pip", git="git"):
+def fetch(pkgs, repo, outdir=".", pip="pip"):
     missingpkg = [pkg for pkg in pkgs if pkg not in repo]
     missingver = [pkg for pkg, ver in pkgs.items()
                                    if pkg in repo and ver not in repo[pkg]]
@@ -122,8 +120,7 @@ def fetch(pkgs, repo, outdir=".", pip="pip", git="git"):
 
             print('Downloading {}'.format(name))
             grab(url, filename = dst, version = ver, protocol = protocol,
-                                                    pip = pip,
-                                                    git = git)
+                                                    pip = pip)
 
             if ext in ['tgz', 'tar.gz', 'tar.bz2', 'tar.xz']:
                 print('Extracting {} ...'.format(dst))
@@ -144,8 +141,6 @@ if __name__ == "__main__":
     parser.add_argument("repofile", type=YamlFile())
     parser.add_argument("--output", "-o", type=str)
     parser.add_argument("--pip", type=str, default="pip")
-    parser.add_argument("--git", type=str, default="git")
     args = parser.parse_args()
     fetch(args.pkgfile, args.repofile, outdir = args.output,
-                                       pip = args.pip,
-                                       git = args.git)
+                                       pip = args.pip)
