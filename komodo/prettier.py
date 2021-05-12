@@ -117,11 +117,15 @@ def prettified_yaml(filepath, check_only=True):
     return True
 
 
-def write_to_file(repository, filename, check_type=True):
+def write_to_string(repository, check_type=True):
     if type(repository) == dict:
         repository = ordereddict(sorted(repository.items(), key=lambda t: t[0]))
         repository = ruamel.yaml.comments.CommentedMap(repository)
-    output_str = prettier(repository, check_type)
+    return prettier(repository, check_type)
+
+
+def write_to_file(repository, filename, check_type=True):
+    output_str = write_to_string(repository, check_type)
     with open(filename, mode="w") as output_file:
         output_file.write(output_str)
 
