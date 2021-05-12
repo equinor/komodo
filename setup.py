@@ -39,6 +39,7 @@ setup(
             'komodo-post-messages = komodo.post_messages:main',
             'komodo-snyk-test = komodo.snyk_reporting:main',
             'komodo-reverse-deps = komodo.reverse_dep_graph:main'
+            'komodo-insert-proposals = komodo.insert_proposals:main',
         ]
     },
 )
