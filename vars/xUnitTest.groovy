@@ -3,7 +3,7 @@ def call(Map args = [:]) {
     pipeline {
         agent { label 'master||tr-vresdeploy01.tr.statoil.no||tr-vresdeploy02.tr.statoil.no' }
         options {
-            disableConcurrentBuilds()
+            timeout(time: 30, unit: 'MINUTES')
         }
 
         parameters {
