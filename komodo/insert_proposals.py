@@ -82,14 +82,15 @@ def main():
     proposal_yaml = load_yaml_from_repo("upgrade_proposals.yml", repo, args.git_ref)
     upgrade_key = f"{year}-{month}"
     upgrade = proposal_yaml.get(upgrade_key)
-    if not upgrade:
+    if upgrade_key not in proposal_yaml:
         raise ValueError(
             f"No section for this release ({upgrade_key}) in upgrade_proposals.yml"
         )
     base_file = f"releases/matrices/{base}.yml"
     target_file = f"releases/matrices/{target}.yml"
     base_dict = load_yaml_from_repo(base_file, repo, args.git_ref)
-    recursive_update(base_dict, upgrade)
+    if upgrade:
+        recursive_update(base_dict, upgrade)
     result = write_to_string(base_dict)
 
     # create new release file
