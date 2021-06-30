@@ -15,12 +15,6 @@ def eprint(*args, **kwargs):
     return print(*args, file = sys.stderr, **kwargs)
 
 
-def normalize_filename(filename):
-    """Replace last occurrence of - into ==."""
-    assert '-' in filename
-    segments = filename.split('-')
-    return '-'.join(segments[:-1]) + "==" + segments[-1]
-
 def grab(path, filename = None, version = None, protocol = None,
                                                 pip = 'pip'):
     # guess protocol if it's obvious from the url (usually is)
@@ -115,7 +109,7 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
 
             if url == "pypi":
                 print("Defering download of {}".format(name))
-                pypi_packages.append(normalize_filename(strip_version(dst)))
+                pypi_packages.append(f"{pkg_alias}=={ver}")
                 continue
 
             print('Downloading {}'.format(name))
