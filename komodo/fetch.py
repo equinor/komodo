@@ -109,7 +109,7 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
 
             if url == "pypi":
                 print("Defering download of {}".format(name))
-                pypi_packages.append(f"{pkg_alias}=={ver}")
+                pypi_packages.append(f"{pkg_alias}=={ver.split('+')[0]}")
                 continue
 
             print('Downloading {}'.format(name))
