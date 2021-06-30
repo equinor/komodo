@@ -19,7 +19,7 @@ setup(
         "PyYAML",
         "ruamel.yaml",
         "packaging",
-        "PyGithub",
+        "PyGithub >= 1.55",
         "jinja2",
         "pysnyk; python_version >= '3.7'",
     ],
