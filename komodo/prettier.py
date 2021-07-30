@@ -31,7 +31,8 @@ def is_repository(config):
     """Returns `False` if the configuration corresponds to a Komodo release
     (all config elements below top level key are strings). Returns `True` if
     it corresponds to a _repository_ (all config elements below top level key are
-    themselves dictionaries).
+    themselves dictionaries). If config elements are both strings and dicts
+    we assume the file is a release.
 
     Raises ValueError if inconsistent throughout the config.
     """
@@ -53,10 +54,8 @@ def is_repository(config):
     ):
         return True
 
-    raise ValueError(
-        "Inconsistent configuration file. "
-        "Not able to detect if it is a release or repository."
-    )
+    # Mix of strings and dicts. Assume we have a release file.
+    return False
 
 
 def prettier(yaml_input_dict, check_type=True):
