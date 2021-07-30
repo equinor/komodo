@@ -34,10 +34,6 @@ class TestPrettier(unittest.TestCase):
         with self.assertRaises(SystemExit):
             load_yaml(os.path.join(INPUT_FOLDER, "duplicate_repository.yml"))
 
-    def test_inconsistent_config(self):
-        with self.assertRaises(ValueError):
-            prettier(load_yaml(os.path.join(INPUT_FOLDER, "inconsistent_config.yml")))
-
 
 if __name__ == "__main__":
     unittest.main()
