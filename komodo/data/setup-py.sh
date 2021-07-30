@@ -36,6 +36,10 @@ while test $# -gt 0; do
             shift
             export PYTHONPATH=$1
             ;;
+        --virtualenv)
+            shift
+            export VIRTUALENV=$1
+            ;;
         --ld-library-path)
             shift
             ;;
@@ -52,7 +56,7 @@ while test $# -gt 0; do
 done
 
 unset DESTDIR
-$PIP install .           \
+$PIP install $OPTS .           \
     --ignore-installed   \
     --root $FAKEROOT     \
     --no-deps            \
