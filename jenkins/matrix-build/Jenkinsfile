@@ -4,6 +4,10 @@ pipeline {
     parameters {
         string(name: 'MATRIX_FILE_BASE', description: 'The matrix file that is to be built. I.e. bleeding or 2020.06.05. It is expected that there is a matrix file in komodo-release/releases/matrices/{base}.yml.')
         booleanParam(name: 'overwrite', defaultValue: false, description: 'Whether or not to overwrite if matrix already exist')
+        string name: 'CODE_GIT_FORK', defaultValue: 'equinor', description: 'Fork to fetch komodo from'
+        string name: 'CODE_GIT_REF', defaultValue: 'master', description: 'Branch to fetch komodo from'
+        string name: 'CONFIG_GIT_FORK', defaultValue: 'equinor', description: 'Fork to fetch komodo-releases from'
+        string name: 'CONFIG_GIT_REF', defaultValue: 'master', description: 'Branch to fetch komodo-releases from'
     }
 
     stages {
@@ -37,6 +41,10 @@ pipeline {
                                 string(name: 'RH_VERSION', value: RH_VERSION),
                                 string(name: 'PYTHON_VERSION', value: PY_VERSION),
                                 string(name: 'MATRIX_FILE_BASE', value: params.MATRIX_FILE_BASE),
+                                string(name: 'CODE_GIT_FORK', value: params.CODE_GIT_FORK ),
+                                string(name: 'CODE_GIT_REF', value: params.CODE_GIT_REF ),
+                                string(name: 'CONFIG_GIT_FORK', value: params.CONFIG_GIT_FORK ),
+                                string(name: 'CONFIG_GIT_REF', value: params.CONFIG_GIT_REF ),
                                 booleanParam(name: 'overwrite', value: params.overwrite)
                             ], wait: true
                         }
