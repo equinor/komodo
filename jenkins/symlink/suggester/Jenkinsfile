@@ -16,8 +16,10 @@ pipeline {
                             returnStdout: true,
                                 script: "source env/bin/activate; komodo-suggest-symlinks --git-fork ${env.GIT_FORK} --git-repo ${env.GIT_REPO} --git-ref ${env.GIT_REF} ${env.RELEASE} ${env.MODE} ${env.BUILD_URL} ${env.JOB_NAME}"
                             ).trim()
+                        if (! (env.PR_URL.isEmpty())) {
+                            slackSend color: "#2f993a", message: """Suggested new symlink (${env.RELEASE} - ${env.MODE}): (<${env.PR_URL}|Open>)"""
+                        }
                     }
-                    slackSend color: "#2f993a", message: """Suggested new symlink (${env.RELEASE} - ${env.MODE}): (<${env.PR_URL}|Open>)"""
                 }
             }
         }
