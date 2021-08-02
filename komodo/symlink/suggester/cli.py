@@ -77,6 +77,9 @@ def suggest_symlink_configuration(args, repo):
     except UnknownObjectException:
         sys.exit("Could not find {}".format(args.symlink_conf_path))
 
+    if args.release.startswith("bleeding"):
+        return None
+
     new_symlink_content, updated = config_update(
         b64decode(sym_conf_content.content), args.release, args.mode
     )
