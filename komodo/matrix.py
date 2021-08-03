@@ -5,7 +5,7 @@ repeat itself."""
 import itertools
 
 RH_VERSIONS = ["7"]
-PY_VERSIONS = ["3.6"]
+PY_VERSIONS = ["3.6", "3.8"]
 
 
 def get_matrix():
