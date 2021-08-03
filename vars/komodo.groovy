@@ -8,7 +8,11 @@ def getPython() {
             return "/prog/sdpsoft/python3.6.4/bin/python3"
         }
     } else if (params.RH_VERSION == "7") {
-        return "/usr/bin/python${params.PYTHON_VERSION}"
+        if (params.PYTHON_VERSION == "3.8") {
+            return "/opt/rh/rh-python38/root/bin/python3.8"
+        } else {
+            return "/usr/bin/python${params.PYTHON_VERSION}"
+        }
     }
     throw new Exception("Bad RH version " + params.RH_VERSION)
 }
@@ -22,6 +26,8 @@ def getReleaseName() {
         return "${params.MATRIX_FILE_BASE}-py27-rhel${params.RH_VERSION}"
     } else if (params.PYTHON_VERSION == "3.6") {
         return "${params.MATRIX_FILE_BASE}-py36-rhel${params.RH_VERSION}"
+    } else if (params.PYTHON_VERSION == "3.8") {
+        return "${params.MATRIX_FILE_BASE}-py38-rhel${params.RH_VERSION}"
     }
     throw new Exception("Bad Python version '${params.PYTHON_VERSION}'")
 }

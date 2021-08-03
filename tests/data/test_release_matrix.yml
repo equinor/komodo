@@ -2,15 +2,20 @@ lib1:
   rhel6:
     py27: 0.1.2
     py36: 1.2.3
+    py38: 1.2.4
   rhel7:
     py27: 0.1.2+builtin
     py36: 1.2.3+builtin
+    py38: 1.2.3+builtin
 lib2:
   py27: 1.2.3
   py36: 2.3.4
+  py38: 2.3.4
 lib3:
   py27: 2.3.4
   py36: 3.4.5
+  py38: 3.4.6
 lib4:
   py27: 3.4.5
   py36:
+  py38:
