@@ -9,6 +9,7 @@ alias disable_komodo '\\
     test $?_KOMODO_OLD_PROMPT != 0 && set prompt="$_KOMODO_OLD_PROMPT" && unsetenv _KOMODO_OLD_PROMPT;\\
     test "\!:*" != "preserve_disable_komodo" && unalias disable_komodo;\\
     unsetenv KOMODO_RELEASE;\\
+    unsetenv KOMODO_ROOT;\\
     unsetenv ERT_LSF_SERVER;\\
     rehash;\\
     '
