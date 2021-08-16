@@ -50,6 +50,7 @@ disable_komodo () {
 
 
     unset KOMODO_RELEASE
+    unset KOMODO_ROOT
     unset ERT_LSF_SERVER
     if [ ! "${1:-}" = "preserve_disable_komodo" ]
     then
