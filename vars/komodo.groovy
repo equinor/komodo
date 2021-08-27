@@ -99,13 +99,13 @@ def call(Map args = [:]) {
             stage('Already deployed') {
                 when {
                     expression {
-                        params.overwrite
+                        !params.overwrite
                     }
                 }
                 steps {
                     script {
-                        if (fileExists("${params.PREFIX}/${env.RELEASE_NAME}")) {
-                            error "${env.RELEASE_NAME} is already deployed at ${params.PREFIX}/${env.RELEASE_NAME}!"
+                        if (fileExists("${params.PREFIX}/${getReleaseName()}")) {
+                            error "${getReleaseName()} is already deployed at ${params.PREFIX}/${getReleaseName()}!"
                         }
                     }
                 }
