@@ -65,3 +65,8 @@ endif
 if ( -d komodo_prefix/../motd/messages ) then
     cat komodo_prefix/../motd/messages/*
 endif
+
+# log komodo-usage
+if(`where log-komodo-usage` != "") then
+    log-komodo-usage
+endif
