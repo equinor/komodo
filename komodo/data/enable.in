@@ -99,3 +99,8 @@ if [ -d komodo_prefix/../motd/messages ]
 then
     cat komodo_prefix/../motd/messages/*
 fi
+
+# log komodo-usage
+if [[ $(type -P "log-komodo-usage") ]]; then
+    log-komodo-usage
+fi
