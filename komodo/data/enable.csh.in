@@ -51,6 +51,11 @@ endif
 if ( $?prompt ) then
     setenv _KOMODO_OLD_PROMPT "$prompt"
     set prompt = "[$KOMODO_RELEASE] $prompt"
+
+    # log komodo-usage
+    if(`where log-komodo-usage` != "") then
+        log-komodo-usage
+    endif
 endif
 
 rehash
@@ -64,9 +69,4 @@ endif
 
 if ( -d komodo_prefix/../motd/messages ) then
     cat komodo_prefix/../motd/messages/*
-endif
-
-# log komodo-usage
-if(`where log-komodo-usage` != "") then
-    log-komodo-usage
 endif
