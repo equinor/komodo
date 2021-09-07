@@ -73,6 +73,13 @@ export _PRE_KOMODO_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 export _PRE_KOMODO_PS1="${PS1:-}"
+if [[ -n $_PRE_KOMODO_PS1 ]]
+then
+    # log komodo-usage
+    if [[ $(type -P "log-komodo-usage") ]]; then
+        log-komodo-usage
+    fi
+fi
 export PS1="(${KOMODO_RELEASE}) ${PS1:-}"
 
 local_script=komodo_prefix/../local
@@ -98,9 +105,4 @@ fi
 if [ -d komodo_prefix/../motd/messages ]
 then
     cat komodo_prefix/../motd/messages/*
-fi
-
-# log komodo-usage
-if [[ $(type -P "log-komodo-usage") ]]; then
-    log-komodo-usage
 fi
