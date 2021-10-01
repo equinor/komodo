@@ -1,5 +1,10 @@
 def call(Map args = [:]) {
     def job_name = args.job_name
+    def test_script = "ci/jenkins/testkomodo.sh"
+    if (args.test_script) {
+        test_script = args.test_script
+    }
+
     pipeline {
         agent { label 'master||tr-vresdeploy01.tr.statoil.no||tr-vresdeploy02.tr.statoil.no' }
         options {
@@ -30,6 +35,7 @@ def call(Map args = [:]) {
                                 build job: "${job_name}", parameters: [
                                     string(name: 'KOMODO_RELEASE', value: "${params.RELEASE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
                                     string(name: 'ghprbPullId', value: "${params.ghprbPullId}"),
+                                    string(name: 'TEST_SCRIPT', value: "${test_script}"),
                                 ], wait: true
                             }
                         }

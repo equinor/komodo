@@ -45,6 +45,7 @@ def call(Map args = [:]) {
             string name: 'GIT_HELPER_REF', defaultValue: 'master'
 
             string name: 'KOMODO_RELEASE', defaultValue: 'bleeding-py36'
+            string(name: 'TEST_SCRIPT', defaultValue: "ci/jenkins/testkomodo.sh", description: 'The custom script for running tests against komodo')
         }
 
         options {
@@ -137,7 +138,7 @@ def call(Map args = [:]) {
 
                         set -x
                         git log -n 1
-                        source ${env.CI_SOURCE_ROOT}/ci/jenkins/testkomodo.sh
+                        source ${env.CI_SOURCE_ROOT}/${params.TEST_SCRIPT}
                         git log -n 1
                         run_tests
                     """
