@@ -18,7 +18,7 @@ def call(Map args = [:]) {
         stages {
             stage('Test Matrix') {
                 matrix {
-                    agent { label "!(scout-ci || scout-ci7)"}
+                    agent any
                     axes {
                         axis {
                             name 'RH_VERSION'
