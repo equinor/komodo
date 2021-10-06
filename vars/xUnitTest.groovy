@@ -6,7 +6,7 @@ def call(Map args = [:]) {
     }
 
     pipeline {
-        agent any
+        agent { label 'master||scout-ci'}
         options {
             timeout(time: 30, unit: 'MINUTES')
         }
@@ -18,7 +18,7 @@ def call(Map args = [:]) {
         stages {
             stage('Test Matrix') {
                 matrix {
-                    agent any
+                    agent { label 'master||scout-ci' }
                     axes {
                         axis {
                             name 'RH_VERSION'
