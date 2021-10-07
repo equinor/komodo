@@ -14,6 +14,14 @@ function ci_install_cmake {
     export LD_LIBRARY_PATH=$root/lib:$root/lib64
 }
 
+function ci_install_conan {
+    pip install conan
+
+    # Conan v1 bundles its own certs due to legacy reasons, so we point it
+    # to the system's certs instead.
+    export CONAN_CACERT_PATH=/etc/pki/tls/cert.pem
+}
+
 copy_test_files () {
     if [ -d "$CI_SOURCE_ROOT/tests" ]; then
         cp -r $CI_SOURCE_ROOT/tests $CI_TEST_ROOT/tests
