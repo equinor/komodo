@@ -71,13 +71,11 @@ def call(Map args = [:]) {
                 steps {
                     deleteDir()
 
-                    // Install komodoenv
-                    sh '/prog/sdpsoft/python3.6.4/bin/python3 -m venv komodoenv-venv'
-                    sh 'komodoenv-venv/bin/pip install --upgrade pip setuptools wheel'
-                    sh 'komodoenv-venv/bin/pip install git+https://github.com/equinor/komodoenv.git'
-
-                    // Use komodoenv to generate a komodoenv
-                    sh "komodoenv-venv/bin/komodoenv -r${env.CI_KOMODO_RELEASE} --no-update test-kenv"
+                    // Setup komodoenv
+                    sh '''\
+                    source ${KOMODO_ROOT}/${CI_KOMODO_RELEASE}/enable
+                    komodoenv -r${CI_KOMODO_RELEASE} --no-update test-kenv
+                    '''
 
                     // Git clone
                     script {
@@ -122,6 +120,7 @@ def call(Map args = [:]) {
                         set +x
                         source ${env.WORKSPACE}/test-kenv/enable
                         source /opt/rh/devtoolset-8/enable
+                        source /opt/rh/rh-git227/enable
 
                         # Additional CI environment variables
                         export CI_PYTHON_VERSION=\$(python -c 'import sys;print("%s.%s"%sys.version_info[:2])')
@@ -130,9 +129,6 @@ def call(Map args = [:]) {
                         export CLICOLOR=1
                         export CLICOLOR_FORCE=1
                         export PYTEST_ADDOPTS="--color=yes"
-
-                        GIT_VERSION=2.8.0
-                        source /prog/sdpsoft/env.sh
 
                         source ${env.WORKSPACE}/ci_helper.sh
 
