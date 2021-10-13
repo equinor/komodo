@@ -11,7 +11,7 @@ function ci_install_cmake {
     export CXXFLAGS="${CXXFLAGS:-} -fdiagnostics-color=always"
     export LDFLAGS="${LDFLAGS:-} -fdiagnostics-color=always"
 
-    export LD_LIBRARY_PATH=$root/lib:$root/lib64
+    export LD_LIBRARY_PATH=$root/lib:$root/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 }
 
 function ci_install_conan {
