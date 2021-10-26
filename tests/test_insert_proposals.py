@@ -1,4 +1,6 @@
 from unittest import mock
+
+from yaml.loader import Loader
 from komodo.insert_proposals import insert_proposals
 import yaml
 from base64 import b64encode
@@ -40,11 +42,11 @@ class MockRepo(object):
 
     def create_file(self, target_file, msg, content, branch):
         assert target_file not in self.updated_files
-        self.updated_files[target_file] = {"content": yaml.load(content), "branch": branch}
+        self.updated_files[target_file] = {"content": yaml.load(content, Loader=yaml.CLoader), "branch": branch}
 
     def update_file(self, target_file, msg, content, sha, branch):
         assert target_file not in self.updated_files
-        self.updated_files[target_file] = {"content": yaml.load(content), "branch": branch}
+        self.updated_files[target_file] = {"content": yaml.load(content, Loader=yaml.CLoader), "branch": branch}
 
     def create_pull(self, title, body, head, base):
         o = mock.Mock()
