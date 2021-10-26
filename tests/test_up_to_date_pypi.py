@@ -1,6 +1,8 @@
 import pathlib
 import sys
 from unittest.mock import MagicMock
+from yaml.cyaml import CLoader
+
 import pytest
 import requests
 import yaml
@@ -341,8 +343,8 @@ def test_integration(monkeypatch, tmpdir, release, repository, request_json, exp
 
         result = {}
         with open("new_file") as fin:
-            result["release"] = yaml.load(fin)
+            result["release"] = yaml.load(fin, Loader=CLoader)
         with open("repository_file") as fin:
-            result["repo"] = yaml.load(fin)
+            result["repo"] = yaml.load(fin, Loader=CLoader)
 
         assert result == expected
