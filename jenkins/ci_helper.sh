@@ -1,4 +1,5 @@
 function ci_install_cmake {
+    pip install --upgrade pip
     pip install cmake ninja
 
     local root=${KOMODO_ROOT}/${CI_KOMODO_RELEASE}/root
