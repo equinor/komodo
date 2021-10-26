@@ -19,7 +19,7 @@ def getVersion(project) {
     @NonCPS
     def parseVersion = { file ->
         def yaml = new Yaml()
-        def pkgs = yaml.load(file)
+        def pkgs = yaml.safe_load(file)
         def ver = pkgs[project].version
         def index = ver.indexOf('+')
         index == -1 ? ver : ver[0..<index]

@@ -119,8 +119,8 @@ def test_get_pypi_packages(input_release, input_repo):
 )
 def test_insert_upgrade_proposals(release, repository, suggestions, expected):
     yaml = yaml_parser()
-    repository = yaml.load(str(repository))
-    release = yaml.load(str(release))
+    repository = yaml.safe_load(str(repository))
+    release = yaml.safe_load(str(release))
     insert_upgrade_proposals(
         suggestions, repository, release,
     )
@@ -194,8 +194,8 @@ def test_main_file_output(monkeypatch, tmpdir):
         yaml = yaml_parser()
         input_mock = MagicMock()
         input_mock.side_effect = [
-            yaml.load("""{"dummy_package": "1.0.0", "custom_package": "1.1.1"}"""),
-            yaml.load(
+            yaml.safe_load("""{"dummy_package": "1.0.0", "custom_package": "1.1.1"}"""),
+            yaml.safe_load(
                 """{
                 "dummy_package": {"1.0.0": {"source": "pypi"}},
                 "custom_package": {"1.1.1": {"maintainer": "some_person"}},
@@ -214,10 +214,10 @@ def test_main_file_output(monkeypatch, tmpdir):
             check_up_to_date_pypi.main()
 
         result = {}
-        with open("new_file") as fin:
-            result["suggestions"] = yaml.load(fin)
-        with open("repository_file") as fin:
-            result["updated_repo"] = yaml.load(fin)
+        with open("new_file", encoding="utf-8") as fin:
+            result["suggestions"] = yaml.safe_safe(fin)
+        with open("repository_file", encoding="utf-8") as fin:
+            result["updated_repo"] = yaml.safe_load(fin)
 
         assert result == {
             "suggestions": {"dummy_package": "2.0.0", "custom_package": "1.1.1"},
@@ -340,9 +340,9 @@ def test_integration(monkeypatch, tmpdir, release, repository, request_json, exp
             check_up_to_date_pypi.main()
 
         result = {}
-        with open("new_file") as fin:
-            result["release"] = yaml.load(fin)
-        with open("repository_file") as fin:
-            result["repo"] = yaml.load(fin)
+        with open("new_file", encoding="utf-8") as fin:
+            result["release"] = yaml.safe_load(fin)
+        with open("repository_file", encoding="utf-8") as fin:
+            result["repo"] = yaml.safe_load(fin)
 
         assert result == expected

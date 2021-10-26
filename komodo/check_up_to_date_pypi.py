@@ -1,12 +1,14 @@
 import copy
 import sys
 import pathlib
+import argparse
+import requests
+from yaml import CLoader
+
+import ruamel.yaml
 
 from packaging import version as get_version
 from packaging.specifiers import SpecifierSet
-import requests
-import ruamel.yaml
-import argparse
 from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version
 from komodo.prettier import write_to_file
 
@@ -23,8 +25,8 @@ def yaml_parser():
 
 
 def load_from_file(yaml, fname):
-    with open(fname, "r") as fin:
-        result = yaml.load(fin)
+    with open(fname, "r", encoding="utf-8") as fin:
+        result = yaml.load(fin, Loader=CLoader)
     return result
 
 
