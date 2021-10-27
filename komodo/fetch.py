@@ -26,7 +26,6 @@ def grab(path, filename = None, version = None, protocol = None,
     elif protocol in ('git'):
         shell(
             "git clone "
-            "--depth 50 "
             "-b {version} "
             "-q --recursive "
             "-- {path} {filename}"
