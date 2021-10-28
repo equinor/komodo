@@ -1,9 +1,6 @@
 def call(Map args = [:]) {
     def job_name = args.job_name
-    def test_script = "ci/jenkins/testkomodo.sh"
-    if (args.test_script) {
-        test_script = args.test_script
-    }
+    def test_script = args.test_script ? args.test_script : "ci/jenkins/testkomodo.sh"
 
     pipeline {
         agent { label 'master||scout-ci'}
@@ -13,6 +10,11 @@ def call(Map args = [:]) {
 
         parameters {
             string(name: 'RELEASE_BASE', defaultValue: "bleeding", description: 'The release base that is to be tested. I.e. bleeding or 2020.06.05.')
+        }
+
+        environment {
+            SUB_JOB_NAME = "${job_name}"
+            TEST_SCRIPT = "${test_script}"
         }
 
         stages {
@@ -32,10 +34,10 @@ def call(Map args = [:]) {
                     stages {
                         stage('Run PR job') {
                             steps {
-                                build job: "${job_name}", parameters: [
+                                build job: "${env.SUB_JOB_NAME}", parameters: [
                                     string(name: 'KOMODO_RELEASE', value: "${params.RELEASE_BASE}-py${PY_VERSION.replace(".", "")}-rhel${RH_VERSION}"),
                                     string(name: 'ghprbPullId', value: "${params.ghprbPullId}"),
-                                    string(name: 'TEST_SCRIPT', value: "${test_script}"),
+                                    string(name: 'TEST_SCRIPT', value: "${env.TEST_SCRIPT}"),
                                 ], wait: true
                             }
                         }
