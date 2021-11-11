@@ -73,26 +73,6 @@ export _PRE_KOMODO_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 export _PRE_KOMODO_PS1="${PS1:-}"
-
-log_komodo() {
-    if [[ $(type -P "log-komodo-usage") ]]; then
-        log-komodo-usage
-    fi
-    export LOGGED_KOMODO_VERSION=$KOMODO_RELEASE
-}
-
-if [[ -n $_PRE_KOMODO_PS1 ]]
-then
-    # log komodo usage
-    if [[ -n $LOGGED_KOMODO_VERSION ]]; then
-        # check if version has been logged before
-        if [[ $LOGGED_KOMODO_VERSION != $KOMODO_RELEASE ]]; then
-            log_komodo
-        fi
-    else
-        log_komodo
-    fi
-fi
 export PS1="(${KOMODO_RELEASE}) ${PS1:-}"
 
 local_script=komodo_prefix/../local
