@@ -1,6 +1,7 @@
 import pytest
 import sys
 
+
 import os
 from komodo.cli import cli_main
 from tests import _get_test_root
@@ -28,6 +29,7 @@ from komodo.package_version import LATEST_PACKAGE_ALIAS
             "--extra-data-dirs",
             os.path.join(_get_test_root(), "data/cli"),
             os.path.join(_get_test_root(), "data/cli/hackres"),
+            os.path.join(_get_test_root(), "data/cli/hackgit"),
             "--locations-config",
             os.path.join(_get_test_root(), "data/cli/locations.yml"),
             os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
@@ -40,6 +42,10 @@ def test_main(args, tmpdir):
     shutil.copytree(
         os.path.join(_get_test_root(), "data/cli/hackres"),
         os.path.join(tmpdir, "hackres"),
+    )
+    shutil.copytree(
+        os.path.join(_get_test_root(), "data/cli/hackgit"),
+        os.path.join(tmpdir, "hackgit"),
     )
 
     sys.argv = [
@@ -78,3 +84,8 @@ def test_main(args, tmpdir):
 
         # ensure the alias is used when resolving the version
         assert "version: null" not in releasedoc_content
+
+        # Ensure that the commit hash is reported as version and not the
+        # branch "test-hack" specified in nominal_repository.yml
+        assert "test-hash" not in releasedoc_content
+        assert "version: 7f4405928bd16de496522d9301c377c7bcca5ef0" in releasedoc_content

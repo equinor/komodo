@@ -23,7 +23,7 @@ def _main(args):
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
     if args.download or (not args.build and not args.install):
-        fetch(args.pkgs, args.repo, outdir=args.cache, pip=args.pip)
+        git_hashes = fetch(args.pkgs, args.repo, outdir=args.cache, pip=args.pip)
 
     if args.download and not args.build:
         sys.exit(0)
@@ -89,6 +89,8 @@ def _main(args):
             maintainer = args.repo[pkg][ver]["maintainer"]
             if ver == LATEST_PACKAGE_ALIAS:
                 ver = latest_pypi_version(entry.get("pypi_package_name", pkg))
+            elif args.repo[pkg][ver].get("fetch") == "git":
+                ver = git_hashes[pkg]
             release[pkg] = {
                 "version": ver,
                 "maintainer": maintainer,

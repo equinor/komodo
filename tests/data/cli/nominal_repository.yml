@@ -23,6 +23,14 @@ hackres:
     makefile: test_build_script.sh
     maintainer: bob
 
+hackgit:
+  test-hash:
+    source: ../hackgit/.git-hack
+    fetch: git
+    make: sh
+    makefile: dummy.sh
+    maintainer: charlie
+
 ert42:
   '*':
     source: pypi
