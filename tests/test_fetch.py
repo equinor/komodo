@@ -141,3 +141,30 @@ def test_fetch_pip_with_latest_version(captured_shell_commands, tmpdir):
         fetch(packages, repositories, str(tmpdir))
         mock_latest_ver.assert_called_once_with("ert3")
         assert "ert3==1.0.0" in captured_shell_commands[0]
+
+
+def test_fetch_git_hash(captured_shell_commands, tmpdir):
+    packages = {"ert": "main"}
+    repositories = {
+        "ert": {
+            "main": {
+                "source": "git://github.com/equinor/ert.git",
+                "fetch": "git",
+                "make": "sh",
+                "maintainer": "someone",
+                "makefile": "setup-py.sh",
+                "depends": [],
+            }
+        }
+    }
+
+    with patch("komodo.fetch.get_git_revision_hash") as mock_get_git_revision_hash:
+        mock_get_git_revision_hash.return_value = (
+            "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"
+        )
+        git_hashes = fetch(packages, repositories, str(tmpdir))
+        assert (
+            captured_shell_commands[0]
+            == "git clone -b main -q --recursive -- git://github.com/equinor/ert.git ert-main"
+        )
+        assert git_hashes == {"ert": "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"}

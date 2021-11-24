@@ -6,7 +6,7 @@ import argparse
 import os
 import sys
 
-from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version, latest_pypi_version
+from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version, latest_pypi_version, get_git_revision_hash
 from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
 
@@ -70,6 +70,7 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
 
     pypi_packages = []
 
+    git_hashes = {}
     with pushd(outdir):
         for pkg, ver in pkgs.items():
 
@@ -115,6 +116,9 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
             grab(url, filename = dst, version = ver, protocol = protocol,
                                                     pip = pip)
 
+            if protocol == "git":
+                git_hashes[pkg] = get_git_revision_hash(path=dst)
+
             if ext in ['tgz', 'tar.gz', 'tar.bz2', 'tar.xz']:
                 print('Extracting {} ...'.format(dst))
                 topdir = shell(' tar -xvf {}'.format(dst)).decode("utf-8").split()[0]
@@ -127,6 +131,7 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
         print('Downloading {} pypi packages'.format(len(pypi_packages)))
         shell([pip, 'download', '--no-deps', '--dest .', " ".join(pypi_packages)])
 
+    return git_hashes
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="fetch packages")

@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 import sys
@@ -39,3 +40,13 @@ def latest_pypi_version(package):
             return None
         return version
     raise ValueError(f"{cmd} did not raise CalledProcessError")
+
+
+def get_git_revision_hash(path):
+    env = os.environ.copy()
+    env["GIT_DIR"] = f"{path}/.git"
+    return (
+        subprocess.check_output(["git", "rev-parse", "HEAD"], env=env)
+        .decode(sys.getfilesystemencoding())
+        .strip()
+    )
