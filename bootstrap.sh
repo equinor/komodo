@@ -101,6 +101,7 @@ function create_runkmd {
     cat << EOF > runkmd.sh
 #!/bin/bash
 export PATH=$PWD/boot/bintools:$PWD/boot/build-env/bin:\$PATH
+export VIRTUAL_ENV=$PWD/boot/build-env
 $PWD/boot/kmd-env/bin/kmd "\$@"
 EOF
     chmod +x runkmd.sh
