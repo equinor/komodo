@@ -9,7 +9,7 @@ def getPython() {
         }
     } else if (params.RH_VERSION == "7") {
         if (params.PYTHON_VERSION == "3.8") {
-            return "/opt/rh/rh-python38/root/bin/python3.8"
+            return "/opt/rh/rh-python38/root/usr/bin/python3.8"
         } else {
             return "/usr/bin/python${params.PYTHON_VERSION}"
         }
