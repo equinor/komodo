@@ -136,6 +136,7 @@ def call(Map args = [:]) {
                         git log -n 1
                         source ${env.CI_SOURCE_ROOT}/${params.TEST_SCRIPT}
                         git log -n 1
+                        export MPLBACKEND=agg
                         run_tests
                     """
                     }
