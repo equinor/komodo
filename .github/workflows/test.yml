@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.8]
 
     runs-on: ubuntu-latest
 
@@ -55,7 +55,13 @@ jobs:
         python -c "import numpy;print(numpy.__file__)"
         ci/travis/test_import_lib.py
 
-    - name: Test that everything makes sense
+    - name: Test enable script
       run: |
         source /tmp/pfx/travis/enable
         [[ "$(which python)" == "/tmp/pfx/travis/root/bin/python" ]]
+
+    - name: Test Python version
+      run: |
+        source /tmp/pfx/travis/enable
+        pyver=$(python -c 'from sys import version_info as v;print(f"{v[0]}.{v[1]}")')
+        [[ "${pyver}" == "${{ matrix.python-version }}" ]]
