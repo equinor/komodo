@@ -21,7 +21,7 @@ setup(
         "packaging",
         "PyGithub >= 1.55",
         "jinja2",
-        "pysnyk @ git+https://github.com/equinor/pysnyk ; python_version >= '3.7'",
+        "pysnyk @ git+https://github.com/equinor/pysnyk",
     ],
     entry_points={
         "console_scripts": [

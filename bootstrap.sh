@@ -24,29 +24,22 @@ function cleanup {
 }
 
 function install_komodo {
-    # Install the environment that the kmd executable will run in. We also
-    # install the virtualenv package because the user might specify to target
-    # Python 2.7, where the 'venv' module doesn't exist.
+    # Install the environment that the kmd executable will run in.
 
-    python3_bin=/usr/bin/python3
+    python3_bin=/usr/bin/python3.8
 
-    if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-        # Travis provides Python via a virtualenv, lets respect that
-        python3_bin=`which python`
+    if [[ ! -f "${python3_bin}" ]]; then
+        # Lets assume we're on a RHEL 7 machine
+        python3_bin=/opt/rh/rh-python38/root/usr/bin/python3.8
     fi
     if [[ ! -f "${python3_bin}" ]]; then
-        # Lets assume we're on an Equinor machine
-        python3_bin=/prog/sdpsoft/python3.6.4/bin/python3
-    fi
-    if [[ ! -f "${python3_bin}" ]]; then
-        echo "Couldn't find a Python 3 binary"
+        echo "Couldn't find a Python 3.8 binary"
         exit 1
     fi
 
     echo "Installing Komodo"
     $python3_bin -m venv boot/kmd-env
-    boot/kmd-env/bin/python -m pip install --upgrade pip pytest virtualenv
-    boot/kmd-env/bin/python -m pip install .
+    boot/kmd-env/bin/python -m pip install virtualenv pytest .
 }
 
 function install_devtoolset {
