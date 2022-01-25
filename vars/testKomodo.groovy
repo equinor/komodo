@@ -112,7 +112,7 @@ def call(Map args = [:]) {
 
             stage('Run Tests') {
                 steps {
-                    sh "wget https://raw.githubusercontent.com/${params.GIT_HELPER_FORK}/komodo/${params.GIT_HELPER_REF}/jenkins/ci_helper.sh"
+                    sh "git clone  --branch ${params.GIT_HELPER_REF} --no-checkout --depth 1 https://github.com/${params.GIT_HELPER_FORK}/komodo.git && pushd komodo && git show HEAD:jenkins/ci_helper.sh >> ../ci_helper.sh && popd"
 
                     dir(env.CI_SOURCE_ROOT) {
 
