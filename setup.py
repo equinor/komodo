@@ -23,6 +23,7 @@ setup(
         "jinja2",
         "pysnyk @ git+https://github.com/equinor/pysnyk",
     ],
+    python_requires="~=3.8",
     entry_points={
         "console_scripts": [
             "kmd = komodo.cli:cli_main",
