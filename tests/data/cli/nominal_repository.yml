@@ -50,3 +50,11 @@ python:
     makefile: test_python_builtin.sh
     maintainer: alice
     makeopts: --python-version 4.2
+
+some_github_binary_artifact:
+  0.0.1a1:
+    make: download
+    maintainer: alice
+    url: https://github.com/equinor/webviz-config-editor/releases/download/v0.0.1-alpha.1/WebvizConfigEditor-linux-0.0.1-x86_64.AppImage
+    destination: bin/some-github-binary-artifact
+    hash: sha256:32d1f47a90ec01cb554db06ee5cb3c43b497e98c6704f4392d336e14101c8651

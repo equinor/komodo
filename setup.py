@@ -21,6 +21,7 @@ setup(
         "packaging",
         "PyGithub >= 1.55",
         "jinja2",
+        "requests",
         "pysnyk @ git+https://github.com/equinor/pysnyk",
     ],
     python_requires="~=3.8",

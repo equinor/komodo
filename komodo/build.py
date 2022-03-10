@@ -5,7 +5,12 @@ from __future__ import print_function
 import itertools as itr
 import os
 import sys
+import stat
+import hashlib
+import pathlib
 from distutils.dir_util import mkpath
+
+import requests
 
 from komodo.package_version import LATEST_PACKAGE_ALIAS, latest_pypi_version, strip_version
 from komodo.shell import pushd, shell
@@ -116,6 +121,50 @@ def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
     )
 
 
+def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
+    print(f"Installing {pkg} ({ver}) with download")
+
+    url = kwargs["url"]
+    if not url.startswith("https"):
+        raise ValueError(f"{url} does not use https:// protocol")
+
+    hash_type, hash = kwargs["hash"].split(":")
+    if hash_type != "sha256":
+        raise NotImplementedError(
+            f"Hash type {hash_type} given - only sha256 implemented"
+        )
+
+    fakeprefix = pathlib.Path(kwargs["fakeroot"] + prefix)
+    dest_path = fakeprefix / kwargs["destination"]
+
+    session = requests.Session()
+    session.mount("https://", requests.adapters.HTTPAdapter(max_retries=20))
+    response = session.get(url, stream=True)
+
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"GET request to {url} returned status code {response.status_code}"
+        )
+
+    sha256 = hashlib.sha256()
+
+    with open(dest_path, "wb") as file_handle:
+        for chunk in response.iter_content(chunk_size=1024):
+            file_handle.write(chunk)
+            sha256.update(chunk)
+
+    if sha256.hexdigest() != hash:
+        raise ValueError(
+            f"Hash of downloaded file ({sha256.hexdigest()}) not equal to expected hash."
+        )
+
+    # Add executable permission if in bin folder:
+    if "bin" in dest_path.parts:
+        dest_path.chmod(
+            dest_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+        )
+
+
 def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip="pip", *args, **kwargs):
     ver = strip_version(ver)
     if ver == LATEST_PACKAGE_ALIAS:
@@ -197,13 +246,20 @@ def make(
     def resolve(x):
         return x.replace('$(prefix)', prefix)
 
-    build = { 'rpm': rpm, 'cmake': cmake, 'sh': sh, 'pip': pip_install, 'rsync': rsync, 'noop': noop }
+    build = { 'rpm': rpm, 'cmake': cmake, 'sh': sh, 'pip': pip_install, 'rsync': rsync, 'noop': noop, 'download': download }
 
     for pkg, path in zip(pkgorder, pkgpaths):
         ver = pkgs[pkg]
         current = repo[pkg][ver]
         make = current['make']
         pkgpath = os.path.abspath(path)
+
+        download_keys = ["url", "destination", "hash"]
+        if any(key in current for key in download_keys) and make != "download":
+            raise ValueError(", ".join(download_keys) + " only valid with 'make: download'")
+        if not all(key in current for key in download_keys) and make == "download":
+            raise ValueError(", ".join(download_keys) + " all required with 'make: download'")
+
         if "pypi_package_name" in current and make != "pip":
             raise ValueError("pypi_package_name is only valid when building with pip")
 
@@ -232,4 +288,7 @@ def make(
             pythonpath=build_pythonpath,
             binpath=build_path,
             ld_lib_path=build_ld_lib_path,
+            url=current.get("url"),
+            destination=current.get("destination"),
+            hash=current.get("hash"),
         )
