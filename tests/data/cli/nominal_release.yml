@@ -5,3 +5,4 @@ hackgit: test-hash
 python: 2.7.5-builtin
 qt5: 5.13.6-builtin
 ert42: '*'
+some_github_binary_artifact: 0.0.1a1

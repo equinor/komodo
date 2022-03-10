@@ -74,6 +74,10 @@ def test_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "local"))
     assert os.path.exists(os.path.join(release_path, "local.csh"))
 
+    downloaded_file = os.path.join(release_path, "root/bin/some-github-binary-artifact")
+    assert os.path.exists(downloaded_file)
+    assert os.access(downloaded_file, os.X_OK)
+
     with open(os.path.join(release_path, release_name)) as releasedoc:
         releasedoc_content = releasedoc.read()
 
