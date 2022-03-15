@@ -33,6 +33,7 @@ def call(Map args = [:]) {
     def isPullRequest = args.pullRequest
     def gitCredentialsID = args.gitCredentialsID
     def agentLabel = params.KOMODO_RELEASE.contains("rhel7") ? "scout-ci7" : "scout-ci"
+    def time_out = args.time_out ? args.time_out : 30
 
     pipeline {
         agent { label agentLabel }
@@ -50,6 +51,7 @@ def call(Map args = [:]) {
 
         options {
             ansiColor('xterm')
+            timeout(time: "${time_out}", unit: 'MINUTES')
         }
 
         environment {
