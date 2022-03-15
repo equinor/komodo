@@ -1,11 +1,12 @@
 def call(Map args = [:]) {
     def job_name = args.job_name
     def test_script = args.test_script ? args.test_script : "ci/jenkins/testkomodo.sh"
+    def time_out = args.time_out ? args.time_out : 30
 
     pipeline {
         agent { label 'master||scout-ci'}
         options {
-            timeout(time: 30, unit: 'MINUTES')
+            timeout(time: "${time_out}", unit: 'MINUTES')
         }
 
         parameters {
