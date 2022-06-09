@@ -65,9 +65,9 @@ def call(Map args = [:]) {
         agent { label getAgentLabel() }
 
         parameters {
-            string name: 'RH_VERSION', defaultValue: '6',
+            string name: 'RH_VERSION', defaultValue: '7',
                 description: 'Dictates on what Red Hat version the build runs, as well as what version it targets'
-            string name: 'PYTHON_VERSION', defaultValue: '2.7',
+            string name: 'PYTHON_VERSION', defaultValue: '3.8',
                 description: 'The target Python version'
 
             string name: 'MATRIX_FILE_BASE', defaultValue: 'bleeding',

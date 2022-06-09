@@ -29,7 +29,7 @@ def call(Map args = [:]) {
                         }
                         axis {
                             name 'PY_VERSION'
-                            values '3.6'
+                            values '3.8'
                         }
                     }
                     stages {
