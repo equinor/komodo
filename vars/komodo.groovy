@@ -32,6 +32,13 @@ def getReleaseName() {
     throw new Exception("Bad Python version '${params.PYTHON_VERSION}'")
 }
 
+def getSwigRoot() {
+    if (params.RH_VERSION == "7") {
+        return "/prog/res/opt/rhel7/swig_4.0.2"
+    }
+    return ""
+}
+
 def gitClone(String url, String branchName) {
     @NonCPS
     def getTargetDir = { ->
@@ -93,6 +100,7 @@ def call(Map args = [:]) {
 
         environment {
             MATRIX_FILE = "releases/matrices/${params.MATRIX_FILE_BASE}.yml"
+            SWIG_ROOT = getSwigRoot()
         }
 
         stages {
