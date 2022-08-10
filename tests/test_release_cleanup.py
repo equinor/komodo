@@ -60,6 +60,7 @@ def test_unused_versions():
     files = [
         os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py27.yml"),
         os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py36.yml"),
+        os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py38.yml"),
     ]
     used_versions = load_all_releases(files)
 
