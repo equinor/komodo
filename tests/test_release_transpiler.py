@@ -41,5 +41,5 @@ def test_transpile(tmpdir):
     with tmpdir.as_cwd():
         transpile_releases(release_file, os.getcwd())
         for rhel_ver in ("rhel7",):
-            for py_ver in ("py36", "py38"):
+            for py_ver in ("py38", ):
                 assert os.path.isfile("{}-{}-{}.yml".format(release_base, py_ver, rhel_ver))

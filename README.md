@@ -63,7 +63,7 @@ If you are in e.g CI and only want to check style compliance, add `--check`.
 You can show reverse dependencies of a package by running the komodo/reverse_dep_graph.py
 Example of use:
 ```bash
-python komodo/reverse_dep_graph.py releases/2020.08.01-py36.yml repository.yml --pkg libres 
+python komodo/reverse_dep_graph.py releases/2020.08.01-py38.yml repository.yml --pkg libres
 ```
 If --pkg is not specified, the program will prompt for it.
 

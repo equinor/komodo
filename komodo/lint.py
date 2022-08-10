@@ -48,7 +48,7 @@ def _validate(pkg, ver, repo):
 def lint_release_name(pkgfile):
     relname = os.path.basename(pkgfile)
     found = False
-    for py_suffix in "-py27", "-py36":
+    for py_suffix in "-py27", "-py36", "-py38":
         for rh_suffix in "", "-rhel6", "-rhel7":
             if relname.endswith(py_suffix + rh_suffix + ".yml"):
                 found = True

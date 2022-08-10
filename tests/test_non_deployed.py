@@ -19,13 +19,13 @@ def test_non_deployed_empty(tmpdir):
         os.makedirs(release_folder)
 
         # partially deployed, but this currently means it is deployed
-        os.makedirs(os.path.join(install_root, "2019.12.02-py36-rhel7/root"))
-        os.makedirs(os.path.join(install_root, "2022.02.01-py36-rhel7/root"))
+        os.makedirs(os.path.join(install_root, "2019.12.02-py38-rhel7/root"))
+        os.makedirs(os.path.join(install_root, "2022.02.01-py38-rhel7/root"))
 
         _create_links(
             (
-                ("2019.12.02-py36-rhel7", "2019.12"),
-                ("2022.02.01-py36-rhel7", "2022.02"),
+                ("2019.12.02-py38-rhel7", "2019.12"),
+                ("2022.02.01-py38-rhel7", "2022.02"),
             ),
             root=install_root,
         )
@@ -41,7 +41,7 @@ def test_non_deployed(tmpdir):
         os.makedirs(release_folder)
 
         # Fully deployed
-        os.makedirs(os.path.join(install_root, "2019.11.05-py36-rhel7/root"))
+        os.makedirs(os.path.join(install_root, "2019.11.05-py38-rhel7/root"))
 
         # Create matrix files
         open(os.path.join(release_folder, "2019.11.05.yml"), "a").close()
@@ -59,13 +59,13 @@ def test_links_ignored(tmpdir):
         os.makedirs(release_folder)
 
         # partially deployed, but this currently means it is deployed
-        os.makedirs(os.path.join(install_root, "2019.12.01-py36-rhel7/root"))
-        os.makedirs(os.path.join(install_root, "2022.02.02-py36-rhel7/root"))
+        os.makedirs(os.path.join(install_root, "2019.12.01-py38-rhel7/root"))
+        os.makedirs(os.path.join(install_root, "2022.02.02-py38-rhel7/root"))
 
         _create_links(
             (
-                ("2019.12.01-py36-rhel7", "stable"),
-                ("2022.02.02-py36-rhel7", "testing"),
+                ("2019.12.01-py38-rhel7", "stable"),
+                ("2022.02.02-py38-rhel7", "testing"),
             ),
             root=install_root,
         )
