@@ -39,10 +39,10 @@ def call(Map args = [:]) {
 
         parameters {
             string name: 'GIT_CODE_FORK', defaultValue: 'Equinor'
-            string name: 'GIT_CODE_REF', defaultValue: 'master'
+            string name: 'GIT_CODE_REF', defaultValue: 'main'
 
             string name: 'GIT_HELPER_FORK', defaultValue: 'Equinor'
-            string name: 'GIT_HELPER_REF', defaultValue: 'master'
+            string name: 'GIT_HELPER_REF', defaultValue: 'main'
 
             string name: 'KOMODO_RELEASE', defaultValue: 'bleeding-py38'
             string(name: 'TEST_SCRIPT', defaultValue: "ci/jenkins/testkomodo.sh", description: 'The custom script for running tests against komodo')
