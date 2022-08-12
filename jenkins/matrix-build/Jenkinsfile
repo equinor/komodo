@@ -5,9 +5,9 @@ pipeline {
         string(name: 'MATRIX_FILE_BASE', description: 'The matrix file that is to be built. I.e. bleeding or 2020.06.05. It is expected that there is a matrix file in komodo-release/releases/matrices/{base}.yml.')
         booleanParam(name: 'overwrite', defaultValue: false, description: 'Whether or not to overwrite if matrix already exist')
         string(name: 'CODE_GIT_FORK', defaultValue: 'equinor', description: 'Fork to fetch komodo from')
-        string(name: 'CODE_GIT_REF', defaultValue: 'master', description: 'Branch to fetch komodo from')
+        string(name: 'CODE_GIT_REF', defaultValue: 'main', description: 'Branch to fetch komodo from')
         string(name: 'CONFIG_GIT_FORK', defaultValue: 'equinor', description: 'Fork to fetch komodo-releases from')
-        string(name: 'CONFIG_GIT_REF', defaultValue: 'master', description: 'Branch to fetch komodo-releases from')
+        string(name: 'CONFIG_GIT_REF', defaultValue: 'main', description: 'Branch to fetch komodo-releases from')
     }
 
     stages {

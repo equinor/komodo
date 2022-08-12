@@ -203,7 +203,7 @@ def parse_args():
     parser.add_argument("jobname", help="name of the job")
     parser.add_argument("--git-fork", help="git fork", default="equinor")
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
-    parser.add_argument("--git-ref", help="git ref", default="master")
+    parser.add_argument("--git-ref", help="git ref", default="main")
     args = parser.parse_args()
     return args
 
