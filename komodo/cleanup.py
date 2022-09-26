@@ -4,24 +4,25 @@ from __future__ import print_function
 import logging
 import yaml as yml
 
+
 def cleanup(repofile, releasefiles):
-    with open(repofile, 'r') as r:
+    with open(repofile, "r") as r:
         repo = yml.safe_load(r)
     rels = []
     for fname in releasefiles:
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             rels.append(yml.safe_load(f))
 
     if not isinstance(repo, dict):
-        raise ValueError('Malformed package file: %s ' % str(type(repo)))
+        raise ValueError("Malformed package file: %s " % str(type(repo)))
     for rel in rels:
         if not isinstance(rel, dict):
-            raise ValueError('Malformed repository file: %s' % str(type(rel)))
+            raise ValueError("Malformed repository file: %s" % str(type(rel)))
 
     registered_versions = []
     for pkg in repo:
         for v in repo[pkg]:
-            registered_versions.append((pkg,v))
+            registered_versions.append((pkg, v))
 
     seen_versions = set()
     for rel in rels:
@@ -32,18 +33,18 @@ def cleanup(repofile, releasefiles):
     for ver in registered_versions:
         if ver not in seen_versions:
             if seen_all:
-                print('unused:')
+                print("unused:")
                 seen_all = False
-            print('  - %s: %s' % ver)
+            print("  - %s: %s" % ver)
     if seen_all:
-        print('ok')
+        print("ok")
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     if len(sys.argv) < 3:
-        exit('usage: komodo.cleanup repo.yml rel1.yml rel2.yml ... reln.yml')
+        exit("usage: komodo.cleanup repo.yml rel1.yml rel2.yml ... reln.yml")
 
     repo = sys.argv[1]
     releases = sys.argv[2:]

@@ -1,0 +1,33 @@
+name: Style
+
+on:
+ push:
+   branches:
+     - main
+     - 'version-**'
+ pull_request:
+
+jobs:
+  check-style:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -r dev-requirements.txt
+
+    - name: Run black
+      uses: psf/black@stable

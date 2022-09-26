@@ -77,7 +77,10 @@ def test_get_pypi_packages(input_release, input_repo):
     [
         pytest.param(
             {"dummy_package": "1.0.0", "custom_package": "1.1.1"},
-            {"dummy_package": {"1.0.0": {}}, "custom_package": {"1.1.1": {}},},
+            {
+                "dummy_package": {"1.0.0": {}},
+                "custom_package": {"1.1.1": {}},
+            },
             {"dummy_package": {"suggested": "2.0.0", "previous": "1.0.0"}},
             {
                 "release": {"dummy_package": "2.0.0", "custom_package": "1.1.1"},
@@ -106,7 +109,10 @@ def test_get_pypi_packages(input_release, input_repo):
         ),
         pytest.param(
             {"dummy_package": "1.0.0+py23", "custom_package": "1.1.1"},
-            {"dummy_package": {"1.0.0+py23": {}}, "custom_package": {"1.1.1": {}},},
+            {
+                "dummy_package": {"1.0.0+py23": {}},
+                "custom_package": {"1.1.1": {}},
+            },
             {"dummy_package": {"suggested": "2.0.0", "previous": "1.0.0+py23"}},
             {
                 "release": {"dummy_package": "2.0.0", "custom_package": "1.1.1"},
@@ -124,7 +130,9 @@ def test_insert_upgrade_proposals(release, repository, suggestions, expected):
     repository = yaml.load(str(repository))
     release = yaml.load(str(release))
     insert_upgrade_proposals(
-        suggestions, repository, release,
+        suggestions,
+        repository,
+        release,
     )
     assert {"release": release, "repo": repository} == expected
 
@@ -139,7 +147,9 @@ def test_run(monkeypatch):
     response_mock = MagicMock(return_value=[("dummy_package", MagicMock())])
     compatible_versions = MagicMock(return_value=["2.0.0"])
     monkeypatch.setattr(check_up_to_date_pypi, "get_pypi_info", response_mock)
-    monkeypatch.setattr(check_up_to_date_pypi, "compatible_versions", compatible_versions)
+    monkeypatch.setattr(
+        check_up_to_date_pypi, "compatible_versions", compatible_versions
+    )
     result = check_up_to_date_pypi.get_upgrade_proposal(release, repository, "3.6.8")
     assert result == {"dummy_package": {"previous": "1.0.0", "suggested": "2.0.0"}}
 
@@ -231,6 +241,7 @@ def test_main_file_output(monkeypatch, tmpdir):
                 "custom_package": {"1.1.1": {"maintainer": "some_person"}},
             },
         }
+
 
 @pytest.mark.parametrize(
     "release, repository, request_json, expected",

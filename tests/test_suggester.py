@@ -48,7 +48,11 @@ def test_path_is_release(test_input, expected):
 
 
 @pytest.mark.parametrize(
-    "release_id,expected", [("2019.12.00-py3", "py3"), ("2019.12.00-py2.7", "py2.7"),],
+    "release_id,expected",
+    [
+        ("2019.12.00-py3", "py3"),
+        ("2019.12.00-py2.7", "py2.7"),
+    ],
 )
 def test_py_ver(release_id, expected):
     release = Release(release_id)

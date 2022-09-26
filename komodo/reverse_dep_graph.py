@@ -143,7 +143,9 @@ def main():
             )
             display_proc = subprocess.Popen(["display"], stdin=dot_proc.stdout)
             out = io.TextIOWrapper(
-                dot_proc.stdin, encoding="utf-8", line_buffering=True,
+                dot_proc.stdin,
+                encoding="utf-8",
+                line_buffering=True,
             )
             run(args.base_pkgs, args.repo, True, pkg, out)
             out.close()

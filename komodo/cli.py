@@ -11,7 +11,11 @@ import komodo.switch as switch
 from komodo.build import make
 from komodo.data import Data
 from komodo.fetch import fetch
-from komodo.package_version import LATEST_PACKAGE_ALIAS, latest_pypi_version, strip_version
+from komodo.package_version import (
+    LATEST_PACKAGE_ALIAS,
+    latest_pypi_version,
+    strip_version,
+)
 from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
@@ -125,7 +129,7 @@ def _main(args):
         # cases falling back to /tmp, which is undesired when building on nfs.
         os.environ["TMPDIR"] = args.tmp
 
-    print('Fixup #! in pip-provided packages if bin exist')
+    print("Fixup #! in pip-provided packages if bin exist")
     release_path = os.path.join(args.prefix, args.release)
     release_root = os.path.join(release_path, "root")
     for pkg, ver in args.pkgs.items():

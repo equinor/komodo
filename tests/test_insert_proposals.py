@@ -42,11 +42,17 @@ class MockRepo(object):
 
     def create_file(self, target_file, msg, content, branch):
         assert target_file not in self.updated_files
-        self.updated_files[target_file] = {"content": yaml.load(content, Loader=yaml.CLoader), "branch": branch}
+        self.updated_files[target_file] = {
+            "content": yaml.load(content, Loader=yaml.CLoader),
+            "branch": branch,
+        }
 
     def update_file(self, target_file, msg, content, sha, branch):
         assert target_file not in self.updated_files
-        self.updated_files[target_file] = {"content": yaml.load(content, Loader=yaml.CLoader), "branch": branch}
+        self.updated_files[target_file] = {
+            "content": yaml.load(content, Loader=yaml.CLoader),
+            "branch": branch,
+        }
 
     def create_pull(self, title, body, head, base):
         o = mock.Mock()
@@ -78,11 +84,11 @@ class MockRepo(object):
                 "upgrade_proposals.yml": {
                     "1111-11": None,
                     "1111-12": {"testlib2": "ignore"},
-                }
+                },
             },
             ["Temporary PR 1111.11.rc2", "Add release 1111.11.rc2"],
             type(None),
-            id="empty_upgrade_proposal"
+            id="empty_upgrade_proposal",
         ),
         pytest.param(
             "1111.11.rc1",
@@ -137,7 +143,7 @@ class MockRepo(object):
             [],
             ValueError,
             id="branch_already_exists",
-        )
+        ),
     ],
 )
 def test_insert_proposals(base, target, repo_files, changed_files, prs, return_type):
