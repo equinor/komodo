@@ -5,17 +5,13 @@ import yaml
 
 
 builtins = {
-    "lib1" : {
-        "rhel6": {
-            "py27" : "0.1.2",
-            "py36" : "1.2.3",
-            "py38" : "1.2.4"
-        },
+    "lib1": {
+        "rhel6": {"py27": "0.1.2", "py36": "1.2.3", "py38": "1.2.4"},
         "rhel7": {
-            "py27" : "0.1.2+builtin",
-            "py36" : "1.2.3+builtin",
-            "py38" : "1.2.3+builtin"
-        }
+            "py27": "0.1.2+builtin",
+            "py36": "1.2.3+builtin",
+            "py38": "1.2.3+builtin",
+        },
     },
 }
 
@@ -41,5 +37,7 @@ def test_transpile(tmpdir):
     with tmpdir.as_cwd():
         transpile_releases(release_file, os.getcwd())
         for rhel_ver in ("rhel7",):
-            for py_ver in ("py38", ):
-                assert os.path.isfile("{}-{}-{}.yml".format(release_base, py_ver, rhel_ver))
+            for py_ver in ("py38",):
+                assert os.path.isfile(
+                    "{}-{}-{}.yml".format(release_base, py_ver, rhel_ver)
+                )

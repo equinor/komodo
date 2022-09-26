@@ -161,7 +161,11 @@ def main():
     releases = load_from_file(yaml, args.release_file)
     repository = load_from_file(yaml, args.repository_file)
 
-    upgrade_proposals = get_upgrade_proposal(releases, repository, args.python_version,)
+    upgrade_proposals = get_upgrade_proposal(
+        releases,
+        repository,
+        args.python_version,
+    )
 
     if upgrade_proposals:
         if args.propose_upgrade:

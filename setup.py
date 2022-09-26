@@ -6,7 +6,9 @@ setup(
     name="Komodo",
     version="1.0",
     packages=["komodo", "komodo.data", "komodo.symlink", "komodo.symlink.suggester"],
-    package_data={"komodo.data": ["*"],},
+    package_data={
+        "komodo.data": ["*"],
+    },
     package_dir={
         "komodo": "komodo",
         "komodo.data": "komodo/data",
@@ -36,13 +38,13 @@ setup(
             "komodo-extract-dep-graph = komodo.extract_dep_graph:main",
             "komodo-lint-package-status = komodo.lint_package_status:main",
             "komodo-lint-maturity = komodo.lint_maturity:main",
-            'komodo-clean-repository = komodo.release_cleanup:main',
-            'komodo-transpiler = komodo.release_transpiler:main',
-            'komodo-post-messages = komodo.post_messages:main',
-            'komodo-snyk-test = komodo.snyk_reporting:main',
-            'komodo-reverse-deps = komodo.reverse_dep_graph:main',
-            'komodo-insert-proposals = komodo.insert_proposals:main',
-            'komodo-check-pypi = komodo.check_up_to_date_pypi:main',
+            "komodo-clean-repository = komodo.release_cleanup:main",
+            "komodo-transpiler = komodo.release_transpiler:main",
+            "komodo-post-messages = komodo.post_messages:main",
+            "komodo-snyk-test = komodo.snyk_reporting:main",
+            "komodo-reverse-deps = komodo.reverse_dep_graph:main",
+            "komodo-insert-proposals = komodo.insert_proposals:main",
+            "komodo-check-pypi = komodo.check_up_to_date_pypi:main",
         ]
     },
 )

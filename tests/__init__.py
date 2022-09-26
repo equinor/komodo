@@ -1,8 +1,10 @@
 import os
 import ruamel.yaml
 
+
 def _get_test_root():
     return os.path.realpath(os.path.dirname(__file__))
+
 
 def _load_yaml(filename):
     ruamel_instance = ruamel.yaml.YAML()

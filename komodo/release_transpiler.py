@@ -20,7 +20,9 @@ def build_matrix_file(release_base, release_folder, builtins):
     for key in py_keys:
         files[key] = load_yaml("{}/{}-{}.yml".format(release_folder, release_base, key))
 
-    all_packages = set(itertools.chain.from_iterable(files[key].keys() for key in files))
+    all_packages = set(
+        itertools.chain.from_iterable(files[key].keys() for key in files)
+    )
     compiled = {}
 
     for p in all_packages:
@@ -54,7 +56,9 @@ def _build(packages, py_ver, rhel_ver):
 def transpile_releases(matrix_file, output_folder):
     release_base = os.path.splitext(os.path.basename(matrix_file))[0]
     release_folder = os.path.dirname(matrix_file)
-    release_matrix = load_yaml("{}.yml".format(os.path.join(release_folder, release_base)))
+    release_matrix = load_yaml(
+        "{}.yml".format(os.path.join(release_folder, release_base))
+    )
     for rhel_ver, py_ver in get_matrix():
         release_dict = _build(release_matrix, py_ver, rhel_ver)
         filename = "{}.yml".format(format_release(release_base, rhel_ver, py_ver))
@@ -62,15 +66,19 @@ def transpile_releases(matrix_file, output_folder):
 
 
 def combine(args):
-    build_matrix_file(args.release_base, args.release_folder, load_yaml(args.override_mapping))
+    build_matrix_file(
+        args.release_base, args.release_folder, load_yaml(args.override_mapping)
+    )
+
 
 def transpile(args):
     transpile_releases(args.matrix_file, args.output_folder)
 
 
-
 def main():
-    parser = ArgumentParser(description="Build release files.", formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(
+        description="Build release files.", formatter_class=RawTextHelpFormatter
+    )
 
     subparsers = parser.add_subparsers(
         title="Commands",
@@ -93,42 +101,34 @@ example-package:
   rhel7:
     py27 : # package not included in release
     py36 : 5.11.13+builtin""",
-        formatter_class=RawTextHelpFormatter
+        formatter_class=RawTextHelpFormatter,
     )
     matrix_parser.set_defaults(func=combine)
     matrix_parser.add_argument(
-        "--release-base",
-        help="Name of the release to handle",
-        required=True
+        "--release-base", help="Name of the release to handle", required=True
     )
     matrix_parser.add_argument(
-        "--release-folder",
-        help="Folder with existing release file",
-        required=True
+        "--release-folder", help="Folder with existing release file", required=True
     )
     matrix_parser.add_argument(
         "--override-mapping",
         help="File containing explicit matrix packages",
-        required=True
+        required=True,
     )
 
     transpile_parser = subparsers.add_parser(
-        "transpile",
-        description="Transpile a matrix file into separate release files."
+        "transpile", description="Transpile a matrix file into separate release files."
     )
     transpile_parser.set_defaults(func=transpile)
     transpile_parser.add_argument(
-        "--matrix-file",
-        help="Yaml file describing the release matrix",
-        required=True
+        "--matrix-file", help="Yaml file describing the release matrix", required=True
     )
     transpile_parser.add_argument(
-        "--output-folder",
-        help="Folder to output new release files",
-        required=True
+        "--output-folder", help="Folder to output new release files", required=True
     )
     args = parser.parse_args()
     args.func(args)
+
 
 if __name__ == "__main__":
     main()

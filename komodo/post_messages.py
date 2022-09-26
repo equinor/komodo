@@ -45,11 +45,17 @@ def get_parser():
     parser = ArgumentParser(description="Post messages to a release.")
 
     parser.add_argument(
-        "--releases", "-r", nargs="+", help="The releases to post messages to.",
+        "--releases",
+        "-r",
+        nargs="+",
+        help="The releases to post messages to.",
     )
 
     parser.add_argument(
-        "--motd-db", "-m", required=True, help="YML file defining the messages.",
+        "--motd-db",
+        "-m",
+        required=True,
+        help="YML file defining the messages.",
     )
 
     parser.add_argument(

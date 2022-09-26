@@ -10,16 +10,17 @@ def maintainers(pkgfile, repofile):
 
     maints = set()
     for pkg, ver in pkgs.items():
-        maints.add((pkg, ver, repo[pkg][ver]['maintainer']))
+        maints.add((pkg, ver, repo[pkg][ver]["maintainer"]))
     return maints
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description='print maintainers')
-    parser.add_argument('pkgfile', type=str)
-    parser.add_argument('repofile', type=str)
+
+    parser = argparse.ArgumentParser(description="print maintainers")
+    parser.add_argument("pkgfile", type=str)
+    parser.add_argument("repofile", type=str)
     args = parser.parse_args()
     maints = maintainers(args.pkgfile, args.repofile)
     for pkg, ver, maintainer in maints:
-        print('%s %s %s' % (pkg, ver, maintainer))
+        print("%s %s %s" % (pkg, ver, maintainer))

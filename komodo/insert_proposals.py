@@ -72,7 +72,9 @@ def load_yaml_from_repo(filename, repo, ref):
 def main():
     args = parse_args()
     repo = _get_repo(os.getenv("GITHUB_TOKEN"), args.git_fork, args.git_repo)
-    status = insert_proposals(repo, args.base, args.target, args.git_ref, args.jobname, args.joburl)
+    status = insert_proposals(
+        repo, args.base, args.target, args.git_ref, args.jobname, args.joburl
+    )
     if status is not None:
         raise status
 
@@ -80,7 +82,7 @@ def main():
 def insert_proposals(repo, base, target, git_ref, jobname, joburl):
     year = target.split(".")[0]
     month = target.split(".")[1]
-    tmp_target = target+".tmp"
+    tmp_target = target + ".tmp"
 
     # check that the branches do not already exist
     try:

@@ -226,7 +226,8 @@ def test_msg_release_exception():
 def test_get_release_version(release_basename, expected_release_version):
 
     release_version = lint_maturity.get_release_version(
-        release_basename=release_basename, tag_exceptions_release=["bleeding", "rpath"],
+        release_basename=release_basename,
+        tag_exceptions_release=["bleeding", "rpath"],
     )
 
     assert release_version == expected_release_version
@@ -401,7 +402,8 @@ def test_main(monkeypatch, tmpdir):
         release_folder=args.release_folder, release_file=args.release_file
     )
     run_mock.assert_called_once_with(
-        list_files_expected, {"release": [], "package": []},
+        list_files_expected,
+        {"release": [], "package": []},
     )
 
 
