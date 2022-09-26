@@ -3,10 +3,10 @@
 import argparse
 import os
 import sys
-import yaml
-from packaging.version import Version, parse, InvalidVersion
 import warnings
 
+import yaml
+from packaging.version import InvalidVersion, Version, parse
 
 _INVALID_TAGS = {
     "a": ["invalid"],

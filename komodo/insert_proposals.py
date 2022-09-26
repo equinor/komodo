@@ -1,16 +1,16 @@
-import github
-from datetime import datetime
-
-from base64 import b64decode
-
-import os
 import argparse
 import collections
-from github import Github, UnknownObjectException
-from komodo.prettier import load_yaml, write_to_string, write_to_file
 import difflib
-from ruamel.yaml.compat import StringIO, ordereddict
+import os
+from base64 import b64decode
+from datetime import datetime
+
+import github
 import ruamel.yaml
+from github import Github, UnknownObjectException
+from ruamel.yaml.compat import StringIO, ordereddict
+
+from komodo.prettier import load_yaml, write_to_file, write_to_string
 
 
 def recursive_update(left, right):

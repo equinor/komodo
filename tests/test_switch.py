@@ -1,6 +1,7 @@
 import os
 
 import pytest  # noqa
+
 from komodo import switch
 from komodo.data import Data
 from komodo.switch import MIGRATION_WARNING

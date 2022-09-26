@@ -1,8 +1,10 @@
-import os, sys
 import argparse
 import json
-from .sanity_check import verify_integrity
+import os
+import sys
 from contextlib import contextmanager
+
+from .sanity_check import verify_integrity
 
 
 @contextmanager

@@ -1,6 +1,6 @@
 import pytest
-from komodo import lint
 
+from komodo import lint
 
 REPO = {
     "python": {

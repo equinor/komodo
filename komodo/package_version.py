@@ -3,7 +3,6 @@ import re
 import subprocess
 import sys
 
-
 LATEST_PACKAGE_ALIAS = "*"
 _PYPI_LATEST_VERSION_RE = r".+from\ versions\:\ (.+)\)"
 # This command is deprecated. Hopefully it is not removed until a replacement

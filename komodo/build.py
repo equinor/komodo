@@ -2,12 +2,12 @@
 
 from __future__ import print_function
 
+import hashlib
 import itertools as itr
 import os
-import sys
-import stat
-import hashlib
 import pathlib
+import stat
+import sys
 from distutils.dir_util import mkpath
 
 import requests

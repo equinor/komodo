@@ -1,20 +1,20 @@
 import pathlib
 import sys
 from unittest.mock import MagicMock
-from yaml.cyaml import CLoader
 
 import pytest
 import requests
 import yaml
+from packaging import version
+from yaml.cyaml import CLoader
 
+from komodo import check_up_to_date_pypi
 from komodo.check_up_to_date_pypi import (
     compatible_versions,
     get_pypi_packages,
-    yaml_parser,
     insert_upgrade_proposals,
+    yaml_parser,
 )
-from komodo import check_up_to_date_pypi
-from packaging import version
 
 
 @pytest.mark.parametrize(

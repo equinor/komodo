@@ -1,8 +1,9 @@
-import os, sys
-import json
 import argparse
 import difflib
+import json
+import os
 import pprint
+import sys
 
 
 def equal_links(a, b):
