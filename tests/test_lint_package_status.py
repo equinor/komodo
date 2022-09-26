@@ -33,9 +33,9 @@ def test_missing_status():
     }
     with pytest.raises(SystemExit) as exit_info:
         lint_package_status.run(missing_status, REPO)
-    assert (
-        str(exit_info.value)
-        == "The following packages are specified in the repository file, but not in the package status file: ['package_c']"
+    assert str(exit_info.value) == (
+        "The following packages are specified in the repository file, "
+        "but not in the package status file: ['package_c']"
     )
 
 
@@ -49,9 +49,9 @@ def test_missing_repo():
     del repo_missing["package_c"]
     with pytest.raises(SystemExit) as exit_info:
         lint_package_status.run(missing_status, repo_missing)
-    assert (
-        str(exit_info.value)
-        == "The following packages are specified in the package status file, but not in the repository file: ['package_c']"
+    assert str(exit_info.value) == (
+        "The following packages are specified in the package status file, "
+        "but not in the repository file: ['package_c']"
     )
 
 

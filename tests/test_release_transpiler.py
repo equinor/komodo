@@ -3,7 +3,7 @@ import os
 import yaml
 
 from komodo.release_transpiler import build_matrix_file, transpile_releases
-from tests import _get_test_root, _load_yaml
+from tests import _get_test_root
 
 builtins = {
     "lib1": {

@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 
-import argparse
 import itertools
 import os
-from argparse import (
-    ArgumentError,
-    ArgumentParser,
-    ArgumentTypeError,
-    RawTextHelpFormatter,
-)
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 from komodo.matrix import format_release, get_matrix
 from komodo.prettier import load_yaml, write_to_file

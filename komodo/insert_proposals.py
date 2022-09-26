@@ -8,9 +8,8 @@ from datetime import datetime
 import github
 import ruamel.yaml
 from github import Github, UnknownObjectException
-from ruamel.yaml.compat import StringIO, ordereddict
 
-from komodo.prettier import load_yaml, write_to_file, write_to_string
+from komodo.prettier import write_to_string
 
 
 def recursive_update(left, right):

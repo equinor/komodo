@@ -149,7 +149,11 @@ def main():
     )
     parser.add_argument(
         "--python-version",
-        default=f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        default=(
+            f"{sys.version_info.major}."
+            f"{sys.version_info.minor}."
+            f"{sys.version_info.micro}"
+        ),
         help="Which python version to upgrade to, defaults to the system python. "
         "Should provide it on the form: major.minor.micro, though only: major or: "
         "major.minor is allowed (but might give unexpected results, for example if "
@@ -172,7 +176,8 @@ def main():
         if args.propose_upgrade:
             insert_upgrade_proposals(upgrade_proposals, repository, releases)
             print(
-                "Writing upgrade proposals, assuming nothing has changed with dependencies..."
+                "Writing upgrade proposals, "
+                "assuming nothing has changed with dependencies..."
             )
             with open(args.propose_upgrade, "w") as fout:
                 yaml.dump(releases, fout)
@@ -183,7 +188,8 @@ def main():
             pypi_latest = versions["suggested"]
             current_version = versions["previous"]
             errors.append(
-                f"{name} not at latest pypi version: {pypi_latest}, is at: {current_version}"
+                f"{name} not at latest pypi version: {pypi_latest}, "
+                f"is at: {current_version}"
             )
         sys.exit("\n".join(errors) + "\nFound out of date packages!")
 

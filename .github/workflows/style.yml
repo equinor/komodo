@@ -35,3 +35,7 @@ jobs:
     - name: Run isort
       run: |
         isort --check komodo tests *.py
+
+    - name: Lint with flake8
+      run: |
+        flake8

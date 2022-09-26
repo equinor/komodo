@@ -4,7 +4,6 @@ from unittest import mock
 import github
 import pytest
 import yaml
-from yaml.loader import Loader
 
 from komodo.insert_proposals import insert_proposals
 

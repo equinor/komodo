@@ -83,7 +83,8 @@ def assert_root_nodes(link_dict):
     inferred_roots = _get_root_nodes(link_dict)
     if set(input_roots) != inferred_roots:
         raise AssertionError(
-            "The roots in the link-tree is not matching the roots defined in link_roots in dict\n"
+            "The roots in the link-tree is not matching "
+            + "the roots defined in link_roots in dict\n"
             + "Roots defined: {}\n".format(set(input_roots))
             + "Roots expected: {}".format(inferred_roots)
         )
@@ -97,7 +98,9 @@ def _compare_dicts(d1, d2):
 
 def sanity_main():
     parser = argparse.ArgumentParser(
-        description="Verify symlinks for komodo versions are according to a given config."
+        description=(
+            "Verify symlinks for komodo versions are " "according to a given config."
+        )
     )
     parser.add_argument(
         "config", type=str, help="a json file describing symlink structure"
@@ -113,9 +116,8 @@ def sanity_main():
 
     if not equal_links(input_dict, from_dir):
         print(
-            "The config file: {} does not match with the current folder structure".format(
-                args.config
-            )
+            f"The config file: {args.config} does not match with the "
+            "current folder structure"
         )
         print(_compare_dicts(input_dict, from_dir))
         sys.exit(1)

@@ -2,7 +2,6 @@ import fnmatch
 import hashlib
 import os
 import shutil
-import sys
 from argparse import ArgumentParser
 
 import yaml as yml

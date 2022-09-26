@@ -1,5 +1,4 @@
 import os
-import sys
 import warnings
 from unittest import mock
 
@@ -66,7 +65,7 @@ def test_msg_packages_invalid(release_basename, release_version, count_tag_inval
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag invalid packages: [('package_IV1', '5.13.1-src')]
 
-"""
+"""  # noqa
 
     assert exit_msg in EXPECTED_SYSTEMEXIT
 
@@ -84,7 +83,7 @@ def test_msg_packages_exception():
     for file_basename in RELEASE_FILE_NAMES:
         expected_warning_msg = file_basename + ", exception list of packages:\n"
         expected_warning_msg += (
-            "\t" + str([("package_EX2", "testing/2020.3/rc1")]) + " \n"
+            "\t" + str([("package_EX2", "testing/2020.3/rc1")]) + "\n"
         )
         warning_msg = lint_maturity.msg_packages_exception(
             file_basename,
@@ -254,16 +253,16 @@ package_EX2: testing/2020.3/rc1""",
         )
 
         EXPECTED_WARNING = """2020.02.01-py27.yml, exception list of packages:
-\t[('package_EX2', 'testing/2020.3/rc1')] 
+\t[('package_EX2', 'testing/2020.3/rc1')]
 2020.02.a1-py27.yml, exception list of packages:
-\t[('package_EX2', 'testing/2020.3/rc1')] 
+\t[('package_EX2', 'testing/2020.3/rc1')]
 2020.02.b1-py27.yml, exception list of packages:
-\t[('package_EX2', 'testing/2020.3/rc1')] 
+\t[('package_EX2', 'testing/2020.3/rc1')]
 2020.02.rc1-py27.yml, exception list of packages:
-\t[('package_EX2', 'testing/2020.3/rc1')] 
+\t[('package_EX2', 'testing/2020.3/rc1')]
 bleeding-py27.yml not lint because it is in the exception list.
 bleeding-py27.yml, exception list of packages:
-\t[('package_EX2', 'testing/2020.3/rc1')] 
+\t[('package_EX2', 'testing/2020.3/rc1')]
 bleeding-py27.yml has 4 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
@@ -289,7 +288,7 @@ bleeding-py27.yml has 4 packages with invalid maturity tag.
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag invalid packages: [('package_IV1', '5.13.1-src')]
 
-"""
+"""  # noqa
 
     for list_file in list_files:
 
@@ -443,6 +442,6 @@ package_EX2: testing/2020.3/rc1""",
 \tTag rc packages: [('package_rc1', 'v3.1.rc1')]
 \tTag invalid packages: [('package_IV1', '5.13.1-src'), ('package_EX2', 'testing/2020.3/rc1')]
 
-"""
+"""  # noqa
 
     assert str(exit_info.value) in EXPECTED_SYSTEMEXIT

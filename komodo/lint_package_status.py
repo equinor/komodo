@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import os
-import sys
-
-import yaml
 
 from komodo.yaml_file_type import YamlFile
 
@@ -18,13 +14,15 @@ def run(package_status, repository):
     repository_set = set(repository.keys())
     if package_status_set.difference(repository_set):
         raise SystemExit(
-            "The following packages are specified in the package status file, but not in the repository file: {}".format(
+            "The following packages are specified in the "
+            "package status file, but not in the repository file: {}".format(
                 list(package_status_set.difference(repository_set))
             )
         )
     if repository_set.difference(package_status_set):
         raise SystemExit(
-            "The following packages are specified in the repository file, but not in the package status file: {}".format(
+            "The following packages are specified in the "
+            "repository file, but not in the package status file: {}".format(
                 list(repository_set.difference(package_status_set))
             )
         )

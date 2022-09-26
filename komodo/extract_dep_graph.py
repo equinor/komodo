@@ -1,6 +1,5 @@
 import argparse
 import os
-import sys
 
 import yaml
 
@@ -33,20 +32,18 @@ def _extract_dependencies(package, version, base_pkgs, repofile, dependencies):
     if version not in repofile[package]:
         available_versions = list(repofile[package].keys())
         raise SystemExit(
-            "Version '{}' for package '{}' not found in 'repo'. Available version(s) is: {}.".format(
-                version, package, available_versions
-            )
+            f"Version '{version}' for package '{package}' not found in 'repo'. "
+            f"Available version(s) is: {available_versions}."
         )
     if package not in dependencies:
         dependencies[package] = version
 
     if "depends" in repofile[package][version]:
         for dependency in repofile[package][version]["depends"]:
-            if not dependency in base_pkgs:
+            if dependency not in base_pkgs:
                 raise SystemExit(
-                    "'{}' not found in 'base_pkgs'. This needs to be in place in order to pick correct version.".format(
-                        dependency
-                    )
+                    f"'{dependency}' not found in 'base_pkgs'. "
+                    "This needs to be in place in order to pick correct version."
                 )
             version = base_pkgs[dependency]
             _extract_dependencies(
@@ -87,7 +84,8 @@ def main():
     parser.add_argument(
         "--out",
         "-o",
-        help="File to be written with resolved dependencies. If not specified dump to stdout.",
+        help="File to be written with resolved dependencies. "
+        "If not specified dump to stdout.",
     )
 
     args = parser.parse_args()

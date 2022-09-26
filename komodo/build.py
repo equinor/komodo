@@ -178,7 +178,8 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
 
     if sha256.hexdigest() != hash:
         raise ValueError(
-            f"Hash of downloaded file ({sha256.hexdigest()}) not equal to expected hash."
+            f"Hash of downloaded file ({sha256.hexdigest()}) "
+            "not equal to expected hash."
         )
 
     # Add executable permission if in bin folder:
