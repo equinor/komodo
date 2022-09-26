@@ -1,8 +1,10 @@
-import yaml
-import os
-import pytest
 import hashlib
-from komodo.post_messages import get_messages_and_scripts, copy_files, main
+import os
+
+import pytest
+import yaml
+
+from komodo.post_messages import copy_files, get_messages_and_scripts, main
 from tests import _get_test_root
 
 

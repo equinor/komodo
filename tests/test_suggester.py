@@ -1,17 +1,17 @@
 import sys
 from argparse import Namespace
+from base64 import b64encode
 
 import pytest
 
 from komodo.symlink.suggester.cli import suggest_symlink_configuration
-from komodo.symlink.suggester.configuration import update, Configuration
+from komodo.symlink.suggester.configuration import Configuration, update
 from komodo.symlink.suggester.release import Release
-from base64 import b64encode
 
 if sys.version_info >= (3, 3):
-    from unittest.mock import MagicMock, ANY
+    from unittest.mock import ANY, MagicMock
 else:
-    from mock import MagicMock, ANY
+    from mock import ANY, MagicMock
 
 
 @pytest.mark.parametrize(

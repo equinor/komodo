@@ -1,17 +1,18 @@
-from komodo.symlink.sanity_check import (
-    read_link_structure,
-    equal_links,
-    assert_root_nodes,
-    verify_integrity,
-    sanity_main,
-)
-from komodo.symlink.create_links import create_symlinks, symlink_main
-
-import os
-import sys
-import shutil
 import json
+import os
+import shutil
+import sys
+
 import pytest
+
+from komodo.symlink.create_links import create_symlinks, symlink_main
+from komodo.symlink.sanity_check import (
+    assert_root_nodes,
+    equal_links,
+    read_link_structure,
+    sanity_main,
+    verify_integrity,
+)
 from tests import _get_test_root
 
 

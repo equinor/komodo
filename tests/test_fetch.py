@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+
 from komodo.fetch import fetch
 from komodo.package_version import LATEST_PACKAGE_ALIAS
 

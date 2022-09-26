@@ -8,9 +8,9 @@ import sys
 
 from komodo.package_version import (
     LATEST_PACKAGE_ALIAS,
-    strip_version,
-    latest_pypi_version,
     get_git_revision_hash,
+    latest_pypi_version,
+    strip_version,
 )
 from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile

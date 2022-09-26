@@ -1,14 +1,14 @@
+import sys
+from unittest.mock import Mock, PropertyMock, patch
+
 import pytest
 
 from komodo.snyk_reporting import snyk_main
 from komodo.symlink.suggester.release import Release
 
-from unittest.mock import patch, Mock, PropertyMock
-import sys
-
 if sys.version_info >= (3, 7):
-    from snyk.models import Vulnerability
     from snyk import SnykClient
+    from snyk.models import Vulnerability
 
 above_py37 = pytest.mark.skipif(
     sys.version_info < (3, 7), reason="requires Python >= 3.7"

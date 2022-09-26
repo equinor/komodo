@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
-import os
 import argparse
 import logging
+import os
+from collections import namedtuple
+
 import yaml as yml
 from pkg_resources import parse_version
-
-from collections import namedtuple
 
 kerr = namedtuple("KomodoError", ["pkg", "version", "maintainer", "depends", "err"])
 

@@ -31,3 +31,7 @@ jobs:
 
     - name: Run black
       uses: psf/black@stable
+
+    - name: Run isort
+      run: |
+        isort --check komodo tests *.py

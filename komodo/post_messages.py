@@ -1,10 +1,11 @@
-from argparse import ArgumentParser
-import yaml as yml
 import fnmatch
-import sys
+import hashlib
 import os
 import shutil
-import hashlib
+import sys
+from argparse import ArgumentParser
+
+import yaml as yml
 
 
 def get_messages_and_scripts(release_name, motd_db):

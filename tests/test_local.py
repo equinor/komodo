@@ -1,4 +1,5 @@
 import os
+
 import pytest  # noqa
 
 from komodo import local

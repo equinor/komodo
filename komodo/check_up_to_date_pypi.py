@@ -1,12 +1,13 @@
+import argparse
 import copy
-import sys
 import pathlib
+import sys
 
-from packaging import version as get_version
-from packaging.specifiers import SpecifierSet
 import requests
 import ruamel.yaml
-import argparse
+from packaging import version as get_version
+from packaging.specifiers import SpecifierSet
+
 from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version
 from komodo.prettier import write_to_file
 

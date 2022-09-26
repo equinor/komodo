@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
-import sys
-import yaml
-import subprocess
 import io
+import os
+import subprocess
+import sys
+
+import yaml
 
 
 def run(base_pkgfile, repofile, dot, display_pkg, out):

@@ -3,6 +3,7 @@ from subprocess import CalledProcessError
 from unittest.mock import patch
 
 import pytest
+
 from komodo.package_version import latest_pypi_version
 
 

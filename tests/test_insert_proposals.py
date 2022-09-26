@@ -1,11 +1,12 @@
+from base64 import b64encode
 from unittest import mock
 
-from yaml.loader import Loader
-from komodo.insert_proposals import insert_proposals
-import yaml
-from base64 import b64encode
-import pytest
 import github
+import pytest
+import yaml
+from yaml.loader import Loader
+
+from komodo.insert_proposals import insert_proposals
 
 
 class MockContent(object):

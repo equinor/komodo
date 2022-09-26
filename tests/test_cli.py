@@ -1,12 +1,12 @@
-import pytest
+import os
+import shutil
 import sys
 
+import pytest
 
-import os
 from komodo.cli import cli_main
-from tests import _get_test_root
-import shutil
 from komodo.package_version import LATEST_PACKAGE_ALIAS
+from tests import _get_test_root
 
 
 @pytest.mark.parametrize(

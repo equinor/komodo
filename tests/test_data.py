@@ -1,4 +1,5 @@
 import pytest
+
 from komodo.data import Data
 
 

@@ -1,9 +1,11 @@
-import pytest
 import os
 import sys
-from komodo import lint_maturity
 import warnings
 from unittest import mock
+
+import pytest
+
+from komodo import lint_maturity
 
 
 def _create_tmp_test_files(release_sample, file_names_sample):

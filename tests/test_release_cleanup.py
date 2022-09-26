@@ -1,16 +1,17 @@
-from komodo.release_cleanup import (
-    load_all_releases,
-    find_unused_versions,
-    remove_unused_versions,
-    write_to_file,
-    main,
-)
-from tests import _get_test_root, _load_yaml
-from argparse import ArgumentTypeError
 import os
+from argparse import ArgumentTypeError
+
 import pytest
 
 from komodo.prettier import prettier
+from komodo.release_cleanup import (
+    find_unused_versions,
+    load_all_releases,
+    main,
+    remove_unused_versions,
+    write_to_file,
+)
+from tests import _get_test_root, _load_yaml
 
 expected_result = """lib1:
   1.2.3:

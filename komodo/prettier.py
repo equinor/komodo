@@ -1,14 +1,15 @@
 from __future__ import print_function
 
+import argparse
+import functools
 import os
 import re
 import sys
-import argparse
-import functools
+
+import ruamel.yaml
 
 # On Python3, StringIO can come from standard library io:
 from ruamel.yaml.compat import StringIO, ordereddict
-import ruamel.yaml
 
 
 def repository_specific_formatting(empty_line_top_level, yaml_string):

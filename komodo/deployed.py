@@ -1,9 +1,10 @@
 import argparse
-import re
 import os
+import re
 import sys
 from builtins import map
-from komodo.matrix import get_matrix, format_release, get_matrix_base
+
+from komodo.matrix import format_release, get_matrix, get_matrix_base
 
 
 def _is_release(path):
