@@ -6,9 +6,9 @@
 Komodo is a software distribution system.
 
 The purpose of Komodo is to be able to automatically, reproducibly, testably
-create a software distribution containing all systems Software Innovation Bergen
-is responsible for. Automatic deploy of new releases as well as nightly deploy
-and the option of automatically moving the testing stage will be supported.
+create a software distribution. Automatic deploy of new releases as well as
+nightly deploy and the option of automatically moving the testing stage will be
+supported.
 
 ## Overall goal
 
@@ -34,7 +34,7 @@ opm-parser:
   git: git@github.com:opm/opm-parser
 ecl:
   version: 2.3
-  git: git@github.com:statoil/libecl
+  git: git@github.com:equinor/ecl
 ```
 
 Then a release, e.g. _unstable_ is defined as another YAML file,
@@ -55,25 +55,24 @@ To use, `source /my/software/center/unstable/enable`.
 
 You can auto-format repository and/or releases by running something like
 ```bash
-komodo-prettier repository.yml releases/*
+komodo-clean-repository prettier --files repository.yml releases/*
 ```
 If you are in e.g CI and only want to check style compliance, add `--check`.
 
 ## Finding reverse dependecies
 
-You can show reverse dependencies of a package by running the komodo/reverse_dep_graph.py
-Example of use:
+You can show reverse dependencies of a package by running the tool `komodo-reverse-deps`:
 ```bash
-python komodo/reverse_dep_graph.py releases/2020.08.01-py38.yml repository.yml --pkg libres
+komodo-reverse-deps releases/matrices/2022.09.02.yml repository.yml --pkg websockets
 ```
-If --pkg is not specified, the program will prompt for it.
+If `--pkg` is not specified, the program will prompt for it.
 
 ### Render graph
 
 Can also output a graph of the reverse dependencies in dot format which can then be rendered using
 the dot program from the `ImageMagick` package. As a convenience can also render it automatically
 using dot and display. To use this convenience you must have installed these tools, which are
-distributed with the Graphwiz and ImageMagick packages.
+distributed with the Graphviz and ImageMagick packages.
 
 ## Install
 
