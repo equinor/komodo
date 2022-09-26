@@ -2,11 +2,10 @@
 
 import argparse
 import os
-import sys
 import warnings
 
 import yaml
-from packaging.version import InvalidVersion, Version, parse
+from packaging.version import InvalidVersion, Version
 
 _INVALID_TAGS = {
     "a": ["invalid"],
@@ -57,7 +56,7 @@ def msg_packages_exception(release_basename, dict_tag_maturity):
 
     if len(dict_tag_maturity["exception"]) > 0:
         msg_exception += release_basename + ", exception list of packages:\n"
-        msg_exception += "\t" + str(dict_tag_maturity["exception"]) + " \n"
+        msg_exception += "\t" + str(dict_tag_maturity["exception"]) + "\n"
 
     return msg_exception
 

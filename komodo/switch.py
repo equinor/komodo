@@ -3,7 +3,13 @@ import shutil
 
 from jinja2 import Template
 
-MIGRATION_WARNING = """Attention! Your machine is running on a RHEL6 environment which is in the process of being phased out.\\nNew versions of komodo will from October 2020 only support RHEL7.\\nPlease migrate as soon as possible. If you have any questions or issues - contact us on #ert-users on Slack or Equinor's Yammer!"""
+MIGRATION_WARNING = (
+    "Attention! Your machine is running on a RHEL6 environment "
+    "which is in the process of being phased out.\n"
+    "New versions of komodo will from October 2020 only support RHEL7.\n"
+    "Please migrate as soon as possible. If you have any questions or issues - "
+    "contact us on #ert-users on Slack or Equinor's Yammer!"
+)
 
 
 def create_activator_switch(data, prefix, release):

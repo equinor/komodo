@@ -12,17 +12,17 @@ from komodo.package_version import latest_pypi_version
     [
         (
             """ERROR: Could not find a version that satisfies the requirement equinor_libres== (from versions: 3.3.1a9, 7.2.0b0, 7.2.0rc0, 8.0.0rc0, 8.0.0, 8.0.1, 8.1.0rc0, 9.0.0b0, 9.0.0b1)
-    ERROR: No matching distribution found for equinor_libres==""",
+    ERROR: No matching distribution found for equinor_libres==""",  # noqa
             "9.0.0b1",
         ),
         (
             """ERROR: Could not find a version that satisfies the requirement equinor_libres== (from versions: 0.1.0)
-ERROR: No matching distribution found for equinor_libres==""",
+ERROR: No matching distribution found for equinor_libres==""",  # noqa
             "0.1.0",
         ),
         (
             """ERROR: Could not find a version that satisfies the requirement equinor_libres== (from versions: none)
-ERROR: No matching distribution found for equinor_libres==""",
+ERROR: No matching distribution found for equinor_libres==""",  # noqa
             None,
         ),
     ],

@@ -2,7 +2,6 @@ import os
 
 import pytest  # noqa
 
-import komodo
 from komodo.shebang import fixup_python_shebangs
 
 

@@ -164,8 +164,8 @@ def test_fetch_git_hash(captured_shell_commands, tmpdir):
             "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"
         )
         git_hashes = fetch(packages, repositories, str(tmpdir))
-        assert (
-            captured_shell_commands[0]
-            == "git clone -b main -q --recursive -- git://github.com/equinor/ert.git ert-main"
+        assert captured_shell_commands[0] == (
+            "git clone -b main -q --recursive -- "
+            "git://github.com/equinor/ert.git ert-main"
         )
         assert git_hashes == {"ert": "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"}

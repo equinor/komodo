@@ -55,7 +55,8 @@ def lint_release_name(pkgfile):
         return [
             _kerr(
                 pkg=pkgfile,
-                err="Invalid release name suffix. Must be of the most -pyXX or -pyXX-rhelY",
+                err="Invalid release name suffix. "
+                "Must be of the most -pyXX or -pyXX-rhelY",
             )
         ]
 
@@ -90,7 +91,7 @@ def lint_version_numbers(pkgs, repo):
             v = parse_version(ver)
             if "Legacy" in repr(v):  # don't know if possible to check otherwise
                 __reg_version_err(errs, pkg, ver, maintainer)
-        except:
+        except:  # noqa
             __reg_version_err(errs, pkg, ver, maintainer)
     return errs
 

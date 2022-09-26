@@ -132,7 +132,10 @@ def _format_github(vulnerabilities: Dict[str, List[Vulnerability]]) -> str:
         if not vulns:
             result += "No security vulnerabilities found!\n"
             continue
-        result += "| id | Package | Version | Title | URL | Identifiers | Severity |\n| - | - | - | - | - | - | - |\n"
+        result += (
+            "| id | Package | Version | Title | URL | Identifiers | Severity |\n"
+            "| - | - | - | - | - | - | - |\n"
+        )
         for vul in vulns:
             result += _GITHUB_VULNERABILITY_FORMAT.format(
                 id=vul.id,

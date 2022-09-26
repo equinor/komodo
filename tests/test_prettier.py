@@ -3,8 +3,6 @@
 import os
 import unittest
 
-from ruamel.yaml.constructor import DuplicateKeyError
-
 from komodo.prettier import load_yaml, prettier
 
 INPUT_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), "input")

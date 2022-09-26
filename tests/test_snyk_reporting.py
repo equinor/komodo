@@ -1,13 +1,11 @@
 import sys
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
 from komodo.snyk_reporting import snyk_main
-from komodo.symlink.suggester.release import Release
 
 if sys.version_info >= (3, 7):
-    from snyk import SnykClient
     from snyk.models import Vulnerability
 
 above_py37 = pytest.mark.skipif(
@@ -44,19 +42,16 @@ def _create_result_mock(issue_ids):
 def test_no_api_token():
     with pytest.raises(
         ValueError,
-        match=r"No api token given, please set the environment variable SNYK_API_TOKEN.",
+        match=r"No api token given, please set the "
+        r"environment variable SNYK_API_TOKEN.",
     ):
-        vulnerabilities = snyk_main(
-            releases={}, repository={}, api_token=None, org_id="some_org_id"
-        )
+        snyk_main(releases={}, repository={}, api_token=None, org_id="some_org_id")
 
 
 @pytest.mark.skipif(sys.version_info >= (3, 7), reason="requires Python < 3.7")
 def test_python36():
     with pytest.raises(RuntimeError):
-        vulnerabilities = snyk_main(
-            releases={}, repository={}, api_token=None, org_id="some_org_id"
-        )
+        snyk_main(releases={}, repository={}, api_token=None, org_id="some_org_id")
 
 
 @above_py37

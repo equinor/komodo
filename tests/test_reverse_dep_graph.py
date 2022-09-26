@@ -1,5 +1,3 @@
-import json
-
 import pytest
 
 from komodo import reverse_dep_graph

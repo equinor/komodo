@@ -105,7 +105,6 @@ def _main(args):
         return
 
     print("Installing {} to {}".format(args.release, args.prefix))
-    install_root = os.path.join(args.prefix, args.release, "root")
 
     shell("{1} {0} .{0} {0}".format(args.release, args.renamer))
     shell("rsync -a .{} {}".format(args.release, args.prefix), sudo=args.sudo)
@@ -203,7 +202,8 @@ def cli_main():
         nargs="+",
         type=str,
         default=None,
-        help="Directories containing extra data files. Multiple directores can be given, separated with space.",
+        help="Directories containing extra data files. "
+        "Multiple directores can be given, separated with space.",
     )
     parser.add_argument("--postinst", "-P", type=str)
     parser.add_argument(
