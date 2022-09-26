@@ -1,4 +1,5 @@
-# Komodo [![Build Status](https://travis-ci.org/equinor/komodo.svg?branch=master)](https://travis-ci.org/equinor/komodo)
+# Komodo
+[![Build Status](https://github.com/equinor/komodo/actions/workflows/test.yml/badge.svg)](https://github.com/equinor/komodo/actions/workflows/test.yml)
 
 ## Software Innovation Bergen Software Distribution
 
@@ -69,9 +70,9 @@ If --pkg is not specified, the program will prompt for it.
 
 ### Render graph
 
-Can also output a graph of the reverse dependencies in dot format which can then be rendered using 
-the dot program from the `ImageMagick` package. As a convenience can also render it automatically 
-using dot and display. To use this convenience you must have installed these tools, which are 
+Can also output a graph of the reverse dependencies in dot format which can then be rendered using
+the dot program from the `ImageMagick` package. As a convenience can also render it automatically
+using dot and display. To use this convenience you must have installed these tools, which are
 distributed with the Graphwiz and ImageMagick packages.
 
 ## Install
