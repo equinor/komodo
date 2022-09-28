@@ -4,10 +4,11 @@ from __future__ import print_function
 import argparse
 import logging
 import os
+import warnings
 from collections import namedtuple
 
 import yaml as yml
-from pkg_resources import parse_version
+from pkg_resources import PkgResourcesDeprecationWarning, parse_version
 
 kerr = namedtuple("KomodoError", ["pkg", "version", "maintainer", "depends", "err"])
 
@@ -88,7 +89,10 @@ def lint_version_numbers(pkgs, repo):
             if "master" in ver:
                 __reg_version_err(errs, pkg, ver, maintainer, err=MASTER_VERSION)
                 continue
-            v = parse_version(ver)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
+                v = parse_version(ver)
+                # A warning coincides with finding "Legacy" in repr(v)
             if "Legacy" in repr(v):  # don't know if possible to check otherwise
                 __reg_version_err(errs, pkg, ver, maintainer)
         except:  # noqa
