@@ -6,7 +6,6 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: "${env.GITHUB_CREDENTIAL}", usernameVariable: 'GH_USER', passwordVariable: 'GITHUB_TOKEN')]) {
                     sh """
-                        source /project/res/SDP_bashrc
                         source /opt/rh/rh-python38/enable
                         python3 -m venv env
                         source env/bin/activate
