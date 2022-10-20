@@ -63,7 +63,18 @@ def call(Map args = [:]) {
             CI_TEST_ROOT       = "${env.WORKSPACE}/test-root"
             CI_KOMODO_RELEASE  = "${params.KOMODO_RELEASE}"
 
-            EQUINOR_TESTDATA_ROOT = "/project/res-testdata/ErtTestData/fmu-test-data"
+            EQUINOR_TESTDATA_ROOT         = "/project/res-testdata/ErtTestData/fmu-test-data"
+            CI_ACTUAL_COMMIT              = "${ghprbActualCommit}"
+            CI_ACTUAL_COMMIT_AUTHOR       = "${ghprbActualCommitAuthor}"
+            CI_ACTUAL_COMMIT_AUTHOR_EMAIL = "${ghprbActualCommitAuthorEmail}"
+            CI_PULL_DESCRIPTION           = "${ghprbPullDescription}"
+            CI_PULL_ID                    = "${ghprbPullId}"
+            CI_PULL_LINK                  = "${ghprbPullLink}"
+            CI_PULL_TITLE                 = "${ghprbPullTitle}"
+            CI_SOURCE_BRANCH              = "${ghprbSourceBranch}"
+            CI_TARGET_BRANCH              = "${ghprbTargetBranch}"
+            CI_COMMENT_BODY               = "${ghprbCommentBody}"
+            CI_SHA1                       = "${sha1}"
         }
 
         stages {
