@@ -44,7 +44,7 @@ install_test_dependencies () {
 }
 
 start_tests () {
-    pytest
+    pytest  2>$1 | tee $CI_LOG_DIR/$CI_PROJECT_NAME.log
 }
 
 run_tests_default () {

@@ -61,6 +61,8 @@ def call(Map args = [:]) {
             CI_PR_RUN          = "${isPullRequest == true ? "1" : ""}"
             CI_SOURCE_ROOT     = "${env.WORKSPACE}/source-root"
             CI_TEST_ROOT       = "${env.WORKSPACE}/test-root"
+            CI_PROJECT_NAME    = "${args.project}"
+            CI_LOGS_DIR        = "${env.WORKSPACE}/logs"
             CI_KOMODO_RELEASE  = "${params.KOMODO_RELEASE}"
 
             EQUINOR_TESTDATA_ROOT = "/project/res-testdata/ErtTestData/fmu-test-data"
