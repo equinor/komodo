@@ -63,6 +63,7 @@ def call(Map args = [:]) {
             CI_TEST_ROOT       = "${env.WORKSPACE}/test-root"
             CI_KOMODO_RELEASE  = "${params.KOMODO_RELEASE}"
 
+            EQUINOR_TESTDATA_ROOT         = "/project/res-testdata/ErtTestData/fmu-test-data"
             CI_ACTUAL_COMMIT              = "${ghprbActualCommit}"
             CI_ACTUAL_COMMIT_AUTHOR       = "${ghprbActualCommitAuthor}"
             CI_ACTUAL_COMMIT_AUTHOR_EMAIL = "${ghprbActualCommitAuthorEmail}"
