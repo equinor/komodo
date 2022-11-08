@@ -26,30 +26,26 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
         protocol = path.split(":")[0]
 
     if protocol in ("http", "https", "ftp"):
-        shell("wget --quiet {} -O {}".format(path, filename))
+        shell(f"wget --quiet {path} -O {filename}")
     elif protocol in ("git"):
         shell(
             "git clone "
-            "-b {version} "
-            "-q --recursive "
-            "-- {path} {filename}"
-            "".format(
-                version=strip_version(version),
-                path=path,
-                filename=filename,
-            )
+            f"-b {strip_version(version)} "
+            "--quiet "
+            "--recurse-submodules "
+            f"-- {path} {filename}"
         )
 
     elif protocol in ("nfs", "fs-ln"):
-        shell("cp --recursive --symbolic-link {} {}".format(path, filename))
+        shell(f"cp --recursive --symbolic-link {path} {filename}")
 
     elif protocol in ("fs-cp"):
-        shell("cp --recursive {} {}".format(path, filename))
+        shell(f"cp --recursive {path} {filename}")
 
     elif protocol in ("rsync"):
-        shell("rsync -a {}/ {}".format(path, filename))
+        shell(f"rsync -a {path}/ {filename}")
     else:
-        raise NotImplementedError("Unknown protocol {}".format(protocol))
+        raise NotImplementedError(f"Unknown protocol {protocol}")
 
 
 def fetch(pkgs, repo, outdir=".", pip="pip"):
@@ -60,13 +56,12 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
 
     if missingpkg:
         eprint("Packages requested, but not found in the repository:")
-        eprint("missingpkg: {}".format(",".join(missingpkg)))
+        eprint("missingpkg: " + ",".join(missingpkg))
 
     for pkg in missingver:
         eprint(
-            "missingver: missing version for {}: {} requested, found: {}".format(
-                pkg, pkgs[pkg], ",".join(repo[pkg].keys())
-            )
+            f"missingver: missing version for {pkg}: {pkgs[pkg]} requested, "
+            f'found: {",".join(repo[pkg].keys())}'
         )
 
     if missingpkg or missingver:
@@ -94,15 +89,14 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
             if url == "pypi" and ver == LATEST_PACKAGE_ALIAS:
                 ver = latest_pypi_version(pkg_alias)
 
-            name = "{} ({}): {}".format(pkg_alias, ver, url)
-            pkgname = "{}-{}".format(pkg_alias, ver)
+            name = f"{pkg_alias} ({ver}): {url}"
+            pkgname = f"{pkg_alias}-{ver}"
 
             if url is None and protocol is None:
                 package_folder = os.path.abspath(pkgname)
                 print(
-                    "Nothing to fetch for {}, but created folder {}".format(
-                        pkgname, package_folder
-                    )
+                    f"Nothing to fetch for {pkgname}, "
+                    f"but created folder {package_folder}"
                 )
                 os.mkdir(pkgname)
                 continue
@@ -113,32 +107,32 @@ def fetch(pkgs, repo, outdir=".", pip="pip"):
             ext = spliturl[-1]
 
             if len(spliturl) > 1 and spliturl[-2] == "tar":
-                ext = "tar.{}".format(spliturl[-1])
+                ext = f"tar.{spliturl[-1]}"
 
             if ext in ["rpm", "tar", "gz", "tgz", "tar.gz", "tar.bz2", "tar.xz"]:
-                dst = "{}.{}".format(dst, ext)
+                dst = f"{dst}.{ext}"
 
             if url == "pypi":
-                print("Defering download of {}".format(name))
+                print(f"Deferring download of {name}")
                 pypi_packages.append(f"{pkg_alias}=={ver.split('+')[0]}")
                 continue
 
-            print("Downloading {}".format(name))
+            print(f"Downloading {name}")
             grab(url, filename=dst, version=ver, protocol=protocol, pip=pip)
 
             if protocol == "git":
                 git_hashes[pkg] = get_git_revision_hash(path=dst)
 
             if ext in ["tgz", "tar.gz", "tar.bz2", "tar.xz"]:
-                print("Extracting {} ...".format(dst))
-                topdir = shell(" tar -xvf {}".format(dst)).decode("utf-8").split()[0]
+                print(f"Extracting {dst} ...")
+                topdir = shell(f"tar -xvf {dst}").decode("utf-8").split()[0]
                 normalised_dir = topdir.split("/")[0]
 
                 if not os.path.exists(pkgname):
-                    print("Creating symlink {} -> {}".format(normalised_dir, pkgname))
+                    print(f"Creating symlink {normalised_dir} -> {pkgname}")
                     os.symlink(normalised_dir, pkgname)
 
-        print("Downloading {} pypi packages".format(len(pypi_packages)))
+        print(f"Downloading {len(pypi_packages)} pypi packages")
         shell([pip, "download", "--no-deps", "--dest .", " ".join(pypi_packages)])
 
     return git_hashes
