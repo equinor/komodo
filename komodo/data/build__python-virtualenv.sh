@@ -18,7 +18,7 @@ while test $# -gt 0; do
             ;;
         --virtualenv-interpreter)
             shift
-            export VIRTUALENV_INTEPRETER=$1
+            export VIRTUALENV_INTERPRETER=$1
             ;;
         *)
             export OPTS="$OPTS $1"
@@ -26,4 +26,4 @@ while test $# -gt 0; do
     esac
     shift
 done
-$VIRTUALENV -p $VIRTUALENV_INTEPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}/${PREFIX} 1>&2
+$VIRTUALENV -p $VIRTUALENV_INTERPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}/${PREFIX} 1>&2
