@@ -22,7 +22,7 @@ def _create_link(src, dst, link_dict):
         _create_link(link_dict[src], src, link_dict)
 
     if not os.path.exists(src):
-        raise ValueError("{} does not exist".format(src))
+        raise ValueError(f"{src} does not exist")
 
     if os.path.exists(dst) and os.path.islink(dst):
         if os.readlink(dst) == src:
@@ -38,7 +38,7 @@ def create_symlinks(links_dict):
         raise ValueError("The root folder specified is not absolute")
 
     if not os.path.isdir(root_folder):
-        raise ValueError("The folder {} does not exist".format(root_folder))
+        raise ValueError(f"{root_folder} is not a directory or does not exist")
 
     with working_dir(root_folder):
         for dst, src in links_dict["links"].items():
@@ -54,7 +54,7 @@ def symlink_main():
 
     args = parser.parse_args()
     if not os.path.isfile(args.config):
-        sys.exit("the file {} can,not be found".format(args.config))
+        sys.exit(f"The file {args.config} can not be found")
 
     with open(args.config) as input_file:
         input_dict = json.load(input_file)
