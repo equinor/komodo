@@ -1,16 +1,9 @@
-import sys
 from unittest.mock import Mock, patch
 
 import pytest
+from snyk.models import Vulnerability
 
 from komodo.snyk_reporting import snyk_main
-
-if sys.version_info >= (3, 7):
-    from snyk.models import Vulnerability
-
-above_py37 = pytest.mark.skipif(
-    sys.version_info < (3, 7), reason="requires Python >= 3.7"
-)
 
 
 def _create_result_mock(issue_ids):
@@ -38,7 +31,6 @@ def _create_result_mock(issue_ids):
     return result_mock
 
 
-@above_py37
 def test_no_api_token():
     with pytest.raises(
         ValueError,
@@ -48,13 +40,6 @@ def test_no_api_token():
         snyk_main(releases={}, repository={}, api_token=None, org_id="some_org_id")
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 7), reason="requires Python < 3.7")
-def test_python36():
-    with pytest.raises(RuntimeError):
-        snyk_main(releases={}, repository={}, api_token=None, org_id="some_org_id")
-
-
-@above_py37
 @pytest.mark.parametrize(
     "packages,expected_search_string,input_issue_ids,expected_issue_ids",
     [

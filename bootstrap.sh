@@ -25,20 +25,8 @@ function cleanup {
 
 function install_komodo {
     # Install the environment that the kmd executable will run in.
-
-    python3_bin=/usr/bin/python3.8
-
-    if [[ ! -f "${python3_bin}" ]]; then
-        # Lets assume we're on a RHEL 7 machine
-        python3_bin=/opt/rh/rh-python38/root/usr/bin/python3.8
-    fi
-    if [[ ! -f "${python3_bin}" ]]; then
-        echo "Couldn't find a Python 3.8 binary"
-        exit 1
-    fi
-
     echo "Installing Komodo"
-    $python3_bin -m venv boot/kmd-env
+    $python_bin -m venv boot/kmd-env
     boot/kmd-env/bin/python -m pip install virtualenv pytest .
 }
 

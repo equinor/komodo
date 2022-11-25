@@ -24,7 +24,7 @@ setup(
         "PyGithub >= 1.55",
         "jinja2",
         "requests",
-        "pysnyk @ git+https://github.com/equinor/pysnyk",
+        "pysnyk",
     ],
     python_requires="~=3.8",
     entry_points={

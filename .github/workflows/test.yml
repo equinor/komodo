@@ -4,14 +4,14 @@ on: [pull_request]
 
 jobs:
   build:
-
     env:
-      RELEASE: release-py37.yml
+      RELEASE: release-py3x.yml
+
 
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.6", "3.8"]
+        python-version: ['3.8', '3.10']
 
     runs-on: ubuntu-20.04
 
@@ -21,14 +21,14 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install csh
+        sudo apt update
+        sudo apt install csh
 
     - name: Setup Komodo
       run: |
@@ -44,7 +44,16 @@ jobs:
 
     - name: Full integration test
       run: |
-        ./runkmd.sh ci/travis/${RELEASE} ci/travis/repository.yml --workspace /tmp/kmd-ws --cache /tmp/kmd-cache --prefix /tmp/pfx --release travis --locations-config $(realpath ci/travis/locations.yml) --renamer rename.ul
+        ./runkmd.sh \
+            ci/travis/${RELEASE} \
+            ci/travis/repository.yml \
+            --workspace /tmp/kmd-ws \
+            --cache /tmp/kmd-cache \
+            --prefix /tmp/pfx \
+            --release travis \
+            --locations-config $(realpath ci/travis/locations.yml) \
+            --renamer rename.ul
+
     - name: Build libkmd.so for testing
       run: |
         ci/travis/build_lib.sh /tmp/pfx/travis
