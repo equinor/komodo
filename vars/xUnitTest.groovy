@@ -4,7 +4,7 @@ def call(Map args = [:]) {
     def time_out = args.time_out ? args.time_out : 60
 
     pipeline {
-        agent { label 'master||scout-ci'}
+        agent { label 'master||orchestrating'}
         options {
             timeout(time: "${time_out}", unit: 'MINUTES')
         }
@@ -21,7 +21,7 @@ def call(Map args = [:]) {
         stages {
             stage('Test Matrix') {
                 matrix {
-                    agent { label 'master||scout-ci' }
+                    agent { label 'master||orchestrating' }
                     axes {
                         axis {
                             name 'RH_VERSION'
