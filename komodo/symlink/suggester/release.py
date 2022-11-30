@@ -43,10 +43,9 @@ class Release(object):
         except TypeError:
             raise ValueError("{} has no python version".format(self.release_id))
         except AttributeError as attr_error:
-            # in the case that this is a monthly alias without postfix, assume
-            # py27
+            # In the case that this is a monthly alias without postfix, assume 3.8
             if len(repr(self)) == 7:
-                return "py27"
+                return "py38"
 
             raise attr_error
 
