@@ -6,7 +6,7 @@ usage: cli.py [-h] [--symlink-conf-path SYMLINK_CONF_PATH]
               release mode joburl jobname
 
 positional arguments:
-  release               e.g. 2019.12.rc0-py2
+  release               e.g. 2019.12.rc0-py38
   mode                  stable,testing,unstable
   joburl                link to the job that triggered this
   jobname               name of the job
@@ -45,7 +45,7 @@ Source code for this script can be found [here](https://github.com/equinor/komod
 
 def _parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("release", help="e.g. 2019.12.rc0-py2")
+    parser.add_argument("release", help="e.g. 2019.12.rc0-py38")
     parser.add_argument("mode", help="stable,testing,unstable")
     parser.add_argument("joburl", help="link to the job that triggered this")
     parser.add_argument("jobname", help="name of the job")
