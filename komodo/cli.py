@@ -3,6 +3,7 @@ from __future__ import print_function
 import argparse
 import os
 import sys
+from pathlib import Path
 
 import yaml as yml
 
@@ -22,7 +23,7 @@ from komodo.yaml_file_type import YamlFile
 
 
 def _main(args):
-    args.prefix = os.path.abspath(args.prefix)
+    abs_prefix = Path(args.prefix).resolve()
 
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
@@ -35,27 +36,26 @@ def _main(args):
     # append root to the temporary build dir, as we want a named root/
     # directory as the distribution root, organised under the distribution name
     # (release)
-    tmp_prefix = os.path.join(os.path.join(args.prefix), args.release, "root")
-    fakeroot = os.path.abspath(args.release)
+    tmp_prefix = abs_prefix / args.release / "root"
+    fakeroot = Path(args.release).resolve()
     if args.build or not args.install:
         make(
             args.pkgs,
             args.repo,
             data,
-            prefix=tmp_prefix,
+            prefix=str(tmp_prefix),
             dlprefix=args.cache,
             builddir=args.tmp,
             jobs=args.jobs,
             cmk=args.cmake,
             pip=args.pip,
             virtualenv=args.virtualenv,
-            fakeroot=fakeroot,
+            fakeroot=str(fakeroot),
         )
-        shell("mv {} {}".format(args.release + tmp_prefix, args.release))
+        shell(f"mv {args.release + str(tmp_prefix)} {args.release}")
         shell(
-            "rmdir -p --ignore-fail-on-non-empty {}".format(
-                os.path.dirname(args.release + tmp_prefix)
-            )
+            "rmdir -p --ignore-fail-on-non-empty "
+            f"{args.release + str(tmp_prefix.parent)}"
         )
 
     if args.build and not args.install:
@@ -64,29 +64,29 @@ def _main(args):
     # create the enable script
     for tmpl, target in [("enable.in", "enable"), ("enable.csh.in", "enable.csh")]:
         # TODO should args.release be release_path?
-        with open("{}/{}".format(args.release, target), "w") as f:
-            f.write(
+        with open(f"{args.release}/{target}", mode="w", encoding="utf-8") as f_handle:
+            f_handle.write(
                 shell(
                     [
-                        "m4 {}".format(data.get("enable.m4")),
-                        "-D komodo_prefix={}".format(tmp_prefix),
-                        "-D komodo_pyver={}".format(args.pyver),
-                        "-D komodo_release={}".format(args.release),
+                        f"m4 {data.get('enable.m4')}",
+                        f"-D komodo_prefix={tmp_prefix}",
+                        f"-D komodo_pyver={args.pyver}",
+                        f"-D komodo_release={args.release}",
                         data.get(tmpl),
                     ]
                 ).decode("utf-8")
             )
 
-    with open(args.locations_config) as defs, open(
-        os.path.join(args.release, "local"), "w"
+    with open(args.locations_config, mode="r", encoding="utf-8") as defs, open(
+        Path(args.release) / "local", mode="w", encoding="utf-8"
     ) as local_activator, open(
-        os.path.join(args.release, "local.csh"), "w"
+        Path(args.release) / "local.csh", mode="w", encoding="utf-8"
     ) as local_csh_activator:
         defs = yml.safe_load(defs)
         local.write_local_activators(data, defs, local_activator, local_csh_activator)
 
-    releasedoc = os.path.join(args.release, args.release)
-    with open(releasedoc, "w") as y:
+    releasedoc = Path(args.release) / Path(args.release)
+    with open(releasedoc, "w", encoding="utf-8") as filehandle:
         release = {}
         for pkg, ver in args.pkgs.items():
             entry = args.repo[pkg][ver]
@@ -99,29 +99,28 @@ def _main(args):
                 "version": ver,
                 "maintainer": maintainer,
             }
-        yml.dump(release, y, default_flow_style=False)
+        yml.dump(release, filehandle, default_flow_style=False)
 
     if args.dry_run:
         return
 
-    print("Installing {} to {}".format(args.release, args.prefix))
+    print(f"Installing {args.release} to {args.prefix}")
 
-    shell("{1} {0} .{0} {0}".format(args.release, args.renamer))
-    shell("rsync -a .{} {}".format(args.release, args.prefix), sudo=args.sudo)
+    shell(f"{args.renamer} {args.release} .{args.release} {args.release}")
+    shell(f"rsync -a .{args.release} {args.prefix}", sudo=args.sudo)
 
-    if os.path.exists("{1}/{0}".format(args.release, args.prefix)):
+    if Path(f"{args.prefix}/{args.release}").exists():
         shell(
-            "{2} {0} {0}.delete {1}/{0}".format(
-                args.release, args.prefix, args.renamer
-            ),
+            f"{args.renamer} {args.release} "
+            f"{args.release}.delete {args.prefix}/{args.release}",
             sudo=args.sudo,
         )
 
     shell(
-        "{2} .{0} {0} {1}/.{0}".format(args.release, args.prefix, args.renamer),
+        f"{args.renamer} .{args.release} {args.release} {args.prefix}/.{args.release}",
         sudo=args.sudo,
     )
-    shell("rm -rf {1}/{0}.delete".format(args.release, args.prefix), sudo=args.sudo)
+    shell(f"rm -rf {args.prefix}/{args.release}.delete", sudo=args.sudo)
 
     if args.tmp:
         # Allows e.g. pip to use this folder as tmpfolder, instead of in some
@@ -129,8 +128,8 @@ def _main(args):
         os.environ["TMPDIR"] = args.tmp
 
     print("Fixup #! in pip-provided packages if bin exist")
-    release_path = os.path.join(args.prefix, args.release)
-    release_root = os.path.join(release_path, "root")
+    release_path = Path(args.prefix) / Path(args.release)
+    release_root = release_path / "root"
     for pkg, ver in args.pkgs.items():
         current = args.repo[pkg][ver]
         if current["make"] != "pip":
@@ -141,14 +140,14 @@ def _main(args):
             ver = latest_pypi_version(package_name)
         shell_input = [
             args.pip,
-            "install {}=={}".format(package_name, strip_version(ver)),
+            f"install {package_name}=={strip_version(ver)}",
             "--prefix",
-            release_root,
+            str(release_root),
             "--no-index",
             "--no-deps",
             "--ignore-installed",
-            "--cache-dir {}".format(args.cache),
-            "--find-links {}".format(args.cache),
+            f"--cache-dir {args.cache}",
+            f"--find-links {args.cache}",
         ]
         shell_input.append(current.get("makeopts"))
 
@@ -162,11 +161,11 @@ def _main(args):
     if args.postinst:
         shell([args.postinst, release_path])
 
-    print("running", "find {} -name '*.pyc' -delete".format(release_root))
-    shell("find {} -name '*.pyc' -delete".format(release_root))
+    print("running", f"find {release_root} -name '*.pyc' -delete")
+    shell(f"find {release_root} -name '*.pyc' -delete")
 
     print("Setting permissions", [data.get("set_permissions.sh"), release_path])
-    shell([data.get("set_permissions.sh"), release_path])
+    shell([data.get("set_permissions.sh"), str(release_path)])
 
 
 def cli_main():
@@ -193,7 +192,7 @@ def cli_main():
         default="virtualenv",
         help="What virtualenv command to use",
     )
-    parser.add_argument("--pyver", type=str, default="2.7")
+    parser.add_argument("--pyver", type=str, default="3.8")
 
     parser.add_argument("--sudo", action="store_true")
     parser.add_argument("--workspace", type=str, default=None)
@@ -217,8 +216,8 @@ def cli_main():
 
     args = parser.parse_args()
 
-    if args.workspace and not os.path.exists(args.workspace):
-        os.mkdir(args.workspace)
+    if args.workspace and not Path(args.workspace).exists():
+        Path(args.workspace).mkdir()
 
     with pushd(args.workspace):
         _main(args)
