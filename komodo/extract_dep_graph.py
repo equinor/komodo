@@ -11,7 +11,7 @@ def run(pkgfile, base_pkgfile, repofile, outfile=None):
     result = _iterate_packages(pkgs, base_pkgs, repo)
 
     if outfile:
-        with open(outfile, "w") as out:
+        with open(outfile, "w", encoding="utf-8") as out:
             yaml.dump(result, out)
     else:
         print(yaml.dump(result))
@@ -26,9 +26,7 @@ def _iterate_packages(pkgs, base_pkgs, repo):
 
 def _extract_dependencies(package, version, base_pkgs, repofile, dependencies):
     if package not in repofile:
-        raise SystemExit(
-            "'{}' not found in 'repo'. This needs to be resolved.".format(package)
-        )
+        raise SystemExit(f"'{package}' not found in 'repo'. This needs to be resolved.")
     if version not in repofile[package]:
         available_versions = list(repofile[package].keys())
         raise SystemExit(
@@ -64,21 +62,21 @@ def main():
         "pkgs",
         type=lambda arg: arg
         if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="File with packages you want to resolve dependencies for.",
     )
     parser.add_argument(
         "base_pkgs",
         type=lambda arg: arg
         if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="Base file where all packages are listed with wanted versions specified.",
     )
     parser.add_argument(
         "repo",
         type=lambda arg: arg
         if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="Repository file with all packages listed with dependencies.",
     )
     parser.add_argument(

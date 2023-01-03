@@ -131,14 +131,14 @@ def main():
         "release_file",
         type=lambda arg: arg
         if pathlib.Path(arg).is_file()
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="Release file you would like to check dependencies on.",
     )
     parser.add_argument(
         "repository_file",
         type=lambda arg: arg
         if pathlib.Path(arg).is_file()
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="Repository file where the source of the packages is found",
     )
     parser.add_argument(

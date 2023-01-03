@@ -15,23 +15,21 @@ def run(package_status, repository):
     if package_status_set.difference(repository_set):
         raise SystemExit(
             "The following packages are specified in the "
-            "package status file, but not in the repository file: {}".format(
-                list(package_status_set.difference(repository_set))
-            )
+            "package status file, but not in the repository file: "
+            + str(list(package_status_set.difference(repository_set)))
         )
     if repository_set.difference(package_status_set):
         raise SystemExit(
             "The following packages are specified in the "
-            "repository file, but not in the package status file: {}".format(
-                list(repository_set.difference(package_status_set))
-            )
+            "repository file, but not in the package status file: "
+            + str(list(repository_set.difference(package_status_set)))
         )
 
     errors = []
     for package, status in package_status.items():
         if status.get("visibility") not in VALID_VISIBILITY:
             errors.append(
-                (package, "Malformed visibility: {}".format(status.get("visibility")))
+                (package, f"Malformed visibility: {status.get('visibility')}")
             )
             continue
 
@@ -39,19 +37,14 @@ def run(package_status, repository):
         if visibility == "public":
             if status.get("maturity") not in VALID_MATURITY:
                 errors.append(
-                    (package, "Malformed maturity: {}".format(status.get("maturity")))
+                    (package, f"Malformed maturity: {status.get('maturity')}")
                 )
             if status.get("importance") not in VALID_IMPORTANCE:
                 errors.append(
-                    (
-                        package,
-                        "Malformed importance: {}".format(status.get("importance")),
-                    )
+                    (package, f"Malformed importance: {status.get('importance')}"),
                 )
     if errors:
-        raise SystemExit(
-            "\n".join(["{}: {}".format(package, msg) for package, msg in errors])
-        )
+        raise SystemExit("\n".join([f"{package}: {msg}" for package, msg in errors]))
 
 
 def get_parser():

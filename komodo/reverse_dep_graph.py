@@ -95,14 +95,14 @@ def main():
         "base_pkgs",
         type=lambda arg: arg
         if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="Base file where all packages are listed with wanted versions specified.",
     )
     parser.add_argument(
         "repo",
         type=lambda arg: arg
         if os.path.isfile(arg)
-        else parser.error("{} is not a file".format(arg)),
+        else parser.error(f"{arg} is not a file"),
         help="Repository file with all packages listed with dependencies.",
     )
     parser.add_argument(

@@ -46,14 +46,14 @@ def deployed_main():
         "install_root",
         type=lambda arg: os.path.realpath(arg)
         if os.path.isdir(arg)
-        else parser.error("{} is not a directory".format(arg)),
+        else parser.error(f"{arg} is not a directory"),
         help="The root folder of the deployed matrices",
     )
     parser.add_argument(
         "releases_folder",
         type=lambda arg: os.path.realpath(arg)
         if os.path.isdir(arg)
-        else parser.error("{} is not a directory".format(arg)),
+        else parser.error(f"{arg} is not a directory"),
         help="The folder containing the matrix files",
     )
     parser.add_argument(

@@ -96,7 +96,7 @@ def prettified_yaml(filepath, check_only=True):
     If `check_only` is False, the input file will be "prettified" in place if necessary.
     """
 
-    print("Checking {}... ".format(filepath), end="")
+    print(f"Checking {filepath}... ", end="")
     with open(file=filepath, mode="r") as input_file:
         yaml_original = input_file.read()
 
@@ -105,7 +105,7 @@ def prettified_yaml(filepath, check_only=True):
     yaml_prettified_string = prettier(yaml_input)
 
     if yaml_prettified_string != yaml_original:
-        print("{} reformatted!".format("would be" if check_only else ""))
+        print(f"{'would be' if check_only else ''} reformatted!")
         if not check_only:
             with open(filepath, "w") as fh:
                 fh.write(yaml_prettified_string)
@@ -130,7 +130,7 @@ def write_to_file(repository, filename, check_type=True):
 
 def load_yaml(filename):
     if not os.path.isfile(os.path.realpath(filename)):
-        raise argparse.ArgumentTypeError("{} is not a valid file".format(filename))
+        raise argparse.ArgumentTypeError(f"{filename} is not a valid file")
 
     ruamel_instance = ruamel.yaml.YAML()
     ruamel_instance.indent(  # Komodo prefers two space indendation
@@ -147,6 +147,4 @@ def load_yaml(filename):
         ruamel.yaml.scanner.ScannerError,
         ruamel.yaml.constructor.DuplicateKeyError,
     ) as e:
-        raise SystemExit(
-            "The file: <{}> contains invalid YAML syntax:\n {}".format(filename, str(e))
-        )
+        raise SystemExit(f"The file: <{filename}> contains invalid YAML syntax:\n {e}")

@@ -12,7 +12,7 @@ def build_matrix_file(release_base, release_folder, builtins):
     files = {}
     py_keys = [py_ver for _, py_ver in get_matrix()]
     for key in py_keys:
-        files[key] = load_yaml("{}/{}-{}.yml".format(release_folder, release_base, key))
+        files[key] = load_yaml(f"{release_folder}/{release_base}-{key}.yml")
 
     all_packages = set(
         itertools.chain.from_iterable(files[key].keys() for key in files)
@@ -29,7 +29,7 @@ def build_matrix_file(release_base, release_folder, builtins):
         else:
             compiled[p] = {key: files[key].get(p) for key in py_keys}
 
-    write_to_file(compiled, "{}.yml".format(release_base), False)
+    write_to_file(compiled, f"{release_base}.yml", False)
 
 
 def _build(packages, py_ver, rhel_ver):
@@ -50,12 +50,10 @@ def _build(packages, py_ver, rhel_ver):
 def transpile_releases(matrix_file, output_folder):
     release_base = os.path.splitext(os.path.basename(matrix_file))[0]
     release_folder = os.path.dirname(matrix_file)
-    release_matrix = load_yaml(
-        "{}.yml".format(os.path.join(release_folder, release_base))
-    )
+    release_matrix = load_yaml(f"{os.path.join(release_folder, release_base)}.yml")
     for rhel_ver, py_ver in get_matrix():
         release_dict = _build(release_matrix, py_ver, rhel_ver)
-        filename = "{}.yml".format(format_release(release_base, rhel_ver, py_ver))
+        filename = f"{format_release(release_base, rhel_ver, py_ver)}.yml"
         write_to_file(release_dict, os.path.join(output_folder, filename))
 
 
@@ -89,12 +87,12 @@ def main():
 Combine release files into a matrix file.
 Output format:
 example-package:
-  rhel6:
-    py27 : # package not included in release
-    py36 : 5.11.13
   rhel7:
-    py27 : # package not included in release
-    py36 : 5.11.13+builtin""",
+    py36 : # package not included in release
+    py38 : 5.11.13
+  rhel8:
+    py36 : # package not included in release
+    py38 : 5.11.13+builtin""",
         formatter_class=RawTextHelpFormatter,
     )
     matrix_parser.set_defaults(func=combine)

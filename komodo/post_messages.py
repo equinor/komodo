@@ -34,10 +34,10 @@ def copy_files(file_list, dst_path, src_path):
     if not os.path.isdir(dst_path):
         os.makedirs(dst_path)
     for file_name in file_list:
-        print("Installing message: {}".format(file_name))
+        print(f"Installing message: {file_name}")
         file_path = os.path.join(src_path, file_name)
         if not os.path.exists(file_path):
-            raise SystemExit("ERROR: Message file {} does not exisit".format(file_name))
+            raise SystemExit(f"ERROR: Message file {file_name} does not exisit")
         shutil.copy(file_path, os.path.join(dst_path, file_name))
 
 
@@ -73,15 +73,13 @@ def main(args=None):
     args = parser.parse_args(args=args)
 
     if not os.path.isfile(args.motd_db):
-        raise SystemExit(
-            "ERROR: The message-database {} was not found".format(args.motd_db)
-        )
+        raise SystemExit(f"ERROR: The message-database {args.motd_db} was not found")
     with open(args.motd_db) as motd_db_file:
         motd_db = yml.safe_load(motd_db_file)
     motd_path = os.path.dirname(args.motd_db)
 
     if not os.path.isdir(args.komodo_prefix):
-        raise SystemExit("ERROR: Komodo-prefix {} not found".format(args.komodo_prefix))
+        raise SystemExit(f"ERROR: Komodo-prefix {args.komodo_prefix} not found")
 
     # Create list of releases to post to
     releases = args.releases
@@ -99,7 +97,7 @@ def main(args=None):
         komodo_path = os.path.join(args.komodo_prefix, release_name)
 
         if not os.path.isdir(komodo_path):
-            raise SystemExit("ERROR: Release {} not found".format(release_name))
+            raise SystemExit(f"ERROR: Release {release_name} not found")
 
         dst_motd_path = os.path.join(komodo_path, "motd")
         if os.path.isdir(dst_motd_path):
@@ -111,7 +109,7 @@ def main(args=None):
     for release_name in releases:
         scripts, messages, inline = get_messages_and_scripts(release_name, motd_db)
         if not scripts and not messages and not inline:
-            print("WARNING: No messages found for release: {}".format(release_name))
+            print(f"WARNING: No messages found for release: {release_name}")
             return
 
         komodo_path = os.path.join(args.komodo_prefix, release_name)
