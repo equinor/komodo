@@ -167,34 +167,60 @@ def _main(args):
 
 
 def cli_main():
-    parser = argparse.ArgumentParser(description="build distribution")
+    """
+    Set up the command-line interface with three groups of arguments:
+      - required positional arguments
+      - required named arguments
+      - optional named arguments
+    """
+    parser = argparse.ArgumentParser(
+        description="Welcome to Komodo. "
+        "Automatically, reproducibly, and testably create software "
+        "distributions.",
+        add_help=False,
+    )
+
     parser.add_argument("pkgs", type=YamlFile())
     parser.add_argument("repo", type=YamlFile())
-    parser.add_argument("--prefix", "-p", type=str, required=True)
-    parser.add_argument("--release", "-r", type=str, required=True)
 
-    parser.add_argument("--tmp", "-t", type=str)
-    parser.add_argument("--cache", "-c", type=str)
-    parser.add_argument("--jobs", "-j", type=int, default=1)
+    required_args = parser.add_argument_group("required named arguments")
 
-    parser.add_argument("--download", "-d", action="store_true")
-    parser.add_argument("--build", "-b", action="store_true")
-    parser.add_argument("--install", "-i", action="store_true")
-    parser.add_argument("--dry-run", "-n", action="store_true")
+    required_args.add_argument("--prefix", "-p", type=str, required=True)
+    required_args.add_argument("--release", "-r", type=str, required=True)
+    required_args.add_argument(
+        "--locations-config",
+        type=str,
+        required=True,
+        help="Path to locations.yml, a map of location to a server.",
+    )
 
-    parser.add_argument("--cmake", type=str, default="cmake")
-    parser.add_argument("--pip", type=str, default="pip")
-    parser.add_argument(
+    optional_args = parser.add_argument_group("optional arguments")
+
+    optional_args.add_argument(
+        "--help", "-h", action="help", help="show this help message and exit"
+    )
+    optional_args.add_argument("--tmp", "-t", type=str)
+    optional_args.add_argument("--cache", "-c", type=str, default="pip-cache")
+    optional_args.add_argument("--jobs", "-j", type=int, default=1)
+
+    optional_args.add_argument("--download", "-d", action="store_true")
+    optional_args.add_argument("--build", "-b", action="store_true")
+    optional_args.add_argument("--install", "-i", action="store_true")
+    optional_args.add_argument("--dry-run", "-n", action="store_true")
+
+    optional_args.add_argument("--cmake", type=str, default="cmake")
+    optional_args.add_argument("--pip", type=str, default="pip")
+    optional_args.add_argument(
         "--virtualenv",
         type=str,
         default="virtualenv",
         help="What virtualenv command to use",
     )
-    parser.add_argument("--pyver", type=str, default="3.8")
+    optional_args.add_argument("--pyver", type=str, default="3.8")
 
-    parser.add_argument("--sudo", action="store_true")
-    parser.add_argument("--workspace", type=str, default=None)
-    parser.add_argument(
+    optional_args.add_argument("--sudo", action="store_true")
+    optional_args.add_argument("--workspace", type=str, default=None)
+    optional_args.add_argument(
         "--extra-data-dirs",
         nargs="+",
         type=str,
@@ -202,15 +228,9 @@ def cli_main():
         help="Directories containing extra data files. "
         "Multiple directores can be given, separated with space.",
     )
-    parser.add_argument("--postinst", "-P", type=str)
-    parser.add_argument(
-        "--locations-config",
-        type=str,
-        required=True,
-        help="Path to locations.yml, a map of location to a server.",
-    )
+    optional_args.add_argument("--postinst", "-P", type=str)
 
-    parser.add_argument("--renamer", "-R", default="rename", type=str)
+    optional_args.add_argument("--renamer", "-R", default="rename", type=str)
 
     args = parser.parse_args()
 

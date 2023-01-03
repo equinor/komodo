@@ -326,7 +326,7 @@ def make(
             builddir=builddir,
             makeopts=current.get("makeopts"),
             makefile=current.get("makefile"),
-            dlprefix=dlprefix if dlprefix else ".",
+            dlprefix=dlprefix,
             jobs=jobs,
             cmake=cmk,
             pip=pip,
