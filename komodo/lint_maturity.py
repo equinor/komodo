@@ -226,14 +226,14 @@ def get_parser():
         "--release_file",
         type=lambda arg: arg
         if os.path.isfile(arg)
-        else parser.error("{} is not a valid file".format(arg)),
+        else parser.error(f"{arg} is not a valid file"),
         help="Release file",
     )
     group.add_argument(
         "--release_folder",
         type=lambda arg: arg
         if os.path.isdir(arg)
-        else parser.error("{} is not a valid directory".format(arg)),
+        else parser.error(f"{arg} is not a valid directory"),
         help="File with all package tags named as release version.",
     )
 

@@ -13,13 +13,13 @@ def get_matrix():
     current release matrix."""
     for product in itertools.product(RH_VERSIONS, PY_VERSIONS):
         rh_ver, py_ver = product
-        yield ("rhel{}".format(rh_ver), "py{}".format(py_ver.replace(".", "")))
+        yield (f"rhel{rh_ver}", f"py{py_ver.replace('.', '')}")
 
 
 def format_release(base, rhel_ver, py_ver):
     """Format a base (e.g. a matrix file without the .yml suffix) such that it
     looks like a concrete release."""
-    return "{}-{}-{}".format(base, py_ver, rhel_ver)
+    return f"{base}-{py_ver}-{rhel_ver}"
 
 
 def get_matrix_base(release):

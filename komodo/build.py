@@ -29,9 +29,9 @@ def dfs(pkg, version, pkgs, repo):
 
     if not all(map(pkgs.__contains__, repo[pkg][version]["depends"])):
         print(
-            "error: {} required as dependency, is not in distribution".format(
-                ",".join(repo[pkg][version]["depends"])
-            ),
+            "error: "
+            + ",".join(repo[pkg][version]["depends"])
+            + " required as dependency, is not in distribution",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -46,8 +46,8 @@ def dfs(pkg, version, pkgs, repo):
 def rpm(pkg, ver, path, data, prefix, *args, **kwargs):
     # cpio always outputs to cwd, can't be overriden with switches
     with pushd(prefix):
-        print("Installing {} ({}) from rpm".format(pkg, ver))
-        shell("rpm2cpio {}.rpm | cpio -imd --quiet".format(path))
+        print(f"Installing {pkg} ({ver}) from rpm")
+        shell(f"rpm2cpio {path}.rpm | cpio -imd --quiet")
         shell("rsync -a usr/* .")
         shell("rm -rf usr")
 
@@ -74,7 +74,7 @@ def cmake(
     *args,
     **kwargs,
 ):
-    bdir = "{}-{}-build".format(pkg, ver)
+    bdir = f"{pkg}-{ver}-build"
     if builddir is not None:
         bdir = os.path.join(builddir, bdir)
 
@@ -83,12 +83,12 @@ def cmake(
 
     flags = [
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DBOOST_ROOT={}".format(fakeprefix),
+        f"-DBOOST_ROOT={fakeprefix}",
         "-DBUILD_SHARED_LIBS=ON",
-        "-DCMAKE_PREFIX_PATH={}".format(fakeprefix),
-        "-DCMAKE_MODULE_PATH={}/share/cmake/Modules".format(fakeprefix),
-        "-DCMAKE_INSTALL_PREFIX={}".format(prefix),
-        "-DDEST_PREFIX={}".format(fakeroot),
+        f"-DCMAKE_PREFIX_PATH={fakeprefix}",
+        f"-DCMAKE_MODULE_PATH={fakeprefix}/share/cmake/Modules",
+        f"-DCMAKE_INSTALL_PREFIX={prefix}",
+        f"-DDEST_PREFIX={fakeroot}",
     ]
 
     mkpath(bdir)
@@ -97,10 +97,10 @@ def cmake(
         _pre_PATH = os.environ["PATH"]
         os.environ["PATH"] = kwargs.get("binpath")
 
-        print("Installing {} ({}) from source with cmake".format(pkg, ver))
+        print(f"Installing {pkg} ({ver}) from source with cmake")
         shell([cmake, path] + flags + [makeopts])
-        print(shell("make -j{}".format(jobs)))
-        print(shell("make DESTDIR={} install".format(fakeroot)))
+        print(shell(f"make -j{jobs}"))
+        print(shell(f"make DESTDIR={fakeroot} install"))
 
         del os.environ["LD_LIBRARY_PATH"]
         os.environ["PATH"] = _pre_PATH
@@ -111,33 +111,33 @@ def sh(pkg, ver, pkgpath, data, prefix, makefile, *args, **kwargs):
 
     with pushd(pkgpath):
         cmd = [
-            "bash {} --prefix {}".format(makefile, prefix),
-            "--fakeroot {}".format(kwargs["fakeroot"]),
-            "--python {}/bin/python".format(prefix),
+            f"bash {makefile} --prefix {prefix}",
+            f"--fakeroot {kwargs['fakeroot']}",
+            f"--python {prefix}/bin/python",
         ]
         if "jobs" in kwargs:
-            cmd.append("--jobs {}".format(kwargs["jobs"]))
+            cmd.append(f"--jobs {kwargs['jobs']}")
         if "cmake" in kwargs:
-            cmd.append("--cmake {}".format(kwargs["cmake"]))
-        cmd.append("--pythonpath {}".format(kwargs["pythonpath"]))
-        cmd.append("--path {}".format(kwargs["binpath"]))
-        cmd.append("--pip {}".format(kwargs["pip"]))
-        cmd.append("--virtualenv {}".format(kwargs["virtualenv"]))
-        cmd.append("--ld-library-path {}".format(kwargs["ld_lib_path"]))
+            cmd.append(f"--cmake {kwargs['cmake']}")
+        cmd.append(f"--pythonpath {kwargs['pythonpath']}")
+        cmd.append(f"--path {kwargs['binpath']}")
+        cmd.append(f"--pip {kwargs['pip']}")
+        cmd.append(f"--virtualenv {kwargs['virtualenv']}")
+        cmd.append(f"--ld-library-path {kwargs['ld_lib_path']}")
         cmd.append(kwargs.get("makeopts"))
 
-        print("Installing {} ({}) from sh".format(pkg, ver))
+        print(f"Installing {pkg} ({ver}) from sh")
         shell(cmd)
 
 
 def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
-    print("Installing {} ({}) with rsync".format(pkg, ver))
+    print(f"Installing {pkg} ({ver}) with rsync")
     # assume a root-like layout in the pkgpath dir, and just copy it
     shell(
         [
             "rsync -am",
             kwargs.get("makeopts"),
-            "{}/".format(pkgpath),
+            f"{pkgpath}/",
             kwargs["fakeroot"] + prefix,
         ]
     )
@@ -194,23 +194,23 @@ def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip="pip", *args, **k
         ver = latest_pypi_version(pkg)
     cmd = [
         pip,
-        "install {}=={}".format(pkg, strip_version(ver)),
-        "--root {}".format(kwargs["fakeroot"]),
-        "--prefix {}".format(prefix),
+        f"install {pkg}=={strip_version(ver)}",
+        f"--root {kwargs['fakeroot']}",
+        f"--prefix {prefix}",
         "--no-index",
         "--no-deps",
         "--ignore-installed",
-        "--cache-dir {}".format(dlprefix),
-        "--find-links {}".format(dlprefix),
+        f"--cache-dir {dlprefix}",
+        f"--find-links {dlprefix}",
         kwargs.get("makeopts", ""),
     ]
 
-    print("Installing {} ({}) from pip".format(pkg, ver))
+    print(f"Installing {pkg} ({ver}) from pip")
     shell(cmd)
 
 
 def noop(pkg, ver, *args, **kwargs):
-    print("Doing nothing for noop package {} ({})".format(pkg, ver))
+    print(f"Doing nothing for noop package {pkg} ({ver})")
     pass
 
 
@@ -220,9 +220,9 @@ def pypaths(prefix, version):
     pyver = "python" + ".".join(version.split(".")[:-1])
     return ":".join(
         [
-            "{0}/lib/{1}".format(prefix, pyver),
-            "{0}/lib/{1}/site-packages".format(prefix, pyver),
-            "{0}/lib64/{1}/site-packages".format(prefix, pyver),
+            f"{prefix}/lib/{pyver}",
+            f"{prefix}/lib/{pyver}/site-packages",
+            f"{prefix}/lib64/{pyver}/site-packages",
         ]
     )
 
@@ -274,7 +274,7 @@ def make(
     build_pythonpath = pypaths(fakeprefix, pkgs.get("python"))
     build_path = ":".join([os.path.join(fakeprefix, "bin"), os.environ["PATH"]])
 
-    pkgpaths = ["{}-{}".format(pkg, pkgs[pkg]) for pkg in pkgorder]
+    pkgpaths = [f"{pkg}-{pkgs[pkg]}" for pkg in pkgorder]
     if dlprefix:
         pkgpaths = [os.path.join(dlprefix, path) for path in pkgpaths]
 

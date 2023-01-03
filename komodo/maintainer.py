@@ -22,4 +22,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     maints = maintainers(args.pkgfile, args.repofile)
     for pkg, ver, maintainer in maints:
-        print("%s %s %s" % (pkg, ver, maintainer))
+        print(f"{pkg} {ver} {maintainer}")

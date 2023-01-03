@@ -26,7 +26,7 @@ def shell(cmd, sudo=False):
     if sudo:
         cmdlist = ["sudo"] + cmdlist
 
-    prompt = "[{}]>".format(os.getcwd())
+    prompt = f"[{os.getcwd()}]>"
     print(prompt, " ".join(cmdlist))
 
     try:

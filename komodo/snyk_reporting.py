@@ -69,10 +69,7 @@ def filter_pip_packages(
 
 def create_snyk_search_string(packages: Dict[str, str]) -> str:
     return "\n".join(
-        [
-            "{}=={}".format(package_name, version)
-            for package_name, version in packages.items()
-        ]
+        [f"{package_name}=={version}" for package_name, version in packages.items()]
     )
 
 

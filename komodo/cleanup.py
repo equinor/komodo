@@ -4,18 +4,18 @@ import yaml as yml
 
 
 def cleanup(repofile, releasefiles):
-    with open(repofile, "r") as r:
+    with open(repofile, "r", encoding="utf-8") as r:
         repo = yml.safe_load(r)
     rels = []
     for fname in releasefiles:
-        with open(fname, "r") as f:
+        with open(fname, "r", encoding="utf-8") as f:
             rels.append(yml.safe_load(f))
 
     if not isinstance(repo, dict):
-        raise ValueError("Malformed package file: %s " % str(type(repo)))
+        raise ValueError(f"Malformed package file: {type(repo)}")
     for rel in rels:
         if not isinstance(rel, dict):
-            raise ValueError("Malformed repository file: %s" % str(type(rel)))
+            raise ValueError(f"Malformed repository file: {type(rel)}")
 
     registered_versions = []
     for pkg in repo:
@@ -33,7 +33,7 @@ def cleanup(repofile, releasefiles):
             if seen_all:
                 print("unused:")
                 seen_all = False
-            print("  - %s: %s" % ver)
+            print(f"  - {ver[0]}: {ver[1]}")
     if seen_all:
         print("ok")
 

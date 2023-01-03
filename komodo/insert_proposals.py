@@ -28,7 +28,7 @@ def recursive_update(left, right):
 def _get_repo(token, fork, repo):
     client = Github(token)
     try:
-        return client.get_repo("{}/{}".format(fork, repo))
+        return client.get_repo(f"{fork}/{repo}")
     except UnknownObjectException:
         org = client.get_organization(fork)
         return org.get_repo(repo)
@@ -63,9 +63,7 @@ def load_yaml_from_repo(filename, repo, ref):
         ruamel.yaml.scanner.ScannerError,
         ruamel.yaml.constructor.DuplicateKeyError,
     ) as e:
-        raise SystemExit(
-            "The file: <{}> contains invalid YAML syntax:\n {}".format(filename, str(e))
-        )
+        raise SystemExit(f"The file: <{filename}> contains invalid YAML syntax:\n {e}")
 
 
 def main():

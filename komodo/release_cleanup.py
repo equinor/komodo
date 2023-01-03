@@ -72,7 +72,7 @@ def _valid_path_or_files(path):
     elif os.path.isfile(full_path) and _is_yml(full_path):
         yml_files.append(full_path)
     else:
-        raise ArgumentTypeError("{} is not a valid yml-file or folder".format(path))
+        raise ArgumentTypeError(f"{path} is not a valid yml-file or folder")
     return yml_files
 
 
@@ -174,7 +174,7 @@ def run_cleanup(args, parser):
         output_file = args.output
     write_to_file(repository, output_file)
     if unused_versions:
-        print("Success! New repository file written to {}".format(output_file))
+        print(f"Success! New repository file written to {output_file}")
         print("The following software version are not in use:")
         for lib, versions in unused_versions.items():
             print(lib, versions)
