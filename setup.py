@@ -43,6 +43,7 @@ setup(
             "komodo-reverse-deps = komodo.reverse_dep_graph:main",
             "komodo-insert-proposals = komodo.insert_proposals:main",
             "komodo-check-pypi = komodo.check_up_to_date_pypi:main",
+            "komodo-show-version = komodo.show_version:main",
         ]
     },
 )
