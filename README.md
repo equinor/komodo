@@ -105,6 +105,7 @@ packages
 - `komodo-non-deployed` &mdash; Outputs the name of undeployed matrices given
 an installation root and a release folder
 - `komodo-transpiler` &mdash; Build release files
+- `komodo-show-version` &mdash; Return the version of a specified package in the active release
 
 ### Auto-formatting configuration files
 
