@@ -69,14 +69,12 @@ def load_yaml_from_repo(filename, repo, ref):
 def main():
     args = parse_args()
     repo = _get_repo(os.getenv("GITHUB_TOKEN"), args.git_fork, args.git_repo)
-    status = insert_proposals(
+    insert_proposals(
         repo, args.base, args.target, args.git_ref, args.jobname, args.joburl
     )
-    if status is not None:
-        raise status
 
 
-def insert_proposals(repo, base, target, git_ref, jobname, joburl):
+def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
     year = target.split(".")[0]
     month = target.split(".")[1]
     tmp_target = target + ".tmp"
@@ -87,21 +85,21 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl):
     except github.GithubException:
         pass
     else:
-        return ValueError(f"Branch {target} exists already")
+        raise ValueError(f"Branch {target} exists already")
 
     try:
         repo.get_branch(tmp_target)
     except github.GithubException:
         pass
     else:
-        return ValueError(f"Branch {tmp_target} exists already")
+        raise ValueError(f"Branch {tmp_target} exists already")
 
     # create contents of new release
     proposal_yaml = load_yaml_from_repo("upgrade_proposals.yml", repo, git_ref)
     upgrade_key = f"{year}-{month}"
     upgrade = proposal_yaml.get(upgrade_key)
     if upgrade_key not in proposal_yaml:
-        return ValueError(
+        raise ValueError(
             f"No section for this release ({upgrade_key}) in upgrade_proposals.yml"
         )
     base_file = f"releases/matrices/{base}.yml"

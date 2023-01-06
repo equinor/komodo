@@ -116,7 +116,7 @@ def prettified_yaml(filepath, check_only=True):
 
 
 def write_to_string(repository, check_type=True):
-    if type(repository) == dict:
+    if isinstance(repository, dict):
         repository = ordereddict(sorted(repository.items(), key=lambda t: t[0]))
         repository = ruamel.yaml.comments.CommentedMap(repository)
     return prettier(repository, check_type)

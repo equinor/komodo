@@ -148,9 +148,12 @@ class MockRepo(object):
 )
 def test_insert_proposals(base, target, repo_files, changed_files, prs, return_type):
     repo = MockRepo(files=repo_files)
-    status = insert_proposals(repo, base, target, "git_ref", "jobname", "joburl")
 
-    assert isinstance(status, return_type)
+    if isinstance(return_type(), Exception):
+        with pytest.raises(return_type):
+            insert_proposals(repo, base, target, "git_ref", "jobname", "joburl")
+    else:
+        insert_proposals(repo, base, target, "git_ref", "jobname", "joburl")
 
     assert len(changed_files) == len(repo.updated_files)
     for file, content in changed_files.items():

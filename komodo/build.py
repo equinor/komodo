@@ -7,7 +7,7 @@ import os
 import pathlib
 import stat
 import sys
-from distutils.dir_util import mkpath
+from pathlib import Path
 
 import requests
 
@@ -70,8 +70,8 @@ def cmake(
     builddir,
     makeopts,
     jobs,
-    cmake="cmake",
     *args,
+    cmake="cmake",
     **kwargs,
 ):
     bdir = f"{pkg}-{ver}-build"
@@ -91,7 +91,7 @@ def cmake(
         f"-DDEST_PREFIX={fakeroot}",
     ]
 
-    mkpath(bdir)
+    Path(bdir).mkdir(parents=True, exist_ok=True)
     with pushd(bdir):
         os.environ["LD_LIBRARY_PATH"] = kwargs.get("ld_lib_path")
         _pre_PATH = os.environ["PATH"]
@@ -150,7 +150,7 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
     if not url.startswith("https"):
         raise ValueError(f"{url} does not use https:// protocol")
 
-    hash_type, hash = kwargs["hash"].split(":")
+    hash_type, hash_value = kwargs["hash"].split(":")
     if hash_type != "sha256":
         raise NotImplementedError(
             f"Hash type {hash_type} given - only sha256 implemented"
@@ -175,7 +175,7 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
             file_handle.write(chunk)
             sha256.update(chunk)
 
-    if sha256.hexdigest() != hash:
+    if sha256.hexdigest() != hash_value:
         raise ValueError(
             f"Hash of downloaded file ({sha256.hexdigest()}) "
             "not equal to expected hash."
@@ -188,7 +188,7 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
         )
 
 
-def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, pip="pip", *args, **kwargs):
+def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, *args, pip="pip", **kwargs):
     ver = strip_version(ver)
     if ver == LATEST_PACKAGE_ALIAS:
         ver = latest_pypi_version(pkg)

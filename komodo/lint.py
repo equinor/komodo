@@ -94,7 +94,8 @@ def lint_version_numbers(pkgs, repo):
                 # A warning coincides with finding "Legacy" in repr(v)
             if "Legacy" in repr(v):  # don't know if possible to check otherwise
                 __reg_version_err(errs, pkg, ver, maintainer)
-        except:  # noqa
+        except:  # pylint: disable=bare-except  # noqa
+            # Log any exception:
             __reg_version_err(errs, pkg, ver, maintainer)
     return errs
 

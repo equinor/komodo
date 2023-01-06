@@ -58,13 +58,13 @@ def _dump_dot(reverse, pkg, version, out):
 def _dump_dot_dep(reverse, pkg, version, out, seen):
     if pkg in seen:
         return
-    id = pkg.lower().replace("-", "_")
-    out.write(f'  {id} [label="{pkg}-{version}"];\n')
+    _id = pkg.lower().replace("-", "_")
+    out.write(f'  {_id} [label="{pkg}-{version}"];\n')
     if pkg in reverse:
         seen.add(pkg)
         for rev_dep, rev_version in reverse[pkg]:
             rev_id = rev_dep.lower().replace("-", "_")
-            out.write(f"  {id} -> {rev_id};\n")
+            out.write(f"  {_id} -> {rev_id};\n")
             _dump_dot_dep(reverse, rev_dep, rev_version, out, seen)
 
 
