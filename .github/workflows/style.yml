@@ -27,6 +27,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        pip install .
         pip install -r dev-requirements.txt
 
     - name: Run black
@@ -39,3 +40,7 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8
+
+    - name: pylint
+      run: |
+        pylint komodo tests setup.py
