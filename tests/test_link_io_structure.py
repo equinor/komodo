@@ -41,7 +41,7 @@ def test_read_folder_structure(tmpdir):
 
         output_dict = read_link_structure(os.getcwd())
 
-        assert type(output_dict) == dict
+        assert isinstance(output_dict, dict)
         assert equal_links(output_dict, expected_result)
 
 

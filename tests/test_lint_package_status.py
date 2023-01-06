@@ -68,7 +68,7 @@ def test_malformed_visibility():
     malformed_visibility = {
         "package_a": {"visibility": "privat3"},
         "package_b": {"visibility": "publ1c"},
-        "package_c": dict(),
+        "package_c": {},
     }
     with pytest.raises(SystemExit) as exit_info:
         lint_package_status.run(malformed_visibility, REPO)

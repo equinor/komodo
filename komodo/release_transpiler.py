@@ -19,15 +19,15 @@ def build_matrix_file(release_base, release_folder, builtins):
     )
     compiled = {}
 
-    for p in all_packages:
-        if p in builtins:
-            compiled[p] = builtins[p]
+    for package in all_packages:
+        if package in builtins:
+            compiled[package] = builtins[package]
             continue
 
-        if len(set([files[key].get(p) for key in files])) == 1:
-            compiled[p] = next(iter(files.values()))[p]
+        if len({files[key].get(package) for key in files}) == 1:
+            compiled[package] = next(iter(files.values()))[package]
         else:
-            compiled[p] = {key: files[key].get(p) for key in py_keys}
+            compiled[package] = {key: files[key].get(package) for key in py_keys}
 
     write_to_file(compiled, f"{release_base}.yml", False)
 

@@ -47,7 +47,7 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
         raise NotImplementedError(f"Unknown protocol {protocol}")
 
 
-def fetch(pkgs, repo, outdir, pip="pip"):
+def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     missingpkg = [pkg for pkg in pkgs if pkg not in repo]
     missingver = [
         pkg for pkg, ver in pkgs.items() if pkg in repo and ver not in repo[pkg]
@@ -64,14 +64,14 @@ def fetch(pkgs, repo, outdir, pip="pip"):
         )
 
     if missingpkg or missingver:
-        return
+        return {}
 
     if not outdir:
         raise ValueError(
             "The value of `outdir`, the cache location for pip and other "
             "tools, cannot be None or the empty string."
         )
-    elif not os.path.exists(outdir):
+    if not os.path.exists(outdir):
         os.mkdir(outdir)
 
     pypi_packages = []

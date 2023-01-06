@@ -6,8 +6,7 @@ from pathlib import Path
 import jinja2
 import yaml as yml
 
-import komodo.local as local
-import komodo.switch as switch
+from komodo import local, switch
 from komodo.build import make
 from komodo.data import Data
 from komodo.fetch import fetch

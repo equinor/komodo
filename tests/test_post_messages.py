@@ -17,13 +17,13 @@ def test_get_messages():
     scripts, messages, inline = get_messages_and_scripts(release, motd_db)
     assert "script1" in scripts
     assert "message1" not in messages
-    assert inline is not []
+    assert inline != []
 
     release = "2020.01.01-py36-rhel6"
     scripts, messages, inline = get_messages_and_scripts(release, motd_db)
     assert "script1" not in scripts
     assert "message1" in messages
-    assert inline is not []
+    assert inline != []
 
 
 def test_main_success(tmpdir):

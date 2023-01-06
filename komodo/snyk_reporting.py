@@ -4,13 +4,9 @@ import os
 import sys
 from typing import Any, Dict, List
 
-if sys.version_info >= (3, 7):
-    from snyk import SnykClient
-    from snyk.managers import OrganizationManager
-    from snyk.models import Vulnerability
-else:
-    OrganizationManager = Any
-    Vulnerability = Any
+from snyk import SnykClient
+from snyk.managers import OrganizationManager
+from snyk.models import Vulnerability
 
 from komodo.yaml_file_type import ReleaseDir, ReleaseFile, YamlFile
 
@@ -89,7 +85,7 @@ def find_vulnerabilities(
     repository: Dict[str, Any],
     org: OrganizationManager,
 ) -> Dict[str, List[Vulnerability]]:
-    result = dict()
+    result = {}
 
     for release_name, packages in releases.items():
         pip_packages = filter_pip_packages(packages=packages, repository=repository)
