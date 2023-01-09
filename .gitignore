@@ -1,3 +1,7 @@
+# Ignore the dynamically updated version file.
+_version.py
+
+# Standard Python project ignores.
 *.pyc
 .vscode
 .idea
@@ -5,3 +9,4 @@
 __pycache__/
 .pytest_cache/
 *.egg-info
+dist/

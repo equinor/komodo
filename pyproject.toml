@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=65.0", "setuptools-scm>=7.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "komodo"
+authors = [{ name="Equinor ASA", email="fg_sib-scout@equinor.com" },]
+description = "Komodo is a software distribution system."
+dynamic = ["version"]
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+readme = "README.md"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Development Status :: 4 - Beta",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "jinja2",
+    "packaging",
+    "PyGithub >= 1.55",
+    "pysnyk",
+    "PyYAML",
+    "requests",
+    "ruamel.yaml",
+    "shell",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools_scm]
+write_to = "komodo/_version.py"
+
+[project.scripts]
+kmd = "komodo.cli:cli_main"
+komodo-check-pypi = "komodo.check_up_to_date_pypi:main"
+komodo-check-symlinks = "komodo.symlink.sanity_check:sanity_main"
+komodo-clean-repository = "komodo.release_cleanup:main"
+komodo-create-symlinks = "komodo.symlink.create_links:symlink_main"
+komodo-extract-dep-graph = "komodo.extract_dep_graph:main"
+komodo-insert-proposals = "komodo.insert_proposals:main"
+komodo-lint = "komodo.lint:lint_main"
+komodo-lint-maturity = "komodo.lint_maturity:main"
+komodo-lint-package-status = "komodo.lint_package_status:main"
+komodo-non-deployed = "komodo.deployed:deployed_main"
+komodo-post-messages = "komodo.post_messages:main"
+komodo-reverse-deps = "komodo.reverse_dep_graph:main"
+komodo-show-version = "komodo.show_version:main"
+komodo-snyk-test = "komodo.snyk_reporting:main"
+komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
+komodo-transpiler = "komodo.release_transpiler:main"
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint.messages_control]
+disable = [
+    "bad-inline-option",
+    "consider-using-dict-items",
+    "consider-using-f-string",
+    "consider-using-sys-exit",
+    "consider-using-with",
+    "deprecated-pragma",
+    "duplicate-code",
+    "file-ignored",
+    "fixme",
+    "invalid-name",
+    "line-too-long",
+    "locally-disabled",
+    "logging-not-lazy",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "no-else-return",
+    "protected-access",
+    "raise-missing-from",
+    "raw-checker-failed",
+    "redefined-outer-name",
+    "suppressed-message",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-branches",
+    "too-many-locals",
+    "too-many-statements",
+    "unnecessary-lambda",
+    "unspecified-encoding",
+    "unused-argument",
+    "use-a-generator",
+    "use-implicit-booleaness-not-comparison",
+    "use-symbolic-message-instead",
+    "useless-object-inheritance",
+]

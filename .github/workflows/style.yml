@@ -35,12 +35,12 @@ jobs:
 
     - name: Run isort
       run: |
-        isort --check komodo tests *.py
+        isort --check komodo tests
 
     - name: Lint with flake8
       run: |
-        flake8
+        flake8 --max-line-length 88
 
     - name: pylint
       run: |
-        pylint komodo tests setup.py
+        pylint komodo tests
