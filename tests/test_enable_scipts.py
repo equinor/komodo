@@ -1,25 +1,8 @@
 import json
-import os
+from pathlib import Path
 
-from komodo.data import Data
+from komodo.cli import create_enable_scripts
 from komodo.shell import shell
-
-
-def _create_script(kmd_prefix, kmd_pyver, kmd_release, target, template):
-    data = Data(extra_data_dirs=None)
-    os.mkdir(kmd_release)
-    with open("{}/{}".format(kmd_release, target), "w") as f:
-        f.write(
-            shell(
-                [
-                    "m4 {}".format(data.get("enable.m4")),
-                    "-D komodo_prefix={}".format(kmd_prefix),
-                    "-D komodo_pyver={}".format(kmd_pyver),
-                    "-D komodo_release={}".format(kmd_release),
-                    data.get(template),
-                ]
-            ).decode("utf-8")
-        )
 
 
 def _load_envs():
@@ -51,10 +34,8 @@ unset LD_LIBRARY_PATH
 
 def test_enable_bash_nopresets(tmpdir):
     with tmpdir.as_cwd():
-        kmd_release = "bleeding"
-        kmd_pyver = "3.6"
-        kmd_prefix = "prefix"
-        _create_script(kmd_prefix, kmd_pyver, kmd_release, "enable", "enable.in")
+        Path("bleeding").mkdir()
+        create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
         with open("test_enable.sh", "w") as test_file:
             test_file.write(
                 TEST_SCRIPT_SIMPLE.format(
@@ -80,12 +61,8 @@ unsetenv LD_LIBRARY_PATH
 
 def test_enable_csh_no_presets(tmpdir):
     with tmpdir.as_cwd():
-        kmd_release = "bleeding"
-        kmd_pyver = "3.6"
-        kmd_prefix = "prefix"
-        _create_script(
-            kmd_prefix, kmd_pyver, kmd_release, "enable.csh", "enable.csh.in"
-        )
+        Path("bleeding").mkdir()
+        create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
         with open("test_enable.sh", "w") as test_file:
             test_file.write(
                 TEST_SCRIPT_SIMPLE.format(
@@ -111,16 +88,14 @@ export MANPATH=/some/man/path
 
 def test_enable_bash_with_presets(tmpdir):
     with tmpdir.as_cwd():
-        kmd_release = "bleeding"
-        kmd_pyver = "3.6"
-        kmd_prefix = "prefix"
-        _create_script(kmd_prefix, kmd_pyver, kmd_release, "enable", "enable.in")
-        with open("test_enable.sh", "w") as test_file:
-            test_file.write(
-                TEST_SCRIPT_SIMPLE.format(
-                    set_envs=BASH_ENVS, enable_path="bleeding/enable"
-                )
-            )
+        Path("bleeding").mkdir()
+        create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
+        Path("test_enable.sh").write_text(
+            TEST_SCRIPT_SIMPLE.format(
+                set_envs=BASH_ENVS, enable_path="bleeding/enable"
+            ),
+            encoding="utf-8",
+        )
 
         shell(["bash test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
@@ -139,18 +114,14 @@ setenv MANPATH /some/man/path
 
 def test_enable_csh_with_presets(tmpdir):
     with tmpdir.as_cwd():
-        kmd_release = "bleeding"
-        kmd_pyver = "3.6"
-        kmd_prefix = "prefix"
-        _create_script(
-            kmd_prefix, kmd_pyver, kmd_release, "enable.csh", "enable.csh.in"
+        Path("bleeding").mkdir()
+        create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
+        Path("test_enable.sh").write_text(
+            TEST_SCRIPT_SIMPLE.format(
+                set_envs=CSH_ENVS, enable_path="bleeding/enable.csh"
+            ),
+            encoding="utf-8",
         )
-        with open("test_enable.sh", "w") as test_file:
-            test_file.write(
-                TEST_SCRIPT_SIMPLE.format(
-                    set_envs=CSH_ENVS, enable_path="bleeding/enable.csh"
-                )
-            )
 
         shell(["csh test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()

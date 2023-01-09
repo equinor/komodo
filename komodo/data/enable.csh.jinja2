@@ -1,5 +1,3 @@
-changequote(<!,!>)
-
 alias disable_komodo '\\
     test $?_PRE_KOMODO_PATH != 0 && setenv PATH "$_PRE_KOMODO_PATH" && unsetenv _PRE_KOMODO_PATH;\\
     test $?KOMODO_RELEASE != 0 && test $?_PRE_KOMODO_MANPATH == 0 && unsetenv MANPATH;\\
@@ -18,29 +16,29 @@ disable_komodo preserve_disable_komodo
 
 if $?PATH then
     setenv _PRE_KOMODO_PATH "$PATH"
-    setenv PATH komodo_prefix/bin:$PATH
+    setenv PATH {{komodo_prefix}}/bin:$PATH
 else
-    setenv PATH komodo_prefix/bin
+    setenv PATH {{komodo_prefix}}/bin
 endif
 
 if $?MANPATH then
     setenv _PRE_KOMODO_MANPATH "$MANPATH"
-    setenv MANPATH komodo_prefix/share/man:$MANPATH
+    setenv MANPATH {{komodo_prefix}}/share/man:$MANPATH
 else
-    setenv MANPATH komodo_prefix/share/man:
+    setenv MANPATH {{komodo_prefix}}/share/man:
 endif
 
 
 if $?LD_LIBRARY_PATH then
     setenv _PRE_KOMODO_LD_PATH "$LD_LIBRARY_PATH"
-    setenv LD_LIBRARY_PATH komodo_prefix/lib:komodo_prefix/lib64:$LD_LIBRARY_PATH
+    setenv LD_LIBRARY_PATH {{komodo_prefix}}/lib:{{komodo_prefix}}/lib64:$LD_LIBRARY_PATH
 else
-    setenv LD_LIBRARY_PATH komodo_prefix/lib:komodo_prefix/lib64
+    setenv LD_LIBRARY_PATH {{komodo_prefix}}/lib:{{komodo_prefix}}/lib64
 endif
 
-setenv KOMODO_RELEASE komodo_release
+setenv KOMODO_RELEASE {{komodo_release}}
 
-set local_script=komodo_prefix/../local.csh
+set local_script={{komodo_prefix}}/../local.csh
 if ( -r $local_script) then
     source $local_script
 endif
@@ -54,14 +52,13 @@ if ( $?prompt ) then
 endif
 
 rehash
-changequote()
 
-if ( -d komodo_prefix/../motd/scripts ) then
-    foreach f (komodo_prefix/../motd/scripts/*)
+if ( -d {{komodo_prefix}}/../motd/scripts ) then
+    foreach f ({{komodo_prefix}}/../motd/scripts/*)
         $f
     end
 endif
 
-if ( -d komodo_prefix/../motd/messages ) then
-    cat komodo_prefix/../motd/messages/*
+if ( -d {{komodo_prefix}}/../motd/messages ) then
+    cat {{komodo_prefix}}/../motd/messages/*
 endif

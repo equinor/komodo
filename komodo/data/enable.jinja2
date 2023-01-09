@@ -61,21 +61,21 @@ disable_komodo () {
 # unset irrelevant variables
 disable_komodo preserve_disable_komodo
 
-export KOMODO_RELEASE=komodo_release
+export KOMODO_RELEASE={{komodo_release}}
 
 export _PRE_KOMODO_PATH="${PATH:-}"
-export PATH=komodo_prefix/bin${PATH:+:${PATH}}
+export PATH={{komodo_prefix}}/bin${PATH:+:${PATH}}
 
 export _PRE_KOMODO_MANPATH="${MANPATH:-}"
-export MANPATH=komodo_prefix/share/man:${MANPATH:-}
+export MANPATH={{komodo_prefix}}/share/man:${MANPATH:-}
 
 export _PRE_KOMODO_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH=komodo_prefix/lib:komodo_prefix/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export LD_LIBRARY_PATH={{komodo_prefix}}/lib:{{komodo_prefix}}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 export _PRE_KOMODO_PS1="${PS1:-}"
 export PS1="(${KOMODO_RELEASE}) ${PS1:-}"
 
-local_script=komodo_prefix/../local
+local_script={{komodo_prefix}}/../local
 if [ -e $local_script ]; then
    source $local_script
 fi
@@ -87,15 +87,15 @@ if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
     hash -r
 fi
 
-if [ -d komodo_prefix/../motd/scripts ]
+if [ -d {{komodo_prefix}}/../motd/scripts ]
 then
-    for f in komodo_prefix/../motd/scripts/*
+    for f in {{komodo_prefix}}/../motd/scripts/*
     do
         $f
     done
 fi
 
-if [ -d komodo_prefix/../motd/messages ]
+if [ -d {{komodo_prefix}}/../motd/messages ]
 then
-    cat komodo_prefix/../motd/messages/*
+    cat {{komodo_prefix}}/../motd/messages/*
 fi
