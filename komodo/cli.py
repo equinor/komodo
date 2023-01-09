@@ -3,6 +3,7 @@ import os
 import sys
 from pathlib import Path
 
+import jinja2
 import yaml as yml
 
 import komodo.local as local
@@ -18,6 +19,33 @@ from komodo.package_version import (
 from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
 from komodo.yaml_file_type import YamlFile
+
+
+def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
+    """Render enable scripts (user facing) for bash and csh to an existing
+    directory komodo_release (in current working directory).
+
+    Args:
+        komodo_prefix: The filesystem path to where the release is to be
+            deployed.
+        komodo_release: The name of the release.
+    """
+    jinja_env = jinja2.Environment(
+        loader=jinja2.PackageLoader(package_name="komodo", package_path="data"),
+        keep_trailing_newline=True,
+    )
+    for tmpl, target in [
+        ("enable.jinja2", "enable"),
+        ("enable.csh.jinja2", "enable.csh"),
+    ]:
+
+        (Path(komodo_release) / target).write_text(
+            jinja_env.get_template(tmpl).render(
+                komodo_prefix=komodo_prefix,
+                komodo_release=komodo_release,
+            ),
+            encoding="utf-8",
+        )
 
 
 def _main(args):
@@ -59,21 +87,7 @@ def _main(args):
     if args.build and not args.install:
         sys.exit(0)
 
-    # create the enable script
-    for tmpl, target in [("enable.in", "enable"), ("enable.csh.in", "enable.csh")]:
-        # TODO should args.release be release_path?
-        with open(f"{args.release}/{target}", mode="w", encoding="utf-8") as f_handle:
-            f_handle.write(
-                shell(
-                    [
-                        f"m4 {data.get('enable.m4')}",
-                        f"-D komodo_prefix={tmp_prefix}",
-                        f"-D komodo_pyver={args.pyver}",
-                        f"-D komodo_release={args.release}",
-                        data.get(tmpl),
-                    ]
-                ).decode("utf-8")
-            )
+    create_enable_scripts(komodo_prefix=tmp_prefix, komodo_release=args.release)
 
     with open(args.locations_config, mode="r", encoding="utf-8") as defs, open(
         Path(args.release) / "local", mode="w", encoding="utf-8"
