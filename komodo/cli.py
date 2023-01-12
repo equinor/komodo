@@ -117,18 +117,17 @@ def _main(args):
 
     print(f"Installing {args.release} to {args.prefix}")
 
-    shell(f"{args.renamer} {args.release} .{args.release} {args.release}")
+    shell(f"mv {args.release} .{args.release}")
     shell(f"rsync -a .{args.release} {args.prefix}", sudo=args.sudo)
 
     if Path(f"{args.prefix}/{args.release}").exists():
         shell(
-            f"{args.renamer} {args.release} "
-            f"{args.release}.delete {args.prefix}/{args.release}",
+            f"mv {args.prefix}/{args.release} {args.prefix}/{args.release}.delete",
             sudo=args.sudo,
         )
 
     shell(
-        f"{args.renamer} .{args.release} {args.release} {args.prefix}/.{args.release}",
+        f"mv {args.prefix}/.{args.release} {args.prefix}/{args.release}",
         sudo=args.sudo,
     )
     shell(f"rm -rf {args.prefix}/{args.release}.delete", sudo=args.sudo)
@@ -242,8 +241,6 @@ def cli_main():
         "Multiple directores can be given, separated with space.",
     )
     optional_args.add_argument("--postinst", "-P", type=str)
-
-    optional_args.add_argument("--renamer", "-R", default="rename", type=str)
 
     args = parser.parse_args()
 

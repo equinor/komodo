@@ -13,7 +13,7 @@ jobs:
       matrix:
         python-version: ['3.8', '3.10']
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -52,7 +52,6 @@ jobs:
             --prefix /tmp/pfx \
             --release travis \
             --locations-config $(realpath ci/travis/locations.yml) \
-            --renamer rename.ul
 
     - name: Build libkmd.so for testing
       run: |
