@@ -38,7 +38,7 @@ from tests import _get_test_root
     ],
 )
 def test_main(args, tmpdir):
-    tmpdir = str(tmpdir)  # XXX: python2 support
+    tmpdir = str(tmpdir)
     shutil.copytree(
         os.path.join(_get_test_root(), "data/cli/hackres"),
         os.path.join(tmpdir, "hackres"),
@@ -53,11 +53,6 @@ def test_main(args, tmpdir):
         "--workspace",
         tmpdir,
     ]
-
-    # Komodo expects the renamer from util-linux. On Debian/Ubuntu, this
-    # renamer has been renamed to rename.ul.
-    if os.path.exists("/usr/bin/rename.ul"):
-        sys.argv.extend(["--renamer", "/usr/bin/rename.ul"])
 
     sys.argv.extend(list(args))
 
