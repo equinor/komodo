@@ -1,6 +1,8 @@
 import os
 
-from komodo.deployed import fetch_non_deployed
+import pytest
+
+from komodo.deployed import fetch_non_deployed, output_formatter
 
 
 def _create_links(links, root=""):
@@ -75,3 +77,16 @@ def test_links_ignored(tmpdir):
 
         non_deployed = fetch_non_deployed(install_root, release_folder)
         assert len(non_deployed) == 0, non_deployed
+
+
+@pytest.mark.parametrize(
+    "release_list, do_json, expected",
+    [
+        (["a"], False, "a"),
+        (["a"], True, '["a"]'),
+        (["a", "b"], False, "a\nb"),
+        (["a", "b"], True, '["a", "b"]'),
+    ],
+)
+def test_output_formatter(release_list, do_json, expected):
+    assert output_formatter(release_list, do_json) == expected
