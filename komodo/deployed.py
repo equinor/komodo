@@ -1,5 +1,7 @@
 import argparse
+import json
 import os
+from typing import List, Optional
 
 from komodo.matrix import get_matrix_base
 
@@ -29,9 +31,17 @@ def _fetch_non_deployed_releases(install_root, release_folder):
     return list(set(releases) - set(deployed))
 
 
-def fetch_non_deployed(install_root, releases_folder, limit=None):
+def fetch_non_deployed(
+    install_root: str, releases_folder: str, limit: Optional[int] = None
+) -> List[str]:
     non_deployed = _fetch_non_deployed_releases(install_root, releases_folder)
     return non_deployed[:limit]
+
+
+def output_formatter(release_list: List[str], do_json: bool = False) -> str:
+    if do_json:
+        return json.dumps(release_list)
+    return "\n".join(release_list)
 
 
 def deployed_main():
@@ -40,7 +50,8 @@ def deployed_main():
             """Outputs the name of undeployed matrices given an installation
             root and a release folder. A partially deployed matrix is
             considered deployed."""
-        )
+        ),
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "install_root",
@@ -62,6 +73,7 @@ def deployed_main():
         default=None,
         help="The maximum number of undeployed matrices to list.",
     )
+    parser.add_argument("--json", action="store_true", help="Get output in JSON format")
 
     args = parser.parse_args()
     non_deployed = fetch_non_deployed(
@@ -70,5 +82,4 @@ def deployed_main():
         limit=args.limit,
     )
 
-    if non_deployed:
-        print("\n".join(non_deployed))
+    print(output_formatter(non_deployed, do_json=args.json))
