@@ -5,6 +5,8 @@ import argparse
 import os
 import sys
 
+import jinja2
+
 from komodo.package_version import (
     LATEST_PACKAGE_ALIAS,
     get_git_revision_hash,
@@ -86,7 +88,14 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     "pypi_package_name is only valid when building with pip"
                 )
 
-            url = current.get("source")
+            if "source" in current:
+                templater = jinja2.Environment(loader=jinja2.BaseLoader).from_string(
+                    current.get("source")
+                )
+                url = templater.render(os.environ)
+            else:
+                url = None
+
             protocol = current.get("fetch")
             pkg_alias = current.get("pypi_package_name", pkg)
 

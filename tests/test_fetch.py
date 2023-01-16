@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 
 import pytest
@@ -169,3 +170,25 @@ def test_fetch_git_hash(captured_shell_commands, tmpdir):
             "git://github.com/equinor/ert.git ert-main"
         )
         assert git_hashes == {"ert": "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"}
+
+
+@patch.dict(os.environ, {"ACCESS_TOKEN": "VERYSECRETTOKEN"})
+def test_expand_jinja2_templates_in_source(captured_shell_commands, tmpdir):
+    packages = {"secrettool": "10.0"}
+    repositories = {
+        "secrettool": {
+            "10.0": {
+                "source": "https://{{ACCESS_TOKEN}}@github.com/equinor/secrettool.git",
+                "fetch": "git",
+                "make": "pip",
+                "maintainer": "Prop Rietary",
+                "depends": [],
+            }
+        }
+    }
+
+    with patch("komodo.fetch.get_git_revision_hash") as mock_get_git_revision_hash:
+        mock_get_git_revision_hash.return_value = ""
+        fetch(packages, repositories, str(tmpdir))
+        assert captured_shell_commands[0].startswith("git clone")
+        assert "https://VERYSECRETTOKEN@github.com" in captured_shell_commands[0]
