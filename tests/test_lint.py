@@ -47,6 +47,8 @@ def test_lint():
         "bleeding-py36.yml",
         "/home/anyuser/komodo/2020.01.03-py36-rhel6.yml",
         "myrelease-py36.yml",
+        "myrelease-py310.yml",
+        "myrelease-py310-rhel8.yml",
         "myrelease-py36-rhel6.yml",
         "myrelease-py36-rhel7.yml",
     ),

@@ -46,8 +46,8 @@ def _validate(pkg, ver, repo):
 def lint_release_name(pkgfile):
     relname = os.path.basename(pkgfile)
     found = False
-    for py_suffix in "-py27", "-py36", "-py38":
-        for rh_suffix in "", "-rhel6", "-rhel7":
+    for py_suffix in "-py27", "-py36", "-py38", "-py310":
+        for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
             if relname.endswith(py_suffix + rh_suffix + ".yml"):
                 found = True
                 break
@@ -56,7 +56,7 @@ def lint_release_name(pkgfile):
             _kerr(
                 pkg=pkgfile,
                 err="Invalid release name suffix. "
-                "Must be of the most -pyXX or -pyXX-rhelY",
+                "Must be of the form -pyXX[X] or -pyXX[X]-rhelY",
             )
         ]
 
