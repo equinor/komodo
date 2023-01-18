@@ -85,7 +85,7 @@ def test_links_ignored(tmpdir):
         (["a"], False, "a"),
         (["a"], True, '["a"]'),
         (["a", "b"], False, "a\nb"),
-        (["a", "b"], True, '["a", "b"]'),
+        (["a", "b"], True, '["a","b"]'),
     ],
 )
 def test_output_formatter(release_list, do_json, expected):

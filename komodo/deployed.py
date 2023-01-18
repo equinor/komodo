@@ -40,7 +40,7 @@ def fetch_non_deployed(
 
 def output_formatter(release_list: List[str], do_json: bool = False) -> str:
     if do_json:
-        return json.dumps(release_list)
+        return json.dumps(release_list, separators=(",", ":"))
     return "\n".join(release_list)
 
 
