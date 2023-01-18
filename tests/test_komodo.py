@@ -1,7 +1,5 @@
 import os
 
-import pytest  # noqa
-
 from komodo.shebang import fixup_python_shebangs
 
 

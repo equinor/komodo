@@ -36,14 +36,7 @@ def is_repository(config):
     Raises ValueError if inconsistent throughout the config.
     """
 
-    # For Python2+3 compatibility. On Python3-only, use isinstance(x, str)
-    # instead of isinstance(x, basestring).
-    try:
-        basestring
-    except NameError:
-        basestring = str  # No basestring on Python3
-
-    if all([isinstance(package, basestring) for package in config.values()]):
+    if all([isinstance(package, str) for package in config.values()]):
         return False
     elif all(
         [

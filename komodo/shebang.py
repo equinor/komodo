@@ -36,7 +36,7 @@ def fixup_python_shebangs(prefix, release):
                 shebang = f.readline().strip()
             if _is_shebang(shebang):
                 bins_.append(bin_)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             print(f"Exception in reading bin {bin_}: {err}")
 
     for bin_ in bins_:

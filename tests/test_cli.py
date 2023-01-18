@@ -59,7 +59,7 @@ def test_main(args, tmpdir):
     if os.path.exists("/usr/bin/rename.ul"):
         sys.argv.extend(["--renamer", "/usr/bin/rename.ul"])
 
-    sys.argv.extend([arg for arg in args])
+    sys.argv.extend(list(args))
 
     cli_main()
 
