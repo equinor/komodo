@@ -211,7 +211,6 @@ def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, *args, pip="pip", **k
 
 def noop(pkg, ver, *args, **kwargs):
     print(f"Doing nothing for noop package {pkg} ({ver})")
-    pass
 
 
 def pypaths(prefix, version):

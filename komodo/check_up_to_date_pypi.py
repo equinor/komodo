@@ -31,7 +31,10 @@ def load_from_file(yaml, fname):
 
 def get_pypi_info(package_names):
     return [
-        (package, requests.get(f"https://pypi.python.org/pypi/{package}/json"))
+        (
+            package,
+            requests.get(f"https://pypi.python.org/pypi/{package}/json", timeout=60),
+        )
         for package in package_names
     ]
 

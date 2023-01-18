@@ -96,7 +96,7 @@ def test_extract_reverse_graph():
 
 
 def _sort_graph(a):
-    for k, v in a.items():
+    for _, v in a.items():
         v.sort(
             key=lambda dep_graph: list(dep_graph.keys())[0]
             if len(dep_graph) == 1

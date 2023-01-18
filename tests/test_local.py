@@ -1,7 +1,5 @@
 import os
 
-import pytest  # noqa
-
 from komodo import local
 from komodo.data import Data
 

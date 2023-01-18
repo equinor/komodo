@@ -183,9 +183,12 @@ def run_cleanup(args, parser):
 def run_prettier(args, _):
     release_files = [filename for sublist in args.files for filename in sublist]
 
-    sys.exit(0) if all(
+    if not args.check or all(
         [prettified_yaml(filename, args.check) for filename in release_files]
-    ) or not args.check else sys.exit(1)
+    ):
+        sys.exit(0)
+
+    sys.exit(1)
 
 
 def main(args=None):
