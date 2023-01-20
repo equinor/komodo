@@ -16,9 +16,21 @@ def maintainers(pkgfile, repofile):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="print maintainers")
-    parser.add_argument("pkgfile", type=str)
-    parser.add_argument("repofile", type=str)
+    parser = argparse.ArgumentParser(
+        description="Print maintainers.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "pkgfile",
+        type=str,
+        help="A Komodo release file mapping package name to version, "
+        "in YAML format.",
+    )
+    parser.add_argument(
+        "repofile",
+        type=str,
+        help="A Komodo repository file, in YAML format.",
+    )
     args = parser.parse_args()
     maints = maintainers(args.pkgfile, args.repofile)
     for pkg, ver, maintainer in maints:

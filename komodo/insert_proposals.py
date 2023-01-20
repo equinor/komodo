@@ -183,7 +183,8 @@ Source code for this script can be found [here](https://github.com/equinor/komod
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Copy proposals into release and create PR."
+        description="Copy proposals into release and create PR.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "base",

@@ -41,14 +41,36 @@ def main() -> None:
 
 def parse_args(args: Dict[str, str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Test a release for security and license issues"
+        description="Test a release for security and license issues.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("--orgid", type=str, required=True)
-    parser.add_argument("--repo", type=YamlFile(), required=True)
+    parser.add_argument(
+        "--orgid", type=str, required=True, help="The Snyk organization ID."
+    )
+    parser.add_argument(
+        "--repo",
+        type=YamlFile(),
+        required=True,
+        help="A Komodo repository file, in YAML format.",
+    )
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--release", type=ReleaseFile())
-    group.add_argument("--release-folder", type=ReleaseDir())
-    parser.add_argument("--format-github", action="store_true")
+    group.add_argument(
+        "--release",
+        type=ReleaseFile(),
+        help="A Komodo release file mapping package name to version, "
+        "in YAML format.",
+    )
+    group.add_argument(
+        "--release-folder",
+        type=ReleaseDir(),
+        help="A directory containing Komodo release files.",
+    )
+    parser.add_argument(
+        "--format-github",
+        action="store_true",
+        help="Flag to print vulnerabilities in GitHub-friendly format vs "
+        "console format.",
+    )
 
     return parser.parse_args(args)
 

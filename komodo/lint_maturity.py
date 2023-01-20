@@ -213,7 +213,10 @@ def define_tag_exceptions(tag_exception_arg):
 
 def get_parser():
 
-    parser = argparse.ArgumentParser(description=("Lint the maturity of packages."))
+    parser = argparse.ArgumentParser(
+        description="Lint the maturity of packages.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         "--tag_exceptions",
         nargs="+",
@@ -227,7 +230,7 @@ def get_parser():
         type=lambda arg: arg
         if os.path.isfile(arg)
         else parser.error(f"{arg} is not a valid file"),
-        help="Release file",
+        help="Komodo release file in YAML format.",
     )
     group.add_argument(
         "--release_folder",

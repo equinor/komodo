@@ -33,8 +33,9 @@ def get_release() -> str:
             """
             No active komodo environment found.
 
-            Either run this command from an active komodo or komodoenv environment,
-            or provide an environment manifest file path with the --path option.\
+            Either run this command from an active komodo or komodoenv
+            environment, or provide an environment manifest file path with the
+            --manifest-file option.\
             """
         )
         sys.exit(message)
@@ -154,7 +155,8 @@ def parse_args(args: List[str]) -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         description="Return the version of a specified package in the active "
-        "release or in a given release manifest file."
+        "release or in a given release manifest file.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("package", help="Package to find the version for.")
     parser.add_argument(

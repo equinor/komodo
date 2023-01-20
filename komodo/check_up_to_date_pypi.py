@@ -128,27 +128,30 @@ def insert_upgrade_proposals(upgrade_proposals, repository, releases):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Checks if pypi packages are up to date"
+        description="Checks if pypi packages are up to date.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "release_file",
         type=lambda arg: arg
         if pathlib.Path(arg).is_file()
         else parser.error(f"{arg} is not a file"),
-        help="Release file you would like to check dependencies on.",
+        help="Komodo release file you would like to check dependencies on, "
+        "in YAML format.",
     )
     parser.add_argument(
         "repository_file",
         type=lambda arg: arg
         if pathlib.Path(arg).is_file()
         else parser.error(f"{arg} is not a file"),
-        help="Repository file where the source of the packages is found",
+        help="Komodo repository file where the source of the packages is found, "
+        "in YAML format.",
     )
     parser.add_argument(
         "--propose-upgrade",
         default=False,
         help="If given, will change the repository and release file "
-        "using the argument as name of the release file",
+        "using the argument as name of the release file.",
     )
     parser.add_argument(
         "--python-version",

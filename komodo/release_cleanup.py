@@ -1,6 +1,6 @@
+import argparse
 import os
 import sys
-from argparse import ArgumentError, ArgumentParser, ArgumentTypeError
 
 from komodo.prettier import load_yaml, prettier, prettified_yaml, write_to_file
 
@@ -72,7 +72,7 @@ def _valid_path_or_files(path):
     elif os.path.isfile(full_path) and _is_yml(full_path):
         yml_files.append(full_path)
     else:
-        raise ArgumentTypeError(f"{path} is not a valid yml-file or folder")
+        raise argparse.ArgumentTypeError(f"{path} is not a valid yml-file or folder")
     return yml_files
 
 
@@ -144,7 +144,7 @@ def add_prettier_parser(subparsers):
 def run_cleanup(args, parser):
     if args.check and args.stdout:
         parser.error(
-            ArgumentError(
+            argparse.ArgumentError(
                 message="Only check, stdout can not be used together!",
                 argument=args.check,
             )
@@ -192,7 +192,10 @@ def run_prettier(args, _):
 
 
 def main(args=None):
-    parser = ArgumentParser(description="Tidy up release and repository files.")
+    parser = argparse.ArgumentParser(
+        description="Tidy up release and repository files.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
     subparsers = parser.add_subparsers(
         title="Available user entries",

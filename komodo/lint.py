@@ -149,12 +149,24 @@ def lint(pkgfile, repofile):
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="lint komodo setup")
-    parser.add_argument("pkgfile", type=str)
-    parser.add_argument("repofile", type=str)
+    parser = argparse.ArgumentParser(
+        description="Lint komodo setup.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "pkgfile",
+        type=str,
+        help="A Komodo release file mapping package name to version, "
+        "in YAML format.",
+    )
+    parser.add_argument(
+        "repofile",
+        type=str,
+        help="A Komodo repository file, in YAML format.",
+    )
     parser.add_argument(
         "--verbose",
-        help="Massive amount of outputs",
+        help="Massive amount of outputs.",
         action="store_const",
         dest="loglevel",
         const=logging.INFO,
