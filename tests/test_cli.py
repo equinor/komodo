@@ -88,3 +88,45 @@ def test_main(args, tmpdir):
         # branch "test-hack" specified in nominal_repository.yml
         assert "test-hash" not in releasedoc_content
         assert "version: 7f4405928bd16de496522d9301c377c7bcca5ef0" in releasedoc_content
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        (
+            os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+            os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+            "--prefix",
+            "prefix",
+            "--release",
+            "minimal_release",
+            "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+            os.path.join(_get_test_root(), "data/cli"),
+        ),
+    ],
+)
+def test_minimal_main(args, tmpdir):
+    """
+    Check that a minimal example, more like that from the README, also works.
+
+    Without --locations-config, this should not produce the scripts local & local.csh.
+    """
+    tmpdir = str(tmpdir)
+
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        tmpdir,
+    ]
+
+    sys.argv.extend(list(args))
+
+    cli_main()
+
+    release_name = args[5]
+    release_path = os.path.join(tmpdir, "prefix", release_name)
+
+    assert os.path.exists(os.path.join(release_path, "enable"))
+    assert os.path.exists(os.path.join(release_path, "enable.csh"))
+    assert not os.path.exists(os.path.join(release_path, "local"))
+    assert not os.path.exists(os.path.join(release_path, "local.csh"))

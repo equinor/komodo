@@ -61,19 +61,11 @@ python: 3-builtin
 treelib: 1.6.1
 ```
 
-We also need to create a file to control the location(s) to which the release
-will be deployed. Here's a minimal example which we'll call `locations.yml`:
-
-```yml
-locations:
-  foo: my-computer.foo.example.com
-```
-
 A full software distribution can then be built and deployed to a specified
 path, e.g. `./builds/stable-0.0.1`, with the following command:
 
 ```bash
-kmd stable.yml repository.yml --prefix builds --release stable-0.0.1 --locations-config locations.yml --cache pip-cache
+kmd stable.yml repository.yml --prefix builds --release stable-0.0.1
 ```
 
 To use this environment, type `source builds/stable-0.0.1/enable`.

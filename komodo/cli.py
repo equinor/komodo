@@ -88,13 +88,16 @@ def _main(args):
 
     create_enable_scripts(komodo_prefix=tmp_prefix, komodo_release=args.release)
 
-    with open(args.locations_config, mode="r", encoding="utf-8") as defs, open(
-        Path(args.release) / "local", mode="w", encoding="utf-8"
-    ) as local_activator, open(
-        Path(args.release) / "local.csh", mode="w", encoding="utf-8"
-    ) as local_csh_activator:
-        defs = yml.safe_load(defs)
-        local.write_local_activators(data, defs, local_activator, local_csh_activator)
+    if args.locations_config is not None:
+        with open(args.locations_config, mode="r", encoding="utf-8") as defs, open(
+            Path(args.release) / "local", mode="w", encoding="utf-8"
+        ) as local_activator, open(
+            Path(args.release) / "local.csh", mode="w", encoding="utf-8"
+        ) as local_csh_activator:
+            defs = yml.safe_load(defs)
+            local.write_local_activators(
+                data, defs, local_activator, local_csh_activator
+            )
 
     releasedoc = Path(args.release) / Path(args.release)
     with open(releasedoc, "w", encoding="utf-8") as filehandle:
@@ -223,12 +226,6 @@ def cli_main():
         help="The name of the release, will be used as the name of the directory "
         "containing the enable script and environment `root` directory.",
     )
-    required_args.add_argument(
-        "--locations-config",
-        type=str,
-        required=True,
-        help="Path to locations file, mapping locations to servers, in YAML format.",
-    )
 
     optional_args = parser.add_argument_group("optional arguments")
 
@@ -335,6 +332,12 @@ def cli_main():
         type=str,
         help="Path to a script which will run on the release path "
         "(prefix/release) after installation.",
+    )
+    required_args.add_argument(
+        "--locations-config",
+        type=str,
+        help="Path to a YAML file defining a dictionary available to "
+        "shell script templates.",
     )
 
     args = parser.parse_args()
