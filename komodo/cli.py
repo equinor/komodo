@@ -190,57 +190,152 @@ def cli_main():
         "Automatically, reproducibly, and testably create software "
         "distributions.",
         add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    parser.add_argument("pkgs", type=YamlFile())
-    parser.add_argument("repo", type=YamlFile())
+    parser.add_argument(
+        "pkgs",
+        type=YamlFile(),
+        help="A Komodo release file mapping package name to version, "
+        "in YAML format.",
+    )
+    parser.add_argument(
+        "repo",
+        type=YamlFile(),
+        help="A Komodo repository file, in YAML format.",
+    )
 
     required_args = parser.add_argument_group("required named arguments")
 
-    required_args.add_argument("--prefix", "-p", type=str, required=True)
-    required_args.add_argument("--release", "-r", type=str, required=True)
+    required_args.add_argument(
+        "--prefix",
+        "-p",
+        type=str,
+        required=True,
+        help="The path of the directory in which you would like to place the "
+        "built environment.",
+    )
+    required_args.add_argument(
+        "--release",
+        "-r",
+        type=str,
+        required=True,
+        help="The name of the release, will be used as the name of the directory "
+        "containing the enable script and environment `root` directory.",
+    )
     required_args.add_argument(
         "--locations-config",
         type=str,
         required=True,
-        help="Path to locations.yml, a map of location to a server.",
+        help="Path to locations file, mapping locations to servers, in YAML format.",
     )
 
     optional_args = parser.add_argument_group("optional arguments")
 
     optional_args.add_argument(
-        "--help", "-h", action="help", help="show this help message and exit"
+        "--help",
+        "-h",
+        action="help",
+        help="Show this help message and exit.",
     )
-    optional_args.add_argument("--tmp", "-t", type=str)
-    optional_args.add_argument("--cache", "-c", type=str, default="pip-cache")
-    optional_args.add_argument("--jobs", "-j", type=int, default=1)
-
-    optional_args.add_argument("--download", "-d", action="store_true")
-    optional_args.add_argument("--build", "-b", action="store_true")
-    optional_args.add_argument("--install", "-i", action="store_true")
-    optional_args.add_argument("--dry-run", "-n", action="store_true")
-
-    optional_args.add_argument("--cmake", type=str, default="cmake")
-    optional_args.add_argument("--pip", type=str, default="pip")
+    optional_args.add_argument(
+        "--tmp",
+        "-t",
+        type=str,
+        help="The directory to use for builds by cmake. None means "
+        "current working directory.",
+    )
+    optional_args.add_argument(
+        "--cache",
+        "-c",
+        type=str,
+        default="pip-cache",
+        help="The temporary directory used for downloads, e.g. by pip.",
+    )
+    optional_args.add_argument(
+        "--jobs",
+        "-j",
+        type=int,
+        default=1,
+        help="The number of parallel jobs to use for builds by cmake.",
+    )
+    optional_args.add_argument(
+        "--download",
+        "-d",
+        action="store_true",
+        help="Flag to choose whether to download the packages.",
+    )
+    optional_args.add_argument(
+        "--build",
+        "-b",
+        action="store_true",
+        help="Flag to choose whether to build the packages.",
+    )
+    optional_args.add_argument(
+        "--install",
+        "-i",
+        action="store_true",
+        help="Flag to choose whether to create enable scripts and manifest file.",
+    )
+    optional_args.add_argument(
+        "--dry-run",
+        "-n",
+        action="store_true",
+        help="Flag to choose whether stop before installing the environment. "
+        "to the `prefix` location.",
+    )
+    optional_args.add_argument(
+        "--cmake",
+        type=str,
+        default="cmake",
+        help="The command to use for cmake builds.",
+    )
+    optional_args.add_argument(
+        "--pip",
+        type=str,
+        default="pip",
+        help="The command to use for pip builds.",
+    )
     optional_args.add_argument(
         "--virtualenv",
         type=str,
         default="virtualenv",
-        help="What virtualenv command to use",
+        help="The command to use for virtual environment construction.",
     )
-    optional_args.add_argument("--pyver", type=str, default="3.8")
-
-    optional_args.add_argument("--sudo", action="store_true")
-    optional_args.add_argument("--workspace", type=str, default=None)
+    optional_args.add_argument(
+        "--pyver",
+        type=str,
+        default="3.8",
+        help="This argument is not used.",
+    )
+    optional_args.add_argument(
+        "--sudo",
+        action="store_true",
+        help="Flag to choose whether to use `sudo` for shell commands when "
+        "installing the environment.",
+    )
+    optional_args.add_argument(
+        "--workspace",
+        type=str,
+        default=None,
+        help="Directory to set as working directory during execution. "
+        "None means current working directory.",
+    )
     optional_args.add_argument(
         "--extra-data-dirs",
         nargs="+",
         type=str,
         default=None,
-        help="Directories containing extra data files. "
+        help="Directories containing extra data files for `sh` builds. "
         "Multiple directores can be given, separated with space.",
     )
-    optional_args.add_argument("--postinst", "-P", type=str)
+    optional_args.add_argument(
+        "--postinst",
+        "-P",
+        type=str,
+        help="Path to a script which will run on the release path "
+        "(prefix/release) after installation.",
+    )
 
     args = parser.parse_args()
 

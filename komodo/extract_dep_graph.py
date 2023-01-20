@@ -56,7 +56,8 @@ def main():
         description=(
             "Extracts dependencies from a given set of packages where "
             "versions will be resolved from a complete release file. "
-        )
+        ),
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "pkgs",

@@ -48,7 +48,10 @@ def run(package_status, repository):
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(description=("Lint the package status file."))
+    parser = argparse.ArgumentParser(
+        description="Lint the package status file.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         "package_status",
         type=YamlFile(),
@@ -57,7 +60,8 @@ def get_parser():
     parser.add_argument(
         "repository",
         type=YamlFile(),
-        help="Repository file with all packages listed with dependencies.",
+        help="Komodo repository file with all packages listed with dependencies, "
+        "in YAML format.",
     )
     return parser
 

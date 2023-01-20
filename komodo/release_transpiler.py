@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+import argparse
 import itertools
 import os
-from argparse import ArgumentParser, RawTextHelpFormatter
 
 from komodo.matrix import format_release, get_matrix
 from komodo.prettier import load_yaml, write_to_file
@@ -68,8 +68,9 @@ def transpile(args):
 
 
 def main():
-    parser = ArgumentParser(
-        description="Build release files.", formatter_class=RawTextHelpFormatter
+    parser = argparse.ArgumentParser(
+        description="Build release files.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(
@@ -84,28 +85,32 @@ def main():
     matrix_parser = subparsers.add_parser(
         "combine",
         description="""
-Combine release files into a matrix file.
-Output format:
-example-package:
-  rhel7:
-    py36 : # package not included in release
-    py38 : 5.11.13
-  rhel8:
-    py36 : # package not included in release
-    py38 : 5.11.13+builtin""",
-        formatter_class=RawTextHelpFormatter,
+Combine release files into a matrix file. Output format:
+
+  example-package:
+    rhel7:
+      py36 : # package not included in release
+      py38 : 5.11.13
+    rhel8:
+      py36 : # package not included in release
+      py38 : 5.11.13+builtin""",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     matrix_parser.set_defaults(func=combine)
     matrix_parser.add_argument(
-        "--release-base", help="Name of the release to handle", required=True
+        "--release-base",
+        required=True,
+        help="Name of the release to handle (default: None)",
     )
     matrix_parser.add_argument(
-        "--release-folder", help="Folder with existing release file", required=True
+        "--release-folder",
+        required=True,
+        help="Folder with existing release file (default: None)",
     )
     matrix_parser.add_argument(
         "--override-mapping",
-        help="File containing explicit matrix packages",
         required=True,
+        help="File containing explicit matrix packages (default: None)",
     )
 
     transpile_parser = subparsers.add_parser(
@@ -113,10 +118,14 @@ example-package:
     )
     transpile_parser.set_defaults(func=transpile)
     transpile_parser.add_argument(
-        "--matrix-file", help="Yaml file describing the release matrix", required=True
+        "--matrix-file",
+        required=True,
+        help="Yaml file describing the release matrix",
     )
     transpile_parser.add_argument(
-        "--output-folder", help="Folder to output new release files", required=True
+        "--output-folder",
+        required=True,
+        help="Folder to output new release files",
     )
     args = parser.parse_args()
     args.func(args)

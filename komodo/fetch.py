@@ -152,10 +152,33 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="fetch packages")
-    parser.add_argument("pkgfile", type=YamlFile())
-    parser.add_argument("repofile", type=YamlFile())
-    parser.add_argument("--output", "-o", type=str)
-    parser.add_argument("--pip", type=str, default="pip")
+    parser = argparse.ArgumentParser(
+        description="fetch packages",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "pkgfile",
+        type=YamlFile(),
+        help="A Komodo release file mapping package name to version, "
+        "in YAML format.",
+    )
+    parser.add_argument(
+        "repofile",
+        type=YamlFile(),
+        help="A Komodo repository file, in YAML format.",
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        required=True,
+        help="The cache location for pip and other tools; will be created.",
+    )
+    parser.add_argument(
+        "--pip",
+        type=str,
+        default="pip",
+        help="The command to use for downloading.",
+    )
     args = parser.parse_args()
     fetch(args.pkgfile, args.repofile, outdir=args.output, pip=args.pip)

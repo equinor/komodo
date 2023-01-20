@@ -89,21 +89,24 @@ def main():
             "display the graph as an image, but in that case "
             "needs dot (from Graphwiz) and display "
             "(from ImageMagick) installed."
-        )
+        ),
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "base_pkgs",
         type=lambda arg: arg
         if os.path.isfile(arg)
         else parser.error(f"{arg} is not a file"),
-        help="Base file where all packages are listed with wanted versions specified.",
+        help="Base Komodo release file where all packages are listed with "
+        "wanted versions specified, in YAML format.",
     )
     parser.add_argument(
         "repo",
         type=lambda arg: arg
         if os.path.isfile(arg)
         else parser.error(f"{arg} is not a file"),
-        help="Repository file with all packages listed with dependencies.",
+        help="Komodo repository file with all packages listed with dependencies, "
+        "in YAML format.",
     )
     parser.add_argument(
         "--pkg",

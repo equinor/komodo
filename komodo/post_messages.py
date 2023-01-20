@@ -1,8 +1,8 @@
+import argparse
 import fnmatch
 import hashlib
 import os
 import shutil
-from argparse import ArgumentParser
 
 import yaml as yml
 
@@ -42,7 +42,10 @@ def copy_files(file_list, dst_path, src_path):
 
 
 def get_parser():
-    parser = ArgumentParser(description="Post messages to a release.")
+    parser = argparse.ArgumentParser(
+        description="Post messages to a release.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
     parser.add_argument(
         "--releases",
