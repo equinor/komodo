@@ -18,5 +18,4 @@ def test_format_matrix():
     ],
 )
 def test_get_matrix_base(test_input, expected):
-    print(test_input)
     assert matrix.get_matrix_base(test_input) == expected

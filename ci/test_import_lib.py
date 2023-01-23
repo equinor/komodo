@@ -2,7 +2,6 @@
 import sys
 from ctypes import CDLL, c_char_p
 
-
 lib = CDLL("libkmd.so")
 foo = lib.foo
 foo.restype = c_char_p
