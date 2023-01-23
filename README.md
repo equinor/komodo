@@ -18,6 +18,10 @@ GitHub:
 pip install git+https://github.com/equinor/komodo.git
 ```
 
+## Documentation
+
+[The documentation](https://equinor.github.io/komodo) is online. Developers can build it by installing `dev-requirements.txt` and running `make html` in the `docs` directory.
+
 
 ## Basic usage
 
@@ -33,7 +37,7 @@ versions. Each version contains:
 
 For example, we may have a `repository.yml` like this:
 
-```yml
+```yaml
 python:
   3-builtin:
     make: sh
@@ -56,7 +60,7 @@ Note that `build__python-virtualenv.sh` is a script that comes with `komodo`
 Now a 'release', e.g. _stable_, is defined in another YAML file, e.g.
 `stable.yml`, containing some or all of the packages in the repository file:
 
-```yml
+```yaml
 python: 3-builtin
 treelib: 1.6.1
 ```
@@ -99,37 +103,15 @@ an installation root and a release folder
 - `komodo-transpiler` &mdash; Build release files
 - `komodo-show-version` &mdash; Return the version of a specified package in the active release
 
-### Auto-formatting configuration files
-
-You can auto-format repository and/or releases by running something like
-
-```bash
-komodo-clean-repository prettier --files repository.yml releases/*
-```
-
-If you are in e.g. CI and only want to check style compliance, add `--check`.
-
-### Finding reverse dependecies
-
-You can show reverse dependencies of a package by running the tool
-`komodo-reverse-deps`:
-
-```bash
-komodo-reverse-deps releases/matrices/2022.09.02.yml repository.yml --pkg websockets
-```
-
-If `--pkg` is not specified, the program will prompt for it.
-
-The `--dot` option outputs the reverse dependency graph in `.dot` format.
-Alternatively, if `GraphViz` and `ImageMagick` are available, the
-`--display_dot` option will try to render the graph directly.
-
 
 ## Run tests
+
+In a virtual environment:
 
 ```bash
 git clone https://github.com/equinor/komodo.git
 cd komodo
+pip install .
 pip install -r dev-requirements.txt
 pytest tests
 ```

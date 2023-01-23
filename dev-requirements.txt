@@ -1,5 +1,8 @@
 black
 flake8
+furo
 isort
+myst_parser
 pylint
 pytest
+sphinx

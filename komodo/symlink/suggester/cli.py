@@ -1,23 +1,4 @@
 #!/usr/bin/env python
-"""suggest changes to a symlink configuration
-
-usage: cli.py [-h] [--symlink-conf-path SYMLINK_CONF_PATH]
-              [--git-fork GIT_FORK] [--git-repo GIT_REPO] [--git-ref GIT_REF]
-              release mode joburl jobname
-
-positional arguments:
-  release               e.g. 2019.12.rc0-py38
-  mode                  stable,testing,unstable
-  joburl                link to the job that triggered this
-  jobname               name of the job
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --symlink-conf-path SYMLINK_CONF_PATH
-  --git-fork GIT_FORK   git fork
-  --git-repo GIT_REPO   git repo
-  --git-ref GIT_REF     git ref
-"""
 import argparse
 import logging
 import os
