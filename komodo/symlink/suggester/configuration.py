@@ -1,9 +1,10 @@
 import json
+from typing import Tuple
 
 from komodo.symlink.suggester.release import Release
 
 
-class Configuration(object):
+class Configuration:
     def __init__(self, conf):
         self.conf = conf
         self.links = conf["links"]
@@ -18,7 +19,7 @@ class Configuration(object):
         return release
 
     def update(self, release, mode):
-        link = "{}-{}".format(mode, release.py_ver())
+        link = f"{mode}-{release.py_ver()}"
         link_exists = link in self.links
         linked_release = self._get_concrete_release(link) if link_exists else None
 
@@ -27,7 +28,7 @@ class Configuration(object):
                 self.links[link] = repr(release)
 
         elif mode == "testing":
-            stable_link = "stable-{}".format(release.py_ver())
+            stable_link = f"stable-{release.py_ver()}"
             stable = (
                 self._get_concrete_release(stable_link)
                 if stable_link in self.links
@@ -52,7 +53,7 @@ class Configuration(object):
             self.links[release.month_alias()] = repr(release)
             self.links[link] = release.month_alias()
         else:
-            raise ValueError("mode {} was not recognized".format(mode))
+            raise ValueError(f"Mode {mode} was not recognized")
 
     def to_json(self, json_kwargs):
         return json.dumps(self.conf, **json_kwargs)
@@ -62,8 +63,8 @@ class Configuration(object):
         return Configuration(json.loads(conf_json_str))
 
 
-def update(symlink_configuration, release_id, mode):
-    """Return a touple of a string representing the new symlink config json,
+def update(symlink_configuration, release_id, mode) -> Tuple[str, bool]:
+    """Return a tuple of a string representing the new symlink config json,
     and whether or not an update was made. This function assumes the release_id
     is in the yyyy.mm.[part ...]-py[\\d+] format and that symlink_configuration
     is a string representing the current symlink config json."""
@@ -72,8 +73,10 @@ def update(symlink_configuration, release_id, mode):
 
     configuration = Configuration.from_json(symlink_configuration)
     configuration.update(release, mode)
-    new_json_str = configuration.to_json(json_kwargs)
 
+    new_json_str = configuration.to_json(json_kwargs)
     old_json_str = json.dumps(json.loads(symlink_configuration), **json_kwargs)
 
-    return "{}\n".format(new_json_str), new_json_str != old_json_str
+    configuration_changed = new_json_str != old_json_str
+
+    return f"{new_json_str}\n", configuration_changed
