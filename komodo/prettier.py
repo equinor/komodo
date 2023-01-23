@@ -4,7 +4,7 @@ import os
 import re
 
 import ruamel.yaml
-from ruamel.yaml.compat import StringIO, ordereddict
+from ruamel.yaml.compat import StringIO
 
 
 def repository_specific_formatting(empty_line_top_level, yaml_string):
@@ -101,7 +101,7 @@ def prettified_yaml(filepath, check_only=True):
 
 def write_to_string(repository, check_type=True):
     if isinstance(repository, dict):
-        repository = ordereddict(sorted(repository.items(), key=lambda t: t[0]))
+        repository = dict(sorted(repository.items(), key=lambda t: t[0]))
         repository = ruamel.yaml.comments.CommentedMap(repository)
     return prettier(repository, check_type)
 

@@ -7,3 +7,4 @@ pylint
 pytest
 sphinx
 sphinxcontrib-apidoc
+types-pyyaml

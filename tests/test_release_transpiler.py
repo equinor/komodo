@@ -1,8 +1,13 @@
 import os
 
+import pytest
 import yaml
 
-from komodo.release_transpiler import build_matrix_file, transpile_releases
+from komodo.release_transpiler import (
+    build_matrix_file,
+    get_py_coords,
+    transpile_releases,
+)
 from tests import _get_test_root
 
 builtins = {
@@ -17,28 +22,83 @@ builtins = {
 }
 
 
-def test_build_release_matrix(tmpdir):
+@pytest.mark.parametrize(
+    "py_coords_input,packages_lib2,py_coords_not_in_lib3",
+    [
+        (["3.6", "3.8"], "2.3.4", "py27"),
+        (None, {"py27": "1.2.3", "py36": "2.3.4", "py38": "2.3.4"}, [""]),
+    ],
+)
+def test_build_release_matrix_py_coords(
+    tmpdir, py_coords_input, packages_lib2, py_coords_not_in_lib3
+):
+    """lib1 tests packages with builtins,
+    lib2 tests packages with same version for two py coordinates,
+    lib3 tests packages with different versions for each py coordinate"""
     release_base = "2020.01.a1"
     release_folder = os.path.join(_get_test_root(), "data/test_releases/")
     with tmpdir.as_cwd():
-        build_matrix_file(release_base, release_folder, builtins)
+        build_matrix_file(release_base, release_folder, builtins, py_coords_input)
         new_release_file = "{}.yml".format(release_base)
         assert os.path.isfile(new_release_file)
         with open(new_release_file) as f:
             release_matrix = yaml.safe_load(f)
 
         assert release_matrix["lib1"] == builtins["lib1"]
-        assert "py27" not in release_matrix["lib2"]
-        assert release_matrix["lib2"] == "2.3.4"
+        assert release_matrix["lib2"] == packages_lib2
+        assert all(
+            py_coordinate not in list(release_matrix["lib3"].keys())
+            for py_coordinate in py_coords_not_in_lib3
+        )
 
 
-def test_transpile(tmpdir):
+@pytest.mark.parametrize(
+    "matrix",
+    [({"py": ["3.8"], "rhel": ["7"]}), ({"py": ["3.8", "3.10"], "rhel": ["7", "8"]})],
+)
+def test_transpile_add_argument(tmpdir, matrix):
     release_file = os.path.join(_get_test_root(), "data", "test_release_matrix.yml")
     release_base = os.path.basename(release_file).strip(".yml")
     with tmpdir.as_cwd():
-        transpile_releases(release_file, os.getcwd())
-        for rhel_ver in ("rhel7",):
-            for py_ver in ("py38",):
+        transpile_releases(release_file, os.getcwd(), matrix)
+        for rhel_coordinate in matrix["rhel"]:
+            rhel_coordinate_filename_format = f"rhel{rhel_coordinate}"
+            for py_coordinate in matrix["py"]:
+                py_coordinate_filename_format = f"py{py_coordinate.replace('.', '')}"
                 assert os.path.isfile(
-                    "{}-{}-{}.yml".format(release_base, py_ver, rhel_ver)
+                    "{}-{}-{}.yml".format(
+                        release_base,
+                        py_coordinate_filename_format,
+                        rhel_coordinate_filename_format,
+                    )
                 )
+
+
+@pytest.mark.parametrize(
+    "matrix,error_message_content",
+    [
+        ({"py": ["3.8"], "rhel": ["7"]}, "Test passes, no error reported"),
+        (
+            {"py": ["3.7"], "rhel": ["7"]},
+            ["py37", "rhel7", "lib1"],
+        ),
+        (
+            {"py": ["3.6"], "rhel": ["5"]},
+            ["rhel5", "lib1"],
+        ),
+    ],
+    ids=["Pass for all packages", "Fail", "Fail"],
+)
+def test_check_version_exists_for_coordinates(matrix, error_message_content):
+    release_file = os.path.join(_get_test_root(), "data", "test_release_matrix.yml")
+    try:
+        transpile_releases(release_file, os.getcwd(), matrix)
+    except KeyError as exception_info:
+        assert all(word in str(exception_info) for word in error_message_content)
+
+
+def test_get_py_coords():
+    release_folder = os.path.join(_get_test_root(), "data", "test_releases")
+    release_base = "2020.01.a1"
+    py_coords = get_py_coords(release_base, release_folder)
+    assert py_coords == ["py27", "py36", "py38"]
