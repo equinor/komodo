@@ -93,7 +93,7 @@ def suggest_symlink_configuration(
     try:
         sym_conf_content = repo.get_contents(args.symlink_conf_path, ref=args.git_ref)
     except UnknownObjectException:
-        sys.exit(f"Filename {args.symlink_conf_path} is not in repo f{repo.full_name}")
+        sys.exit(f"Filename {args.symlink_conf_path} is not in repo {repo.full_name}")
 
     if args.release.startswith("bleeding"):
         logger.warning("Symlink to bleeding is not allowed")
