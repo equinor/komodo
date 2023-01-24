@@ -32,7 +32,7 @@ jobs:
 
     - name: Setup Komodo
       run: |
-        ./bootstrap.sh `which python`
+        ./bootstrap.sh $(which python)
 
     - name: Unit tests
       run: boot/kmd-env/bin/python -m pytest tests
@@ -45,31 +45,31 @@ jobs:
     - name: Full integration test
       run: |
         ./runkmd.sh \
-            ci/travis/${RELEASE} \
-            ci/travis/repository.yml \
-            --workspace /tmp/kmd-ws \
-            --cache /tmp/kmd-cache \
-            --prefix /tmp/pfx \
-            --release travis \
-            --locations-config $(realpath ci/travis/locations.yml) \
+            ci/${RELEASE} \
+            ci/repository.yml \
+            --workspace ${{ runner.temp }}/kmd-ws \
+            --cache ${{ runner.temp }}/kmd-cache \
+            --prefix ${{ runner.temp }}/pfx \
+            --release ci \
+            --locations-config $(realpath ci/locations.yml) \
 
-    - name: Build libkmd.so for testing
+    - name: Build libkmd.so (a dummy C library) for testing
       run: |
-        ci/travis/build_lib.sh /tmp/pfx/travis
+        ci/build_lib.sh ${{ runner.temp }}/pfx/ci
 
-        source /tmp/pfx/travis/enable
+        source ${{ runner.temp }}/pfx/ci/enable
         which python
         python --version
         python -c "import numpy;print(numpy.__file__)"
-        ci/travis/test_import_lib.py
+        ci/test_import_lib.py
 
     - name: Test enable script
       run: |
-        source /tmp/pfx/travis/enable
-        [[ "$(which python)" == "/tmp/pfx/travis/root/bin/python" ]]
+        source ${{ runner.temp }}/pfx/ci/enable
+        [[ "$(which python)" == "${{ runner.temp }}/pfx/ci/root/bin/python" ]]
 
     - name: Test Python version
       run: |
-        source /tmp/pfx/travis/enable
+        source ${{ runner.temp }}/pfx/ci/enable
         pyver=$(python -c 'from sys import version_info as v;print(f"{v[0]}.{v[1]}")')
         [[ "${pyver}" == "${{ matrix.python-version }}" ]]
