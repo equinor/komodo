@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from komodo.cli import cli_main
+from komodo.cli import cli_main, parse_args
 from komodo.package_version import LATEST_PACKAGE_ALIAS
 from tests import _get_test_root
 
@@ -69,7 +69,8 @@ def test_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "local"))
     assert os.path.exists(os.path.join(release_path, "local.csh"))
 
-    downloaded_file = os.path.join(release_path, "root/bin/some-github-binary-artifact")
+    fname = "root/bin/some-github-binary-artifact"
+    downloaded_file = os.path.join(release_path, fname)
     assert os.path.exists(downloaded_file)
     assert os.access(downloaded_file, os.X_OK)
 
@@ -130,3 +131,25 @@ def test_minimal_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "enable.csh"))
     assert not os.path.exists(os.path.join(release_path, "local"))
     assert not os.path.exists(os.path.join(release_path, "local.csh"))
+
+
+def test_pyver_is_deprecated(capsys):
+    """
+    pyver is not being used anywhere in the code and has been deprecated.
+    This test ensures that its use prints a message in stderr.
+
+    Note that one can raise a DeprecationWarning instead, and test for it,
+    but it does not show up in the CLI.
+    """
+    pkgs = os.path.join(_get_test_root(), "data/cli/nominal_release.yml")
+    repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml")
+    locs = os.path.join(_get_test_root(), "data/cli/locations.yml")
+    cmd = (
+        f"{pkgs} {repo} --prefix pfx --release rel "
+        f"--locations-config {locs} "
+        f"--pyver 3.8"
+    )
+    with pytest.warns(FutureWarning) as record:
+        _ = parse_args(cmd.split())
+
+    assert "The --pyver option is deprecated" in record[0].message.args[0]

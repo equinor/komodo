@@ -1,7 +1,9 @@
 import argparse
 import os
 import sys
+import warnings
 from pathlib import Path
+from typing import List
 
 import jinja2
 import yaml as yml
@@ -183,10 +185,32 @@ def _main(args):
 
 def cli_main():
     """
+    Pass the command-line args to argparse, then set up the workspace.
+    """
+    args = parse_args(sys.argv[1:])
+
+    if args.workspace and not Path(args.workspace).exists():
+        Path(args.workspace).mkdir()
+
+    with pushd(args.workspace):
+        _main(args)
+
+
+def parse_args(args: List[str]) -> argparse.Namespace:
+    """
+    Parse the arguments from the command line into an `argparse.Namespace`.
+    Having a separated function makes it easier to test the CLI.
+
     Set up the command-line interface with three groups of arguments:
       - required positional arguments
       - required named arguments
       - optional named arguments
+
+    Args:
+        args: A sequence of arguments, e.g. as collected from the command line.
+
+    Returns:
+        The `argparse.Namespace`, a mapping of arg names to values.
     """
     parser = argparse.ArgumentParser(
         description="Welcome to Komodo. "
@@ -302,8 +326,7 @@ def cli_main():
     optional_args.add_argument(
         "--pyver",
         type=str,
-        default="3.8",
-        help="This argument is not used.",
+        help="[DEPRECATED] This argument is not used.",  # Message to stderr below.
     )
     optional_args.add_argument(
         "--sudo",
@@ -340,13 +363,16 @@ def cli_main():
         "shell script templates.",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
-    if args.workspace and not Path(args.workspace).exists():
-        Path(args.workspace).mkdir()
+    if args.pyver is not None:
+        message = (
+            "\n\n⚠️  The --pyver option is deprecated and will be removed in a "
+            "future version of komodo. It is not used by komodo.\n"
+        )
+        warnings.warn(message, FutureWarning, stacklevel=2)
 
-    with pushd(args.workspace):
-        _main(args)
+    return args
 
 
 if __name__ == "__main__":
