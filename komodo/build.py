@@ -22,7 +22,6 @@ flatten = itr.chain.from_iterable
 
 
 def dfs(pkg, version, pkgs, repo):
-
     # package has no more dependencies - add the package itself
     if "depends" not in repo[pkg][version]:
         return [pkg]
@@ -239,7 +238,6 @@ def make(
     virtualenv=None,
     fakeroot=".",
 ):
-
     xs = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
 
     seen = set()

@@ -6,7 +6,6 @@ from komodo.prettier import load_yaml, prettier, prettified_yaml, write_to_file
 
 
 def load_all_releases(files):
-
     used_versions = {}
 
     for filename in files:
@@ -63,7 +62,6 @@ def _get_yml_files(path_name):
 
 
 def _valid_path_or_files(path):
-
     yml_files = []
 
     full_path = os.path.realpath(path)
@@ -112,7 +110,6 @@ def add_cleanup_parser(subparsers):
 
 
 def add_prettier_parser(subparsers):
-
     prettier_parser = subparsers.add_parser(
         "prettier",
         description=(

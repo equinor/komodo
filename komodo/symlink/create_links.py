@@ -46,7 +46,6 @@ def create_symlinks(links_dict):
 
 
 def symlink_main():
-
     parser = argparse.ArgumentParser(description="Create symlinks for komodo versions.")
     parser.add_argument(
         "config", type=str, help="a json file describing symlink structure"

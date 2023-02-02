@@ -39,7 +39,6 @@ def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
         ("enable.jinja2", "enable"),
         ("enable.csh.jinja2", "enable.csh"),
     ]:
-
         (Path(komodo_release) / target).write_text(
             jinja_env.get_template(tmpl).render(
                 komodo_prefix=komodo_prefix,

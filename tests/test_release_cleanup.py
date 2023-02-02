@@ -43,7 +43,6 @@ lib4: # comment to be preserved
 
 
 def test_load_all_releases():
-
     files = [
         os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py27.yml"),
         os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py36.yml"),

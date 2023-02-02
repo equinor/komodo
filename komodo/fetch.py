@@ -81,7 +81,6 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     git_hashes = {}
     with pushd(outdir):
         for pkg, ver in pkgs.items():
-
             current = repo[pkg][ver]
             if "pypi_package_name" in current and current["make"] != "pip":
                 raise ValueError(

@@ -69,7 +69,6 @@ def test_create_symlinks(tmpdir):
 
 
 def test_integration(tmpdir):
-
     test_folder = _get_test_root()
     shutil.copy(os.path.join(test_folder, "data/links.json"), tmpdir)
     with tmpdir.as_cwd():
@@ -89,7 +88,6 @@ def test_integration(tmpdir):
 
 
 def test_root_links(tmpdir):
-
     test_folder = _get_test_root()
     shutil.copy(os.path.join(test_folder, "data/links.json"), tmpdir)
     with tmpdir.as_cwd():

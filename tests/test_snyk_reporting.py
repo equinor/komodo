@@ -7,7 +7,6 @@ from komodo.snyk_reporting import snyk_main
 
 
 def _create_result_mock(issue_ids):
-
     result_mock = Mock()
     result_mock.issues.vulnerabilities = [
         Vulnerability(
