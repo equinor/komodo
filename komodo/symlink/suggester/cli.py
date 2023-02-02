@@ -112,6 +112,8 @@ def suggest_symlink_configuration(
         return None
 
     target_branch = f"{args.release}/{args.mode}"
+    if "azure" in args.symlink_conf_path:
+        target_branch += "/azure"
 
     from_sha = repo.get_branch(args.git_ref).commit.sha
 
