@@ -8,7 +8,6 @@ from komodo import lint_maturity
 
 
 def _create_tmp_test_files(release_sample, file_names_sample):
-
     folder_name = os.path.join(os.getcwd(), "test_lint_maturity/")
     os.mkdir(folder_name)
     list_files = []
@@ -32,7 +31,6 @@ def _create_tmp_test_files(release_sample, file_names_sample):
     ],
 )
 def test_msg_packages_invalid(release_basename, release_version, count_tag_invalid):
-
     exit_msg = lint_maturity.msg_packages_invalid(
         release_basename,
         release_version,
@@ -71,7 +69,6 @@ def test_msg_packages_invalid(release_basename, release_version, count_tag_inval
 
 
 def test_msg_packages_exception():
-
     RELEASE_FILE_NAMES = [
         "2020.02.01-py27.yml",
         "2020.02.a1-py27.yml",
@@ -111,7 +108,6 @@ def test_msg_packages_exception():
     ],
 )
 def test_count_invalid_tags(invalid_tags, expected_n_invalid_tags_release):
-
     n_invalid_tags = lint_maturity.count_invalid_tags(
         dict_tag_maturity={
             "a": [("package_a1", "v3.1.a1")],
@@ -138,14 +134,12 @@ def test_count_invalid_tags(invalid_tags, expected_n_invalid_tags_release):
     ],
 )
 def test_get_release_type(version_string, expected_release_type):
-
     release_type = lint_maturity.get_release_type(version_string)
 
     assert release_type == expected_release_type
 
 
 def test_get_packages_info():
-
     dict_tag_maturity = lint_maturity.get_packages_info(
         packages_dict={
             "package_a1": "v3.1.a1",
@@ -172,7 +166,6 @@ def test_get_packages_info():
 
 
 def test_read_yaml_file(tmpdir):
-
     with tmpdir.as_cwd():
         list_files = _create_tmp_test_files(
             release_sample="""release: ['bleeding', 'rpath']
@@ -187,7 +180,6 @@ package: ['package_EX2']""",
 
 
 def test_msg_release_exception():
-
     EXPECTED_RELEASE_VERSION = ["stable", "a", "b", "rc", "exception"]
     RELEASE_FILE_NAMES = [
         "2020.02.01-py27.yml",
@@ -225,7 +217,6 @@ def test_msg_release_exception():
     ],
 )
 def test_get_release_version(release_basename, expected_release_version):
-
     release_version = lint_maturity.get_release_version(
         release_basename=release_basename,
         tag_exceptions_release=["bleeding", "rpath"],
@@ -235,7 +226,6 @@ def test_get_release_version(release_basename, expected_release_version):
 
 
 def test_lint_maturity_run(tmpdir):
-
     with tmpdir.as_cwd():
         list_files = _create_tmp_test_files(
             release_sample="""package_a1: v3.1.a1
@@ -291,7 +281,6 @@ bleeding-py27.yml has 4 packages with invalid maturity tag.
 """  # noqa
 
     for list_file in list_files:
-
         with pytest.raises(SystemExit) as exit_info, warnings.catch_warnings(
             record=True
         ) as warning_info:
@@ -335,7 +324,6 @@ def test_get_files_to_lint(tmpdir):
 
 
 def test_define_tag_exceptions(tmpdir):
-
     with tmpdir.as_cwd():
         tag_exception_file_name = _create_tmp_test_files(
             release_sample="""release: ['bleeding', 'rpath']
@@ -365,7 +353,6 @@ package: ['package_EX2']""",
 
 
 def test_main(monkeypatch, tmpdir):
-
     with tmpdir.as_cwd():
         list_files_expected = _create_tmp_test_files(
             release_sample="None",
@@ -409,7 +396,6 @@ def test_main(monkeypatch, tmpdir):
 
 
 def test_integration_main(monkeypatch, tmpdir):
-
     with tmpdir.as_cwd():
         list_files_expected = _create_tmp_test_files(
             release_sample="""package_a1: v3.1.a1

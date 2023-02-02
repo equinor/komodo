@@ -86,7 +86,6 @@ def get_pypi_packages(release: dict, repository: dict) -> list:
 
 
 def get_upgrade_proposal(releases: dict, repository: dict, python_version: str) -> dict:
-
     pypi_packages = get_pypi_packages(releases, repository)
     pypi_response = get_pypi_info(pypi_packages)
 

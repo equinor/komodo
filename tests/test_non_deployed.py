@@ -7,7 +7,7 @@ from komodo.deployed import fetch_non_deployed, output_formatter
 
 def _create_links(links, root=""):
     root = os.path.realpath(root)
-    for (src, target) in links:
+    for src, target in links:
         os.symlink(
             os.path.join(root, src),
             os.path.join(root, target),

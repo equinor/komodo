@@ -42,7 +42,6 @@ class Configuration:
             handle_ripe = stable.monthly_diff(release) <= -1 if stable else True
             handle_ours = link_exists and linked_release.monthly_diff(release) == 0
             if handle_ripe or handle_ours:
-
                 # i.e. if the linked release is a month alias
                 if linked and not Release(linked).is_concrete():
                     self.links[release.month_alias()] = repr(release)
