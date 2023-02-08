@@ -171,13 +171,14 @@ def parse_args(args: List[str]) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-def main() -> str:
+def main() -> int:
     """
     Run the CLI and return the result from get_version().
     """
     args = parse_args(sys.argv[1:])
-    return get_version(args.package, manifest=args.manifest_file)
+    print(get_version(args.package, manifest=args.manifest_file))
+    return 0
 
 
 if __name__ == "__main__":
-    print(main())
+    main()
