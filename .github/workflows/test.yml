@@ -44,7 +44,7 @@ jobs:
 
     - name: Full integration test
       run: |
-        ./runkmd.sh \
+        ./run_kmd.sh \
             ci/${RELEASE} \
             ci/repository.yml \
             --workspace ${{ runner.temp }}/kmd-ws \

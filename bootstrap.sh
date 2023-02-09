@@ -17,9 +17,9 @@ function cleanup {
         rm -r boot
     fi
 
-    if [ -f "runkmd.sh" ]; then
-        echo "runkmd.sh exists, deleting"
-        rm runkmd.sh
+    if [ -f "run_kmd.sh" ]; then
+        echo "run_kmd.sh exists, deleting"
+        rm run_kmd.sh
     fi
 }
 
@@ -78,14 +78,14 @@ function install_build_env {
     ln -s $PWD/boot/build-env/bin/pip boot/bintools/
 }
 
-function create_runkmd {
-    cat << EOF > runkmd.sh
+function create_run_kmd {
+    cat << EOF > run_kmd.sh
 #!/bin/bash
 export PATH=$PWD/boot/bintools:$PWD/boot/build-env/bin:\$PATH
 export VIRTUAL_ENV=$PWD/boot/build-env
 $PWD/boot/kmd-env/bin/kmd "\$@"
 EOF
-    chmod +x runkmd.sh
+    chmod +x run_kmd.sh
 }
 
 cleanup
@@ -94,4 +94,4 @@ install_komodo
 install_build_env
 install_devtoolset
 install_cmake
-create_runkmd
+create_run_kmd

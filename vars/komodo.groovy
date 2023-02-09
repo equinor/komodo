@@ -159,7 +159,7 @@ def call(Map args = [:]) {
                             withEnv(["TMPDIR=${configPath}/tmp"]) {
                                 sh """
                             cd ${configPath}
-                            ${komodoPath}/runkmd.sh                                    \
+                            ${komodoPath}/run_kmd.sh                                    \
                                 releases/${releaseFile}                                \
                                 repository.yml                                         \
                                 --download                                             \
