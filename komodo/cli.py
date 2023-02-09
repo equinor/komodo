@@ -141,7 +141,6 @@ def _main(args):
         # cases falling back to /tmp, which is undesired when building on nfs.
         os.environ["TMPDIR"] = args.tmp
 
-    print("Fixup #! in pip-provided packages if bin exist")
     release_path = Path(args.prefix) / Path(args.release)
     release_root = release_path / "root"
     for pkg, ver in args.pkgs.items():
