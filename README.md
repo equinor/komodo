@@ -76,6 +76,9 @@ To use this environment, type `source builds/stable-0.0.1/enable`.
 As well as the `kmd` command, this package installs several other
 commands, each with its own options:
 
+- `komodo-ask-for-tags` &mdash; Checks if there are any internal dependencies
+  with changes since last release and composes a message to ask for new tags
+  from the respective maintainers
 - `komodo-check-pypi` &mdash; Checks if pypi packages are up to date
 - `komodo-insert-proposals` &mdash; Copy proposals into release and create PR
 - `komodo-post-messages` &mdash; Post messages to a release

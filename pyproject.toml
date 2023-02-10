@@ -39,6 +39,7 @@ write_to = "komodo/_version.py"
 
 [project.scripts]
 kmd = "komodo.cli:cli_main"
+komodo-ask-for-tags = "komodo.ask_for_tags:main"
 komodo-check-pypi = "komodo.check_up_to_date_pypi:main"
 komodo-check-symlinks = "komodo.symlink.sanity_check:sanity_main"
 komodo-clean-repository = "komodo.release_cleanup:main"
