@@ -39,6 +39,8 @@ def fixup_python_shebangs(prefix, release):
         except UnicodeDecodeError:
             # Whenever the executables are compiled binaries, we end here.
             pass
+        except IsADirectoryError:
+            pass
 
     for bin_ in bins_:
         binpath_ = os.path.join(prefix, release, "root", "bin", bin_)
