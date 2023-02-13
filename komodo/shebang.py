@@ -12,7 +12,7 @@ def fixup_python_shebangs(prefix, release):
     """Fix shebang to $PREFIX/bin/python.
 
     Some packages installed with pip do not respect target executable, that is,
-    they set as their shebang executable the Python executabl used to build the
+    they set as their shebang executable the Python executable used to build the
     komodo distribution with instead of the Python executable that komodo
     deploys.  This breaks the application since the corresponding Python modules
     won't be picked up correctly.
@@ -36,8 +36,11 @@ def fixup_python_shebangs(prefix, release):
                 shebang = f.readline().strip()
             if _is_shebang(shebang):
                 bins_.append(bin_)
-        except Exception as err:  # pylint: disable=broad-except
-            print(f"Exception in reading bin {bin_}: {err}")
+        except UnicodeDecodeError:
+            # Whenever the executables are compiled binaries, we end here.
+            pass
+        except IsADirectoryError:
+            pass
 
     for bin_ in bins_:
         binpath_ = os.path.join(prefix, release, "root", "bin", bin_)
