@@ -6,7 +6,7 @@ import sys
 import requests
 import ruamel.yaml
 from packaging import version as get_version
-from packaging.specifiers import SpecifierSet
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
 
 from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version
 from komodo.prettier import write_to_file
@@ -58,12 +58,17 @@ def get_python_requirement(sources: list):
 def compatible_versions(releases: dict, python_version):
     compatible_versions = []
     for version_str, build_info in releases.items():
-        package_version = get_version.parse(version_str)
+        try:
+            package_version = get_version.parse(version_str)
+        except get_version.InvalidVersion:  # presumably unparsable pre-release
+            continue
         if package_version.is_prerelease:
             continue
         try:
             required_python = SpecifierSet(get_python_requirement(build_info))
         except YankedException:
+            continue
+        except InvalidSpecifier:
             continue
         if python_version in required_python:
             compatible_versions.append(package_version)
