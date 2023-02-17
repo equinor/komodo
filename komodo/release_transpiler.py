@@ -3,7 +3,7 @@
 import argparse
 import itertools
 import os
-from typing import List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence
 
 import yaml
 from packaging import version as version_parser
@@ -153,6 +153,31 @@ def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> No
         write_to_file(release_dict, os.path.join(output_folder, filename))
 
 
+def transpile_releases_for_pip(
+    matrix_file: str, output_folder: str, repository_file: str, matrix: dict
+) -> None:
+    rhel_versions = matrix["rhel"]
+    python_versions = matrix["py"]
+    release_base = os.path.splitext(os.path.basename(matrix_file))[0]
+    release_folder = os.path.dirname(matrix_file)
+    release_matrix = load_yaml(f"{os.path.join(release_folder, release_base)}.yml")
+    repository = load_yaml(repository_file)
+    for rhel_ver, py_ver in get_matrix(rhel_versions, python_versions):
+        release_dict = _pick_package_versions_for_release(
+            release_matrix, py_ver, rhel_ver
+        )
+        pip_packages = [
+            f"{pkg}=={version}"
+            for pkg, version in release_dict.items()
+            if repository[pkg][version].get("make") == "pip"
+        ]
+        filename = f"{format_release(release_base, rhel_ver, py_ver)}.req"
+        with open(
+            os.path.join(output_folder, filename), mode="w", encoding="utf-8"
+        ) as filehandler:
+            filehandler.write("\n".join(pip_packages))
+
+
 def combine(args):
     build_matrix_file(
         args.release_base,
@@ -164,6 +189,12 @@ def combine(args):
 
 def transpile(args):
     transpile_releases(args.matrix_file, args.output_folder, args.matrix_coordinates)
+
+
+def transpile_for_pip(args: Dict):
+    transpile_releases_for_pip(
+        args.matrix_file, args.output_folder, args.repo, args.matrix_coordinates
+    )
 
 
 def main():
@@ -253,6 +284,33 @@ Combine release files into a matrix file. Output format:
         help="Folder to output new release files",
     )
     transpile_parser.add_argument(
+        "--matrix-coordinates",
+        help="Matrix to be transpiled, expected yaml format string.",
+        type=yaml.safe_load,
+        required=False,
+        default="{rhel: ['7'], py: ['3.8']}",
+    )
+    transpile_for_pip_parser = subparsers.add_parser(
+        "transpile-for-pip",
+        description="transpile a matrix file into separate pip requirement files.",
+    )
+    transpile_for_pip_parser.set_defaults(func=transpile_for_pip)
+    transpile_for_pip_parser.add_argument(
+        "--matrix-file",
+        required=True,
+        help="Yaml file describing the release matrix",
+    )
+    transpile_for_pip_parser.add_argument(
+        "--repo",
+        required=True,
+        help="A Komodo repository file, in YAML format.",
+    )
+    transpile_for_pip_parser.add_argument(
+        "--output-folder",
+        required=True,
+        help="Folder to output new release files",
+    )
+    transpile_for_pip_parser.add_argument(
         "--matrix-coordinates",
         help="Matrix to be transpiled, expected yaml format string.",
         type=yaml.safe_load,
