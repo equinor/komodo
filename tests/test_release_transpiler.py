@@ -7,6 +7,7 @@ from komodo.release_transpiler import (
     build_matrix_file,
     get_py_coords,
     transpile_releases,
+    transpile_releases_for_pip,
 )
 from tests import _get_test_root
 
@@ -102,3 +103,24 @@ def test_get_py_coords():
     release_base = "2020.01.a1"
     py_coords = get_py_coords(release_base, release_folder)
     assert py_coords == ["py27", "py36", "py38"]
+
+
+def test_transpile_for_pip(tmpdir):
+    release_file = os.path.join(_get_test_root(), "data", "test_release_matrix.yml")
+    repo_file = os.path.join(_get_test_root(), "data", "test_repository.yml")
+    release_base = os.path.basename(release_file).strip(".yml")
+    not_pip_pkg = "lib3"
+    expected_line = "lib2==2.3.4"
+    versions_matrix = {"rhel": ["7"], "py": ["38"]}
+    with tmpdir.as_cwd():
+        transpile_releases_for_pip(
+            release_file, os.getcwd(), repo_file, versions_matrix
+        )
+        for rhel_ver in ("rhel7",):
+            for py_ver in ("py38",):
+                filename = f"{release_base}-{py_ver}-{rhel_ver}.req"
+                assert os.path.isfile(filename)
+                with open(filename, mode="r", encoding="utf-8") as fil:
+                    file_lines = fil.read().splitlines()
+                assert all([not line.startswith(not_pip_pkg) for line in file_lines])
+                assert expected_line in file_lines
