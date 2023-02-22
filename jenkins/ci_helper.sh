@@ -15,7 +15,7 @@ function ci_install_cmake {
 }
 
 function ci_install_conan {
-    pip install conan
+    pip install "conan<2"
 
     # Conan v1 bundles its own certs due to legacy reasons, so we point it
     # to the system's certs instead.
