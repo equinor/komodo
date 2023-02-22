@@ -1,95 +1,14 @@
-eclpy:
-  2.2.7:
-    source: git://github.com/statoil/libecl
-    make: cmake
-    makeopts: -DBUILD_PYTHON=ON
-    maintainer: joaho@statoil.com
-    depends:
-      - cwrap
-
-libecl:
-  2.2.7:
-    source: git://github.com/statoil/libecl
-    make: cmake
-    maintainer: joaho@statoil.com
-
-cwrap:
-  1.2.0:
-    source: pypi
-    make: pip
-    maintainer: pgdr@statoil.com
-
-numpy:
-  1.13.3:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - wheel
-
-pyparsing:
-  2.2.0:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-
 python:
-  v2.7.14:
-    source: git://github.com/python/cpython.git
+  3-builtin:
     make: sh
-    makefile: configure
-    maintainer: jokva@statoil.com
+    makefile: build__python-virtualenv.sh
+    maintainer: foo@example.com
+    makeopts: --virtualenv-interpreter python3
 
-PyYAML:
-  3.12:
+treelib:
+  1.6.1:
     source: pypi
     make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-
-requests:
-  2.18.4:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-
-segyio:
-  1.3.9:
-    source: pypi
-    make: pip
-    makeopts: --no-deps
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - wheel
-
-setuptools:
-  36.2.7:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-      - wheel
-
-uptime:
-  3.0.1:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
-    depends:
-      - python
-
-wheel:
-  0.30.0:
-    source: pypi
-    make: pip
-    maintainer: jokva@statoil.com
+    maintainer: bar@example.com
     depends:
       - python
