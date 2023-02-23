@@ -70,8 +70,12 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
 
     if not outdir:
         raise ValueError(
-            "The value of `outdir`, the cache location for pip and other "
-            "tools, cannot be None or the empty string."
+            "The value of `outdir`, the download destination location "
+            "cannot be None or the empty string."
+        )
+    if os.path.exists(outdir) and os.listdir(outdir):
+        raise RuntimeError(
+            f"Downloading to non-empty directory {outdir} is not supported."
         )
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -171,13 +175,14 @@ if __name__ == "__main__":
         "-o",
         type=str,
         required=True,
-        help="The cache location for pip and other tools; will be created.",
+        help="The download destination for pip, cp, rsync and git. "
+        "Must be non-existing or empty.",
     )
     parser.add_argument(
         "--pip",
         type=str,
         default="pip",
-        help="The command to use for downloading.",
+        help="The command to use for downloading pip packages.",
     )
     args = parser.parse_args()
     fetch(args.pkgfile, args.repofile, outdir=args.output, pip=args.pip)

@@ -54,7 +54,7 @@ def _main(args):
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
     if args.download or (not args.build and not args.install):
-        git_hashes = fetch(args.pkgs, args.repo, outdir=args.cache, pip=args.pip)
+        git_hashes = fetch(args.pkgs, args.repo, outdir=args.downloads, pip=args.pip)
 
     if args.download and not args.build:
         sys.exit(0)
@@ -70,7 +70,7 @@ def _main(args):
             args.repo,
             data,
             prefix=str(tmp_prefix),
-            dlprefix=args.cache,
+            dlprefix=args.downloads,
             builddir=args.tmp,
             jobs=args.jobs,
             cmk=args.cmake,
@@ -137,8 +137,9 @@ def _main(args):
     shell(f"rm -rf {args.prefix}/{args.release}.delete", sudo=args.sudo)
 
     if args.tmp:
-        # Allows e.g. pip to use this folder as tmpfolder, instead of in some
-        # cases falling back to /tmp, which is undesired when building on nfs.
+        # Allows e.g. pip to use this folder as a destination for "pip
+        # download", instead of in some cases falling back to /tmp, which is
+        # undesired when building on nfs.
         os.environ["TMPDIR"] = args.tmp
 
     release_path = Path(args.prefix) / Path(args.release)
@@ -159,8 +160,9 @@ def _main(args):
             "--no-index",
             "--no-deps",
             "--ignore-installed",
-            f"--cache-dir {args.cache}",
-            f"--find-links {args.cache}",
+            # assuming fetch.py has done "pip download" to this directory:
+            f"--cache-dir {args.downloads}",
+            f"--find-links {args.downloads}",
         ]
         shell_input.append(current.get("makeopts"))
 
@@ -265,11 +267,15 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "current working directory.",
     )
     optional_args.add_argument(
-        "--cache",
-        "-c",
+        "--downloads",
+        "--cache",  # deprecated
+        "-c",  # deprecated
         type=str,
-        default="pip-cache",
-        help="The temporary directory used for downloads, e.g. by pip.",
+        default="downloads",
+        help="A destination directory relative to the workspace, used for downloads, "
+        "used by pip download, cp, rsync and git clone. This directory "
+        "must be empty if it already exists, otherwise it will be created, "
+        "unless you are running with the --build option.",
     )
     optional_args.add_argument(
         "--jobs",
@@ -282,13 +288,15 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "--download",
         "-d",
         action="store_true",
-        help="Flag to choose whether to download the packages.",
+        help="If set, packages will be downloaded but nothing will be built, unless "
+        "--build is also included.",
     )
     optional_args.add_argument(
         "--build",
         "-b",
         action="store_true",
-        help="Flag to choose whether to build the packages.",
+        help="Flag to only build. If set and --download is not, "
+        "the downloads directory must already be populated.",
     )
     optional_args.add_argument(
         "--install",
