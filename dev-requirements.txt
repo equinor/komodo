@@ -6,3 +6,4 @@ myst_parser
 pylint
 pytest
 sphinx
+sphinxcontrib-apidoc
