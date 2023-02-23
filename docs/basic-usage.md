@@ -52,7 +52,7 @@ A full software distribution can then be built and deployed to a specified
 path, e.g. `./builds/stable-0.0.1`, with the following command:
 
 ```bash
-kmd stable.yml repository.yml --prefix builds --release stable-0.0.1 --locations-config locations.yml --cache pip-cache
+kmd stable.yml repository.yml --prefix builds --release stable-0.0.1 --locations-config locations.yml
 ```
 
 To use this environment, type `source builds/stable-0.0.1/enable`.
