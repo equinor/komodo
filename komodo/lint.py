@@ -21,6 +21,7 @@ MISSING_DEPENDENCY = "missing dependency"
 MISSING_MAINTAINER = "missing maintainer"
 MISSING_MAKE = "missing make information"
 MALFORMED_VERSION = "malformed version"
+MAIN_VERSION = "dangerous version (main branch)"
 MASTER_VERSION = "dangerous version (master branch)"
 FLOAT_VERSION = "dangerous version (float interpretable)"
 
@@ -85,6 +86,9 @@ def lint_version_numbers(pkgs, repo):
 
         try:
             logging.info("Using %s %s" % (pkg, ver))
+            if "main" in ver:
+                __reg_version_err(errs, pkg, ver, maintainer, err=MAIN_VERSION)
+                continue
             if "master" in ver:
                 __reg_version_err(errs, pkg, ver, maintainer, err=MASTER_VERSION)
                 continue
