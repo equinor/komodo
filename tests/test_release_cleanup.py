@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 
@@ -106,6 +107,38 @@ def test_write_to_file(tmpdir):
         write_to_file(repository, "output_repo.yml")
         with open("output_repo.yml") as output:
             assert output.read() == expected_result
+
+
+def test_return_values_of_prettier(tmpdir):
+    os.chdir(tmpdir)
+
+    # Given a yml file with extra whitespace padded at the end:
+    # (a minimal change that will trigger the prettifier)
+    yml_text = (Path(_get_test_root()) / "data" / "test_repository.yml").read_text(
+        encoding="utf-8"
+    )
+    repo_with_whitespace = "repo_with_whitespace.yml"
+    Path(repo_with_whitespace).write_text(yml_text + "\n", encoding="utf-8")
+
+    # Then it will fail with exit code 1 if only checked:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["prettier", "--check-only", "--files", repo_with_whitespace])
+        assert exit_info.value.code == 1
+
+    # Redo check to ensure the yml file was not reformatted, only checked:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["prettier", "--check-only", "--files", repo_with_whitespace])
+        assert exit_info.value.code == 1
+
+    # If we now run without check, the file should be reformatted in-place:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["prettier", "--files", repo_with_whitespace])
+        assert exit_info.value.code == 0
+
+    # If checked again, the file should be ok, proving it was reformatted:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["prettier", "--check-only", "--files", repo_with_whitespace])
+        assert exit_info.value.code == 0
 
 
 def test_cleanup_argparse(tmpdir):
