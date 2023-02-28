@@ -127,6 +127,7 @@ def add_prettier_parser(subparsers):
         nargs="+",
     )
     prettier_parser.add_argument(
+        "--check-only",
         "--check",
         action="store_true",
         help=(
@@ -180,9 +181,16 @@ def run_cleanup(args, parser):
 def run_prettier(args, _):
     release_files = [filename for sublist in args.files for filename in sublist]
 
-    if not args.check or all(
-        [prettified_yaml(filename, args.check) for filename in release_files]
+    if all(
+        [
+            prettified_yaml(filename, check_only=args.check_only)
+            for filename in release_files
+        ]
     ):
+        sys.exit(0)
+
+    if args.check_only is False:
+        # The prettifier has successfully reformatted all files
         sys.exit(0)
 
     sys.exit(1)
