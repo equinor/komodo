@@ -1,9 +1,10 @@
 import argparse
+import datetime
 import os
 import sys
 import warnings
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import jinja2
 import yaml as yml
@@ -48,13 +49,27 @@ def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
         )
 
 
+def _print_timings(
+    timing_element: Tuple[str, datetime.timedelta], adjust: bool = False
+) -> None:
+    if adjust:
+        print(f" * {timing_element[0]:50} {timing_element[1]}")
+    else:
+        print(f" * {timing_element[0]} took {timing_element[1]}")
+
+
 def _main(args):
+    timings: List[Tuple[str, datetime.timedelta]] = []
+
     abs_prefix = Path(args.prefix).resolve()
 
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
     if args.download or (not args.build and not args.install):
+        start_time = datetime.datetime.now()
         git_hashes = fetch(args.pkgs, args.repo, outdir=args.downloads, pip=args.pip)
+        timings.append(("Fetching all packages", datetime.datetime.now() - start_time))
+        _print_timings(timings[-1])
 
     if args.download and not args.build:
         sys.exit(0)
@@ -65,6 +80,7 @@ def _main(args):
     tmp_prefix = abs_prefix / args.release / "root"
     fakeroot = Path(args.release).resolve()
     if args.build or not args.install:
+        start_time = datetime.datetime.now()
         make(
             args.pkgs,
             args.repo,
@@ -78,6 +94,14 @@ def _main(args):
             virtualenv=args.virtualenv,
             fakeroot=str(fakeroot),
         )
+        timings.append(
+            (
+                "Building non-pip part of komodo in workspace",
+                datetime.datetime.now() - start_time,
+            )
+        )
+        _print_timings(timings[-1])
+
         shell(f"mv {args.release + str(tmp_prefix)} {args.release}")
         shell(
             "rmdir -p --ignore-fail-on-non-empty "
@@ -121,8 +145,13 @@ def _main(args):
 
     print(f"Installing {args.release} to {args.prefix}")
 
+    start_time = datetime.datetime.now()
     shell(f"mv {args.release} .{args.release}")
     shell(f"rsync -a .{args.release} {args.prefix}", sudo=args.sudo)
+    timings.append(
+        ("Rsyncing partial komodo to destination", datetime.datetime.now() - start_time)
+    )
+    _print_timings(timings[-1])
 
     if Path(f"{args.prefix}/{args.release}").exists():
         shell(
@@ -134,7 +163,10 @@ def _main(args):
         f"mv {args.prefix}/.{args.release} {args.prefix}/{args.release}",
         sudo=args.sudo,
     )
+    start_time = datetime.datetime.now()
     shell(f"rm -rf {args.prefix}/{args.release}.delete", sudo=args.sudo)
+    timings.append(("Deleting previous release", datetime.datetime.now() - start_time))
+    _print_timings(timings[-1])
 
     if args.tmp:
         # Allows e.g. pip to use this folder as a destination for "pip
@@ -144,6 +176,7 @@ def _main(args):
 
     release_path = Path(args.prefix) / Path(args.release)
     release_root = release_path / "root"
+    start_time = datetime.datetime.now()
     for pkg, ver in args.pkgs.items():
         current = args.repo[pkg][ver]
         if current["make"] != "pip":
@@ -167,20 +200,37 @@ def _main(args):
         shell_input.append(current.get("makeopts"))
 
         print(shell(shell_input, sudo=args.sudo))
+    timings.append(
+        ("pip install to final destination", datetime.datetime.now() - start_time)
+    )
+    _print_timings(timings[-1])
 
     fixup_python_shebangs(args.prefix, args.release)
 
     switch.create_activator_switch(data, args.prefix, args.release)
 
-    # run any post-install scripts on the release
     if args.postinst:
+        start_time = datetime.datetime.now()
         shell([args.postinst, release_path])
+        timings.append(
+            ("Running post-install scripts", datetime.datetime.now() - start_time)
+        )
+        _print_timings(timings[-1])
 
+    start_time = datetime.datetime.now()
     print("running", f"find {release_root} -name '*.pyc' -delete")
     shell(f"find {release_root} -name '*.pyc' -delete")
 
     print("Setting permissions", [data.get("set_permissions.sh"), release_path])
     shell([data.get("set_permissions.sh"), str(release_path)])
+    timings.append(
+        ("Cleanup *.pyc and fix permissions", datetime.datetime.now() - start_time)
+    )
+    _print_timings(timings[-1])
+
+    print("Time report:")
+    for timing_element in timings:
+        _print_timings(timing_element, adjust=True)
 
 
 def cli_main():
