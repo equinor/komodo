@@ -2,11 +2,8 @@ import argparse
 import functools
 import os
 import re
-import sys
 
 import ruamel.yaml
-
-# On Python3, StringIO can come from standard library io:
 from ruamel.yaml.compat import StringIO, ordereddict
 
 
@@ -62,8 +59,6 @@ def prettier(yaml_input_dict, check_type=True):
 
     komodo_repository = check_type and is_repository(yaml_input_dict)
 
-    # On Python3.6+, sorted_config can just be an
-    # ordinary dict as insertion order is then preserved.
     sorted_config = ruamel.yaml.comments.CommentedMap()
     for package in sorted(yaml_input_dict, key=str.lower):
         sorted_config[package] = yaml_input_dict[package]
@@ -76,10 +71,6 @@ def prettier(yaml_input_dict, check_type=True):
         yaml_output,
         transform=functools.partial(repository_specific_formatting, komodo_repository),
     )
-
-    if sys.version_info < (3, 0):
-        # Need to encode the byte-string on Python2
-        return yaml_output.getvalue().encode("utf-8")
 
     return yaml_output.getvalue()
 

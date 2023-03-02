@@ -37,10 +37,9 @@ jobs:
     - name: Unit tests
       run: boot/kmd-env/bin/python -m pytest tests
 
-    - name: Lint tests
+    - name: Lint examples
       run: |
-        boot/kmd-env/bin/python -m komodo.lint examples/releases/unstable.yml examples/repository.yml
-        boot/kmd-env/bin/python -m komodo.lint examples/releases/ecl.yml examples/repository.yml
+        boot/kmd-env/bin/python -m komodo.lint examples/stable.yml examples/repository.yml
 
     - name: Full integration test
       run: |
