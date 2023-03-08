@@ -696,23 +696,24 @@ handling an arbitrary large and funky matrix, without having to guess and/or
 repeat itself.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.matrix.format_release">
-<span class="sig-prename descclassname"><span class="pre">komodo.matrix.</span></span><span class="sig-name descname"><span class="pre">format_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhel_ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py_ver</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.matrix.format_release" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">komodo.matrix.</span></span><span class="sig-name descname"><span class="pre">format_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhel_ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py_ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#komodo.matrix.format_release" title="Permalink to this definition">#</a></dt>
 <dd><p>Format a base (e.g. a matrix file without the .yml suffix) such that it
 looks like a concrete release.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.matrix.get_matrix">
-<span class="sig-prename descclassname"><span class="pre">komodo.matrix.</span></span><span class="sig-name descname"><span class="pre">get_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#komodo.matrix.get_matrix" title="Permalink to this definition">#</a></dt>
-<dd><p>Return tuples of RHEL version and Python version, representing the
+<span class="sig-prename descclassname"><span class="pre">komodo.matrix.</span></span><span class="sig-name descname"><span class="pre">get_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhel_versions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py_versions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.matrix.get_matrix" title="Permalink to this definition">#</a></dt>
+<dd><p>Return tuples of rhel version and Python version, representing the
 current release matrix.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.matrix.get_matrix_base">
-<span class="sig-prename descclassname"><span class="pre">komodo.matrix.</span></span><span class="sig-name descname"><span class="pre">get_matrix_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.matrix.get_matrix_base" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">komodo.matrix.</span></span><span class="sig-name descname"><span class="pre">get_matrix_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#komodo.matrix.get_matrix_base" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the base (e.g. matrix part of a concrete release). Should be the
-inverse of format_release for actual, concrete matrix releases.</p>
+inverse of format_release for actual, concrete matrix releases.
+Hard-coded the suffix pattern ‘-py..-rhel.’ or ‘-py…-rhel.’</p>
 </dd></dl>
 
 </section>
@@ -866,13 +867,20 @@ is True, otherwise no empty lines).</p>
 <span id="komodo-release-transpiler-module"></span><h2>komodo.release_transpiler module<a class="headerlink" href="#module-komodo.release_transpiler" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.release_transpiler.build_matrix_file">
-<span class="sig-prename descclassname"><span class="pre">komodo.release_transpiler.</span></span><span class="sig-name descname"><span class="pre">build_matrix_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtins</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.release_transpiler.build_matrix_file" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">komodo.release_transpiler.</span></span><span class="sig-name descname"><span class="pre">build_matrix_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py_coords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.release_transpiler.build_matrix_file" title="Permalink to this definition">#</a></dt>
+<dd><p>Combine release files from the release_folder into one single matrix_file.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.release_transpiler.combine">
 <span class="sig-prename descclassname"><span class="pre">komodo.release_transpiler.</span></span><span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.release_transpiler.combine" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="komodo.release_transpiler.get_py_coords">
+<span class="sig-prename descclassname"><span class="pre">komodo.release_transpiler.</span></span><span class="sig-name descname"><span class="pre">get_py_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.release_transpiler.get_py_coords" title="Permalink to this definition">#</a></dt>
+<dd><p>Get python versions of release files inside a given release_folder.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.release_transpiler.main">
@@ -886,8 +894,12 @@ is True, otherwise no empty lines).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.release_transpiler.transpile_releases">
-<span class="sig-prename descclassname"><span class="pre">komodo.release_transpiler.</span></span><span class="sig-name descname"><span class="pre">transpile_releases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.release_transpiler.transpile_releases" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">komodo.release_transpiler.</span></span><span class="sig-name descname"><span class="pre">transpile_releases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.release_transpiler.transpile_releases" title="Permalink to this definition">#</a></dt>
+<dd><p>Transpile a matrix file possibly containing different os and framework
+versions (e.g. rhel6 and rhel7, py3.6 and py3.8).
+Write one dimension file for each element in the matrix
+(e.g. rhel7 and py3.8, rhel6 and py3.6)</p>
+</dd></dl>
 
 </section>
 <section id="module-komodo.reverse_dep_graph">
@@ -1350,6 +1362,7 @@ argument is expected to be a komodo.data.Data instance.</p>
 <li><a class="reference internal" href="#module-komodo.release_transpiler">komodo.release_transpiler module</a><ul>
 <li><a class="reference internal" href="#komodo.release_transpiler.build_matrix_file"><code class="docutils literal notranslate"><span class="pre">build_matrix_file()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.release_transpiler.combine"><code class="docutils literal notranslate"><span class="pre">combine()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.release_transpiler.get_py_coords"><code class="docutils literal notranslate"><span class="pre">get_py_coords()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.release_transpiler.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.release_transpiler.transpile"><code class="docutils literal notranslate"><span class="pre">transpile()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.release_transpiler.transpile_releases"><code class="docutils literal notranslate"><span class="pre">transpile_releases()</span></code></a></li>
