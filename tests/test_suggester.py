@@ -261,50 +261,16 @@ def _mock_repo(sym_config):
     return repo
 
 
-def test_suggest_symlink_configuration():
-    config = """{"links": {
-"2050.02-py58": "2050.02.00-py58",
-"stable-py58": "2050.02-py58"
-}}"""
-    repo = _mock_repo(config)
-
-    args = Namespace(
-        git_ref="master",
-        release="2050.02.01-py58",
-        mode="stable",
-        symlink_conf_path="foo.json",
-        joburl="http://job",
-        jobname="job",
-    )
-    suggest_symlink_configuration(args, repo)
-
-    repo.get_contents.assert_called_once_with("foo.json", ref="master")
-    repo.get_branch.assert_called_once_with("master")
-    repo.create_git_ref.assert_called_once_with(
-        ref="refs/heads/2050.02.01-py58/stable", sha=ANY
-    )
-    repo.update_file.assert_called_once_with(
-        "foo.json",
-        "Update stable symlinks for 2050.02.01-py58",
-        """{
-    "links": {
-        "2050.02-py58": "2050.02.01-py58",
-        "stable-py58": "2050.02-py58"
-    }
-}
-""",
-        ANY,
-        branch="2050.02.01-py58/stable",
-    )
-    repo.create_pull.assert_called_once_with(
-        title=ANY, body=ANY, head="2050.02.01-py58/stable", base="master"
-    )
-
-
-def test_suggest_symlink_configuration_azure():
+@pytest.mark.parametrize(
+    "symlink_file,branch_name",
+    [
+        ("foo.json", "onprem-stable"),
+        ("foo_azure.json", "azure-stable"),
+    ],
+)
+def test_suggest_symlink_configuration(symlink_file, branch_name):
     """
-    Testing whether when updating azure symlink file the branch gets a name
-    release/stable/azure
+    Testing whether when updating symlink file the branch gets a corresponding name
     """
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
@@ -316,19 +282,19 @@ def test_suggest_symlink_configuration_azure():
         git_ref="master",
         release="2050.02.01-py58",
         mode="stable",
-        symlink_conf_path="foo_azure.json",
+        symlink_conf_path=symlink_file,
         joburl="http://job",
         jobname="job",
     )
     suggest_symlink_configuration(args, repo)
 
-    repo.get_contents.assert_called_once_with("foo_azure.json", ref="master")
+    repo.get_contents.assert_called_once_with(symlink_file, ref="master")
     repo.get_branch.assert_called_once_with("master")
     repo.create_git_ref.assert_called_once_with(
-        ref="refs/heads/2050.02.01-py58/stable/azure", sha=ANY
+        ref=f"refs/heads/2050.02.01-py58/{branch_name}", sha=ANY
     )
     repo.update_file.assert_called_once_with(
-        "foo_azure.json",
+        symlink_file,
         "Update stable symlinks for 2050.02.01-py58",
         """{
     "links": {
@@ -338,10 +304,10 @@ def test_suggest_symlink_configuration_azure():
 }
 """,
         ANY,
-        branch="2050.02.01-py58/stable/azure",
+        branch=f"2050.02.01-py58/{branch_name}",
     )
     repo.create_pull.assert_called_once_with(
-        title=ANY, body=ANY, head="2050.02.01-py58/stable/azure", base="master"
+        title=ANY, body=ANY, head=f"2050.02.01-py58/{branch_name}", base="master"
     )
 
 
