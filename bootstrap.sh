@@ -27,6 +27,7 @@ function install_komodo {
     # Install the environment that the kmd executable will run in.
     echo "Installing Komodo"
     $python_bin -m venv boot/kmd-env
+    boot/kmd-env/bin/python -m pip install -U pip
     boot/kmd-env/bin/python -m pip install virtualenv pytest .
 }
 
