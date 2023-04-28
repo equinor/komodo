@@ -92,9 +92,10 @@ def suggest_symlink_configuration(
         logger.info("Nothing to update")
         return None
 
-    target_branch = f"{args.release}/{args.mode}"
     if "azure" in args.symlink_conf_path:
-        target_branch += "/azure"
+        target_branch = f"{args.release}/azure-{args.mode}"
+    else:
+        target_branch = f"{args.release}/onprem-{args.mode}"
 
     from_sha = repo.get_branch(args.git_ref).commit.sha
 
