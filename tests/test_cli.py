@@ -145,7 +145,7 @@ def test_pyver_is_deprecated(capsys):
     repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml")
     locs = os.path.join(_get_test_root(), "data/cli/locations.yml")
     cmd = (
-        f"{pkgs} {repo} --prefix pfx --release rel "
+        f"{pkgs} {repo} --prefix prefix --release rel "
         f"--locations-config {locs} "
         f"--pyver 3.8"
     )

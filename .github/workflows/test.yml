@@ -35,7 +35,7 @@ jobs:
         ./bootstrap.sh $(which python)
 
     - name: Unit tests
-      run: 
+      run:
         source boot/build-env/bin/activate
         boot/kmd-env/bin/python -m pytest tests
 
@@ -49,15 +49,15 @@ jobs:
             ci/${RELEASE} \
             ci/repository.yml \
             --workspace ${{ runner.temp }}/kmd-ws \
-            --prefix ${{ runner.temp }}/pfx \
+            --prefix ${{ runner.temp }}/prefix \
             --release ci \
             --locations-config $(realpath ci/locations.yml) \
 
     - name: Build libkmd.so (a dummy C library) for testing
       run: |
-        ci/build_lib.sh ${{ runner.temp }}/pfx/ci
+        ci/build_lib.sh ${{ runner.temp }}/prefix/ci
 
-        source ${{ runner.temp }}/pfx/ci/enable
+        source ${{ runner.temp }}/prefix/ci/enable
         which python
         python --version
         python -c "import numpy;print(numpy.__file__)"
@@ -65,11 +65,11 @@ jobs:
 
     - name: Test enable script
       run: |
-        source ${{ runner.temp }}/pfx/ci/enable
-        [[ "$(which python)" == "${{ runner.temp }}/pfx/ci/root/bin/python" ]]
+        source ${{ runner.temp }}/prefix/ci/enable
+        [[ "$(which python)" == "${{ runner.temp }}/prefix/ci/root/bin/python" ]]
 
     - name: Test Python version
       run: |
-        source ${{ runner.temp }}/pfx/ci/enable
+        source ${{ runner.temp }}/prefix/ci/enable
         pyver=$(python -c 'from sys import version_info as v;print(f"{v[0]}.{v[1]}")')
         [[ "${pyver}" == "${{ matrix.python-version }}" ]]
