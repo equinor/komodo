@@ -10,5 +10,5 @@ foo.argtypes = ()
 # Test that libkmd.so is loaded correctly
 val = foo()
 if val != b"bar":
-    sys.stderr.write("foo() returned '{}' instead of 'bar'\n".format(val))
+    sys.stderr.write(f"foo() returned '{val}' instead of 'bar'\n")
     sys.exit(1)
