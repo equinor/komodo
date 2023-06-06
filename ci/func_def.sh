@@ -59,6 +59,7 @@ run_tests_default () {
 
     pushd $CI_TEST_ROOT
     start_tests
+    popd
 }
 
 function run_tests {
