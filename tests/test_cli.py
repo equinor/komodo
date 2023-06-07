@@ -30,8 +30,6 @@ from tests import _get_test_root
             os.path.join(_get_test_root(), "data/cli"),
             os.path.join(_get_test_root(), "data/cli/hackres"),
             os.path.join(_get_test_root(), "data/cli/hackgit"),
-            "--locations-config",
-            os.path.join(_get_test_root(), "data/cli/locations.yml"),
             os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
             os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
         ),
@@ -143,12 +141,7 @@ def test_pyver_is_deprecated(capsys):
     """
     pkgs = os.path.join(_get_test_root(), "data/cli/nominal_release.yml")
     repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml")
-    locs = os.path.join(_get_test_root(), "data/cli/locations.yml")
-    cmd = (
-        f"{pkgs} {repo} --prefix pfx --release rel "
-        f"--locations-config {locs} "
-        f"--pyver 3.8"
-    )
+    cmd = f"{pkgs} {repo} --prefix pfx --release rel --pyver 3.8"
     with pytest.warns(FutureWarning) as record:
         _ = parse_args(cmd.split())
 
