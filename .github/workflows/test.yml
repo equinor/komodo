@@ -51,7 +51,6 @@ jobs:
             --workspace ${{ runner.temp }}/kmd-ws \
             --prefix ${{ runner.temp }}/prefix \
             --release ci \
-            --locations-config $(realpath ci/locations.yml) \
 
     - name: Build libkmd.so (a dummy C library) for testing
       run: |

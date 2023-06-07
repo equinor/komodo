@@ -9,7 +9,7 @@ from typing import List, Tuple
 import jinja2
 import yaml as yml
 
-from komodo import local, switch
+from komodo import switch
 from komodo.build import make
 from komodo.data import Data
 from komodo.fetch import fetch
@@ -112,17 +112,6 @@ def _main(args):
         sys.exit(0)
 
     create_enable_scripts(komodo_prefix=tmp_prefix, komodo_release=args.release)
-
-    if args.locations_config is not None:
-        with open(args.locations_config, mode="r", encoding="utf-8") as defs, open(
-            Path(args.release) / "local", mode="w", encoding="utf-8"
-        ) as local_activator, open(
-            Path(args.release) / "local.csh", mode="w", encoding="utf-8"
-        ) as local_csh_activator:
-            defs = yml.safe_load(defs)
-            local.write_local_activators(
-                data, defs, local_activator, local_csh_activator
-            )
 
     releasedoc = Path(args.release) / Path(args.release)
     with open(releasedoc, "w", encoding="utf-8") as filehandle:
@@ -411,12 +400,6 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         type=str,
         help="Path to a script which will run on the release path "
         "(prefix/release) after installation.",
-    )
-    required_args.add_argument(
-        "--locations-config",
-        type=str,
-        help="Path to a YAML file defining a dictionary available to "
-        "shell script templates.",
     )
 
     args = parser.parse_args(args)
