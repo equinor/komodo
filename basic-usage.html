@@ -2,10 +2,10 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Komodo commands" href="commands.html" /><link rel="prev" title="Installation" href="installation.html" />
 
-    <link rel="shortcut icon" href="_static/favicon.ico"/><!-- Generated with Sphinx 6.2.1 and Furo 2023.05.20 -->
+    <link rel="shortcut icon" href="_static/favicon.ico"/><!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
         <title>Basic usage - komodo documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
@@ -256,15 +256,9 @@ versions. Each version contains:</p>
 <span class="nt">treelib</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.6.1</span>
 </pre></div>
 </div>
-<p>We also need to create a file to control the location(s) to which the release
-will be deployed. Here’s a minimal example which we’ll call <code class="docutils literal notranslate"><span class="pre">locations.yml</span></code>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">locations</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">foo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-computer.foo.example.com</span>
-</pre></div>
-</div>
 <p>A full software distribution can then be built and deployed to a specified
 path, e.g. <code class="docutils literal notranslate"><span class="pre">./builds/stable-0.0.1</span></code>, with the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kmd<span class="w"> </span>stable.yml<span class="w"> </span>repository.yml<span class="w"> </span>--prefix<span class="w"> </span>builds<span class="w"> </span>--release<span class="w"> </span>stable-0.0.1<span class="w"> </span>--locations-config<span class="w"> </span>locations.yml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kmd<span class="w"> </span>stable.yml<span class="w"> </span>repository.yml<span class="w"> </span>--prefix<span class="w"> </span>builds<span class="w"> </span>--release<span class="w"> </span>stable-0.0.1
 </pre></div>
 </div>
 <p>To use this environment, type <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">builds/stable-0.0.1/enable</span></code>.</p>

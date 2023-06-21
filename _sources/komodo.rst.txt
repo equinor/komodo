@@ -101,14 +101,6 @@ komodo.lint\_package\_status module
    :undoc-members:
    :show-inheritance:
 
-komodo.local module
--------------------
-
-.. automodule:: komodo.local
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 komodo.maintainer module
 ------------------------
 
