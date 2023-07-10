@@ -25,9 +25,13 @@ def _create_link(src, dst, link_dict):
         raise ValueError(f"{src} does not exist")
 
     if os.path.exists(dst) and os.path.islink(dst):
-        if os.readlink(dst) == src:
+        existing_link = os.readlink(dst)
+        if existing_link == src:
             return
         os.remove(dst)
+        print(f"Existing symlink {dst} moved from {existing_link} to {src}")
+    else:
+        print(f"Created new symlink {dst} pointing to {src}")
 
     os.symlink(src, dst)
 
