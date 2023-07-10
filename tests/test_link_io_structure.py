@@ -68,6 +68,36 @@ def test_create_symlinks(tmpdir):
         assert os.path.realpath("unstable") == os.path.realpath("2012.01.rc2")
 
 
+def test_create_symlink_stdout(tmpdir, capsys):
+    links_dict = {
+        "root_folder": tmpdir,
+        "links": {
+            "2023": "2023.07",
+        },
+    }
+    with tmpdir.as_cwd():
+        os.mkdir("2023.07")
+        create_symlinks(links_dict)
+        captured = capsys.readouterr()
+        assert "Created new symlink 2023 pointing to 2023.07\n" == captured.out
+
+
+def test_overwrite_symlink_stdout(tmpdir, capsys):
+    links_dict = {
+        "root_folder": tmpdir,
+        "links": {
+            "2023": "2023.07",
+        },
+    }
+    with tmpdir.as_cwd():
+        os.mkdir("2023.06")
+        os.mkdir("2023.07")
+        os.symlink("2023.06", "2023")
+        create_symlinks(links_dict)
+        captured = capsys.readouterr()
+        assert "Existing symlink 2023 moved from 2023.06 to 2023.07\n" == captured.out
+
+
 def test_integration(tmpdir):
     test_folder = _get_test_root()
     shutil.copy(os.path.join(test_folder, "data/links.json"), tmpdir)
