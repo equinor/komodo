@@ -3,10 +3,10 @@
 import argparse
 import itertools
 import os
-import re
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence
 
 import yaml
+from packaging import version as version_parser
 
 from komodo.matrix import format_release, get_matrix
 from komodo.prettier import load_yaml, write_to_file
@@ -204,20 +204,32 @@ Combine release files into a matrix file. Output format:
     matrix_parser.add_argument(
         "--release-folder",
         required=True,
+        type=dir_path,
         help="Folder with existing release file (default: None)",
     )
     matrix_parser.add_argument(
         "--override-mapping",
         required=True,
+        type=valid_file,
         help="File containing explicit matrix packages (default: None)",
     )
+
+    def comma_delimited_python_versions(python_versions: str) -> List[str]:
+        output_list: List[str] = []
+        for python_version in python_versions.split(","):
+            parsed_python_version = version_parser.parse(python_version).base_version
+            if parsed_python_version >= "4.0.0":
+                raise version_parser.InvalidVersion(python_version)
+            output_list.append(parsed_python_version)
+        return output_list
+
     matrix_parser.add_argument(
         "--py_coords",
-        help="""Comma delimitated list of python versions to be combined,
+        help="""Comma delimited list of python versions to be combined,
         for example, "3.6,3.8" (without spaces).
         If None, the release files in release-folder will be used to imply
         the versions to combine.""",
-        type=lambda s: re.split(",", s),
+        type=comma_delimited_python_versions,
         required=False,
         default=None,
     )
@@ -231,11 +243,13 @@ Combine release files into a matrix file. Output format:
     transpile_parser.add_argument(
         "--matrix-file",
         required=True,
+        type=valid_file,
         help="Yaml file describing the release matrix",
     )
     transpile_parser.add_argument(
         "--output-folder",
         required=True,
+        type=dir_path,
         help="Folder to output new release files",
     )
     transpile_parser.add_argument(
@@ -247,6 +261,18 @@ Combine release files into a matrix file. Output format:
     )
     args = parser.parse_args()
     args.func(args)
+
+
+def valid_file(path: str) -> str:
+    if os.path.isfile(path):
+        return path
+    raise FileNotFoundError(path)
+
+
+def dir_path(should_be_valid_path: str) -> str:
+    if os.path.isdir(should_be_valid_path):
+        return should_be_valid_path
+    raise NotADirectoryError(should_be_valid_path)
 
 
 if __name__ == "__main__":
