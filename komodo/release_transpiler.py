@@ -5,6 +5,7 @@ import itertools
 import os
 import re
 from typing import Optional, Sequence
+from pathlib import Path
 
 import yaml
 
@@ -204,11 +205,13 @@ Combine release files into a matrix file. Output format:
     matrix_parser.add_argument(
         "--release-folder",
         required=True,
+        type=Path,
         help="Folder with existing release file (default: None)",
     )
     matrix_parser.add_argument(
         "--override-mapping",
         required=True,
+        type=open,
         help="File containing explicit matrix packages (default: None)",
     )
     matrix_parser.add_argument(
@@ -231,11 +234,13 @@ Combine release files into a matrix file. Output format:
     transpile_parser.add_argument(
         "--matrix-file",
         required=True,
+        type=open,
         help="Yaml file describing the release matrix",
     )
     transpile_parser.add_argument(
         "--output-folder",
         required=True,
+        type=Path,
         help="Folder to output new release files",
     )
     transpile_parser.add_argument(
