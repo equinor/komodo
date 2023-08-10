@@ -14,7 +14,7 @@ def get_matrix(
     current release matrix."""
     for product in itertools.product(rhel_versions, py_versions):
         rh_ver, py_ver = product
-        yield (f"rhel{rh_ver}", f"py{py_ver.replace('.', '')}")
+        yield (f"rhel{rh_ver}", f"py{str(py_ver).replace('.', '')}")
 
 
 def format_release(base: str, rhel_ver: str, py_ver: str) -> str:
