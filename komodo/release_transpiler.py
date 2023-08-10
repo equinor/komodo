@@ -4,8 +4,8 @@ import argparse
 import itertools
 import os
 import re
-from typing import Optional, Sequence
 from pathlib import Path
+from typing import Optional, Sequence
 
 import yaml
 
