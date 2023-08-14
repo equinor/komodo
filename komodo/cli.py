@@ -103,10 +103,10 @@ def _main(args):
         _print_timings(timings[-1])
 
         shell(f"mv {args.release + str(tmp_prefix)} {args.release}")
-        shell(
-            "rmdir -p --ignore-fail-on-non-empty "
-            f"{args.release + str(tmp_prefix.parent)}"
-        )
+        try:
+            os.rmdir(f"{args.release + str(tmp_prefix.parent)}")
+        except OSError:
+            pass
 
     if args.build and not args.install:
         sys.exit(0)
