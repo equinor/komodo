@@ -217,24 +217,23 @@ Combine release files into a matrix file. Output format:
 
     def checkValidPythonVersion(input: str) -> list:
         output_list = []
-        for item in input.split(','):
-            if (re.match(r"^[2,3](\.\d+)?$", item) == None):
+        for item in input.split(","):
+            if re.match(r"^[2,3](\.\d+)?$", item) == None:
                 raise TypeError(item)
             else:
                 output_list.append(item)
         return output_list
+
     matrix_parser.add_argument(
         "--py_coords",
         help="""Comma delimitated list of python versions to be combined,
         for example, "3.6,3.8" (without spaces).
         If None, the release files in release-folder will be used to imply
         the versions to combine.""",
-        type=checkValidPythonVersion, #lambda s: [x for x in s.split(',') if (re.match(r"^[2,3](\.\d+)?$", x) != None)],   #re.split(",", s),
+        type=checkValidPythonVersion,  # lambda s: [x for x in s.split(',') if (re.match(r"^[2,3](\.\d+)?$", x) != None)],   #re.split(",", s),
         required=False,
         default=None,
     )
- 
-   
 
     transpile_parser = subparsers.add_parser(
         "transpile",
@@ -266,14 +265,14 @@ Combine release files into a matrix file. Output format:
 
 
 def check_if_valid_file(path: str) -> str:
-    if (os.path.isfile(path)):
+    if os.path.isfile(path):
         return path
     raise TypeError(path)
 
 
 def dir_path(should_be_valid_path: str) -> str:
     if os.path.isdir(should_be_valid_path):
-        return should_be_valid_path    
+        return should_be_valid_path
     raise TypeError(should_be_valid_path)
 
 
