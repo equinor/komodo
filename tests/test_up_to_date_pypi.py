@@ -424,9 +424,9 @@ def test_run_up_to_date(
             "new_file",
         ]
         monkeypatch.setattr(sys, "argv", arguments)
-        with open("repository_file", "w") as fout:
+        with open("repository_file", mode="w", encoding="utf-8") as fout:
             fout.write(str(repository))
-        with open("release_file", "w") as fout:
+        with open("release_file", mode="w", encoding="utf-8") as fout:
             fout.write(str(release))
         request_mock = MagicMock()
         request_mock.json.return_value = request_json
@@ -500,9 +500,9 @@ def test_upgrade_type_grouping(release_file_content, tmpdir, monkeypatch, capsys
     """
 
     with tmpdir.as_cwd():
-        with open("repository_file.yml", "w") as fout:
+        with open("repository_file.yml", mode="w", encoding="utf-8") as fout:
             fout.write(repository_file_content)
-        with open("release_file.yml", "w") as fout:
+        with open("release_file.yml", mode="w", encoding="utf-8") as fout:
             fout.write(release_file_content)
         folder_name = os.getcwd()
 
@@ -544,6 +544,129 @@ def test_upgrade_type_grouping(release_file_content, tmpdir, monkeypatch, capsys
         system_print = capsys.readouterr().out
 
         assert (
-            "Major upgrades:\ndummy_package_major not at latest pypi version: 2.0.0, is at: 1.0.0\n\nMinor upgrades:\ndummy_package_minor not at latest pypi version: 1.1.0, is at: 1.0.0\n\nPatch upgrades:\ndummy_package_patch not at latest pypi version: 1.0.1, is at: 1.0.0"
-            in system_print
+            "Major upgrades:\ndummy_package_major not at latest pypi version: 2.0.0, is"
+            " at: 1.0.0\n\nMinor upgrades:\ndummy_package_minor not at latest pypi"
+            " version: 1.1.0, is at: 1.0.0\n\nPatch upgrades:\ndummy_package_patch not"
+            " at latest pypi version: 1.0.1, is at: 1.0.0" in system_print
         )
+
+
+@pytest.mark.parametrize(
+    "release_file_content, ignore_argument",
+    [
+        pytest.param(
+            """
+                    dummy_package_patch: 1.0.0
+                    dummy_package_minor: 1.0.0
+                    dummy_package_major: 1.0.0
+                    dummy_package_should_not_update: main
+                """,
+            "main",
+            id="ignore_main_version",
+        ),
+        pytest.param(
+            """
+                    dummy_package_patch: 1.0.0
+                    dummy_package_minor: 1.0.0
+                    dummy_package_major: 1.0.0
+                    dummy_package_should_not_update: 1.0.0
+                """,
+            "should_not_update",
+            id="ignore_semantic_version",
+        ),
+    ],
+)
+def test_upgrade_ignore_flag(
+    release_file_content, ignore_argument, tmpdir, monkeypatch, capsys
+):
+    repository_file_content = """
+    dummy_package_patch:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_minor:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_major:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_should_not_update:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+      main:
+        source: pypi
+        make: pip
+        maintainer: scout
+    """
+
+    with tmpdir.as_cwd():
+        with open("repository_file.yml", mode="w", encoding="utf-8") as fout:
+            fout.write(repository_file_content)
+        with open("release_file.yml", mode="w", encoding="utf-8") as fout:
+            fout.write(release_file_content)
+        folder_name = os.getcwd()
+
+    def side_effect(url: str, timeout):
+        if "dummy_package_patch" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {"1.0.1": []},
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        elif "dummy_package_minor" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {"1.1.0": []},
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        elif "dummy_package_major" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {"2.0.0": []},
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        elif "dummy_package_main_should_not_update" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {"4.4.3": []},
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        elif "dummy_package_should_not_update" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {"2.0.0": []},
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        else:
+            raise ValueError("INCORRECT PACKAGE NAME ENTERED! " + str(url))
+
+    arguments = [
+        "",
+        f"{folder_name}/release_file.yml",
+        f"{folder_name}/repository_file.yml",
+        "--ignore",
+        ignore_argument,
+    ]
+    monkeypatch.setattr(sys, "argv", arguments)
+    monkeypatch.setattr(requests, "get", MagicMock(side_effect=side_effect))
+
+    check_up_to_date_pypi.main()
+    system_exit_message = capsys.readouterr().out
+    assert "dummy_package_should_not_update" not in system_exit_message
+    assert "dummy_package_main_should_not_update" not in system_exit_message

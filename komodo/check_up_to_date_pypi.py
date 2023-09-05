@@ -1,6 +1,7 @@
 import argparse
 import copy
 import pathlib
+import re
 import sys
 
 import requests
@@ -147,9 +148,17 @@ def run_check_up_to_date(
         f"{sys.version_info.micro}"
     ),
     propose_upgrade=False,
+    ignore=None,
 ):
     yaml = yaml_parser()
-    releases = load_from_file(yaml, release_file)
+    releases: dict = load_from_file(yaml, release_file)
+
+    if ignore:
+        releases = {
+            package_name: package_version
+            for package_name, package_version in releases.items()
+            if re.search(ignore, f"{package_name} {package_version}") is None
+        }
     repository = load_from_file(yaml, repository_file)
     upgrade_proposals_from_pypi = get_upgrade_proposals_from_pypi(
         releases,
@@ -161,7 +170,7 @@ def run_check_up_to_date(
             insert_upgrade_proposals(upgrade_proposals_from_pypi, repository, releases)
             print(
                 "Writing upgrade proposals from pypi, "
-                "assuming nothing has changed with dependencies...",
+                "assuming nothing has changed with dependencies..."
             )
             with open(propose_upgrade, mode="w", encoding="utf-8") as fout:
                 yaml.dump(releases, fout)
@@ -170,7 +179,11 @@ def run_check_up_to_date(
         major_upgrades, minor_upgrades, patch_upgrades, other_upgrades = [], [], [], []
         for name, versions in upgrade_proposals_from_pypi.items():
             pypi_latest = get_version.Version(versions["suggested"])
-            current_version = get_version.Version(versions["previous"])
+            try:
+                current_version = get_version.Version(versions["previous"])
+            except get_version.InvalidVersion:
+                print(f"Could not parse version {versions['previous']}")
+                continue
             if pypi_latest.major > current_version.major:
                 major_upgrades.append(
                     f"{name} not at latest pypi version: {pypi_latest}, "
@@ -194,15 +207,15 @@ def run_check_up_to_date(
         print(
             "\n".join(
                 ["\nMajor upgrades:"]
-                + (major_upgrades if major_upgrades else ["None"])
+                + major_upgrades
                 + ["\nMinor upgrades:"]
-                + (minor_upgrades if minor_upgrades else ["None"])
+                + minor_upgrades
                 + ["\nPatch upgrades:"]
-                + (patch_upgrades if patch_upgrades else ["None"])
-                + ["\nOther upgrades:"]
-                + (other_upgrades if other_upgrades else ["None"])
-                + ["\n\nFound out of date packages!"]
+                + patch_upgrades
+                + ["\nOTHER UPGRADES:"]
+                + other_upgrades
             )
+            + "\n\n\nFound out of date packages!"
         )
 
     else:
@@ -257,6 +270,13 @@ def get_args() -> argparse.Namespace:
         ),
     )
 
+    parser.add_argument(
+        "--ignore",
+        help=(
+            "If given, will ignore packages with names that match the regex expression"
+        ),
+    )
+
     return parser.parse_args()
 
 
@@ -273,6 +293,7 @@ def main():
         args.repository_file,
         args.python_version,
         args.propose_upgrade,
+        args.ignore,
     )
 
 
