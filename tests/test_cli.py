@@ -26,13 +26,13 @@ from tests import _get_test_root
             "nominal_release",
             "--pip",
             "/bin/true",
+            os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
+            os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
             "--extra-data-dirs",
             os.path.join(_get_test_root(), "data/cli"),
             os.path.join(_get_test_root(), "data/cli/hackres"),
             os.path.join(_get_test_root(), "data/cli/hackgit"),
-            os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
-            os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
-        ),
+        )
     ],
 )
 def test_main(args, tmpdir):
@@ -51,7 +51,6 @@ def test_main(args, tmpdir):
         "--workspace",
         tmpdir,
     ]
-
     sys.argv.extend(list(args))
 
     cli_main()

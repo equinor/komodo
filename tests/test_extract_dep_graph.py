@@ -107,10 +107,14 @@ def test_extract_dep_graph_base_file_missing_pkg():
     assert (
         "'package_b' not found in 'base_pkgs'. "
         "This needs to be in place in order to pick correct version."
-    ) in str(exit_info.value)
+        in str(exit_info.value)
+    )
 
 
-BASE_RELEASE_DEFINES_VERSION_NOT_EXISTING = {"package_a": "1.2.3", "package_b": "2.4.3"}
+BASE_RELEASE_DEFINES_VERSION_NOT_EXISTING = {
+    "package_a": "1.2.3",
+    "package_b": "2.4.3",
+}
 
 
 def test_extract_dep_graph_base_file_faulty_version():
@@ -120,8 +124,8 @@ def test_extract_dep_graph_base_file_faulty_version():
         )
     assert (
         "Version '2.4.3' for package 'package_b' not found in 'repo'. "
-        "Available version(s) is: ['2.3.4', '1.0.0']."
-    ) in str(exit_info.value)
+        "Available version(s) is: ['2.3.4', '1.0.0']." in str(exit_info.value)
+    )
 
 
 RELEASE_DEFINES_VERSION_NOT_EXISTING = {"package_a": "11.2.3"}
@@ -134,5 +138,5 @@ def test_extract_dep_graph_pkgs_file_faulty_version():
         )
     assert (
         "Version '11.2.3' for package 'package_a' not found in 'repo'. "
-        "Available version(s) is: ['1.2.3']."
-    ) in str(exit_info.value)
+        "Available version(s) is: ['1.2.3']." in str(exit_info.value)
+    )

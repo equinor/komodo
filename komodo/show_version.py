@@ -8,7 +8,7 @@ import textwrap
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-import yaml
+from ruamel.yaml import YAML
 
 from komodo.yaml_file_types import ManifestFile
 
@@ -130,7 +130,8 @@ def get_version(pkg: str, manifest: Optional[Dict] = None) -> str:
         release_file = path.parts[-1]
 
         with open(path / release_file, "rt", encoding="utf-8") as stream:
-            manifest = yaml.safe_load(stream)
+            yaml = YAML()
+            manifest = yaml.load(stream)
 
     package = manifest.get(pkg)
 
@@ -154,8 +155,10 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         The `argparse.Namespace`, a mapping of arg names to values.
     """
     parser = argparse.ArgumentParser(
-        description="Return the version of a specified package in the active "
-        "release or in a given release manifest file.",
+        description=(
+            "Return the version of a specified package in the active "
+            "release or in a given release manifest file."
+        ),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("package", help="Package to find the version for.")
@@ -163,10 +166,12 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "--manifest-file",
         type=ManifestFile(),
         required=False,
-        help="The full path to a release manifest file. This file is "
-        "produced by komodo when it builds an environment. If omitted, "
-        "komodo-show-version will try to find the file for the active "
-        "environment.",
+        help=(
+            "The full path to a release manifest file. This file is "
+            "produced by komodo when it builds an environment. If omitted, "
+            "komodo-show-version will try to find the file for the active "
+            "environment."
+        ),
     )
     return parser.parse_args(args)
 

@@ -10,6 +10,7 @@ from packaging.specifiers import InvalidSpecifier, SpecifierSet
 
 from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version
 from komodo.prettier import write_to_file
+from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 class YankedException(Exception):
@@ -24,7 +25,7 @@ def yaml_parser():
 
 
 def load_from_file(yaml, fname):
-    with open(fname, "r") as fin:
+    with open(fname, "r", encoding="utf-8") as fin:
         result = yaml.load(fin)
     return result
 
@@ -90,13 +91,15 @@ def get_pypi_packages(release: dict, repository: dict) -> list:
     return pypi_packages
 
 
-def get_upgrade_proposal(releases: dict, repository: dict, python_version: str) -> dict:
+def get_upgrade_proposals_from_pypi(
+    releases: dict, repository: dict, python_version: str
+) -> dict:
     pypi_packages = get_pypi_packages(releases, repository)
-    pypi_response = get_pypi_info(pypi_packages)
+    pypi_responses = get_pypi_info(pypi_packages)
 
-    upgrade_proposals = {}
-    for name, response in pypi_response:
-        komodo_version = get_version.parse(strip_version(releases[name]))
+    upgrade_proposals_from_pypi = {}
+    for package_name, response in pypi_responses:
+        komodo_version = get_version.parse(strip_version(releases[package_name]))
         if response.ok:
             pypi_versions = compatible_versions(
                 response.json()["releases"], python_version
@@ -107,12 +110,12 @@ def get_upgrade_proposal(releases: dict, repository: dict, python_version: str) 
                 f"Response returned non valid return code: {response.reason}"
             )
         if pypi_latest_version != komodo_version:
-            upgrade_proposals[name] = {
-                "previous": releases[name],
+            upgrade_proposals_from_pypi[package_name] = {
+                "previous": releases[package_name],
                 "suggested": str(pypi_latest_version),
             }
 
-    return upgrade_proposals
+    return upgrade_proposals_from_pypi
 
 
 def insert_upgrade_proposals(upgrade_proposals, repository, releases):
@@ -130,71 +133,37 @@ def insert_upgrade_proposals(upgrade_proposals, repository, releases):
         releases[package] = suggested_version
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Checks if pypi packages are up to date.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument(
-        "release_file",
-        type=lambda arg: arg
-        if pathlib.Path(arg).is_file()
-        else parser.error(f"{arg} is not a file"),
-        help="Komodo release file you would like to check dependencies on, "
-        "in YAML format.",
-    )
-    parser.add_argument(
-        "repository_file",
-        type=lambda arg: arg
-        if pathlib.Path(arg).is_file()
-        else parser.error(f"{arg} is not a file"),
-        help="Komodo repository file where the source of the packages is found, "
-        "in YAML format.",
-    )
-    parser.add_argument(
-        "--propose-upgrade",
-        default=False,
-        help="If given, will change the repository and release file "
-        "using the argument as name of the release file.",
-    )
-    parser.add_argument(
-        "--python-version",
-        default=(
-            f"{sys.version_info.major}."
-            f"{sys.version_info.minor}."
-            f"{sys.version_info.micro}"
-        ),
-        help="Which python version to upgrade to, defaults to the system python. "
-        "Should provide it on the form: major.minor.micro, though only: major or: "
-        "major.minor is allowed (but might give unexpected results, for example if "
-        "a package requires >3.6, py-version 3.6 will not be considered valid)",
-    )
-
-    args = parser.parse_args()
-    print(f"Checking against python version: {args.python_version}")
+def run_check_up_to_date(
+    release_file,
+    repository_file,
+    python_version=(
+        f"{sys.version_info.major}."
+        f"{sys.version_info.minor}."
+        f"{sys.version_info.micro}"
+    ),
+    propose_upgrade=False,
+):
     yaml = yaml_parser()
-    releases = load_from_file(yaml, args.release_file)
-    repository = load_from_file(yaml, args.repository_file)
-
-    upgrade_proposals = get_upgrade_proposal(
+    releases = load_from_file(yaml, release_file)
+    repository = load_from_file(yaml, repository_file)
+    upgrade_proposals_from_pypi = get_upgrade_proposals_from_pypi(
         releases,
         repository,
-        args.python_version,
+        python_version,
     )
-
-    if upgrade_proposals:
-        if args.propose_upgrade:
-            insert_upgrade_proposals(upgrade_proposals, repository, releases)
+    if upgrade_proposals_from_pypi:
+        if propose_upgrade:
+            insert_upgrade_proposals(upgrade_proposals_from_pypi, repository, releases)
             print(
-                "Writing upgrade proposals, "
+                "Writing upgrade proposals from pypi, "
                 "assuming nothing has changed with dependencies..."
             )
-            with open(args.propose_upgrade, "w") as fout:
+            with open(propose_upgrade, mode="w", encoding="utf-8") as fout:
                 yaml.dump(releases, fout)
-            write_to_file(repository, args.repository_file)
+            write_to_file(repository, repository_file)
 
         errors = []
-        for name, versions in upgrade_proposals.items():
+        for name, versions in upgrade_proposals_from_pypi.items():
             pypi_latest = versions["suggested"]
             current_version = versions["previous"]
             errors.append(
@@ -205,3 +174,78 @@ def main():
 
     else:
         print("All packages up to date!!!")
+
+
+def get_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Checks if pypi packages are up to date.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "release_file",
+        type=lambda arg: (
+            arg if pathlib.Path(arg).is_file() else parser.error(f"{arg} is not a file")
+        ),
+        help=(
+            "Komodo release file you would like to check dependencies on, "
+            "in YAML format."
+        ),
+    )
+    parser.add_argument(
+        "repository_file",
+        type=lambda arg: (
+            arg if pathlib.Path(arg).is_file() else parser.error(f"{arg} is not a file")
+        ),
+        help=(
+            "Komodo repository file where the source of the packages is found, "
+            "in YAML format."
+        ),
+    )
+    parser.add_argument(
+        "--propose-upgrade",
+        default=False,
+        help=(
+            "If given, will change the repository and release file "
+            "using the argument as name of the release file."
+        ),
+    )
+    parser.add_argument(
+        "--python-version",
+        default=(
+            f"{sys.version_info.major}."
+            f"{sys.version_info.minor}."
+            f"{sys.version_info.micro}"
+        ),
+        help=(
+            "Which python version to upgrade to, defaults to the system python. Should"
+            " provide it on the form: major.minor.micro, though only: major or:"
+            " major.minor is allowed (but might give unexpected results, for example"
+            " if a package requires >3.6, py-version 3.6 will not be considered valid)"
+        ),
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = get_args()
+
+    print(f"Checking against python version: {args.python_version}")
+
+    validate_release_file(args.release_file)
+    validate_repository_file(args.repository_file)
+
+    run_check_up_to_date(
+        args.release_file,
+        args.repository_file,
+        args.python_version,
+        args.propose_upgrade,
+    )
+
+
+def validate_release_file(release_file_path: str) -> None:
+    ReleaseFile()(release_file_path)
+
+
+def validate_repository_file(repository_file_path: str) -> None:
+    RepositoryFile()(repository_file_path)

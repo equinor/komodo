@@ -8,7 +8,7 @@ from snyk import SnykClient
 from snyk.managers import OrganizationManager
 from snyk.models import Vulnerability
 
-from komodo.yaml_file_types import ReleaseDir, ReleaseFile, YamlFile
+from komodo.yaml_file_types import ReleaseDir, ReleaseFile, RepositoryFile
 
 _CONSOLE_VULNERABILITY_FORMAT = """\t{id}
 \t\tPackage: {package}
@@ -49,7 +49,7 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
     )
     parser.add_argument(
         "--repo",
-        type=YamlFile(),
+        type=RepositoryFile(),
         required=True,
         help="A Komodo repository file, in YAML format.",
     )
@@ -57,8 +57,7 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
     group.add_argument(
         "--release",
         type=ReleaseFile(),
-        help="A Komodo release file mapping package name to version, "
-        "in YAML format.",
+        help="A Komodo release file mapping package name to version, in YAML format.",
     )
     group.add_argument(
         "--release-folder",
@@ -68,8 +67,9 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
     parser.add_argument(
         "--format-github",
         action="store_true",
-        help="Flag to print vulnerabilities in GitHub-friendly format vs "
-        "console format.",
+        help=(
+            "Flag to print vulnerabilities in GitHub-friendly format vs console format."
+        ),
     )
 
     return parser.parse_args(args)

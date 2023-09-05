@@ -29,39 +29,17 @@ def does_not_raise():
     [
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "3.8,3.6",
             ],
             does_not_raise(),
         ),
         (
-            [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
-            ],
+            [],
             does_not_raise(),
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "py3.8",
             ],
@@ -69,13 +47,6 @@ def does_not_raise():
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "test",
             ],
@@ -83,13 +54,6 @@ def does_not_raise():
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "'3.8, 3.6'",
             ],
@@ -97,13 +61,6 @@ def does_not_raise():
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "4.2",
             ],
@@ -111,13 +68,6 @@ def does_not_raise():
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "true",
             ],
@@ -126,7 +76,21 @@ def does_not_raise():
     ],
 )
 def test_combine_py_coords_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "",
+            "combine",
+            "--release-folder",
+            VALID_RELEASE_FOLDER,
+            "--release-base",
+            VALID_RELEASE_BASE,
+            "--override-mapping",
+            VALID_OVERRIDE_MAPPING_FILE,
+        ]
+        + args,
+    )
     with expectation:
         release_transpiler_main()
 
@@ -136,13 +100,8 @@ def test_combine_py_coords_type(args: List[str], expectation, monkeypatch):
     [
         (
             [
-                "combine",
                 "--release-folder",
                 VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
                 "3.8,3.6",
             ],
@@ -150,59 +109,36 @@ def test_combine_py_coords_type(args: List[str], expectation, monkeypatch):
         ),
         (
             [
-                "combine",
                 "--release-folder",
                 VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
             ],
             does_not_raise(),
         ),
         (
             [
-                "combine",
                 "--release-folder",
                 "FOLDER/DOES/NOT/EXIST",
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
             ],
             pytest.raises(NotADirectoryError),
         ),
         (
             [
-                "combine",
                 "--release-folder",
                 "true",
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
             ],
             pytest.raises(NotADirectoryError),
         ),
         (
             [
-                "combine",
                 "--release-folder",
                 "null",
-                "--release-base",
-                VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
             ],
             pytest.raises(NotADirectoryError),
         ),
         (
             [
-                "combine",
                 "--release-folder",
                 "random",
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 VALID_OVERRIDE_MAPPING_FILE,
             ],
@@ -211,7 +147,19 @@ def test_combine_py_coords_type(args: List[str], expectation, monkeypatch):
     ],
 )
 def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "",
+            "combine",
+            "--release-base",
+            VALID_RELEASE_BASE,
+            "--override-mapping",
+            VALID_OVERRIDE_MAPPING_FILE,
+        ]
+        + args,
+    )
     with expectation:
         release_transpiler_main()
 
@@ -221,11 +169,6 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
     [
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 VALID_OVERRIDE_MAPPING_FILE,
                 "--py_coords",
@@ -235,11 +178,6 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 VALID_OVERRIDE_MAPPING_FILE,
             ],
@@ -247,11 +185,6 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 "FAKE/PATH/mapping.yml",
             ],
@@ -259,11 +192,6 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 "fake_mapping.yml",
             ],
@@ -271,11 +199,6 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 "random",
             ],
@@ -283,11 +206,6 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
-                "--release-base",
-                VALID_RELEASE_BASE,
                 "--override-mapping",
                 "0",
             ],
@@ -296,7 +214,20 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
     ],
 )
 def test_combine_py_override_mapping_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "",
+            "combine",
+            "--release-base",
+            VALID_RELEASE_BASE,
+            "--release-folder",
+            VALID_RELEASE_FOLDER,
+        ]
+        + args,
+    )
+
     with expectation:
         release_transpiler_main()
 
@@ -306,36 +237,36 @@ def test_combine_py_override_mapping_type(args: List[str], expectation, monkeypa
     [
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
                 "--release-base",
                 VALID_RELEASE_BASE,
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
-                "--py_coords",
-                "3.8,3.6",
             ],
             does_not_raise(),
         ),
         (
             [
-                "combine",
-                "--release-folder",
-                VALID_RELEASE_FOLDER,
                 "--release-base",
                 "INVALID_RELEASE_BASE",
-                "--override-mapping",
-                VALID_OVERRIDE_MAPPING_FILE,
-                "--py_coords",
-                "3.8,3.6",
             ],
             pytest.raises(argparse.ArgumentTypeError),
         ),
     ],
 )
 def test_combine_py_release_base_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "",
+            "combine",
+            "--release-folder",
+            VALID_RELEASE_FOLDER,
+            "--override-mapping",
+            VALID_OVERRIDE_MAPPING_FILE,
+            "--py_coords",
+            "3.8,3.6",
+        ]
+        + args,
+    )
     with expectation:
         release_transpiler_main()
 
@@ -345,11 +276,8 @@ def test_combine_py_release_base_type(args: List[str], expectation, monkeypatch)
     [
         (
             [
-                "transpile",
                 "--matrix-file",
                 VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
                 "--matrix-coordinates",
                 VALID_MATRIX_COORDINATES,
             ],
@@ -357,58 +285,45 @@ def test_combine_py_release_base_type(args: List[str], expectation, monkeypatch)
         ),
         (
             [
-                "transpile",
                 "--matrix-file",
                 VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
             ],
             does_not_raise(),
         ),
         (
             [
-                "transpile",
                 "--matrix-file",
                 dirname(VALID_MATRIX_FILE),
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
             ],
             pytest.raises(FileNotFoundError),
         ),
         (
             [
-                "transpile",
                 "--matrix-file",
                 f"{VALID_MATRIX_FILE}/does_not_exist.yml",
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
             ],
             pytest.raises(FileNotFoundError),
         ),
         (
             [
-                "transpile",
                 "--matrix-file",
                 "random_string",
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
             ],
             pytest.raises(FileNotFoundError),
         ),
         (
             [
-                "transpile",
                 "--matrix-file",
                 "null",
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
             ],
             pytest.raises(FileNotFoundError),
         ),
     ],
 )
 def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys, "argv", ["", "transpile", "--output-folder", VALID_RELEASE_FOLDER] + args
+    )
     with expectation:
         release_transpiler_main()
 
@@ -418,9 +333,6 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
     [
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
                 "--output-folder",
                 VALID_RELEASE_FOLDER,
                 "--matrix-coordinates",
@@ -430,9 +342,6 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
                 "--output-folder",
                 VALID_RELEASE_FOLDER,
             ],
@@ -440,9 +349,6 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
                 "--output-folder",
                 f"{VALID_RELEASE_FOLDER}/does_not_exist",
             ],
@@ -450,9 +356,6 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
                 "--output-folder",
                 "random_string",
             ],
@@ -460,9 +363,6 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
                 "--output-folder",
                 "null",
             ],
@@ -470,9 +370,6 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
                 "--output-folder",
                 "0",
             ],
@@ -481,7 +378,17 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
     ],
 )
 def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "",
+            "transpile",
+            "--matrix-file",
+            VALID_MATRIX_FILE,
+        ]
+        + args,
+    )
     with expectation:
         release_transpiler_main()
 
@@ -491,33 +398,17 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
     [
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
                 "--matrix-coordinates",
                 VALID_MATRIX_COORDINATES,
             ],
             does_not_raise(),
         ),
         (
-            [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
-            ],
+            [],
             does_not_raise(),
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
                 "--matrix-coordinates",
                 "0",
             ],
@@ -525,11 +416,6 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
                 "--matrix-coordinates",
                 "random_string",
             ],
@@ -537,11 +423,6 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
         ),
         (
             [
-                "transpile",
-                "--matrix-file",
-                VALID_MATRIX_FILE,
-                "--output-folder",
-                VALID_RELEASE_FOLDER,
                 "--matrix-coordinates",
                 "false",
             ],
@@ -552,6 +433,18 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
 def test_transpile_py_matrix_coordinates_type(
     args: List[str], expectation, monkeypatch
 ):
-    monkeypatch.setattr(sys, "argv", [""] + args)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "",
+            "transpile",
+            "--matrix-file",
+            VALID_MATRIX_FILE,
+            "--output-folder",
+            VALID_RELEASE_FOLDER,
+        ]
+        + args,
+    )
     with expectation:
         release_transpiler_main()
