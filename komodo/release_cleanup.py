@@ -77,8 +77,9 @@ def _valid_path_or_files(path):
 def add_cleanup_parser(subparsers):
     cleanup_parser = subparsers.add_parser(
         "cleanup",
-        description="Clean up unused versions the repository file "
-        "based on a set of releases",
+        description=(
+            "Clean up unused versions the repository file based on a set of releases"
+        ),
     )
     cleanup_parser.set_defaults(func=run_cleanup)
     cleanup_parser.add_argument(

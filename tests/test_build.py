@@ -99,5 +99,5 @@ def test_make_sh_does_not_accept_pypi_package_name(captured_shell_commands, tmpd
         }
     }
 
-    with pytest.raises(ValueError, match="pypi_package_name"):
+    with pytest.raises(ValueError, match=r"pypi_package_name"):
         make(packages, repositories, {}, str(tmpdir))

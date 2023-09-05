@@ -2,11 +2,12 @@
 
 import argparse
 import io
-import os
 import subprocess
 import sys
 
 import yaml
+
+from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def run(base_pkgfile, repofile, dot, display_pkg, out):
@@ -94,19 +95,19 @@ def main():
     )
     parser.add_argument(
         "base_pkgs",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error(f"{arg} is not a file"),
-        help="Base Komodo release file where all packages are listed with "
-        "wanted versions specified, in YAML format.",
+        type=ReleaseFile(),
+        help=(
+            "Base Komodo release file where all packages are listed with "
+            "wanted versions specified, in YAML format."
+        ),
     )
     parser.add_argument(
         "repo",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error(f"{arg} is not a file"),
-        help="Komodo repository file with all packages listed with dependencies, "
-        "in YAML format.",
+        type=RepositoryFile(),
+        help=(
+            "Komodo repository file with all packages listed with dependencies, "
+            "in YAML format."
+        ),
     )
     parser.add_argument(
         "--pkg",
@@ -116,8 +117,10 @@ def main():
     parser.add_argument(
         "--out",
         "-o",
-        help="File to be written with reverse dependencies. "
-        "If not specified dump to stdout.",
+        help=(
+            "File to be written with reverse dependencies. "
+            "If not specified dump to stdout."
+        ),
     )
     parser.add_argument(
         "--dot",
@@ -129,9 +132,11 @@ def main():
         "--display_dot",
         "-l",
         action="store_true",
-        help="Try to display graph with dot and display. "
-        "You need to have installed these tools, "
-        "distibuted with the Graphwiz and ImageMagick packages respectively",
+        help=(
+            "Try to display graph with dot and display. "
+            "You need to have installed these tools, "
+            "distibuted with the Graphwiz and ImageMagick packages respectively"
+        ),
     )
 
     args = parser.parse_args()

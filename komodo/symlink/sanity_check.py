@@ -99,7 +99,7 @@ def _compare_dicts(d1, d2):
 def sanity_main():
     parser = argparse.ArgumentParser(
         description=(
-            "Verify symlinks for komodo versions are " "according to a given config."
+            "Verify symlinks for komodo versions are according to a given config."
         )
     )
     parser.add_argument(

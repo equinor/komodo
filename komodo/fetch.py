@@ -14,7 +14,7 @@ from komodo.package_version import (
     strip_version,
 )
 from komodo.shell import pushd, shell
-from komodo.yaml_file_types import YamlFile
+from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def eprint(*args, **kwargs):
@@ -38,10 +38,16 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
         )
 
     elif protocol in ("nfs", "fs-ln"):
-        shell(f"cp --recursive --symbolic-link {path} {filename}")
+        if sys.platform == "darwin":
+            shell(f"cp -Rs {path} {filename}")
+        else:
+            shell(f"cp --recursive --symbolic-link {path} {filename}")
 
     elif protocol in ("fs-cp"):
-        shell(f"cp --recursive {path} {filename}")
+        if sys.platform == "darwin":
+            shell(f"cp -R {path} {filename}")
+        else:
+            shell(f"cp --recursive {path} {filename}")
 
     elif protocol in ("rsync"):
         shell(f"rsync -a {path}/ {filename}")
@@ -62,7 +68,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     for pkg in missingver:
         eprint(
             f"missingver: missing version for {pkg}: {pkgs[pkg]} requested, "
-            f'found: {",".join(repo[pkg].keys())}'
+            f"found: {','.join(repo[pkg].keys())}"
         )
 
     if missingpkg or missingver:
@@ -161,13 +167,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "pkgfile",
-        type=YamlFile(),
-        help="A Komodo release file mapping package name to version, "
-        "in YAML format.",
+        type=ReleaseFile(),
+        help="A Komodo release file mapping package name to version, in YAML format.",
     )
     parser.add_argument(
         "repofile",
-        type=YamlFile(),
+        type=RepositoryFile(),
         help="A Komodo repository file, in YAML format.",
     )
     parser.add_argument(
@@ -175,8 +180,10 @@ if __name__ == "__main__":
         "-o",
         type=str,
         required=True,
-        help="The download destination for pip, cp, rsync and git. "
-        "Must be non-existing or empty.",
+        help=(
+            "The download destination for pip, cp, rsync and git. "
+            "Must be non-existing or empty."
+        ),
     )
     parser.add_argument(
         "--pip",
@@ -185,4 +192,9 @@ if __name__ == "__main__":
         help="The command to use for downloading pip packages.",
     )
     args = parser.parse_args()
-    fetch(args.pkgfile, args.repofile, outdir=args.output, pip=args.pip)
+    fetch(
+        args.content.pkgfile,
+        args.content.repofile,
+        outdir=args.content.output,
+        pip=args.pip,
+    )

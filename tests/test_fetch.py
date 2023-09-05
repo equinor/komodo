@@ -119,7 +119,7 @@ def test_fetch_git_does_not_accept_pypi_package_name(captured_shell_commands, tm
         }
     }
 
-    with pytest.raises(ValueError, match="pypi_package_name"):
+    with pytest.raises(ValueError, match=r"pypi_package_name"):
         fetch(packages, repositories, str(tmpdir))
 
 
@@ -165,8 +165,9 @@ def test_fetch_git_hash(captured_shell_commands, tmpdir):
             "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"
         )
         git_hashes = fetch(packages, repositories, str(tmpdir))
-        assert captured_shell_commands[0] == (
-            "git clone -b main --quiet --recurse-submodules -- "
+        assert (
+            captured_shell_commands[0]
+            == "git clone -b main --quiet --recurse-submodules -- "
             "git://github.com/equinor/ert.git ert-main"
         )
         assert git_hashes == {"ert": "439368d5f2e2eb0c0209e1b43afe6e88d58327d3"}

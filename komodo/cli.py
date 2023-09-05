@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 import jinja2
-import yaml as yml
+from ruamel.yaml import YAML
 
 from komodo import switch
 from komodo.build import make
@@ -20,7 +20,7 @@ from komodo.package_version import (
 )
 from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
-from komodo.yaml_file_types import YamlFile
+from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
@@ -60,14 +60,15 @@ def _print_timings(
 
 def _main(args):
     timings: List[Tuple[str, datetime.timedelta]] = []
-
     abs_prefix = Path(args.prefix).resolve()
 
     data = Data(extra_data_dirs=args.extra_data_dirs)
 
     if args.download or (not args.build and not args.install):
         start_time = datetime.datetime.now()
-        git_hashes = fetch(args.pkgs, args.repo, outdir=args.downloads, pip=args.pip)
+        git_hashes = fetch(
+            args.pkgs.content, args.repo.content, outdir=args.downloads, pip=args.pip
+        )
         timings.append(("Fetching all packages", datetime.datetime.now() - start_time))
         _print_timings(timings[-1])
 
@@ -82,8 +83,8 @@ def _main(args):
     if args.build or not args.install:
         start_time = datetime.datetime.now()
         make(
-            args.pkgs,
-            args.repo,
+            args.pkgs.content,
+            args.repo.content,
             data,
             prefix=str(tmp_prefix),
             dlprefix=args.downloads,
@@ -116,18 +117,19 @@ def _main(args):
     releasedoc = Path(args.release) / Path(args.release)
     with open(releasedoc, "w", encoding="utf-8") as filehandle:
         release = {}
-        for pkg, ver in args.pkgs.items():
-            entry = args.repo[pkg][ver]
-            maintainer = args.repo[pkg][ver]["maintainer"]
+        for pkg, ver in args.pkgs.content.items():
+            entry = args.repo.content[pkg][ver]
+            maintainer = args.repo.content[pkg][ver]["maintainer"]
             if ver == LATEST_PACKAGE_ALIAS:
                 ver = latest_pypi_version(entry.get("pypi_package_name", pkg))
-            elif args.repo[pkg][ver].get("fetch") == "git":
+            elif args.repo.content[pkg][ver].get("fetch") == "git":
                 ver = git_hashes[pkg]
             release[pkg] = {
                 "version": ver,
                 "maintainer": maintainer,
             }
-        yml.dump(release, filehandle, default_flow_style=False)
+        yaml = YAML()
+        yaml.dump(release, filehandle)
 
     if args.dry_run:
         return
@@ -138,7 +140,10 @@ def _main(args):
     shell(f"mv {args.release} .{args.release}")
     shell(f"rsync -a .{args.release} {args.prefix}", sudo=args.sudo)
     timings.append(
-        ("Rsyncing partial komodo to destination", datetime.datetime.now() - start_time)
+        (
+            "Rsyncing partial komodo to destination",
+            datetime.datetime.now() - start_time,
+        )
     )
     _print_timings(timings[-1])
 
@@ -166,8 +171,8 @@ def _main(args):
     release_path = Path(args.prefix) / Path(args.release)
     release_root = release_path / "root"
     start_time = datetime.datetime.now()
-    for pkg, ver in args.pkgs.items():
-        current = args.repo[pkg][ver]
+    for pkg, ver in args.pkgs.content.items():
+        current = args.repo.content[pkg][ver]
         if current["make"] != "pip":
             continue
 
@@ -252,22 +257,23 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         The `argparse.Namespace`, a mapping of arg names to values.
     """
     parser = argparse.ArgumentParser(
-        description="Welcome to Komodo. "
-        "Automatically, reproducibly, and testably create software "
-        "distributions.",
+        description=(
+            "Welcome to Komodo. "
+            "Automatically, reproducibly, and testably create software "
+            "distributions."
+        ),
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     parser.add_argument(
         "pkgs",
-        type=YamlFile(),
-        help="A Komodo release file mapping package name to version, "
-        "in YAML format.",
+        type=ReleaseFile(),
+        help="A Komodo release file mapping package name to version, in YAML format.",
     )
     parser.add_argument(
         "repo",
-        type=YamlFile(),
+        type=RepositoryFile(),
         help="A Komodo repository file, in YAML format.",
     )
 
@@ -278,16 +284,20 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "-p",
         type=str,
         required=True,
-        help="The path of the directory in which you would like to place the "
-        "built environment.",
+        help=(
+            "The path of the directory in which you would like to place the "
+            "built environment."
+        ),
     )
     required_args.add_argument(
         "--release",
         "-r",
         type=str,
         required=True,
-        help="The name of the release, will be used as the name of the directory "
-        "containing the enable script and environment `root` directory.",
+        help=(
+            "The name of the release, will be used as the name of the directory "
+            "containing the enable script and environment `root` directory."
+        ),
     )
 
     optional_args = parser.add_argument_group("optional arguments")
@@ -302,8 +312,10 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "--tmp",
         "-t",
         type=str,
-        help="The directory to use for builds by cmake. None means "
-        "current working directory.",
+        help=(
+            "The directory to use for builds by cmake. None means "
+            "current working directory."
+        ),
     )
     optional_args.add_argument(
         "--downloads",
@@ -311,10 +323,12 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "-c",  # deprecated
         type=str,
         default="downloads",
-        help="A destination directory relative to the workspace, used for downloads, "
-        "used by pip download, cp, rsync and git clone. This directory "
-        "must be empty if it already exists, otherwise it will be created, "
-        "unless you are running with the --build option.",
+        help=(
+            "A destination directory relative to the workspace, used for downloads, "
+            "used by pip download, cp, rsync and git clone. This directory "
+            "must be empty if it already exists, otherwise it will be created, "
+            "unless you are running with the --build option."
+        ),
     )
     optional_args.add_argument(
         "--jobs",
@@ -327,15 +341,19 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "--download",
         "-d",
         action="store_true",
-        help="If set, packages will be downloaded but nothing will be built, unless "
-        "--build is also included.",
+        help=(
+            "If set, packages will be downloaded but nothing will be built, unless "
+            "--build is also included."
+        ),
     )
     optional_args.add_argument(
         "--build",
         "-b",
         action="store_true",
-        help="Flag to only build. If set and --download is not, "
-        "the downloads directory must already be populated.",
+        help=(
+            "Flag to only build. If set and --download is not, "
+            "the downloads directory must already be populated."
+        ),
     )
     optional_args.add_argument(
         "--install",
@@ -347,8 +365,10 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "--dry-run",
         "-n",
         action="store_true",
-        help="Flag to choose whether stop before installing the environment. "
-        "to the `prefix` location.",
+        help=(
+            "Flag to choose whether stop before installing the environment. "
+            "to the `prefix` location."
+        ),
     )
     optional_args.add_argument(
         "--cmake",
@@ -376,30 +396,38 @@ def parse_args(args: List[str]) -> argparse.Namespace:
     optional_args.add_argument(
         "--sudo",
         action="store_true",
-        help="Flag to choose whether to use `sudo` for shell commands when "
-        "installing the environment.",
+        help=(
+            "Flag to choose whether to use `sudo` for shell commands when "
+            "installing the environment."
+        ),
     )
     optional_args.add_argument(
         "--workspace",
         type=str,
         default=None,
-        help="Directory to set as working directory during execution. "
-        "None means current working directory.",
+        help=(
+            "Directory to set as working directory during execution. "
+            "None means current working directory."
+        ),
     )
     optional_args.add_argument(
         "--extra-data-dirs",
         nargs="+",
         type=str,
         default=None,
-        help="Directories containing extra data files for `sh` builds. "
-        "Multiple directores can be given, separated with space.",
+        help=(
+            "Directories containing extra data files for `sh` builds. "
+            "Multiple directores can be given, separated with space."
+        ),
     )
     optional_args.add_argument(
         "--postinst",
         "-P",
         type=str,
-        help="Path to a script which will run on the release path "
-        "(prefix/release) after installation.",
+        help=(
+            "Path to a script which will run on the release path "
+            "(prefix/release) after installation."
+        ),
     )
 
     args = parser.parse_args(args)

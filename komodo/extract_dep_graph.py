@@ -1,12 +1,19 @@
 import argparse
 import os
 
-import yaml
+from ruamel.yaml import YAML
+
+from komodo.yaml_file_types import RepositoryFile
 
 
 def run(pkgfile, base_pkgfile, repofile, outfile=None):
     with open(pkgfile) as p, open(base_pkgfile) as bp, open(repofile) as r:
-        pkgs, base_pkgs, repo = yaml.safe_load(p), yaml.safe_load(bp), yaml.safe_load(r)
+        yaml = YAML()
+        pkgs, base_pkgs, repo = (
+            yaml.load(p),
+            yaml.load(bp),
+            yaml.load(r),
+        )
 
     result = _iterate_packages(pkgs, base_pkgs, repo)
 
@@ -61,30 +68,30 @@ def main():
     )
     parser.add_argument(
         "pkgs",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error(f"{arg} is not a file"),
+        type=lambda arg: (
+            arg if os.path.isfile(arg) else parser.error(f"{arg} is not a file")
+        ),
         help="File with packages you want to resolve dependencies for.",
     )
     parser.add_argument(
         "base_pkgs",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error(f"{arg} is not a file"),
+        type=lambda arg: (
+            arg if os.path.isfile(arg) else parser.error(f"{arg} is not a file")
+        ),
         help="Base file where all packages are listed with wanted versions specified.",
     )
     parser.add_argument(
         "repo",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error(f"{arg} is not a file"),
+        type=RepositoryFile(),
         help="Repository file with all packages listed with dependencies.",
     )
     parser.add_argument(
         "--out",
         "-o",
-        help="File to be written with resolved dependencies. "
-        "If not specified dump to stdout.",
+        help=(
+            "File to be written with resolved dependencies. "
+            "If not specified dump to stdout."
+        ),
     )
 
     args = parser.parse_args()

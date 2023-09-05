@@ -4,6 +4,7 @@ import os
 from typing import List, Optional
 
 from komodo.matrix import get_matrix_base
+from komodo.yaml_file_types import ReleaseDir
 
 
 def _is_release(path):
@@ -46,25 +47,23 @@ def output_formatter(release_list: List[str], do_json: bool = False) -> str:
 
 def deployed_main():
     parser = argparse.ArgumentParser(
-        description=(
-            """Outputs the name of undeployed matrices given an installation
+        description="""Outputs the name of undeployed matrices given an installation
             root and a release folder. A partially deployed matrix is
-            considered deployed."""
-        ),
+            considered deployed.""",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "install_root",
-        type=lambda arg: os.path.realpath(arg)
-        if os.path.isdir(arg)
-        else parser.error(f"{arg} is not a directory"),
+        type=lambda arg: (
+            os.path.realpath(arg)
+            if os.path.isdir(arg)
+            else parser.error(f"{arg} is not a directory")
+        ),
         help="The root folder of the deployed matrices",
     )
     parser.add_argument(
         "releases_folder",
-        type=lambda arg: os.path.realpath(arg)
-        if os.path.isdir(arg)
-        else parser.error(f"{arg} is not a directory"),
+        type=ReleaseDir(),
         help="The folder containing the matrix files",
     )
     parser.add_argument(

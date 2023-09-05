@@ -6,13 +6,20 @@ from base64 import b64decode
 from datetime import datetime
 
 import github
-import ruamel.yaml
-from github import Github, UnknownObjectException
+from github import Github, Repository, UnknownObjectException
 
 from komodo.prettier import write_to_string
+from komodo.yaml_file_types import (
+    KomodoException,
+    ReleaseFile,
+    RepositoryFile,
+    UpgradeProposalsFile,
+)
 
 
 def recursive_update(left, right):
+    if right is None:
+        return None
     for k, v in right.items():
         if isinstance(v, collections.abc.Mapping):
             d_val = left.get(k)
@@ -46,32 +53,32 @@ def diff_file_and_string(file_contents, string, leftname, rightname):
     )
 
 
-def load_yaml_from_repo(filename, repo, ref):
-    ruamel_instance = ruamel.yaml.YAML()
-    ruamel_instance.indent(  # Komodo prefers two space indendation
-        mapping=2, sequence=4, offset=2
-    )
-    ruamel_instance.width = 1000  # Avoid ruamel wrapping long
-
-    try:
-        sym_conf_content = repo.get_contents(filename, ref=ref)
-
-        input_dict = ruamel_instance.load(b64decode(sym_conf_content.content))
-        return input_dict
-
-    except (
-        ruamel.yaml.scanner.ScannerError,
-        ruamel.yaml.constructor.DuplicateKeyError,
-    ) as e:
-        raise SystemExit(f"The file: <{filename}> contains invalid YAML syntax:\n {e}")
+def load_yaml_from_repo(filename, repo, ref) -> bytes:
+    sym_conf_content = repo.get_contents(filename, ref=ref)
+    input_dict = b64decode(sym_conf_content.content)
+    return input_dict
 
 
 def main():
     args = parse_args()
     repo = _get_repo(os.getenv("GITHUB_TOKEN"), args.git_fork, args.git_repo)
     insert_proposals(
-        repo, args.base, args.target, args.git_ref, args.jobname, args.joburl
+        repo,
+        args.base,
+        args.target,
+        args.git_ref,
+        args.jobname,
+        args.joburl,
     )
+
+
+def verify_branch_does_not_exist(repo: Repository.Repository, branch_name: str) -> None:
+    try:
+        repo.get_branch(branch_name)
+    except github.GithubException:
+        pass
+    else:
+        raise ValueError(f"Branch {branch_name} exists already")
 
 
 def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
@@ -80,34 +87,33 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
     tmp_target = target + ".tmp"
 
     # check that the branches do not already exist
-    try:
-        repo.get_branch(target)
-    except github.GithubException:
-        pass
-    else:
-        raise ValueError(f"Branch {target} exists already")
-
-    try:
-        repo.get_branch(tmp_target)
-    except github.GithubException:
-        pass
-    else:
-        raise ValueError(f"Branch {tmp_target} exists already")
+    verify_branch_does_not_exist(repo, target)
+    verify_branch_does_not_exist(repo, tmp_target)
 
     # create contents of new release
-    proposal_yaml = load_yaml_from_repo("upgrade_proposals.yml", repo, git_ref)
+    proposals_yaml_string = load_yaml_from_repo("upgrade_proposals.yml", repo, git_ref)
+    proposal_file = UpgradeProposalsFile().from_yaml_string(proposals_yaml_string)
     upgrade_key = f"{year}-{month}"
-    upgrade = proposal_yaml.get(upgrade_key)
-    if upgrade_key not in proposal_yaml:
-        raise ValueError(
-            f"No section for this release ({upgrade_key}) in upgrade_proposals.yml"
-        )
+    upgrade = proposal_file.content.get(upgrade_key)
+    proposal_file.validate_upgrade_key(upgrade_key)
+
     base_file = f"releases/matrices/{base}.yml"
     target_file = f"releases/matrices/{target}.yml"
-    base_dict = load_yaml_from_repo(base_file, repo, git_ref)
+    repofile_yaml_string = load_yaml_from_repo("repository.yml", repo, git_ref)
+    repofile = RepositoryFile().from_yaml_string(repofile_yaml_string)
+    release_file_yaml_string = load_yaml_from_repo(base_file, repo, git_ref)
+    base_dict = ReleaseFile().from_yaml_string(release_file_yaml_string)
     if upgrade:
-        recursive_update(base_dict, upgrade)
-    result = write_to_string(base_dict)
+        errors = []
+        for package_name, package_version in upgrade.items():
+            try:
+                repofile.validate_package_entry(package_name, package_version)
+            except KomodoException as e:
+                errors.append(e.error)
+        if errors:
+            raise SystemExit("\n".join(errors))
+    recursive_update(base_dict.content, upgrade)
+    result = write_to_string(base_dict.content)
 
     # create new release file
     from_sha = repo.get_branch(git_ref).commit.sha
@@ -120,8 +126,8 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
     )
 
     # clean the proposal file
-    proposal_yaml[upgrade_key] = None
-    cleaned_upgrade = write_to_string(proposal_yaml, False)
+    proposal_file.content[upgrade_key] = None
+    cleaned_upgrade = write_to_string(proposal_file.content, False)
     upgrade_contents = repo.get_contents("upgrade_proposals.yml", ref=git_ref)
     repo.update_file(
         "upgrade_proposals.yml",
@@ -189,8 +195,10 @@ def parse_args():
     parser.add_argument(
         "base",
         type=str,
-        help="The name of the release to base on. (E.g. 2021.06.b0). "
-        "A corresponding file must exist in releases/matrices",
+        help=(
+            "The name of the release to base on. (E.g. 2021.06.b0). "
+            "A corresponding file must exist in releases/matrices"
+        ),
     )
     parser.add_argument(
         "target",

@@ -88,15 +88,14 @@ def test_get_version_fails_with_release_file(mock_release_file):
     Passing in manifest file explicitly, but the user provides a release file,
     not a 'manifest' file. (They _should_ match, but release files are written
     by users and given to kmd to contruct an environment, whereas manifest files
-    are produced by kmd during environment consutruction.)
+    are produced by kmd during environment construction.)
     """
-    fname = "/foo/bar/releases/komodo-release-0.0.1.yml"
-    with pytest.raises(AssertionError) as exception_info:
-        _ = parse_args(["foo", "--manifest-file", fname])
-    assert "does not appear to be a manifest file" in str(exception_info.value)
+    filename = "/foo/bar/releases/komodo-release-0.0.1.yml"
+    with pytest.raises(SystemExit, match=r"does not appear to be a manifest file"):
+        _ = parse_args(["foo", "--manifest-file", filename])
 
-    # Goes through argparse.FileType via komodo.yaml_file_types.ManifestFile.
-    mock_release_file.assert_called_once_with(fname, "r", -1, None, None)
+    # Goes through argparse.FileType via komodo.yaml_file_type.ManifestFile.
+    mock_release_file.assert_called_once_with(filename, "r", -1, None, None)
 
 
 def test_package_not_found_error(mock_komodo_env_vars, mock_version_manifest):

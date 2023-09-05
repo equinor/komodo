@@ -205,8 +205,7 @@ def main():
 
     subparsers = parser.add_subparsers(
         title="Commands",
-        description="Combine - build matrix file\n"
-        "Transpile - generate release files",
+        description="Combine - build matrix file\nTranspile - generate release files",
         help="Available sub commands",
         dest="mode",
     )

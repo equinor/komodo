@@ -4,7 +4,7 @@ import hashlib
 import os
 import shutil
 
-import yaml as yml
+from ruamel.yaml import YAML
 
 
 def get_messages_and_scripts(release_name, motd_db):
@@ -78,7 +78,8 @@ def main(args=None):
     if not os.path.isfile(args.motd_db):
         raise SystemExit(f"ERROR: The message-database {args.motd_db} was not found")
     with open(args.motd_db) as motd_db_file:
-        motd_db = yml.safe_load(motd_db_file)
+        yml = YAML()
+        motd_db = yml.load(motd_db_file)
     motd_path = os.path.dirname(args.motd_db)
 
     if not os.path.isdir(args.komodo_prefix):
