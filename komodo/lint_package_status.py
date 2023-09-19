@@ -2,7 +2,7 @@
 
 import argparse
 
-from komodo.yaml_file_type import YamlFile
+from komodo.yaml_file_types import YamlFile
 
 VALID_VISIBILITY = ["public", "private"]
 VALID_IMPORTANCE = ["low", "medium", "high"]

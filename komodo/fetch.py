@@ -14,7 +14,7 @@ from komodo.package_version import (
     strip_version,
 )
 from komodo.shell import pushd, shell
-from komodo.yaml_file_type import YamlFile
+from komodo.yaml_file_types import YamlFile
 
 
 def eprint(*args, **kwargs):

@@ -20,7 +20,7 @@ from komodo.package_version import (
 )
 from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
-from komodo.yaml_file_type import YamlFile
+from komodo.yaml_file_types import YamlFile
 
 
 def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:

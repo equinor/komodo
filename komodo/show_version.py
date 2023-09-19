@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Union
 
 import yaml
 
-from komodo.yaml_file_type import ManifestFile
+from komodo.yaml_file_types import ManifestFile
 
 
 def get_release() -> str:
