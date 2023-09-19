@@ -95,7 +95,36 @@ def test_overwrite_symlink_stdout(tmpdir, capsys):
         os.symlink("2023.06", "2023")
         create_symlinks(links_dict)
         captured = capsys.readouterr()
-        assert captured.out == "Existing symlink 2023 moved from 2023.06 to 2023.07\n"
+        print(captured.out)
+        assert captured.out == "Existing symlink 2023 moved from 2023.06 to 2023.07.\n"
+
+
+def test_overwrite_symlink_implicit_multiple_stdout(tmpdir, capsys):
+    links_dict = {
+        "root_folder": tmpdir,
+        "links": {
+            "stable": "stable-py38",
+            "stable-py38": "2023.09.03",
+            "azure-stable": "azure-stable-py38",
+            "azure-stable-py38": "stable-py38",
+            "2023.09.03": "2023.09.03-rc4",
+        },
+    }
+    with tmpdir.as_cwd():
+        os.mkdir("2023.09.03-rc4")
+        os.mkdir("2023.09.03-rc3")
+        os.symlink("stable-py38", "stable")
+        os.symlink("azure-stable-py38", "azure-stable")
+        os.symlink("stable-py38", "azure-stable-py38")
+        os.symlink("2023.09.03", "stable-py38")
+        os.symlink("2023.09.03-rc3", "2023.09.03")
+        create_symlinks(links_dict)
+        captured = capsys.readouterr()
+        print(captured.out)
+        assert (
+            captured.out
+            == "Existing symlink 2023.09.03 moved from 2023.09.03-rc3 to 2023.09.03-rc4. Some symlinks were implicitly moved due to this: stable, azure-stable.\n"
+        )
 
 
 def test_integration(tmpdir):
