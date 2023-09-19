@@ -8,7 +8,7 @@ from snyk import SnykClient
 from snyk.managers import OrganizationManager
 from snyk.models import Vulnerability
 
-from komodo.yaml_file_type import ReleaseDir, ReleaseFile, YamlFile
+from komodo.yaml_file_types import ReleaseDir, ReleaseFile, YamlFile
 
 _CONSOLE_VULNERABILITY_FORMAT = """\t{id}
 \t\tPackage: {package}

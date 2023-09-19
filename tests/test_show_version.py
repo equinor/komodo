@@ -73,13 +73,13 @@ def test_get_version_with_filepath(mock_version_manifest):
     the file directly.
 
     Note that the file loading _and validation_ is handled by
-    komodo.yaml_file_type.ManifestFile, hence the different args for `open()`.
+    komodo.yaml_file_types.ManifestFile, hence the different args for `open()`.
     """
     fname = "/foo/bar/komodo-release-0.0.1-py38/komodo-release-0.0.1-py38"
     args = parse_args(["foo", "--manifest-file", fname])
     assert get_version(args.package, manifest=args.manifest_file) == "1.2.3"
 
-    # Goes through argparse.FileType via komodo.yaml_file_type.ManifestFile.
+    # Goes through argparse.FileType via komodo.yaml_file_types.ManifestFile.
     mock_version_manifest.assert_called_once_with(fname, "r", -1, None, None)
 
 
@@ -95,7 +95,7 @@ def test_get_version_fails_with_release_file(mock_release_file):
         _ = parse_args(["foo", "--manifest-file", fname])
     assert "does not appear to be a manifest file" in str(exception_info.value)
 
-    # Goes through argparse.FileType via komodo.yaml_file_type.ManifestFile.
+    # Goes through argparse.FileType via komodo.yaml_file_types.ManifestFile.
     mock_release_file.assert_called_once_with(fname, "r", -1, None, None)
 
 
