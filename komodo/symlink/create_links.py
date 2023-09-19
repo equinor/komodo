@@ -3,6 +3,7 @@ import json
 import os
 import sys
 from contextlib import contextmanager
+from typing import List
 
 from .sanity_check import verify_integrity
 
@@ -15,6 +16,19 @@ def working_dir(path):
         yield
     finally:
         os.chdir(prev_dir)
+
+
+def get_implicitly_moved_symlinks(key: str, link_dict: dict) -> List[str]:
+    sources = [src for src, dst in link_dict.items() if dst == key]
+    implicitly_moved_symlinks = []
+    for source in sources:
+        implicitly_moved_symlinks.extend(
+            get_implicitly_moved_symlinks(source, link_dict)
+        )
+
+    if not sources:
+        implicitly_moved_symlinks.append(key)
+    return implicitly_moved_symlinks
 
 
 def _create_link(src, dst, link_dict):
@@ -30,7 +44,19 @@ def _create_link(src, dst, link_dict):
         if existing_link == src:
             return
         os.remove(dst)
-        print(f"Existing symlink {dst} moved from {existing_link} to {src}")
+        implicitly_moved_sources = get_implicitly_moved_symlinks(dst, link_dict)
+        if dst in implicitly_moved_sources:
+            implicitly_moved_sources.remove(dst)
+
+        message = f"Existing symlink {dst} moved from {existing_link} to {src}." + (
+            (
+                " Some symlinks were implicitly moved due to this: "
+                f"{', '.join(implicitly_moved_sources)}."
+            )
+            if implicitly_moved_sources
+            else ""
+        )
+        print(message)
     else:
         print(f"Created new symlink {dst} pointing to {src}")
 
