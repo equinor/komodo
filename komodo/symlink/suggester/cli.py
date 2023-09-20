@@ -16,10 +16,11 @@ from komodo.symlink.suggester import configuration
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
-PR_TEMPLATE = """:robot: Suggesting updating {mode} to {release} in {sym_file}
+PR_TEMPLATE = """:robot: Suggesting updating {platform} {mode} to {release} in {sym_file}
 ---
 ### Description
 - Release: `{release}`
+- Platform `{platform}`
 - Link type: `{mode}`
 - When: `{now}`
 
@@ -93,13 +94,15 @@ def suggest_symlink_configuration(
         return None
 
     if "azure" in args.symlink_conf_path:
-        target_branch = f"{args.release}/azure-{args.mode}"
+        platform = "azure"
     else:
-        target_branch = f"{args.release}/onprem-{args.mode}"
+        platform = "onprem"
+
+    target_branch = f"{args.release}/{platform}-{args.mode}"
 
     from_sha = repo.get_branch(args.git_ref).commit.sha
 
-    msg = f"Update {args.mode} symlinks for {args.release}"
+    msg = f"Update {platform} {args.mode} symlinks for {args.release}"
     if not dry_run:
         repo.create_git_ref(ref=f"refs/heads/{target_branch}", sha=from_sha)
         repo.update_file(
@@ -118,6 +121,7 @@ def suggest_symlink_configuration(
         now=datetime.now(),
         job_url=args.joburl,
         job_name=args.jobname,
+        platform=platform,
     )
 
     if dry_run:
