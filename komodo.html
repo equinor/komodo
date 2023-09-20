@@ -1132,31 +1132,281 @@ argument is expected to be a komodo.data.Data instance.</p>
 </dd></dl>
 
 </section>
-<section id="module-komodo.yaml_file_type">
-<span id="komodo-yaml-file-type-module"></span><h2>komodo.yaml_file_type module<a class="headerlink" href="#module-komodo.yaml_file_type" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="komodo.yaml_file_type.ManifestFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_type.</span></span><span class="sig-name descname"><span class="pre">ManifestFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_type.ManifestFile" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_type.YamlFile" title="komodo.yaml_file_type.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
-<p>Return the data from ‘manifest’ YAML, but validate it first.</p>
+<section id="module-komodo.yaml_file_types">
+<span id="komodo-yaml-file-types-module"></span><h2>komodo.yaml_file_types module<a class="headerlink" href="#module-komodo.yaml_file_types" title="Link to this heading">#</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">KomodoException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">KomodoError</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.KomodoException" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="komodo.yaml_file_type.ReleaseDir">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_type.</span></span><span class="sig-name descname"><span class="pre">ReleaseDir</span></span><a class="headerlink" href="#komodo.yaml_file_type.ReleaseDir" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ManifestFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">ManifestFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ManifestFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
+<p>Return the data from ‘manifest’ YAML, but validate it first.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ManifestFile.validate_manifest_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_manifest_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manifest_file_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ManifestFile.validate_manifest_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">Package</span></span><a class="headerlink" href="#komodo.yaml_file_types.Package" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.VALID_IMPORTANCES">
+<span class="sig-name descname"><span class="pre">VALID_IMPORTANCES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['low',</span> <span class="pre">'medium',</span> <span class="pre">'high']</span></em><a class="headerlink" href="#komodo.yaml_file_types.Package.VALID_IMPORTANCES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.VALID_MAKES">
+<span class="sig-name descname"><span class="pre">VALID_MAKES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['rpm',</span> <span class="pre">'cmake',</span> <span class="pre">'sh',</span> <span class="pre">'pip',</span> <span class="pre">'rsync',</span> <span class="pre">'noop',</span> <span class="pre">'download']</span></em><a class="headerlink" href="#komodo.yaml_file_types.Package.VALID_MAKES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.VALID_MATURITIES">
+<span class="sig-name descname"><span class="pre">VALID_MATURITIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['experimental',</span> <span class="pre">'stable',</span> <span class="pre">'deprecated']</span></em><a class="headerlink" href="#komodo.yaml_file_types.Package.VALID_MATURITIES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.VALID_VISIBILITIES">
+<span class="sig-name descname"><span class="pre">VALID_VISIBILITIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['public',</span> <span class="pre">'private']</span></em><a class="headerlink" href="#komodo.yaml_file_types.Package.VALID_VISIBILITIES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_entry">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_entry" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_entry_with_errors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_entry_with_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_entry_with_errors" title="Link to this definition">#</a></dt>
+<dd><p>Validates package name and version, and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_importance">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_importance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_importance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_importance" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_importance_with_errors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_importance_with_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_importance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_importance_with_errors" title="Link to this definition">#</a></dt>
+<dd><p>Validates package importance of a package and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_maintainer">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_maintainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_maintainer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_maintainer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_maintainer_with_errors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_maintainer_with_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_maintainer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_maintainer_with_errors" title="Link to this definition">#</a></dt>
+<dd><p>Validates maintainer of a package and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_make">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_make</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_make" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_make_with_errors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_make_with_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_make</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_make_with_errors" title="Link to this definition">#</a></dt>
+<dd><p>Validates make of a package and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_maturity">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_maturity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_maturity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_maturity" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_maturity_with_errors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_maturity_with_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_maturity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_maturity_with_errors" title="Link to this definition">#</a></dt>
+<dd><p>Validates package maturity of a package and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_property_type">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_property_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_property_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_property_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_source">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_source" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_source_with_errors">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_source_with_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_source_with_errors" title="Link to this definition">#</a></dt>
+<dd><p>Validates source of a package and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_version">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Package.validate_package_visibility">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_package_visibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_visibility</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.Package.validate_package_visibility" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.PackageStatusFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">PackageStatusFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.PackageStatusFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
+<p>Return the data from ‘package_status’ YAML, but validate it first.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.PackageStatusFile.from_yaml_string">
+<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.PackageStatusFile.from_yaml_string" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.PackageStatusFile.validate_package_status_file">
+<span class="sig-name descname"><span class="pre">validate_package_status_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.PackageStatusFile.validate_package_status_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseDir">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">ReleaseDir</span></span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseDir" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="komodo.yaml_file_type.ReleaseFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_type.</span></span><span class="sig-name descname"><span class="pre">ReleaseFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_type.ReleaseFile" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_type.YamlFile" title="komodo.yaml_file_type.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">ReleaseFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
+<p>Return the data from ‘release’ YAML file, but validate it first.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile.from_yaml_string">
+<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.from_yaml_string" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile.lint_release_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lint_release_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packagefile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">KomodoError</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.lint_release_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile.validate_release_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_release_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_file_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.validate_release_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="komodo.yaml_file_type.YamlFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_type.</span></span><span class="sig-name descname"><span class="pre">YamlFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_type.YamlFile" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">RepositoryFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
+<p>Return the data from ‘repository’ YAML, but validate it first.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.from_yaml_string">
+<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.from_yaml_string" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.lint_maintainer">
+<span class="sig-name descname"><span class="pre">lint_maintainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">KomodoError</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.lint_maintainer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.validate_package_entry">
+<span class="sig-name descname"><span class="pre">validate_package_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">KomodoError</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.validate_package_entry" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.validate_package_properties">
+<span class="sig-name descname"><span class="pre">validate_package_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_property_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.validate_package_properties" title="Link to this definition">#</a></dt>
+<dd><p>Validates package properties of the specified package
+and returns a list of error messages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.validate_repository_file">
+<span class="sig-name descname"><span class="pre">validate_repository_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.validate_repository_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.validate_versions">
+<span class="sig-name descname"><span class="pre">validate_versions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">versions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.validate_versions" title="Link to this definition">#</a></dt>
+<dd><p>Validates versions-dictionary of a package and returns a list of error messages</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.UpgradeProposalsFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">UpgradeProposalsFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
+<p>Return the data from ‘upgrade_proposals’ YAML, but validate it first.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string">
+<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_key">
+<span class="sig-name descname"><span class="pre">validate_upgrade_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upgrade_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_key" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_proposals_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_upgrade_proposals_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upgrade_proposals_file_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_proposals_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.YamlFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">YamlFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.YamlFile" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FileType</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.handle_validation_errors">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">handle_validation_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.handle_validation_errors" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.komodo_error">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">komodo_error</span></span><a class="headerlink" href="#komodo.yaml_file_types.komodo_error" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">KomodoError</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.load_package_status_file">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">load_package_status_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_status_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.load_package_status_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.load_repository_file">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">load_repository_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repository_file_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.load_repository_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.load_yaml_from_string">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">load_yaml_from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.load_yaml_from_string" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.report">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">report</span></span><a class="headerlink" href="#komodo.yaml_file_types.report" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LintReport</span></code></p>
 </dd></dl>
 
 </section>
@@ -1421,11 +1671,69 @@ argument is expected to be a komodo.data.Data instance.</p>
 <li><a class="reference internal" href="#komodo.switch.create_activator_switch"><code class="docutils literal notranslate"><span class="pre">create_activator_switch()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-komodo.yaml_file_type">komodo.yaml_file_type module</a><ul>
-<li><a class="reference internal" href="#komodo.yaml_file_type.ManifestFile"><code class="docutils literal notranslate"><span class="pre">ManifestFile</span></code></a></li>
-<li><a class="reference internal" href="#komodo.yaml_file_type.ReleaseDir"><code class="docutils literal notranslate"><span class="pre">ReleaseDir</span></code></a></li>
-<li><a class="reference internal" href="#komodo.yaml_file_type.ReleaseFile"><code class="docutils literal notranslate"><span class="pre">ReleaseFile</span></code></a></li>
-<li><a class="reference internal" href="#komodo.yaml_file_type.YamlFile"><code class="docutils literal notranslate"><span class="pre">YamlFile</span></code></a></li>
+<li><a class="reference internal" href="#module-komodo.yaml_file_types">komodo.yaml_file_types module</a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoException"><code class="docutils literal notranslate"><span class="pre">KomodoException</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ManifestFile"><code class="docutils literal notranslate"><span class="pre">ManifestFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ManifestFile.validate_manifest_file"><code class="docutils literal notranslate"><span class="pre">ManifestFile.validate_manifest_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package"><code class="docutils literal notranslate"><span class="pre">Package</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.VALID_IMPORTANCES"><code class="docutils literal notranslate"><span class="pre">Package.VALID_IMPORTANCES</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.VALID_MAKES"><code class="docutils literal notranslate"><span class="pre">Package.VALID_MAKES</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.VALID_MATURITIES"><code class="docutils literal notranslate"><span class="pre">Package.VALID_MATURITIES</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.VALID_VISIBILITIES"><code class="docutils literal notranslate"><span class="pre">Package.VALID_VISIBILITIES</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_entry"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_entry()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_entry_with_errors"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_entry_with_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_importance"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_importance()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_importance_with_errors"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_importance_with_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_maintainer"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_maintainer()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_maintainer_with_errors"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_maintainer_with_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_make"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_make()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_make_with_errors"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_make_with_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_maturity"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_maturity()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_maturity_with_errors"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_maturity_with_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_name"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_name()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_property_type"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_property_type()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_source"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_source()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_source_with_errors"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_source_with_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_version"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_version()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Package.validate_package_visibility"><code class="docutils literal notranslate"><span class="pre">Package.validate_package_visibility()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile.from_yaml_string()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile.validate_package_status_file"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile.validate_package_status_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseDir"><code class="docutils literal notranslate"><span class="pre">ReleaseDir</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile"><code class="docutils literal notranslate"><span class="pre">ReleaseFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.from_yaml_string()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.lint_release_name"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.lint_release_name()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.validate_release_file"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.validate_release_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile"><code class="docutils literal notranslate"><span class="pre">RepositoryFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.from_yaml_string()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.lint_maintainer"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.lint_maintainer()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.validate_package_entry"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.validate_package_entry()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.validate_package_properties"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.validate_package_properties()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.validate_repository_file"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.validate_repository_file()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.validate_versions"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.validate_versions()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.from_yaml_string()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_key"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.validate_upgrade_key()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_proposals_file"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.validate_upgrade_proposals_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.YamlFile"><code class="docutils literal notranslate"><span class="pre">YamlFile</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.handle_validation_errors"><code class="docutils literal notranslate"><span class="pre">handle_validation_errors()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.komodo_error"><code class="docutils literal notranslate"><span class="pre">komodo_error</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.load_package_status_file"><code class="docutils literal notranslate"><span class="pre">load_package_status_file()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.load_repository_file"><code class="docutils literal notranslate"><span class="pre">load_repository_file()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.load_yaml_from_string"><code class="docutils literal notranslate"><span class="pre">load_yaml_from_string()</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.report"><code class="docutils literal notranslate"><span class="pre">report</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-komodo">Module contents</a></li>

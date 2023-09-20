@@ -205,10 +205,10 @@ komodo.switch module
    :undoc-members:
    :show-inheritance:
 
-komodo.yaml\_file\_type module
-------------------------------
+komodo.yaml\_file\_types module
+-------------------------------
 
-.. automodule:: komodo.yaml_file_type
+.. automodule:: komodo.yaml_file_types
    :members:
    :undoc-members:
    :show-inheritance:
