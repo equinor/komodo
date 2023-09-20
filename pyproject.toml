@@ -31,6 +31,20 @@ dependencies = [
     "shell",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "furo",
+    "isort",
+    "myst_parser",
+    "pylint",
+    "pytest",
+    "sphinx",
+    "sphinxcontrib-apidoc",
+    "types-pyyaml"
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 
