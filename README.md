@@ -20,7 +20,8 @@ pip install git+https://github.com/equinor/komodo.git
 
 ## Documentation
 
-[The documentation](https://equinor.github.io/komodo) is online. Developers can build it by installing `dev-requirements.txt` and running `make html` in the `docs` directory.
+[The documentation](https://equinor.github.io/komodo) is online. 
+Developers can build it by installing with dev-dependencies by running `pip install ".[dev]"` and running `make html` in the `docs` directory.
 
 
 ## Basic usage
@@ -111,7 +112,6 @@ In a virtual environment:
 ```bash
 git clone https://github.com/equinor/komodo.git
 cd komodo
-pip install .
-pip install -r dev-requirements.txt
+pip install ".[dev]"
 pytest tests
 ```
