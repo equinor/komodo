@@ -295,7 +295,7 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
     )
     repo.update_file.assert_called_once_with(
         symlink_file,
-        "Update stable symlinks for 2050.02.01-py58",
+        f"Update {branch_name.split('-')[0]} stable symlinks for 2050.02.01-py58",
         """{
     "links": {
         "2050.02-py58": "2050.02.01-py58",
