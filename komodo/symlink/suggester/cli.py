@@ -20,7 +20,7 @@ PR_TEMPLATE = """:robot: Suggesting updating {platform} {mode} to {release} in {
 ---
 ### Description
 - Release: `{release}`
-- Platform `{platform}`
+- Platform: `{platform}`
 - Link type: `{mode}`
 - When: `{now}`
 
