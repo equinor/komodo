@@ -101,6 +101,14 @@ komodo.lint\_package\_status module
    :undoc-members:
    :show-inheritance:
 
+komodo.lint\_upgrade\_proposals module
+--------------------------------------
+
+.. automodule:: komodo.lint_upgrade_proposals
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 komodo.maintainer module
 ------------------------
 
