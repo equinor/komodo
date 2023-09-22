@@ -225,12 +225,8 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/equinor/komodo.git
 </pre></div>
 </div>
-<p>Developers should clone the repository, then change to its directory and also install everything in <code class="docutils literal notranslate"><span class="pre">dev-requirements.txt</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>dev-requirements.txt
-</pre></div>
-</div>
 <p>During development you can do the following for an “editable” install that changes while you develop:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
 </pre></div>
 </div>
 <p>If you want to help develop <code class="docutils literal notranslate"><span class="pre">komodo</span></code>, please read <a class="reference internal" href="development.html"><span class="std std-doc">Development</span></a>.</p>
