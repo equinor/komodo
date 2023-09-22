@@ -197,21 +197,36 @@ class RepositoryFile(YamlFile):
         self, package_name: str, package_version: str
     ) -> komodo_error:
         repository_entries = self.content
-        if package_name not in repository_entries:
+        if package_name not in repository_entries.keys():
+            for real_packagename in [
+                lowercase_pkg
+                for lowercase_pkg in repository_entries.keys()
+                if lowercase_pkg.lower() == package_name.lower()
+            ]:
+                raise KomodoException(
+                    f"Package '{package_name}' not found in repository. Did you mean"
+                    f" '{real_packagename}'?"
+                )
             raise KomodoException(f"Package '{package_name}' not found in repository")
         if package_version not in repository_entries[package_name]:
+            if f"v{package_version}" in repository_entries[package_name]:
+                raise KomodoException(
+                    f"Version '{package_version}' of package '{package_name}' not found"
+                    f" in repository. Did you mean 'v{package_version}'?"
+                )
             raise KomodoException(
                 f"Version '{package_version}' of package '{package_name}' not found in"
-                " repository"
+                " repository. Did you mean"
+                f" '{list(repository_entries[package_name].keys())[0]}'?"
             )
 
     def lint_maintainer(self, package, version) -> komodo_error:
         repository_entries = self.content
-        if package not in repository_entries:
-            raise KomodoException(_komodo_error(package=package, err=MISSING_PACKAGE))
-        if version not in repository_entries[package]:
+        try:
+            self.validate_package_entry(package, version)
+        except KomodoException as e:
             raise KomodoException(
-                _komodo_error(package=package, version=version, err=MISSING_VERSION)
+                _komodo_error(package=package, version=version, err=e)
             )
         return _komodo_error(
             package=package,
@@ -457,9 +472,7 @@ class Package:
     @staticmethod
     def validate_package_name(package_name: str) -> None:
         if isinstance(package_name, str):
-            if str.islower(package_name):
-                return
-            raise ValueError(f"Package name '{package_name}' should be lowercase.")
+            return
         raise TypeError(f"Package name ({package_name}) should be of type string")
 
     @staticmethod
@@ -653,13 +666,7 @@ class Package:
         package_property: str,
         package_property_value: str,
     ):
-        if isinstance(package_property, str):
-            if not package_property.islower():
-                raise ValueError(
-                    f"Package '{package_name}' version '{package_version}' property"
-                    f" should be lowercase ({package_property})"
-                )
-        else:
+        if not isinstance(package_property, str):
             raise TypeError(
                 f"Package '{package_name}' version has invalid property type"
                 f" ({package_property})"

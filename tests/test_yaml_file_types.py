@@ -54,22 +54,6 @@ def does_not_raise():
             ),
             id="invalid_release_file_None_package_version",
         ),
-        pytest.param(
-            'zopfli: "0.3"\nPYTEST: "0.3"',
-            pytest.raises(SystemExit, match=r"Package name .* should be lowercase"),
-            id="invalid_release_file_uppercase_package_name",
-        ),
-        pytest.param(
-            'zopfli: 0.3\nPYTEST: "0.3"',
-            pytest.raises(
-                SystemExit,
-                match=(
-                    r"Package .* has invalid version.*\n.*Package name .* should be"
-                    r" lowercase"
-                ),
-            ),
-            id="invalid_release_file_multiple_errors",
-        ),
     ],
 )
 def test_release_file_yaml_type(content, expectations):
@@ -677,11 +661,6 @@ INVALID_YAML = "zopfli"
             id="invalid_repository_file_None_package_version",
         ),
         pytest.param(
-            INVALID_REPOSITORY_UPPERCASE_PACKAGE_NAME,
-            pytest.raises(SystemExit, match=r"Package name .* should be lowercase"),
-            id="invalid_repository_file_uppercase_package_name",
-        ),
-        pytest.param(
             INVALID_REPOSITORY_MISSING_DEPENDENCY,
             pytest.raises(SystemExit, match=r"Dependency .* not found for package"),
             id="invalid_repository_file_dependency_missing",
@@ -734,10 +713,7 @@ INVALID_YAML = "zopfli"
             INVALID_REPOSITORY_MULTIPLE_ERRORS,
             pytest.raises(
                 SystemExit,
-                match=(
-                    r"Package name .* should be lowercase.*\n.*Package .* has invalid"
-                    r" version type"
-                ),
+                match=r"Package .* has invalid version type",
             ),
             id="invalid_repository_file_multiple_errors",
         ),
@@ -750,10 +726,7 @@ INVALID_YAML = "zopfli"
             INVALID_REPOSITORY_ADDITIONAL_UNKNOWN_UPPERCASE_PROPERTIES,
             pytest.raises(
                 SystemExit,
-                match=(
-                    r"property should be lowercase.*\n.*invalid property value type"
-                    r" \(2.2\).*"
-                ),
+                match=(r"invalid property value type" r" \(2.2\).*"),
             ),
             id="invalid_repository_file_additional_unknown_uppercase_properties",
         ),
