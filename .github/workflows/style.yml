@@ -27,8 +27,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install .
-        pip install -r dev-requirements.txt
+        pip install ".[dev]"
 
     - name: Run black
       uses: psf/black@stable
@@ -39,7 +38,7 @@ jobs:
 
     - name: Lint with flake8
       run: |
-        flake8 --max-line-length 88
+        flake8 --max-line-length 88 --exclude ./build/lib/komodo/_version.py,./komodo/_version.py
 
     - name: pylint
       run: |
