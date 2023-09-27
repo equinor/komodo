@@ -26,7 +26,7 @@ def print_system_exit_message(system_exit_msg):
 
 def print_warning_message(system_warning_msg):
     if system_warning_msg != "":
-        warnings.warn(system_warning_msg, UserWarning)
+        warnings.warn(system_warning_msg, UserWarning, stacklevel=2)
 
 
 def msg_packages_invalid(
