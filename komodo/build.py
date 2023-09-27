@@ -267,7 +267,7 @@ def make(
             ],
         )
     )
-    extra_makeopts = os.environ.get("extra_makeopts")
+    extra_makeopts = os.environ.get("EXTRA_MAKEOPTS")
     build_pythonpath = pypaths(fakeprefix, pkgs.get("python"))
     build_path = ":".join([os.path.join(fakeprefix, "bin"), os.environ["PATH"]])
 
