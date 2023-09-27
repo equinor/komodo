@@ -35,7 +35,7 @@ jobs:
         ./bootstrap.sh $(which python)
 
     - name: Unit tests
-      run:
+      run: |
         source boot/build-env/bin/activate
         boot/kmd-env/bin/python -m pytest tests
 
