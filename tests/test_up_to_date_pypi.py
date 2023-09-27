@@ -218,7 +218,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
         request_mock.json.return_value = {
             "releases": {
                 "2.2.0": [{"yanked": True}],
-                "2.0.0": [{"requires_python": ">=3.10"}],
+                "2.0.0": [{"requires_python": ">=3.8"}],
             },
         }
         monkeypatch.setattr(requests, "get", MagicMock(return_value=request_mock))

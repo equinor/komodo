@@ -164,7 +164,7 @@ def transpile_releases_for_pip(
     repository = load_yaml(repository_file)
     for rhel_ver, py_ver in get_matrix(rhel_versions, python_versions):
         release_dict = _pick_package_versions_for_release(
-            release_matrix, py_ver, rhel_ver
+            release_matrix, rhel_ver, py_ver
         )
         pip_packages = [
             f"{pkg}=={version}"
