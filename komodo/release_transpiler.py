@@ -75,7 +75,7 @@ def _pick_package_versions_for_release(
             _check_version_exists_for_coordinates(versions, rhel_ver, py_ver)
         except KeyError as err:
             error_msg = f"{str(err)}. Failed for {pkg_name}."
-            raise KeyError(error_msg)
+            raise KeyError(error_msg) from None
 
         if rhel_ver in versions:
             version = versions[rhel_ver][py_ver]
@@ -128,10 +128,9 @@ def _check_version_exists_for_coordinates(
                 f"Python version {py_coordinate} not found for "
                 f"rhel version {rhel_coordinate}."
             )
-    elif "py" in first_level_versions[0]:
+    elif "py" in first_level_versions[0] and py_coordinate not in first_level_versions:
         # Only python has different versions
-        if py_coordinate not in first_level_versions:
-            raise KeyError(f"Python version {py_coordinate} not found.")
+        raise KeyError(f"Python version {py_coordinate} not found.")
 
 
 def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> None:

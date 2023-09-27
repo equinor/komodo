@@ -1,5 +1,6 @@
 import argparse
 import collections
+import contextlib
 import difflib
 import os
 from base64 import b64decode
@@ -175,13 +176,11 @@ Source code for this script can be found [here](https://github.com/equinor/komod
         commit_title=f"Add release {target}",
         merge_method="squash",
     )
-    try:
+    with contextlib.suppress(github.GithubException):
         tmp_ref.delete()
-    except github.GithubException:
-        pass  # automatically deleted on PR merge
-    # done with temporary PR
+        # If exception occurs, deletion is automatic
 
-    # making the real PR
+    # done with temporary PR, making the real PR:
     repo.create_pull(
         title=f"Add release {target}", body=pr_msg, head=target, base=git_ref
     )

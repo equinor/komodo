@@ -93,10 +93,7 @@ def suggest_symlink_configuration(
         logger.info("Nothing to update")
         return None
 
-    if "azure" in args.symlink_conf_path:
-        platform = "azure"
-    else:
-        platform = "onprem"
+    platform = "azure" if "azure" in args.symlink_conf_path else "onprem"
 
     target_branch = f"{args.release}/{platform}-{args.mode}"
 

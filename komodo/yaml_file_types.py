@@ -52,7 +52,7 @@ def load_yaml_from_string(value: str) -> dict:
         yml = YAML().load(value)
         return yml
     except DuplicateKeyError as e:
-        raise SystemExit(e)
+        raise SystemExit(e) from None
 
 
 class YamlFile(argparse.FileType):
@@ -197,10 +197,10 @@ class RepositoryFile(YamlFile):
         self, package_name: str, package_version: str
     ) -> komodo_error:
         repository_entries = self.content
-        if package_name not in repository_entries.keys():
+        if package_name not in repository_entries:
             for real_packagename in [
                 lowercase_pkg
-                for lowercase_pkg in repository_entries.keys()
+                for lowercase_pkg in repository_entries
                 if lowercase_pkg.lower() == package_name.lower()
             ]:
                 raise KomodoException(
@@ -227,7 +227,7 @@ class RepositoryFile(YamlFile):
         except KomodoException as e:
             raise KomodoException(
                 _komodo_error(package=package, version=version, err=e)
-            )
+            ) from e
         return _komodo_error(
             package=package,
             version=version,
@@ -322,7 +322,7 @@ class RepositoryFile(YamlFile):
                         f" invalid dependency type({dependency})"
                     )
                     continue
-                if dependency not in self.content.keys():
+                if dependency not in self.content:
                     errors.append(
                         f"Dependency '{dependency}' not found for"
                         f" package '{package_name}'"
