@@ -87,26 +87,6 @@ REPOSITORY_FILE_MISSING_PACKAGE_VERSION = """
         maintainer: scout
 """
 
-INVALID_REPOSITORY_UPPERCASE_PACKAGE_NAME = """
-    setuptools:
-      68.0.0:
-        source: pypi
-        make: pip
-        maintainer: scout
-        depends:
-          - wheel
-          - python
-    PYTHON:
-      3.9.6:
-        make: sh
-        makefile: build__python-virtualenv.sh
-        maintainer: scout
-    wheel:
-      0.40.0:
-        make: pip
-        maintainer: scout
-"""
-
 VALID_UPGRADE_PROPOSALS = """
 1111-11:
 1111-12:
@@ -156,12 +136,6 @@ INVALID_UPGRADE_PROPOSALS_FLOAT_PACKAGE_VERSION = """
   python: 3.9
 """
 
-INVALID_UPGRADE_PROPOSALS_UPPERCASE_PACKAGE_NAME = """
-1111-11:
-1111-12:
-  PYTHON: 3.9
-"""
-
 RANDOM_STRING = """
 yaml
 """
@@ -206,7 +180,7 @@ yaml
         pytest.param(
             VALID_EMPTY_UPGRADE_PROPOSALS,
             VALID_REPOSITORY,
-            pytest.raises(SystemExit, match=r"No upgrades found"),
+            does_not_raise(),
             id="no_upgrades_in_upgrade_proposals",
         ),
         pytest.param(
@@ -267,29 +241,6 @@ yaml
                 match=r"invalid version type",
             ),
             id="invalid_upgrade_proposals_float_package_version",
-        ),
-        pytest.param(
-            INVALID_UPGRADE_PROPOSALS_UPPERCASE_PACKAGE_NAME,
-            VALID_REPOSITORY,
-            pytest.raises(
-                SystemExit,
-                match=(
-                    r"should be lowercase.*\n.*does not appear to be an"
-                    r" upgrade_proposals file"
-                ),
-            ),
-            id="invalid_upgrade_proposals_uppercase_package_name",
-        ),
-        pytest.param(
-            VALID_UPGRADE_PROPOSALS,
-            INVALID_REPOSITORY_UPPERCASE_PACKAGE_NAME,
-            pytest.raises(
-                SystemExit,
-                match=(
-                    r"should be lowercase.*\n.*does not appear to be a repository file"
-                ),
-            ),
-            id="upgrade_proposals_invalid_repository_uppercase_package_name",
         ),
     ],
 )

@@ -32,7 +32,7 @@ def verify_package_versions_exist(
         if errors:
             raise SystemExit("\n".join(errors))
     if releases_with_upgrades_counter == 0:
-        raise SystemExit("No upgrades found")
+        print("No upgrades found")
     if releases_with_upgrades_counter > 1:
         raise SystemExit("Found upgrades for more than one release")
 
