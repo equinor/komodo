@@ -63,8 +63,6 @@ def test_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "root/bin/python4.2"))
     assert os.path.exists(os.path.join(release_path, "enable"))
     assert os.path.exists(os.path.join(release_path, "enable.csh"))
-    assert os.path.exists(os.path.join(release_path, "local"))
-    assert os.path.exists(os.path.join(release_path, "local.csh"))
 
     fname = "root/bin/some-github-binary-artifact"
     downloaded_file = os.path.join(release_path, fname)

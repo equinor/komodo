@@ -1,5 +1,5 @@
 lib1:
-  1.2.3+builtin:
+  1.2.4+builtin:
     source: pypi
     make: sh
   0.1.2+builtin:
