@@ -265,6 +265,8 @@
 </li>
         <li><a href="komodo.html#komodo.release_transpiler.combine">combine() (in module komodo.release_transpiler)</a>
 </li>
+        <li><a href="komodo.html#komodo.lint_package_status.compare_sets">compare_sets() (in module komodo.lint_package_status)</a>
+</li>
         <li><a href="komodo.html#komodo.check_up_to_date_pypi.compatible_versions">compatible_versions() (in module komodo.check_up_to_date_pypi)</a>
 </li>
         <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.configuration.Configuration">Configuration (class in komodo.symlink.suggester.configuration)</a>
@@ -373,9 +375,11 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.data.html#komodo.data.Data.get">get() (komodo.data.Data method)</a>
 </li>
-        <li><a href="komodo.html#komodo.lint.get_args">get_args() (in module komodo.lint)</a>
+        <li><a href="komodo.html#komodo.check_up_to_date_pypi.get_args">get_args() (in module komodo.check_up_to_date_pypi)</a>
 
         <ul>
+          <li><a href="komodo.html#komodo.lint.get_args">(in module komodo.lint)</a>
+</li>
           <li><a href="komodo.html#komodo.lint_upgrade_proposals.get_args">(in module komodo.lint_upgrade_proposals)</a>
 </li>
         </ul></li>
@@ -421,7 +425,7 @@
 </li>
         <li><a href="komodo.html#komodo.snyk_reporting.get_unique_issues">get_unique_issues() (in module komodo.snyk_reporting)</a>
 </li>
-        <li><a href="komodo.html#komodo.check_up_to_date_pypi.get_upgrade_proposal">get_upgrade_proposal() (in module komodo.check_up_to_date_pypi)</a>
+        <li><a href="komodo.html#komodo.check_up_to_date_pypi.get_upgrade_proposals_from_pypi">get_upgrade_proposals_from_pypi() (in module komodo.check_up_to_date_pypi)</a>
 </li>
         <li><a href="komodo.html#komodo.show_version.get_version">get_version() (in module komodo.show_version)</a>
 </li>
@@ -465,8 +469,6 @@
   <h2>K</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="komodo.html#komodo.lint.kerr">kerr (in module komodo.lint)</a>
-</li>
         <li>
     komodo
 
@@ -714,8 +716,12 @@
           <li><a href="komodo.html#module-komodo.yaml_file_types">module</a>
 </li>
         </ul></li>
-        <li><a href="komodo.html#komodo.yaml_file_types.komodo_error">komodo_error (in module komodo.yaml_file_types)</a>
+        <li><a href="komodo.html#komodo.lint.komodo_error">komodo_error (in module komodo.lint)</a>
+
+        <ul>
+          <li><a href="komodo.html#komodo.yaml_file_types.komodo_error">(in module komodo.yaml_file_types)</a>
 </li>
+        </ul></li>
         <li><a href="komodo.html#komodo.yaml_file_types.KomodoException">KomodoException</a>
 </li>
     </ul></td>
@@ -730,24 +736,16 @@
 </li>
         <li><a href="komodo.html#komodo.lint.lint">lint() (in module komodo.lint)</a>
 </li>
-        <li><a href="komodo.html#komodo.lint.lint_dependencies">lint_dependencies() (in module komodo.lint)</a>
-</li>
         <li><a href="komodo.html#komodo.lint.lint_main">lint_main() (in module komodo.lint)</a>
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.lint_maintainer">lint_maintainer() (komodo.yaml_file_types.RepositoryFile method)</a>
 </li>
-        <li><a href="komodo.html#komodo.lint.lint_maintainers">lint_maintainers() (in module komodo.lint)</a>
+        <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.lint_release_name">lint_release_name() (komodo.yaml_file_types.ReleaseFile static method)</a>
 </li>
-        <li><a href="komodo.html#komodo.lint.lint_release_name">lint_release_name() (in module komodo.lint)</a>
-
-        <ul>
-          <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.lint_release_name">(komodo.yaml_file_types.ReleaseFile static method)</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.lint.lint_version_numbers">lint_version_numbers() (in module komodo.lint)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.release_cleanup.load_all_releases">load_all_releases() (in module komodo.release_cleanup)</a>
 </li>
         <li><a href="komodo.html#komodo.check_up_to_date_pypi.load_from_file">load_from_file() (in module komodo.check_up_to_date_pypi)</a>
@@ -773,6 +771,8 @@
         <li><a href="komodo.html#komodo.check_up_to_date_pypi.main">main() (in module komodo.check_up_to_date_pypi)</a>
 
         <ul>
+          <li><a href="komodo.html#komodo.cleanup.main">(in module komodo.cleanup)</a>
+</li>
           <li><a href="komodo.html#komodo.extract_dep_graph.main">(in module komodo.extract_dep_graph)</a>
 </li>
           <li><a href="komodo.html#komodo.insert_proposals.main">(in module komodo.insert_proposals)</a>
@@ -971,6 +971,8 @@
 </li>
         <li><a href="komodo.html#komodo.lint_maturity.read_yaml_file">read_yaml_file() (in module komodo.lint_maturity)</a>
 </li>
+        <li><a href="komodo.html#komodo.lint_maturity.read_yaml_file_and_convert_to_release_file">read_yaml_file_and_convert_to_release_file() (in module komodo.lint_maturity)</a>
+</li>
         <li><a href="komodo.html#komodo.insert_proposals.recursive_update">recursive_update() (in module komodo.insert_proposals)</a>
 </li>
         <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.release.Release">Release (class in komodo.symlink.suggester.release)</a>
@@ -1009,6 +1011,8 @@
           <li><a href="komodo.html#komodo.reverse_dep_graph.run">(in module komodo.reverse_dep_graph)</a>
 </li>
         </ul></li>
+        <li><a href="komodo.html#komodo.check_up_to_date_pypi.run_check_up_to_date">run_check_up_to_date() (in module komodo.check_up_to_date_pypi)</a>
+</li>
         <li><a href="komodo.html#komodo.release_cleanup.run_cleanup">run_cleanup() (in module komodo.release_cleanup)</a>
 </li>
         <li><a href="komodo.html#komodo.release_cleanup.run_prettier">run_prettier() (in module komodo.release_cleanup)</a>
@@ -1117,10 +1121,10 @@
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.Package.validate_package_maturity">validate_package_maturity() (komodo.yaml_file_types.Package static method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.yaml_file_types.Package.validate_package_maturity_with_errors">validate_package_maturity_with_errors() (komodo.yaml_file_types.Package static method)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.yaml_file_types.Package.validate_package_name">validate_package_name() (komodo.yaml_file_types.Package static method)</a>
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.validate_package_properties">validate_package_properties() (komodo.yaml_file_types.RepositoryFile method)</a>
@@ -1137,15 +1141,25 @@
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.Package.validate_package_visibility">validate_package_visibility() (komodo.yaml_file_types.Package static method)</a>
 </li>
-        <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.validate_release_file">validate_release_file() (komodo.yaml_file_types.ReleaseFile static method)</a>
+        <li><a href="komodo.html#komodo.check_up_to_date_pypi.validate_release_file">validate_release_file() (in module komodo.check_up_to_date_pypi)</a>
+
+        <ul>
+          <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.validate_release_file">(komodo.yaml_file_types.ReleaseFile static method)</a>
 </li>
-        <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.validate_repository_file">validate_repository_file() (komodo.yaml_file_types.RepositoryFile method)</a>
+        </ul></li>
+        <li><a href="komodo.html#komodo.check_up_to_date_pypi.validate_repository_file">validate_repository_file() (in module komodo.check_up_to_date_pypi)</a>
+
+        <ul>
+          <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.validate_repository_file">(komodo.yaml_file_types.RepositoryFile method)</a>
 </li>
+        </ul></li>
         <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_key">validate_upgrade_key() (komodo.yaml_file_types.UpgradeProposalsFile method)</a>
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_proposals_file">validate_upgrade_proposals_file() (komodo.yaml_file_types.UpgradeProposalsFile static method)</a>
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.validate_versions">validate_versions() (komodo.yaml_file_types.RepositoryFile method)</a>
+</li>
+        <li><a href="komodo.html#komodo.insert_proposals.verify_branch_does_not_exist">verify_branch_does_not_exist() (in module komodo.insert_proposals)</a>
 </li>
         <li><a href="komodo.symlink.html#komodo.symlink.sanity_check.verify_integrity">verify_integrity() (in module komodo.symlink.sanity_check)</a>
 </li>
