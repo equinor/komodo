@@ -18,9 +18,8 @@ def equal_links(a, b):
 
 def _linked_to(s_link, list_of_files):
     for file_name in list_of_files:
-        if os.path.islink(file_name):
-            if os.readlink(file_name) == s_link:
-                return True
+        if os.path.islink(file_name) and os.readlink(file_name) == s_link:
+            return True
 
     return False
 
@@ -54,7 +53,7 @@ def _check_link(link, link_dict, errors, visited):
 
     visited.append(link)
 
-    if link in link_dict["links"].keys():
+    if link in link_dict["links"]:
         _check_link(link_dict["links"][link], link_dict, errors, visited)
 
     elif not os.path.exists(os.path.join(link_dict["root_folder"], link)):
@@ -110,7 +109,8 @@ def sanity_main():
     if not os.path.isfile(args.config):
         sys.exit("The file {} cannot be found".format(args.config))
 
-    input_dict = json.load(open(args.config))
+    with open(args.config, encoding="utf-8") as file:
+        input_dict = json.load(file)
     assert_root_nodes(input_dict)
     from_dir = read_link_structure(input_dict["root_folder"])
 

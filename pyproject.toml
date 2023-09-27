@@ -111,3 +111,13 @@ disable = [
     "use-symbolic-message-instead",
     "useless-object-inheritance",
 ]
+
+[tool.ruff]
+src = ["src"]
+select = [
+  "W",   # pycodestyle
+  "I",   # isort
+  "B",   # flake-8-bugbear
+  "SIM", # flake-8-simplify
+]
+line-length = 88

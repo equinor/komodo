@@ -4,7 +4,7 @@ from komodo import matrix
 
 
 def test_format_matrix():
-    assert "base-py27-rhel6" == matrix.format_release("base", "rhel6", "py27")
+    assert matrix.format_release("base", "rhel6", "py27") == "base-py27-rhel6"
 
 
 @pytest.mark.parametrize(

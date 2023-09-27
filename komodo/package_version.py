@@ -33,7 +33,7 @@ def latest_pypi_version(package):
             raise ValueError(
                 f"got unexpected output from {cmd} using "
                 f"{_PYPI_LATEST_VERSION_RE}: {stderr}"
-            )
+            ) from e
         versions = matches.group(1).split(",")
         version = versions[len(versions) - 1].strip()
         if version == "none":

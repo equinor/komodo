@@ -131,4 +131,4 @@ def load_yaml(filename):
         ruamel.yaml.scanner.ScannerError,
         ruamel.yaml.constructor.DuplicateKeyError,
     ) as e:
-        raise SystemExit(f"The file: <{filename}> contains invalid YAML syntax:\n {e}")
+        raise SystemExit(f"The file: <{filename}> contains invalid YAML syntax") from e

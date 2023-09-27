@@ -71,7 +71,7 @@ def _dump_dot_dep(reverse, pkg, version, out, seen):
 
 def build_doc(pkg, reverse):
     rev_list = []
-    if pkg not in reverse.keys():
+    if pkg not in reverse:
         return rev_list
     for rev_dep, rev_version in reverse[pkg]:
         rev_list.append({f"{rev_dep}-{rev_version}": build_doc(rev_dep, reverse)})

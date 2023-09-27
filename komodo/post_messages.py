@@ -1,4 +1,5 @@
 import argparse
+import contextlib
 import fnmatch
 import hashlib
 import os
@@ -89,12 +90,10 @@ def main(args=None):
     releases = args.releases
     if not args.releases:
         releases = os.listdir(args.komodo_prefix)
-        try:
+        with contextlib.suppress(ValueError):
             releases.remove(
                 "repository"
             )  # repository is not a release in komodo folder
-        except ValueError:
-            pass
 
     # Scrap all old messages
     for release_name in releases:
