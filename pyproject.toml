@@ -34,12 +34,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black",
-    "flake8",
     "furo",
-    "isort",
     "myst_parser",
     "pylint",
     "pytest",
+    "ruff",
     "sphinx",
     "sphinxcontrib-apidoc",
     "types-pyyaml"
@@ -70,9 +69,6 @@ komodo-show-version = "komodo.show_version:main"
 komodo-snyk-test = "komodo.snyk_reporting:main"
 komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
 komodo-transpiler = "komodo.release_transpiler:main"
-
-[tool.isort]
-profile = "black"
 
 [tool.pylint.messages_control]
 disable = [
@@ -121,3 +117,6 @@ select = [
   "SIM", # flake-8-simplify
 ]
 line-length = 88
+
+[tool.ruff.isort]
+known-first-party = ["komodo"]
