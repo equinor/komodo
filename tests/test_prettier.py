@@ -13,13 +13,13 @@ def get_yaml_string(filename):
 
 def test_repository_prettifying():
     assert prettier(load_yaml(INPUT_FOLDER / "ugly_repository.yml")) == get_yaml_string(
-        "pretty_repository.yml"
+        "pretty_repository.yml",
     )
 
 
 def test_release_prettifying():
     assert prettier(load_yaml(INPUT_FOLDER / "ugly_release.yml")) == get_yaml_string(
-        "pretty_release.yml"
+        "pretty_release.yml",
     )
 
 

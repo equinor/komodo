@@ -85,6 +85,7 @@ disable = [
     "line-too-long",
     "locally-disabled",
     "logging-not-lazy",
+    "logging-fstring-interpolation",
     "missing-class-docstring",
     "missing-function-docstring",
     "missing-module-docstring",

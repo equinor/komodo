@@ -38,7 +38,8 @@ def copy_files(file_list, dst_path, src_path):
         print(f"Installing message: {file_name}")
         file_path = os.path.join(src_path, file_name)
         if not os.path.exists(file_path):
-            raise SystemExit(f"ERROR: Message file {file_name} does not exisit")
+            msg = f"ERROR: Message file {file_name} does not exisit"
+            raise SystemExit(msg)
         shutil.copy(file_path, os.path.join(dst_path, file_name))
 
 
@@ -77,14 +78,16 @@ def main(args=None):
     args = parser.parse_args(args=args)
 
     if not os.path.isfile(args.motd_db):
-        raise SystemExit(f"ERROR: The message-database {args.motd_db} was not found")
+        msg = f"ERROR: The message-database {args.motd_db} was not found"
+        raise SystemExit(msg)
     with open(args.motd_db) as motd_db_file:
         yml = YAML()
         motd_db = yml.load(motd_db_file)
     motd_path = os.path.dirname(args.motd_db)
 
     if not os.path.isdir(args.komodo_prefix):
-        raise SystemExit(f"ERROR: Komodo-prefix {args.komodo_prefix} not found")
+        msg = f"ERROR: Komodo-prefix {args.komodo_prefix} not found"
+        raise SystemExit(msg)
 
     # Create list of releases to post to
     releases = args.releases
@@ -92,7 +95,7 @@ def main(args=None):
         releases = os.listdir(args.komodo_prefix)
         with contextlib.suppress(ValueError):
             releases.remove(
-                "repository"
+                "repository",
             )  # repository is not a release in komodo folder
 
     # Scrap all old messages
@@ -100,7 +103,8 @@ def main(args=None):
         komodo_path = os.path.join(args.komodo_prefix, release_name)
 
         if not os.path.isdir(komodo_path):
-            raise SystemExit(f"ERROR: Release {release_name} not found")
+            msg = f"ERROR: Release {release_name} not found"
+            raise SystemExit(msg)
 
         dst_motd_path = os.path.join(komodo_path, "motd")
         if os.path.isdir(dst_motd_path):

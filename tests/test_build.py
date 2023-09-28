@@ -6,7 +6,7 @@ from komodo.build import make
 from komodo.package_version import LATEST_PACKAGE_ALIAS
 
 
-@pytest.fixture
+@pytest.fixture()
 def captured_shell_commands(monkeypatch):
     commands = []
     with monkeypatch.context() as m:
@@ -29,8 +29,8 @@ def test_make_one_pip_package(captured_shell_commands, tmpdir):
                 "make": "pip",
                 "maintainer": "someone",
                 "depends": [],
-            }
-        }
+            },
+        },
     }
 
     make(packages, repositories, {}, str(tmpdir))
@@ -50,8 +50,8 @@ def test_make_one_pip_package_different_name(captured_shell_commands, tmpdir):
                 "make": "pip",
                 "maintainer": "someone",
                 "depends": [],
-            }
-        }
+            },
+        },
     }
 
     make(packages, repositories, {}, str(tmpdir))
@@ -71,8 +71,8 @@ def test_make_pip_package_from_latest(captured_shell_commands, tmpdir):
                 "make": "pip",
                 "maintainer": "someone",
                 "depends": [],
-            }
-        }
+            },
+        },
     }
 
     with patch("komodo.build.latest_pypi_version") as mock_latest_version:
@@ -95,8 +95,8 @@ def test_make_sh_does_not_accept_pypi_package_name(captured_shell_commands, tmpd
                 "make": "sh",
                 "maintainer": "someone",
                 "depends": [],
-            }
-        }
+            },
+        },
     }
 
     with pytest.raises(ValueError, match=r"pypi_package_name"):

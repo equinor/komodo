@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import sys
 import warnings
 from collections import namedtuple
 
@@ -10,11 +11,13 @@ from pkg_resources import PkgResourcesDeprecationWarning, parse_version
 from komodo.yaml_file_types import KomodoException, ReleaseFile, RepositoryFile
 
 komodo_error = namedtuple(
-    "KomodoError", ["package", "version", "maintainer", "depends", "err"]
+    "KomodoError",
+    ["package", "version", "maintainer", "depends", "err"],
 )
 
 report = namedtuple(
-    "LintReport", ["release_name", "maintainers", "dependencies", "versions"]
+    "LintReport",
+    ["release_name", "maintainers", "dependencies", "versions"],
 )
 
 
@@ -44,7 +47,7 @@ def lint_version_numbers(package, version, repo):
     maintainer = pv.get("maintainer", MISSING_MAINTAINER)
 
     try:
-        logging.info("Using %s %s" % (package, version))
+        logging.info(f"Using {package} {version}")
         if "main" in version:
             return _komodo_error(package, version, maintainer, err=MAIN_VERSION)
         if "master" in version:
@@ -66,19 +69,22 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
     for package_name, package_version in release_file.content.items():
         try:
             lint_maintainer = repository_file.lint_maintainer(
-                package_name, package_version
+                package_name,
+                package_version,
             )  # throws komodoexception on missing package or version in repository
             if lint_maintainer:
                 mns.append(lint_maintainer)
 
             lint_version_number = lint_version_numbers(
-                package_name, package_version, repository_file.content
+                package_name,
+                package_version,
+                repository_file.content,
             )
             if lint_version_number:
                 versions.append(lint_version_number)
             missing = []
             repository_file_package_version_data = repository_file.content.get(
-                package_name
+                package_name,
             ).get(package_version)
             for dependency in repository_file_package_version_data.get("depends", []):
                 if dependency not in release_file.content:
@@ -92,13 +98,16 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
                         err=(
                             f"{MISSING_DEPENDENCY} for {package_name} {package_version}"
                         ),
-                    )
+                    ),
                 )
         except KomodoException as e:
             mns.append(e.error)
 
     return report(
-        release_name=[], maintainers=mns, dependencies=deps, versions=versions
+        release_name=[],
+        maintainers=mns,
+        dependencies=deps,
+        versions=versions,
     )
 
 
@@ -124,8 +133,7 @@ def get_args():
         dest="loglevel",
         const=logging.INFO,
     )
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def lint_main():
@@ -136,21 +144,21 @@ def lint_main():
         report = lint(args.packagefile, args.repofile)
         mns, deps, versions = report.maintainers, report.dependencies, report.versions
     except ValueError as err:
-        exit(str(err))
+        sys.exit(str(err))
     print("%d packages" % len(mns))
-    if not any([err.err for err in mns + deps + versions]):
+    if not any(err.err for err in mns + deps + versions):
         print("No errors found")
-        exit(0)
+        sys.exit(0)
 
     for err in mns + deps + versions:
         if err.err:
             dep = ": %s" % ", ".join(err.depends) if err.depends else ""
-            print("%s%s" % (err.err, dep))
+            print(f"{err.err}{dep}")
 
-    if not any([err.err for err in mns + deps]):
-        exit(0)  # currently we allow erronous version numbers
+    if not any(err.err for err in mns + deps):
+        sys.exit(0)  # currently we allow erronous version numbers
 
-    exit("Error in komodo configuration.")
+    sys.exit("Error in komodo configuration.")
 
 
 if __name__ == "__main__":

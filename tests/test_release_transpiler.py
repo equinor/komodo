@@ -24,23 +24,27 @@ builtins = {
 
 
 @pytest.mark.parametrize(
-    "py_coords_input,packages_lib2,py_coords_not_in_lib3",
+    ("py_coords_input", "packages_lib2", "py_coords_not_in_lib3"),
     [
         (["3.6", "3.8"], "2.3.4", "py27"),
         (None, {"py27": "1.2.3", "py36": "2.3.4", "py38": "2.3.4"}, [""]),
     ],
 )
 def test_build_release_matrix_py_coords(
-    tmpdir, py_coords_input, packages_lib2, py_coords_not_in_lib3
+    tmpdir,
+    py_coords_input,
+    packages_lib2,
+    py_coords_not_in_lib3,
 ):
     """lib1 tests packages with builtins,
     lib2 tests packages with same version for two py coordinates,
-    lib3 tests packages with different versions for each py coordinate"""
+    lib3 tests packages with different versions for each py coordinate.
+    """
     release_base = "2020.01.a1"
     release_folder = os.path.join(_get_test_root(), "data/test_releases/")
     with tmpdir.as_cwd():
         build_matrix_file(release_base, release_folder, builtins, py_coords_input)
-        new_release_file = "{}.yml".format(release_base)
+        new_release_file = f"{release_base}.yml"
         assert os.path.isfile(new_release_file)
         with open(new_release_file) as f:
             release_matrix = yaml.safe_load(f)
@@ -71,12 +75,12 @@ def test_transpile_add_argument(tmpdir, matrix):
                         release_base,
                         py_coordinate_filename_format,
                         rhel_coordinate_filename_format,
-                    )
+                    ),
                 )
 
 
 @pytest.mark.parametrize(
-    "matrix,error_message_content",
+    ("matrix", "error_message_content"),
     [
         ({"py": ["3.8"], "rhel": ["7"]}, "Test passes, no error reported"),
         (
@@ -114,13 +118,16 @@ def test_transpile_for_pip(tmpdir):
     versions_matrix = {"rhel": ["7"], "py": ["38"]}
     with tmpdir.as_cwd():
         transpile_releases_for_pip(
-            release_file, os.getcwd(), repo_file, versions_matrix
+            release_file,
+            os.getcwd(),
+            repo_file,
+            versions_matrix,
         )
         for rhel_ver in ("rhel7",):
             for py_ver in ("py38",):
                 filename = f"{release_base}-{py_ver}-{rhel_ver}.req"
                 assert os.path.isfile(filename)
-                with open(filename, mode="r", encoding="utf-8") as fil:
+                with open(filename, encoding="utf-8") as fil:
                     file_lines = fil.read().splitlines()
-                assert all([not line.startswith(not_pip_pkg) for line in file_lines])
+                assert all(not line.startswith(not_pip_pkg) for line in file_lines)
                 assert expected_line in file_lines

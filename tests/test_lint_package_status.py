@@ -437,10 +437,13 @@ def create_tmp_file(file_path: str, file_content: str):
 
 
 @pytest.mark.parametrize(
-    "package_status_file_content, repository_file_content, expectation",
+    ("package_status_file_content", "repository_file_content", "expectation"),
     [
         pytest.param(
-            VALID_PACKAGE_STATUS, VALID_REPOSITORY, does_not_raise(), id="valid_input"
+            VALID_PACKAGE_STATUS,
+            VALID_REPOSITORY,
+            does_not_raise(),
+            id="valid_input",
         ),
         pytest.param(
             VALID_PACKAGE_STATUS,
@@ -475,7 +478,8 @@ def create_tmp_file(file_path: str, file_content: str):
             INVALID_PACKAGE_STATUS_IDENTIFIER_TYPE,
             VALID_REPOSITORY,
             pytest.raises(
-                SystemExit, match=r"Package name .* should be of type string"
+                SystemExit,
+                match=r"Package name .* should be of type string",
             ),
             id="invalid_repository_package_status_identifier_type",
         ),
@@ -537,7 +541,8 @@ def create_tmp_file(file_path: str, file_content: str):
             VALID_PACKAGE_STATUS_INVALID_VISIBILITY_OPTION,
             VALID_REPOSITORY,
             pytest.raises(
-                SystemExit, match=r"Package 'zopfli' has invalid visibility value "
+                SystemExit,
+                match=r"Package 'zopfli' has invalid visibility value ",
             ),
             id="valid_input_package_status_invalid_visibility_option",
         ),
@@ -545,7 +550,8 @@ def create_tmp_file(file_path: str, file_content: str):
             VALID_PACKAGE_STATUS_INVALID_MATURITY_OPTION,
             VALID_REPOSITORY,
             pytest.raises(
-                SystemExit, match=r"Package 'python' has invalid maturity value"
+                SystemExit,
+                match=r"Package 'python' has invalid maturity value",
             ),
             id="valid_input_package_status_invalid_maturity_option",
         ),
@@ -553,7 +559,8 @@ def create_tmp_file(file_path: str, file_content: str):
             VALID_PACKAGE_STATUS_INVALID_IMPORTANCE_OPTION,
             VALID_REPOSITORY,
             pytest.raises(
-                SystemExit, match=r"python has invalid importance value \(very\)"
+                SystemExit,
+                match=r"python has invalid importance value \(very\)",
             ),
             id="valid_input_package_status_invalid_importance_option",
         ),
@@ -576,10 +583,12 @@ def test_integration(
         folder_name = os.path.join(os.getcwd(), "test_package_status/")
         os.makedirs(folder_name)
         repository_file = create_tmp_file(
-            f"{folder_name}/test_repository.yml", repository_file_content
+            f"{folder_name}/test_repository.yml",
+            repository_file_content,
         )
         package_status_file = create_tmp_file(
-            f"{folder_name}/test_package_status.yml", package_status_file_content
+            f"{folder_name}/test_package_status.yml",
+            package_status_file_content,
         )
     monkeypatch.setattr(sys, "argv", ["", package_status_file, repository_file])
     with expectation:

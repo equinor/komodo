@@ -40,7 +40,7 @@ def test_no_api_token():
 
 
 @pytest.mark.parametrize(
-    "packages,expected_search_string,input_issue_ids,expected_issue_ids",
+    ("packages", "expected_search_string", "input_issue_ids", "expected_issue_ids"),
     [
         (
             {"pyaml": "20.4.0"},
@@ -63,7 +63,10 @@ def test_no_api_token():
     ],
 )
 def test_snyk_reporting(
-    packages, expected_search_string, input_issue_ids, expected_issue_ids
+    packages,
+    expected_search_string,
+    input_issue_ids,
+    expected_issue_ids,
 ):
     releases = {"2025.05.00": packages}
     repositories = {
@@ -73,7 +76,7 @@ def test_snyk_reporting(
                 "make": "pip",
                 "maintainer": "someone",
                 "depends": [],
-            }
+            },
         }
         for k, v in packages.items()
     }
@@ -85,14 +88,15 @@ def test_snyk_reporting(
                     "make": "pip",
                     "maintainer": "someone",
                     "depends": [],
-                }
-            }
-        }
+                },
+            },
+        },
     )
     org_mock = Mock()
     org_mock.test_pipfile.return_value = _create_result_mock(input_issue_ids)
     with patch(
-        "komodo.snyk_reporting._get_org", return_value=org_mock
+        "komodo.snyk_reporting._get_org",
+        return_value=org_mock,
     ) as org_func_mock:
         vulnerabilities = snyk_main(
             releases=releases,

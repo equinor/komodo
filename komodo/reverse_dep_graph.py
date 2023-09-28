@@ -37,9 +37,11 @@ def build_reverse(base, repo):
 
     for pkg, version in base.items():
         if pkg not in repo:
-            raise SystemExit(f"No package {pkg} in repo")
+            msg = f"No package {pkg} in repo"
+            raise SystemExit(msg)
         if version not in repo[pkg]:
-            raise SystemExit(f"No version {version} in package {pkg} in repo")
+            msg = f"No version {version} in package {pkg} in repo"
+            raise SystemExit(msg)
         repo_version = repo[pkg][version]
         if "depends" in repo_version:
             for dep in repo_version["depends"]:
@@ -153,7 +155,9 @@ def main():
     elif args.display_dot:
         try:
             dot_proc = subprocess.Popen(
-                ["dot", "-Tpng", "-o"], stdout=subprocess.PIPE, stdin=subprocess.PIPE
+                ["dot", "-Tpng", "-o"],
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE,
             )
             subprocess.Popen(["display"], stdin=dot_proc.stdout)
             out = io.TextIOWrapper(
@@ -167,7 +171,7 @@ def main():
         except FileNotFoundError:
             print(
                 "When using --display-dot You need to have the "
-                "executables dot and display on your path"
+                "executables dot and display on your path",
             )
     else:
         run(args.base_pkgs, args.repo, args.dot, pkg, sys.stdout)

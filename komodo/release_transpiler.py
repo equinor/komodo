@@ -29,7 +29,7 @@ def build_matrix_file(
         files[key] = load_yaml(f"{release_folder}/{release_base}-{key}.yml")
 
     all_packages = set(
-        itertools.chain.from_iterable(files[key].keys() for key in files)
+        itertools.chain.from_iterable(files[key].keys() for key in files),
     )
     compiled = {}
 
@@ -53,28 +53,30 @@ def get_py_coords(release_base: str, release_folder: str) -> Sequence[str]:
             filename
             for filename in os.listdir(release_folder)
             if filename.startswith(release_base)
-        ]
+        ],
     )
     len_release_base = len(release_base + "-")
     irrelevant_suffix_length = len(".yml")
-    py_coords = [
+    return [
         filename[len_release_base:-irrelevant_suffix_length]
         for filename in filenames_with_prefix
     ]
-    return py_coords
 
 
 def _pick_package_versions_for_release(
-    packages: dict, rhel_ver: str, py_ver: str
+    packages: dict,
+    rhel_ver: str,
+    py_ver: str,
 ) -> dict:
     """Consolidate the packages for a given combination of rhel and python version
-    into a dictionary."""
+    into a dictionary.
+    """
     release_dict = {}
     for pkg_name, versions in packages.items():
         try:
             _check_version_exists_for_coordinates(versions, rhel_ver, py_ver)
         except KeyError as err:
-            error_msg = f"{str(err)}. Failed for {pkg_name}."
+            error_msg = f"{err!s}. Failed for {pkg_name}."
             raise KeyError(error_msg) from None
 
         if rhel_ver in versions:
@@ -90,7 +92,9 @@ def _pick_package_versions_for_release(
 
 
 def _check_version_exists_for_coordinates(
-    pkg_versions: dict, rhel_coordinate: str, py_coordinate: str
+    pkg_versions: dict,
+    rhel_coordinate: str,
+    py_coordinate: str,
 ) -> None:
     """Check the coordinates `rhel_ver` and `py_ver` input as arguments to
     build a release against the release matrix file. Raise exceptions if
@@ -110,7 +114,7 @@ def _check_version_exists_for_coordinates(
             py38: 2.1.1,
         }
         or:
-        {1.1.1}
+        {1.1.1}.
 
     """
     first_level_versions = []
@@ -119,25 +123,28 @@ def _check_version_exists_for_coordinates(
     if "rhel" in first_level_versions[0]:
         # Both rhel and python versions can have different versions
         if rhel_coordinate not in first_level_versions:
-            raise KeyError(f"Rhel version {rhel_coordinate} not found.")
+            msg = f"Rhel version {rhel_coordinate} not found."
+            raise KeyError(msg)
         second_level_versions = []
         for version_py in pkg_versions[rhel_coordinate]:
             second_level_versions.append(version_py)
         if py_coordinate not in second_level_versions:
+            msg = f"Python version {py_coordinate} not found for rhel version {rhel_coordinate}."
             raise KeyError(
-                f"Python version {py_coordinate} not found for "
-                f"rhel version {rhel_coordinate}."
+                msg,
             )
     elif "py" in first_level_versions[0] and py_coordinate not in first_level_versions:
         # Only python has different versions
-        raise KeyError(f"Python version {py_coordinate} not found.")
+        msg = f"Python version {py_coordinate} not found."
+        raise KeyError(msg)
 
 
 def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> None:
     """Transpile a matrix file possibly containing different os and framework
     versions (e.g. rhel6 and rhel7, py3.6 and py3.8).
     Write one dimension file for each element in the matrix
-    (e.g. rhel7 and py3.8, rhel6 and py3.6)"""
+    (e.g. rhel7 and py3.8, rhel6 and py3.6).
+    """
     rhel_versions = matrix["rhel"]
     python_versions = matrix["py"]
 
@@ -146,14 +153,19 @@ def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> No
     release_matrix = load_yaml(f"{os.path.join(release_folder, release_base)}.yml")
     for rhel_ver, py_ver in get_matrix(rhel_versions, python_versions):
         release_dict = _pick_package_versions_for_release(
-            release_matrix, rhel_ver, py_ver
+            release_matrix,
+            rhel_ver,
+            py_ver,
         )
         filename = f"{format_release(release_base, rhel_ver, py_ver)}.yml"
         write_to_file(release_dict, os.path.join(output_folder, filename))
 
 
 def transpile_releases_for_pip(
-    matrix_file: str, output_folder: str, repository_file: str, matrix: dict
+    matrix_file: str,
+    output_folder: str,
+    repository_file: str,
+    matrix: dict,
 ) -> None:
     rhel_versions = matrix["rhel"]
     python_versions = matrix["py"]
@@ -163,7 +175,9 @@ def transpile_releases_for_pip(
     repository = load_yaml(repository_file)
     for rhel_ver, py_ver in get_matrix(rhel_versions, python_versions):
         release_dict = _pick_package_versions_for_release(
-            release_matrix, rhel_ver, py_ver
+            release_matrix,
+            rhel_ver,
+            py_ver,
         )
         pip_packages = [
             f"{pkg}=={version}"
@@ -172,7 +186,9 @@ def transpile_releases_for_pip(
         ]
         filename = f"{format_release(release_base, rhel_ver, py_ver)}.req"
         with open(
-            os.path.join(output_folder, filename), mode="w", encoding="utf-8"
+            os.path.join(output_folder, filename),
+            mode="w",
+            encoding="utf-8",
         ) as filehandler:
             filehandler.write("\n".join(pip_packages))
 
@@ -192,7 +208,10 @@ def transpile(args):
 
 def transpile_for_pip(args: Dict):
     transpile_releases_for_pip(
-        args.matrix_file, args.output_folder, args.repo, args.matrix_coordinates
+        args.matrix_file,
+        args.output_folder,
+        args.repo,
+        args.matrix_coordinates,
     )
 
 
