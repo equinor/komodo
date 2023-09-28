@@ -70,7 +70,8 @@ def _valid_path_or_files(path):
     elif os.path.isfile(full_path) and _is_yml(full_path):
         yml_files.append(full_path)
     else:
-        raise argparse.ArgumentTypeError(f"{path} is not a valid yml-file or folder")
+        msg = f"{path} is not a valid yml-file or folder"
+        raise argparse.ArgumentTypeError(msg)
     return yml_files
 
 
@@ -106,7 +107,9 @@ def add_cleanup_parser(subparsers):
         nargs="+",
     )
     cleanup_parser.add_argument(
-        "--output", type=str, help="name of file to write new repository"
+        "--output",
+        type=str,
+        help="name of file to write new repository",
     )
 
 
@@ -146,7 +149,7 @@ def run_cleanup(args, parser):
             argparse.ArgumentError(
                 message="Only check, stdout can not be used together!",
                 argument=args.check,
-            )
+            ),
         )
     repository = load_yaml(args.repository)
     release_files = [filename for sublist in args.releases for filename in sublist]
@@ -183,10 +186,8 @@ def run_prettier(args, _):
     release_files = [filename for sublist in args.files for filename in sublist]
 
     if all(
-        [
-            prettified_yaml(filename, check_only=args.check_only)
-            for filename in release_files
-        ]
+        prettified_yaml(filename, check_only=args.check_only)
+        for filename in release_files
     ):
         sys.exit(0)
 

@@ -44,7 +44,7 @@ def test_compatible_versions(input_dict):
 
 
 @pytest.mark.parametrize(
-    "input_release, input_repo",
+    ("input_release", "input_repo"),
     [
         pytest.param(
             {"dummy_package": "1.0.0"},
@@ -75,7 +75,7 @@ def test_get_pypi_packages(input_release, input_repo):
 
 
 @pytest.mark.parametrize(
-    "release, repository, suggestions, expected",
+    ("release", "repository", "suggestions", "expected"),
     [
         pytest.param(
             {"dummy_package": "1.0.0", "custom_package": "1.1.1"},
@@ -150,7 +150,9 @@ def test_run(monkeypatch):
     compatible_versions = MagicMock(return_value=["2.0.0"])
     monkeypatch.setattr(check_up_to_date_pypi, "get_pypi_info", response_mock)
     monkeypatch.setattr(
-        check_up_to_date_pypi, "compatible_versions", compatible_versions
+        check_up_to_date_pypi,
+        "compatible_versions",
+        compatible_versions,
     )
     result = get_upgrade_proposals_from_pypi(release, repository, "3.6.8")
     assert result == {"dummy_package": {"previous": "1.0.0", "suggested": "2.0.0"}}
@@ -170,10 +172,14 @@ def test_main_happy_path(monkeypatch, tmpdir):
         monkeypatch.setattr(check_up_to_date_pypi, "load_from_file", MagicMock())
         output_mock = MagicMock(return_value={})
         monkeypatch.setattr(
-            check_up_to_date_pypi, "get_upgrade_proposals_from_pypi", output_mock
+            check_up_to_date_pypi,
+            "get_upgrade_proposals_from_pypi",
+            output_mock,
         )
         run_check_up_to_date(
-            "release_file", "repository_file", propose_upgrade="new_file"
+            "release_file",
+            "repository_file",
+            propose_upgrade="new_file",
         )
 
 
@@ -188,10 +194,12 @@ def test_main_upgrade_proposal(monkeypatch):
     monkeypatch.setattr(check_up_to_date_pypi, "load_from_file", input_mock)
     monkeypatch.setattr(pathlib.Path, "is_file", MagicMock(return_value=True))
     output_mock = MagicMock(
-        return_value={"dummy_package": {"previous": "1.0.0", "suggested": "2.0.0"}}
+        return_value={"dummy_package": {"previous": "1.0.0", "suggested": "2.0.0"}},
     )
     monkeypatch.setattr(
-        check_up_to_date_pypi, "get_upgrade_proposals_from_pypi", output_mock
+        check_up_to_date_pypi,
+        "get_upgrade_proposals_from_pypi",
+        output_mock,
     )
     with pytest.raises(
         SystemExit,
@@ -249,20 +257,20 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
 
 
 @pytest.mark.parametrize(
-    "release, repository, request_json, expected",
+    ("release", "repository", "request_json", "expected"),
     [
         pytest.param(
             {"dummy_package": "1.0.0", "custom_package": "1.1.1"},
             {
                 "dummy_package": {
-                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"}
+                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"},
                 },
                 "custom_package": {
                     "1.1.1": {
                         "maintainer": "some_person",
                         "make": "sh",
                         "source": "https://test.com/",
-                    }
+                    },
                 },
             },
             {
@@ -288,7 +296,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
                             "maintainer": "some_person",
                             "make": "sh",
                             "source": "https://test.com/",
-                        }
+                        },
                     },
                 },
             },
@@ -298,10 +306,10 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
             {"dummy_package": "1.0.0", "komodo_version_package": "1.*"},
             {
                 "dummy_package": {
-                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"}
+                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"},
                 },
                 "komodo_version_package": {
-                    "1.*": {"maintainer": "scout", "make": "pip", "source": "pypi"}
+                    "1.*": {"maintainer": "scout", "make": "pip", "source": "pypi"},
                 },
             },
             {
@@ -326,7 +334,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
                         },
                     },
                     "komodo_version_package": {
-                        "1.*": {"maintainer": "scout", "make": "pip", "source": "pypi"}
+                        "1.*": {"maintainer": "scout", "make": "pip", "source": "pypi"},
                     },
                 },
             },
@@ -340,7 +348,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
                         "maintainer": "scout",
                         "make": "pip",
                         "source": "pypi",
-                    }
+                    },
                 },
             },
             {
@@ -369,7 +377,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
             {"dummy_package": "1.0.0"},
             {
                 "dummy_package": {
-                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"}
+                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"},
                 },
             },
             {
@@ -397,7 +405,12 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
     ],
 )
 def test_run_up_to_date(
-    monkeypatch, tmpdir, release, repository, request_json, expected
+    monkeypatch,
+    tmpdir,
+    release,
+    repository,
+    request_json,
+    expected,
 ):
     with tmpdir.as_cwd():
         arguments = [
@@ -433,7 +446,7 @@ def test_run_up_to_date(
 
 
 @pytest.mark.parametrize(
-    "release, repository, expectation",
+    ("release", "repository", "expectation"),
     [
         pytest.param(
             """dummy_package: 1.0.0\ncustom_package: 1.1.1""",
@@ -450,7 +463,11 @@ def test_run_up_to_date(
     ],
 )
 def test_integration_with_invalid_yaml_files(
-    tmpdir, monkeypatch, release, repository, expectation
+    tmpdir,
+    monkeypatch,
+    release,
+    repository,
+    expectation,
 ):
     with tmpdir.as_cwd():
         arguments = [

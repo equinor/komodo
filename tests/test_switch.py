@@ -1,6 +1,6 @@
 import os
 
-import pytest  # noqa
+import pytest
 
 from komodo import switch
 from komodo.data import Data
@@ -14,33 +14,30 @@ def test_write_activator_switches(tmpdir):
     expected_release = "2020.01.01-py27"
     switch.create_activator_switch(Data(), prefix, release)
 
-    actual_bash_activator = os.path.join(prefix, "{}/enable".format(expected_release))
+    actual_bash_activator = os.path.join(prefix, f"{expected_release}/enable")
     with open(actual_bash_activator) as actual:
-        expected = """if [[ $(uname -r) == *el7* ]] ; then
+        expected = f"""if [[ $(uname -r) == *el7* ]] ; then
     export KOMODO_ROOT={prefix}
-    KOMODO_RELEASE_REAL={release}
+    KOMODO_RELEASE_REAL={expected_release}
 
     source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
     export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 else
-    echo -e "{migration_warning}"
+    echo -e "{MIGRATION_WARNING}"
 fi
-""".format(
-            release=expected_release,
-            prefix=prefix,
-            migration_warning=MIGRATION_WARNING,
-        )
+"""
 
         assert actual.read() == expected
 
     actual_csh_activator = os.path.join(
-        prefix, "{}/enable.csh".format(expected_release)
+        prefix,
+        f"{expected_release}/enable.csh",
     )
     with open(actual_csh_activator) as actual:
-        expected = """if ( `uname -r` =~ *el7* ) then
+        expected = f"""if ( `uname -r` =~ *el7* ) then
     setenv KOMODO_ROOT {prefix}
-    set KOMODO_RELEASE_REAL = "{release}"
+    set KOMODO_RELEASE_REAL = "{expected_release}"
 
     source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
     if ( $?_KOMODO_OLD_PROMPT ) then
@@ -48,13 +45,9 @@ fi
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else
-    echo -e "{migration_warning}"
+    echo -e "{MIGRATION_WARNING}"
 endif
-""".format(
-            release=expected_release,
-            prefix=prefix,
-            migration_warning=MIGRATION_WARNING,
-        )
+"""
         assert actual.read() == expected
 
 

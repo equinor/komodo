@@ -59,10 +59,10 @@ def test_main_success_no_release(tmpdir):
         ]
         main(args)
         assert "message1" in os.listdir(
-            os.path.join("2020.01.01-py36-rhel6", "motd", "messages")
+            os.path.join("2020.01.01-py36-rhel6", "motd", "messages"),
         )
         assert "script1" in os.listdir(
-            os.path.join("2020.01.01-py27-rhel6", "motd", "scripts")
+            os.path.join("2020.01.01-py27-rhel6", "motd", "scripts"),
         )
 
 
@@ -82,7 +82,7 @@ def test_main_not_existing_release(tmpdir):
         ]
         with pytest.raises(SystemExit) as excinfo:
             main(args)
-            assert "Release {} not found".format(release) in str(excinfo.value)
+            assert f"Release {release} not found" in str(excinfo.value)
 
 
 def test_main_no_db(tmpdir):
@@ -101,8 +101,8 @@ def test_main_no_db(tmpdir):
         ]
         with pytest.raises(SystemExit) as excinfo:
             main(args)
-            assert "The message-database {} was not found".format(motd_db_file) in str(
-                excinfo.value
+            assert f"The message-database {motd_db_file} was not found" in str(
+                excinfo.value,
             )
 
 
@@ -123,7 +123,7 @@ def test_main_missing_message_file(tmpdir):
         with pytest.raises(SystemExit) as excinfo:
             main(args)
             assert "message file {} does not exisit".format("not-existing") in str(
-                excinfo.value
+                excinfo.value,
             )
 
 
@@ -142,10 +142,10 @@ def test_main_success_symlinks(tmpdir):
         ]
         main(args)
         assert "message1" in os.listdir(
-            os.path.join("2020.01.01-py36-rhel6", "motd", "messages")
+            os.path.join("2020.01.01-py36-rhel6", "motd", "messages"),
         )
         assert "script1" in os.listdir(
-            os.path.join("2020.01.01-py27-rhel6", "motd", "scripts")
+            os.path.join("2020.01.01-py27-rhel6", "motd", "scripts"),
         )
         yaml = YAML()
         with open(motd_db_file) as f:
@@ -154,5 +154,5 @@ def test_main_success_symlinks(tmpdir):
         filename = hashlib.md5(msg.encode()).hexdigest()
         filename = "0Z" + filename  # for orderings sake
         assert filename in os.listdir(
-            os.path.join("2020.01.01-py27-rhel6", "motd", "messages")
+            os.path.join("2020.01.01-py27-rhel6", "motd", "messages"),
         )

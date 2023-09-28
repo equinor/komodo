@@ -32,7 +32,7 @@ def fixup_python_shebangs(prefix, release):
     # executables with wrong shebang
     for bin_ in os.listdir(binpath):
         try:
-            with open(os.path.join(binpath, bin_), "r") as f:
+            with open(os.path.join(binpath, bin_)) as f:
                 shebang = f.readline().strip()
             if _is_shebang(shebang):
                 bins_.append(bin_)

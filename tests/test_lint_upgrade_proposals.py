@@ -14,15 +14,18 @@ def _write_file(file_path: str, file_content: str) -> str:
 
 
 def _create_tmp_test_files(
-    upgrade_proposals_content, repository_file_content
+    upgrade_proposals_content,
+    repository_file_content,
 ) -> (str, str):
     folder_name = os.path.join(os.getcwd(), "test_lint_upgrade_proposals/")
     os.mkdir(folder_name)
     upgrade_proposals_file = _write_file(
-        f"{folder_name}/upgrade_proposals.yml", upgrade_proposals_content
+        f"{folder_name}/upgrade_proposals.yml",
+        upgrade_proposals_content,
     )
     repository_file = _write_file(
-        f"{folder_name}/repository.yml", repository_file_content
+        f"{folder_name}/repository.yml",
+        repository_file_content,
     )
     return (upgrade_proposals_file, repository_file)
 
@@ -142,7 +145,7 @@ yaml
 
 
 @pytest.mark.parametrize(
-    "upgrade_proposals_content, repository_file_content, expectation",
+    ("upgrade_proposals_content", "repository_file_content", "expectation"),
     [
         pytest.param(
             VALID_UPGRADE_PROPOSALS,
@@ -187,7 +190,8 @@ yaml
             VALID_UPGRADE_PROPOSALS_MULTIPLE_RELEASES,
             VALID_REPOSITORY,
             pytest.raises(
-                SystemExit, match=r"Found upgrades for more than one release"
+                SystemExit,
+                match=r"Found upgrades for more than one release",
             ),
             id="upgrades_in_multiple_releases_in_upgrade_proposals",
         ),
@@ -253,7 +257,8 @@ def test_lint(
 ):
     with tmpdir.as_cwd():
         (upgrade_proposals_file, repository_file) = _create_tmp_test_files(
-            upgrade_proposals_content, repository_file_content
+            upgrade_proposals_content,
+            repository_file_content,
         )
 
     monkeypatch.setattr(sys, "argv", ["", upgrade_proposals_file, repository_file])

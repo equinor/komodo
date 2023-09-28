@@ -84,7 +84,7 @@ def test_links_ignored(tmpdir):
 
 
 @pytest.mark.parametrize(
-    "release_list, do_json, expected",
+    ("release_list", "do_json", "expected"),
     [
         (["a"], False, "a"),
         (["a"], True, '["a"]'),

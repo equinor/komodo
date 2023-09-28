@@ -25,9 +25,8 @@ def yaml_parser():
 
 
 def load_from_file(yaml, fname):
-    with open(fname, "r", encoding="utf-8") as fin:
-        result = yaml.load(fin)
-    return result
+    with open(fname, encoding="utf-8") as fin:
+        return yaml.load(fin)
 
 
 def get_pypi_info(package_names):
@@ -41,15 +40,15 @@ def get_pypi_info(package_names):
 
 
 def get_python_requirement(sources: list):
-    """
-    Goes through the different sources of the package and returns the first
+    """Goes through the different sources of the package and returns the first
     python requirement
     :param sources:
-    :return: Python requirement or empty string if there is no requirement
+    :return: Python requirement or empty string if there is no requirement.
     """
     for source in sources:
         if source.get("yanked", False):
-            raise YankedException("Release has been yanked")
+            msg = "Release has been yanked"
+            raise YankedException(msg)
         required_python = source.get("requires_python", "")
         if required_python:
             return required_python
@@ -85,14 +84,17 @@ def get_pypi_packages(release: dict, repository: dict) -> list:
             if repository[package][version].get("source", None) == "pypi":
                 pypi_packages.append(package)
         except KeyError as err:
+            msg = f"Version: {version} of package: {package} not found in repository"
             raise ValueError(
-                f"Version: {version} of package: {package} not found in repository"
+                msg,
             ) from err
     return pypi_packages
 
 
 def get_upgrade_proposals_from_pypi(
-    releases: dict, repository: dict, python_version: str
+    releases: dict,
+    repository: dict,
+    python_version: str,
 ) -> dict:
     pypi_packages = get_pypi_packages(releases, repository)
     pypi_responses = get_pypi_info(pypi_packages)
@@ -102,12 +104,14 @@ def get_upgrade_proposals_from_pypi(
         komodo_version = get_version.parse(strip_version(releases[package_name]))
         if response.ok:
             pypi_versions = compatible_versions(
-                response.json()["releases"], python_version
+                response.json()["releases"],
+                python_version,
             )
             pypi_latest_version = max(pypi_versions)
         else:
+            msg = f"Response returned non valid return code: {response.reason}"
             raise ValueError(
-                f"Response returned non valid return code: {response.reason}"
+                msg,
             )
         if pypi_latest_version != komodo_version:
             upgrade_proposals_from_pypi[package_name] = {
@@ -125,9 +129,9 @@ def insert_upgrade_proposals(upgrade_proposals, repository, releases):
             repository[package].update(
                 {
                     suggested_version: copy.deepcopy(
-                        repository[package][version["previous"]]
-                    )
-                }
+                        repository[package][version["previous"]],
+                    ),
+                },
             )
             repository[package].move_to_end(suggested_version, last=False)
         releases[package] = suggested_version
@@ -156,7 +160,7 @@ def run_check_up_to_date(
             insert_upgrade_proposals(upgrade_proposals_from_pypi, repository, releases)
             print(
                 "Writing upgrade proposals from pypi, "
-                "assuming nothing has changed with dependencies..."
+                "assuming nothing has changed with dependencies...",
             )
             with open(propose_upgrade, mode="w", encoding="utf-8") as fout:
                 yaml.dump(releases, fout)
@@ -168,7 +172,7 @@ def run_check_up_to_date(
             current_version = versions["previous"]
             errors.append(
                 f"{name} not at latest pypi version: {pypi_latest}, "
-                f"is at: {current_version}"
+                f"is at: {current_version}",
             )
         sys.exit("\n".join(errors) + "\nFound out of date packages!")
 

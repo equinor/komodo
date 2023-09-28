@@ -8,15 +8,17 @@ from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
 
 komodo_error = namedtuple(
-    "KomodoError", ["package", "version", "maintainer", "depends", "err"]
+    "KomodoError",
+    ["package", "version", "maintainer", "depends", "err"],
 )
 report = namedtuple(
-    "LintReport", ["release_name", "maintainers", "dependencies", "versions"]
+    "LintReport",
+    ["release_name", "maintainers", "dependencies", "versions"],
 )
 
 
 class KomodoException(Exception):
-    def __init__(self, error_message: komodo_error):
+    def __init__(self, error_message: komodo_error) -> None:
         self.error = error_message
 
 
@@ -43,20 +45,22 @@ def _komodo_error(package=None, version=None, maintainer=None, depends=None, err
 
 def __reg_version_err(errs, package, version, maintainer, err=MALFORMED_VERSION):
     return _komodo_error(
-        package=package, version=version, maintainer=maintainer, err=err
+        package=package,
+        version=version,
+        maintainer=maintainer,
+        err=err,
     )
 
 
 def load_yaml_from_string(value: str) -> dict:
     try:
-        yml = YAML().load(value)
-        return yml
+        return YAML().load(value)
     except DuplicateKeyError as e:
         raise SystemExit(e) from None
 
 
 class YamlFile(argparse.FileType):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__("r", *args, **kwargs)
 
     def __call__(self, value):
@@ -67,11 +71,9 @@ class YamlFile(argparse.FileType):
 
 
 class ReleaseFile(YamlFile):
-    """
-    Return the data from 'release' YAML file, but validate it first.
-    """
+    """Return the data from 'release' YAML file, but validate it first."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
@@ -99,7 +101,8 @@ class ReleaseFile(YamlFile):
         errors = []
         for package_name, package_version in release_file_content.items():
             error = Package.validate_package_entry_with_errors(
-                package_name, package_version
+                package_name,
+                package_version,
             )
             errors.extend(error)
         handle_validation_errors(errors, message)
@@ -121,7 +124,7 @@ class ReleaseFile(YamlFile):
                         "Invalid release name suffix. "
                         "Must be of the form -pyXX[X] or -pyXX[X]-rhelY"
                     ),
-                )
+                ),
             ]
 
         return []
@@ -138,11 +141,9 @@ class ReleaseDir:
 
 
 class ManifestFile(YamlFile):
-    """
-    Return the data from 'manifest' YAML, but validate it first.
-    """
+    """Return the data from 'manifest' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
@@ -168,17 +169,15 @@ class ManifestFile(YamlFile):
                 continue
             if not isinstance(metadata["version"], str):
                 errors.append(
-                    f"Invalid version type in metadata for package '{package_name}'"
+                    f"Invalid version type in metadata for package '{package_name}'",
                 )
         handle_validation_errors(errors, message)
 
 
 class RepositoryFile(YamlFile):
-    """
-    Return the data from 'repository' YAML, but validate it first.
-    """
+    """Return the data from 'repository' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
@@ -194,7 +193,9 @@ class RepositoryFile(YamlFile):
         return self
 
     def validate_package_entry(
-        self, package_name: str, package_version: str
+        self,
+        package_name: str,
+        package_version: str,
     ) -> komodo_error:
         repository_entries = self.content
         if package_name not in repository_entries:
@@ -203,21 +204,21 @@ class RepositoryFile(YamlFile):
                 for lowercase_pkg in repository_entries
                 if lowercase_pkg.lower() == package_name.lower()
             ]:
+                msg = f"Package '{package_name}' not found in repository. Did you mean '{real_packagename}'?"
                 raise KomodoException(
-                    f"Package '{package_name}' not found in repository. Did you mean"
-                    f" '{real_packagename}'?"
+                    msg,
                 )
-            raise KomodoException(f"Package '{package_name}' not found in repository")
+            msg = f"Package '{package_name}' not found in repository"
+            raise KomodoException(msg)
         if package_version not in repository_entries[package_name]:
             if f"v{package_version}" in repository_entries[package_name]:
+                msg = f"Version '{package_version}' of package '{package_name}' not found in repository. Did you mean 'v{package_version}'?"
                 raise KomodoException(
-                    f"Version '{package_version}' of package '{package_name}' not found"
-                    f" in repository. Did you mean 'v{package_version}'?"
+                    msg,
                 )
+            msg = f"Version '{package_version}' of package '{package_name}' not found in repository. Did you mean '{next(iter(repository_entries[package_name].keys()))}'?"
             raise KomodoException(
-                f"Version '{package_version}' of package '{package_name}' not found in"
-                " repository. Did you mean"
-                f" '{list(repository_entries[package_name].keys())[0]}'?"
+                msg,
             )
 
     def lint_maintainer(self, package, version) -> komodo_error:
@@ -226,7 +227,7 @@ class RepositoryFile(YamlFile):
             self.validate_package_entry(package, version)
         except KomodoException as e:
             raise KomodoException(
-                _komodo_error(package=package, version=version, err=e)
+                _komodo_error(package=package, version=version, err=e),
             ) from e
         return _komodo_error(
             package=package,
@@ -252,7 +253,7 @@ class RepositoryFile(YamlFile):
                 if not isinstance(versions, dict):
                     errors.append(
                         f"Versions of package '{package_name}' is not formatted"
-                        f" correctly ({versions})"
+                        f" correctly ({versions})",
                     )
                     continue
                 validation_errors = self.validate_versions(package_name, versions)
@@ -264,14 +265,14 @@ class RepositoryFile(YamlFile):
         handle_validation_errors(errors, message)
 
     def validate_versions(self, package_name: str, versions: dict) -> List[str]:
-        """
-        Validates versions-dictionary of a package and returns a list of error messages
-        """
+        """Validates versions-dictionary of a package and returns a list of error messages."""
         errors = []
         for version, version_metadata in versions.items():
             Package.validate_package_version(package_name, version)
             make_errors = Package.validate_package_make_with_errors(
-                package_name, version, version_metadata.get("make")
+                package_name,
+                version,
+                version_metadata.get("make"),
             )
             errors.extend(make_errors)
             maintainer_errors = Package.validate_package_maintainer_with_errors(
@@ -300,9 +301,8 @@ class RepositoryFile(YamlFile):
         package_property: str,
         package_property_value: str,
     ) -> List[str]:
-        """
-        Validates package properties of the specified package
-        and returns a list of error messages
+        """Validates package properties of the specified package
+        and returns a list of error messages.
         """
         pre_checked_properties = ["make", "maintainer"]
         errors = []
@@ -312,20 +312,20 @@ class RepositoryFile(YamlFile):
             if not isinstance(package_property_value, list):
                 errors.append(
                     f"Dependencies for package {package_name} have"
-                    f" invalid type {package_property_value}"
+                    f" invalid type {package_property_value}",
                 )
                 return errors
             for dependency in package_property_value:
                 if not isinstance(dependency, str):
                     errors.append(
                         f"Package {package_name} version {package_version} has"
-                        f" invalid dependency type({dependency})"
+                        f" invalid dependency type({dependency})",
                     )
                     continue
                 if dependency not in self.content:
                     errors.append(
                         f"Dependency '{dependency}' not found for"
-                        f" package '{package_name}'"
+                        f" package '{package_name}'",
                     )
         else:
             try:
@@ -341,11 +341,9 @@ class RepositoryFile(YamlFile):
 
 
 class UpgradeProposalsFile(YamlFile):
-    """
-    Return the data from 'upgrade_proposals' YAML, but validate it first.
-    """
+    """Return the data from 'upgrade_proposals' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
@@ -382,7 +380,7 @@ class UpgradeProposalsFile(YamlFile):
         ) in upgrade_proposals_file_content.items():
             if not isinstance(release_version, str):
                 errors.append(
-                    f"Release version ({release_version}) is not of type string"
+                    f"Release version ({release_version}) is not of type string",
                 )
                 continue
             if packages_to_upgrade is None:
@@ -390,24 +388,23 @@ class UpgradeProposalsFile(YamlFile):
             if not isinstance(packages_to_upgrade, dict):
                 errors.append(
                     "New package upgrades have to be listed in dictionary format"
-                    f" ({packages_to_upgrade})"
+                    f" ({packages_to_upgrade})",
                 )
                 continue
             for package_name, package_version in packages_to_upgrade.items():
                 errors.extend(
                     Package.validate_package_entry_with_errors(
-                        package_name, package_version
-                    )
+                        package_name,
+                        package_version,
+                    ),
                 )
         handle_validation_errors(errors, message)
 
 
 class PackageStatusFile(YamlFile):
-    """
-    Return the data from 'package_status' YAML, but validate it first.
-    """
+    """Return the data from 'package_status' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
@@ -443,7 +440,8 @@ class PackageStatusFile(YamlFile):
                     errors.append(f"Invalid package data for {package_name} - {status}")
                     continue
                 Package.validate_package_visibility(
-                    package_name, status.get("visibility")
+                    package_name,
+                    status.get("visibility"),
                 )
             except (ValueError, TypeError) as e:
                 errors.append(str(e))
@@ -451,12 +449,14 @@ class PackageStatusFile(YamlFile):
             visibility = status["visibility"]
             if visibility == "public":
                 maturity_errors = Package.validate_package_maturity_with_errors(
-                    package_name, status.get("maturity")
+                    package_name,
+                    status.get("maturity"),
                 )
                 errors.extend(maturity_errors)
 
                 importance_errors = Package.validate_package_importance_with_errors(
-                    package_name, status.get("importance")
+                    package_name,
+                    status.get("importance"),
                 )
                 errors.extend(importance_errors)
 
@@ -473,14 +473,16 @@ class Package:
     def validate_package_name(package_name: str) -> None:
         if isinstance(package_name, str):
             return
-        raise TypeError(f"Package name ({package_name}) should be of type string")
+        msg = f"Package name ({package_name}) should be of type string"
+        raise TypeError(msg)
 
     @staticmethod
     def validate_package_version(package_name: str, package_version: str) -> None:
         if isinstance(package_version, str):
             return
+        msg = f"Package '{package_name}' has invalid version type ({package_version})"
         raise TypeError(
-            f"Package '{package_name}' has invalid version type ({package_version})"
+            msg,
         )
 
     @staticmethod
@@ -490,11 +492,10 @@ class Package:
 
     @staticmethod
     def validate_package_entry_with_errors(
-        package_name: str, package_version: str
+        package_name: str,
+        package_version: str,
     ) -> List[str]:
-        """
-        Validates package name and version, and returns a list of error messages
-        """
+        """Validates package name and version, and returns a list of error messages."""
         errors = []
         try:
             Package.validate_package_entry(package_name, package_version)
@@ -507,20 +508,21 @@ class Package:
         if isinstance(package_importance, str):
             if package_importance in Package.VALID_IMPORTANCES:
                 return
+            msg = f"{package_name} has invalid importance value ({package_importance})"
             raise ValueError(
-                f"{package_name} has invalid importance value ({package_importance})"
+                msg,
             )
+        msg = f"{package_name} has invalid importance type ({package_importance})"
         raise TypeError(
-            f"{package_name} has invalid importance type ({package_importance})"
+            msg,
         )
 
     @staticmethod
     def validate_package_importance_with_errors(
-        package_name, package_importance: str
+        package_name,
+        package_importance: str,
     ) -> List[str]:
-        """
-        Validates package importance of a package and returns a list of error messages
-        """
+        """Validates package importance of a package and returns a list of error messages."""
         errors = []
         try:
             Package.validate_package_importance(package_name, package_importance)
@@ -533,13 +535,13 @@ class Package:
         if isinstance(package_visibility, str):
             if package_visibility in Package.VALID_VISIBILITIES:
                 return
+            msg = f"Package '{package_name}' has invalid visibility value ({package_visibility})"
             raise ValueError(
-                f"Package '{package_name}' has invalid visibility value"
-                f" ({package_visibility})"
+                msg,
             )
+        msg = f"Package '{package_name}' has invalid visibility type ({package_visibility})"
         raise TypeError(
-            f"Package '{package_name}' has invalid visibility type"
-            f" ({package_visibility})"
+            msg,
         )
 
     @staticmethod
@@ -547,21 +549,21 @@ class Package:
         if isinstance(package_maturity, str):
             if package_maturity in Package.VALID_MATURITIES:
                 return
+            msg = f"Package '{package_name}' has invalid maturity value ({package_maturity})"
             raise ValueError(
-                f"Package '{package_name}' has invalid maturity value"
-                f" ({package_maturity})"
+                msg,
             )
+        msg = f"Package '{package_name}' has invalid maturity type ({package_maturity})"
         raise TypeError(
-            f"Package '{package_name}' has invalid maturity type ({package_maturity})"
+            msg,
         )
 
     @staticmethod
     def validate_package_maturity_with_errors(
-        package_name: str, package_maturity: str
+        package_name: str,
+        package_maturity: str,
     ) -> List[str]:
-        """
-        Validates package maturity of a package and returns a list of error messages
-        """
+        """Validates package maturity of a package and returns a list of error messages."""
         errors = []
         try:
             Package.validate_package_maturity(package_name, package_maturity)
@@ -571,18 +573,20 @@ class Package:
 
     @staticmethod
     def validate_package_make(
-        package_name: str, package_version: str, package_make: str
+        package_name: str,
+        package_version: str,
+        package_make: str,
     ) -> None:
         if isinstance(package_make, str):
             if package_make in Package.VALID_MAKES:
                 return
+            msg = f"Package '{package_name}' version {package_version} has invalid make value ({package_make})"
             raise ValueError(
-                f"Package '{package_name}' version {package_version} has invalid make "
-                f"value ({package_make})"
+                msg,
             )
+        msg = f"Package '{package_name}' version {package_version} has invalid make type ({package_make})"
         raise TypeError(
-            f"Package '{package_name}' version {package_version} has invalid make type"
-            f" ({package_make})"
+            msg,
         )
 
     @staticmethod
@@ -591,9 +595,7 @@ class Package:
         package_version: str,
         package_make: str,
     ) -> List[str]:
-        """
-        Validates make of a package and returns a list of error messages
-        """
+        """Validates make of a package and returns a list of error messages."""
         errors = []
         try:
             Package.validate_package_make(package_name, package_version, package_make)
@@ -603,13 +605,15 @@ class Package:
 
     @staticmethod
     def validate_package_maintainer(
-        package_name: str, package_version: str, package_maintainer: str
+        package_name: str,
+        package_version: str,
+        package_maintainer: str,
     ) -> None:
         if isinstance(package_maintainer, str):
             return
+        msg = f"Package '{package_name}' version {package_version} has invalid maintainer type ({package_maintainer})"
         raise TypeError(
-            f"Package '{package_name}' version {package_version} has invalid"
-            f" maintainer type ({package_maintainer})"
+            msg,
         )
 
     @staticmethod
@@ -618,13 +622,13 @@ class Package:
         package_version: str,
         package_maintainer: str,
     ) -> List[str]:
-        """
-        Validates maintainer of a package and returns a list of error messages
-        """
+        """Validates maintainer of a package and returns a list of error messages."""
         errors = []
         try:
             Package.validate_package_maintainer(
-                package_name, package_version, package_maintainer
+                package_name,
+                package_version,
+                package_maintainer,
             )
         except TypeError as e:
             errors.append(str(e))
@@ -632,13 +636,15 @@ class Package:
 
     @staticmethod
     def validate_package_source(
-        package_name: str, package_version: str, package_source: str
+        package_name: str,
+        package_version: str,
+        package_source: str,
     ) -> None:
         if isinstance(package_source, (str, type(None))):
             return
+        msg = f"Package '{package_name}' version {package_version} has invalid source type ({package_source})"
         raise TypeError(
-            f"Package '{package_name}' version {package_version} has invalid source"
-            f" type ({package_source})"
+            msg,
         )
 
     @staticmethod
@@ -647,13 +653,13 @@ class Package:
         package_version: str,
         package_source: str,
     ) -> List[str]:
-        """
-        Validates source of a package and returns a list of error messages
-        """
+        """Validates source of a package and returns a list of error messages."""
         errors = []
         try:
             Package.validate_package_source(
-                package_name, package_version, package_source
+                package_name,
+                package_version,
+                package_source,
             )
         except TypeError as e:
             errors.append(str(e))
@@ -667,21 +673,20 @@ class Package:
         package_property_value: str,
     ):
         if not isinstance(package_property, str):
+            msg = f"Package '{package_name}' version has invalid property type ({package_property})"
             raise TypeError(
-                f"Package '{package_name}' version has invalid property type"
-                f" ({package_property})"
+                msg,
             )
         if not isinstance(package_property_value, str):
+            msg = f"Package '{package_name}' version '{package_version}' property '{package_property}' has invalid property value type ({package_property_value})"
             raise TypeError(
-                f"Package '{package_name}' version '{package_version}' property"
-                f" '{package_property}' has invalid property value type"
-                f" ({package_property_value})"
+                msg,
             )
 
 
 def handle_validation_errors(errors: List[str], message: str):
     if errors:
-        raise SystemExit("\n".join(errors + [message]))
+        raise SystemExit("\n".join([*errors, message]))
 
 
 def load_package_status_file(package_status_string: str):

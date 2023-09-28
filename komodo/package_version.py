@@ -11,8 +11,7 @@ _PYPI_LATEST_VERSION_CMD = "python -m pip install --use-deprecated=legacy-resolv
 
 
 def strip_version(version):
-    """
-    In order to be able to support both py2 and py3 we need to be able
+    """In order to be able to support both py2 and py3 we need to be able
     to have multiple versions of the same package/version due to
     differences in dependencies. This is achieved by adding i.e '+py3'
     to a version-spec in both the release and repository file. This func
@@ -30,16 +29,17 @@ def latest_pypi_version(package):
         stderr = e.stderr.decode(sys.getfilesystemencoding())
         matches = re.match(_PYPI_LATEST_VERSION_RE, stderr)
         if matches.lastindex == 0:
+            msg = f"got unexpected output from {cmd} using {_PYPI_LATEST_VERSION_RE}: {stderr}"
             raise ValueError(
-                f"got unexpected output from {cmd} using "
-                f"{_PYPI_LATEST_VERSION_RE}: {stderr}"
+                msg,
             ) from e
         versions = matches.group(1).split(",")
         version = versions[len(versions) - 1].strip()
         if version == "none":
             return None
         return version
-    raise ValueError(f"{cmd} did not raise CalledProcessError")
+    msg = f"{cmd} did not raise CalledProcessError"
+    raise ValueError(msg)
 
 
 def get_git_revision_hash(path):

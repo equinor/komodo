@@ -16,7 +16,7 @@ REPO = {
             "make": "sh",
             "makefile": "configure",
             "source": "git://github.com/python/cpython.git",
-        }
+        },
     },
     "requests": {
         "8.18.4": {
@@ -24,7 +24,7 @@ REPO = {
             "maintainer": "maintainer@equinor.com",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "secrettool": {
         "10.0": {
@@ -32,7 +32,7 @@ REPO = {
             "fetch": "git",
             "make": "pip",
             "maintainer": "Prop Rietary",
-        }
+        },
     },
 }
 
@@ -60,10 +60,12 @@ def _create_tmp_test_files(release_file_content, repository_file_content) -> (st
     folder_name = os.path.join(os.getcwd(), "test_lint/")
     os.mkdir(folder_name)
     release_file = _write_file(
-        f"{folder_name}/2020.02.08-py27.yml", release_file_content
+        f"{folder_name}/2020.02.08-py27.yml",
+        release_file_content,
     )
     repository_file = _write_file(
-        f"{folder_name}/repository.yml", repository_file_content
+        f"{folder_name}/repository.yml",
+        repository_file_content,
     )
     return (release_file, repository_file)
 
@@ -227,7 +229,7 @@ INVALID_RELEASE_FILE_MISSING_DEPENDENCY_NEEDED_IN_REPOSITORY = (
 
 
 @pytest.mark.parametrize(
-    "release_file_content,repository_file_content, expectation",
+    ("release_file_content", "repository_file_content", "expectation"),
     [
         pytest.param(
             VALID_RELEASE_FILE,
@@ -345,11 +347,16 @@ INVALID_RELEASE_FILE_MISSING_DEPENDENCY_NEEDED_IN_REPOSITORY = (
     ],
 )
 def test_integration_main(
-    release_file_content, repository_file_content, expectation, monkeypatch, tmpdir
+    release_file_content,
+    repository_file_content,
+    expectation,
+    monkeypatch,
+    tmpdir,
 ):
     with tmpdir.as_cwd():
         (release_file, repository_file) = _create_tmp_test_files(
-            release_file_content, repository_file_content
+            release_file_content,
+            repository_file_content,
         )
     monkeypatch.setattr(sys, "argv", ["", release_file, repository_file])
     with expectation:

@@ -30,7 +30,10 @@ def main() -> None:
     releases = args.release_folder if args.release_folder else args.release
 
     vulnerabilities = snyk_main(
-        releases=releases, repository=args.repo, api_token=api_token, org_id=args.orgid
+        releases=releases,
+        repository=args.repo,
+        api_token=api_token,
+        org_id=args.orgid,
     )
 
     if args.format_github:
@@ -45,7 +48,10 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "--orgid", type=str, required=True, help="The Snyk organization ID."
+        "--orgid",
+        type=str,
+        required=True,
+        help="The Snyk organization ID.",
     )
     parser.add_argument(
         "--repo",
@@ -76,7 +82,8 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
 
 
 def filter_pip_packages(
-    packages: Dict[str, str], repository: Dict[str, Any]
+    packages: Dict[str, str],
+    repository: Dict[str, Any],
 ) -> Dict[str, str]:
     return {
         package_name: version
@@ -87,7 +94,7 @@ def filter_pip_packages(
 
 def create_snyk_search_string(packages: Dict[str, str]) -> str:
     return "\n".join(
-        [f"{package_name}=={version}" for package_name, version in packages.items()]
+        [f"{package_name}=={version}" for package_name, version in packages.items()],
     )
 
 
@@ -176,20 +183,19 @@ def snyk_main(
     api_token: str,
     org_id: str,
 ) -> None:
-    if sys.version_info < (3, 7):
-        raise RuntimeError("Snyk security reporting requires Python >= 3.7")
     if api_token is None:
+        msg = "No api token given, please set the environment variable SNYK_API_TOKEN."
         raise ValueError(
-            "No api token given, please set the environment variable SNYK_API_TOKEN."
+            msg,
         )
 
     org = _get_org(api_token, org_id)
 
-    vulnerabilities = find_vulnerabilities(
-        releases=releases, repository=repository, org=org
+    return find_vulnerabilities(
+        releases=releases,
+        repository=repository,
+        org=org,
     )
-
-    return vulnerabilities
 
 
 if __name__ == "__main__":

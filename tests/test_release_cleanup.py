@@ -57,10 +57,10 @@ def test_load_all_releases():
     ]
     used_versions = load_all_releases(files)
 
-    assert set(used_versions["lib1"]) == set(["1.2.3", "0.1.2"])
-    assert set(used_versions["lib2"]) == set(["2.3.4", "1.2.3"])
-    assert set(used_versions["lib3"]) == set(["3.4.5", "2.3.4"])
-    assert set(used_versions["lib4"]) == set(["3.4.5"])
+    assert set(used_versions["lib1"]) == {"1.2.3", "0.1.2"}
+    assert set(used_versions["lib2"]) == {"2.3.4", "1.2.3"}
+    assert set(used_versions["lib3"]) == {"3.4.5", "2.3.4"}
+    assert set(used_versions["lib4"]) == {"3.4.5"}
 
 
 def test_unused_versions():
@@ -107,7 +107,7 @@ def test_write_to_file(tmpdir):
         ]
         used_versions = load_all_releases(files)
         repository = _load_yaml(
-            os.path.join(_get_test_root(), "data/test_repository.yml")
+            os.path.join(_get_test_root(), "data/test_repository.yml"),
         )
         unused_versions = find_unused_versions(used_versions, repository)
         remove_unused_versions(repository, unused_versions)
@@ -122,7 +122,7 @@ def test_return_values_of_prettier(tmpdir):
     # Given a yml file with extra whitespace padded at the end:
     # (a minimal change that will trigger the prettifier)
     yml_text = (Path(_get_test_root()) / "data" / "test_repository.yml").read_text(
-        encoding="utf-8"
+        encoding="utf-8",
     )
     repo_with_whitespace = "repo_with_whitespace.yml"
     Path(repo_with_whitespace).write_text(yml_text + "\n", encoding="utf-8")
@@ -157,7 +157,7 @@ def test_cleanup_argparse(tmpdir):
                 "--releases",
                 "non_exisiting_path",
                 "--check",
-            ]
+            ],
         )
 
     with pytest.raises(SystemExit):
@@ -169,7 +169,7 @@ def test_cleanup_argparse(tmpdir):
                 "--releases",
                 "non_exisiting_path",
                 "--check",
-            ]
+            ],
         )
 
     main(
@@ -177,12 +177,12 @@ def test_cleanup_argparse(tmpdir):
             "cleanup",
             "--repository",
             os.path.realpath(
-                os.path.join(_get_test_root(), "data/test_repository.yml")
+                os.path.join(_get_test_root(), "data/test_repository.yml"),
             ),
             "--releases",
             os.path.join(_get_test_root(), "data/test_releases"),
             "--check",
-        ]
+        ],
     )
 
     with pytest.raises(SystemExit):
@@ -193,11 +193,11 @@ def test_cleanup_argparse(tmpdir):
                 "--check",
                 "--stdout",
                 os.path.realpath(
-                    os.path.join(_get_test_root(), "data/test_repository.yml")
+                    os.path.join(_get_test_root(), "data/test_repository.yml"),
                 ),
                 "--releases",
                 os.path.join(_get_test_root(), "data/test_releases"),
-            ]
+            ],
         )
 
     with tmpdir.as_cwd():
@@ -206,12 +206,12 @@ def test_cleanup_argparse(tmpdir):
                 "cleanup",
                 "--repository",
                 os.path.realpath(
-                    os.path.join(_get_test_root(), "data/test_repository.yml")
+                    os.path.join(_get_test_root(), "data/test_repository.yml"),
                 ),
                 "--releases",
                 os.path.join(_get_test_root(), "data/test_releases"),
                 "--output",
                 "output_repo.yml",
-            ]
+            ],
         )
         assert os.path.isfile("output_repo.yml")

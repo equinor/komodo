@@ -14,8 +14,7 @@ from komodo.yaml_file_types import ManifestFile
 
 
 def get_release() -> str:
-    """
-    Get the komodo release from the active environment.
+    """Get the komodo release from the active environment.
 
     The value of the KOMODO_RELEASE environment variable implicitly tells
     us the kind of environment we are in. If it looks like an ordinary name,
@@ -36,42 +35,44 @@ def get_release() -> str:
             Either run this command from an active komodo or komodoenv
             environment, or provide an environment manifest file path with the
             --manifest-file option.\
-            """
+            """,
         )
         sys.exit(message)
 
 
 def read_config(fname: Union[str, Path]) -> dict:
-    """
-    Read an INI file (aka config file) that does not have sections.
+    """Read an INI file (aka config file) that does not have sections.
     Sections are part of the INI file format specification and cannot be read
     by a `configparser.ConfigParser` without them. This function creates a
     temporary 'MAIN' section and passes back its contents.
 
     Args:
+    ----
         fname: the path to a 'flat' config file, i.e. one with no sections.
 
     Returns:
+    -------
         The configuration.
     """
     config = configparser.ConfigParser()
-    with open(fname, "rt", encoding="utf-8") as stream:
+    with open(fname, encoding="utf-8") as stream:
         config.read_string("[MAIN]\n" + stream.read())
     return dict(config["MAIN"])
 
 
 def get_komodoenv_path(release: str) -> Path:
-    """
-    Use the release name to find the 'real' release path, but from a
+    """Use the release name to find the 'real' release path, but from a
     komodoenv environment. These environments overwrite the environment
     variable $KOMODO_RELEASE and $PATH, but they store the original path
     in the komodoenv at 'root/pyvenv.cfg'.
 
     Args:
+    ----
         release: The name of the release, e.g. as stored in the KOMODO_RELEASE
             environment variable.
 
     Returns:
+    -------
         The path to the release, where the 'root/bin' folder is.
     """
     config = read_config(Path(release) / "root" / "pyvenv.cfg")
@@ -80,17 +81,18 @@ def get_komodoenv_path(release: str) -> Path:
 
 
 def get_komodo_path(release: str) -> Path:
-    """
-    Use the release name to find the 'real' release path in an ordinary
+    """Use the release name to find the 'real' release path in an ordinary
     komodo environment. E.g., the release may be something like
     '2023.01.02-py38' but the 'real' release (where the release manifest
     is stored) might be platform-specific, e.g. '2023.01.02-py38-rhel7'.
     The real path is in the PATH, so we try to get it from there.
 
     Args:
+    ----
         release: The name of the release, e.g. from $KOMODO_RELEASE.
 
     Returns:
+    -------
         The path to the release, where the 'root/bin' folder is.
     """
     paths = os.environ["PATH"]
@@ -105,19 +107,20 @@ def get_komodo_path(release: str) -> Path:
 
 
 def get_version(pkg: str, manifest: Optional[Dict] = None) -> str:
-    """
-    Get the release number (or git commit hash) for a package in a
+    """Get the release number (or git commit hash) for a package in a
     komodo release file. If no file is specified, the current release
     is used. If no environment is active, the path to the release
     must be specified.
 
     Args:
+    ----
         pkg: The name of the package to get the version for.
         manifest: Optional. A mapping of packages to dicts of version and
             maintainer. Typically, this will come from the YAML file created
             by komodo when it builds a release.
 
     Returns:
+    -------
         The version number or git hash of the version.
     """
     path = None
@@ -129,7 +132,7 @@ def get_version(pkg: str, manifest: Optional[Dict] = None) -> str:
             path = get_komodo_path(release)
         release_file = path.parts[-1]
 
-        with open(path / release_file, "rt", encoding="utf-8") as stream:
+        with open(path / release_file, encoding="utf-8") as stream:
             yaml = YAML()
             manifest = yaml.load(stream)
 
@@ -144,14 +147,15 @@ def get_version(pkg: str, manifest: Optional[Dict] = None) -> str:
 
 
 def parse_args(args: List[str]) -> argparse.Namespace:
-    """
-    Parse the arguments from the command line into an `argparse.Namespace`.
+    """Parse the arguments from the command line into an `argparse.Namespace`.
     Having a separated function makes it easier to test the CLI.
 
     Args:
+    ----
         args: A sequence of arguments, e.g. as collected from the command line.
 
     Returns:
+    -------
         The `argparse.Namespace`, a mapping of arg names to values.
     """
     parser = argparse.ArgumentParser(
@@ -177,9 +181,7 @@ def parse_args(args: List[str]) -> argparse.Namespace:
 
 
 def main() -> int:
-    """
-    Run the CLI and return the result from get_version().
-    """
+    """Run the CLI and return the result from get_version()."""
     args = parse_args(sys.argv[1:])
     print(get_version(args.package, manifest=args.manifest_file))
     return 0

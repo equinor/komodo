@@ -10,7 +10,7 @@ from komodo.symlink.suggester.release import Release
 
 
 @pytest.mark.parametrize(
-    "test_input,expected",
+    ("test_input", "expected"),
     [
         ("releases/2019.12.00-py27.yml", "2019.12.00-py27"),
         ("releases/2019.12.rc0.yml", "2019.12.rc0"),
@@ -21,7 +21,7 @@ def test_release_from_file_name(test_input, expected):
 
 
 @pytest.mark.parametrize(
-    "release_a,release_b,expected",
+    ("release_a", "release_b", "expected"),
     [
         ("2019.12.00-py27", "2019.12.rc0", 0),
         ("2019.12.00-py27", "2019.07.02", 5),
@@ -35,7 +35,7 @@ def test_monthly_diff_releases(release_a, release_b, expected):
 
 
 @pytest.mark.parametrize(
-    "test_input,expected",
+    ("test_input", "expected"),
     [("foo/bar.yml", False), ("releases/foo.yml", True), ("foo.yml", False)],
 )
 def test_path_is_release(test_input, expected):
@@ -43,7 +43,7 @@ def test_path_is_release(test_input, expected):
 
 
 @pytest.mark.parametrize(
-    "release_id,expected",
+    ("release_id", "expected"),
     [
         ("2019.12.00-py3", "py3"),
         ("2019.12.00-py2.7", "py2.7"),
@@ -55,7 +55,7 @@ def test_py_ver(release_id, expected):
 
 
 @pytest.mark.parametrize(
-    "conf,link,concrete",
+    ("conf", "link", "concrete"),
     [
         # unstable happy path
         (
@@ -64,11 +64,11 @@ def test_py_ver(release_id, expected):
                     "unstable-py27": "1349.01-py27",
                     "1349.01-py27": "1349.02-py27",
                     "1349.02-py27": "1349.01.a0-py27",
-                }
+                },
             },
             "unstable-py27",
             "1349.01.a0-py27",
-        )
+        ),
     ],
 )
 def test_get_concrete_release(conf, link, concrete):
@@ -77,7 +77,7 @@ def test_get_concrete_release(conf, link, concrete):
 
 
 @pytest.mark.parametrize(
-    "json_in,release_id,mode,changed,json_out",
+    ("json_in", "release_id", "mode", "changed", "json_out"),
     [
         # unstable happy path
         (
@@ -256,22 +256,21 @@ def test_update(json_in, release_id, mode, changed, json_out):
 def _mock_repo(sym_config):
     repo = MagicMock()
     repo.get_contents.return_value = Namespace(
-        content=b64encode(sym_config.encode()), sha="123"
+        content=b64encode(sym_config.encode()),
+        sha="123",
     )
     return repo
 
 
 @pytest.mark.parametrize(
-    "symlink_file,branch_name",
+    ("symlink_file", "branch_name"),
     [
         ("foo.json", "onprem-stable"),
         ("foo_azure.json", "azure-stable"),
     ],
 )
 def test_suggest_symlink_configuration(symlink_file, branch_name):
-    """
-    Testing whether when updating symlink file the branch gets a corresponding name
-    """
+    """Testing whether when updating symlink file the branch gets a corresponding name."""
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
 "stable-py58": "2050.02-py58"
@@ -291,7 +290,8 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
     repo.get_contents.assert_called_once_with(symlink_file, ref="master")
     repo.get_branch.assert_called_once_with("master")
     repo.create_git_ref.assert_called_once_with(
-        ref=f"refs/heads/2050.02.01-py58/{branch_name}", sha=ANY
+        ref=f"refs/heads/2050.02.01-py58/{branch_name}",
+        sha=ANY,
     )
     repo.update_file.assert_called_once_with(
         symlink_file,
@@ -307,7 +307,10 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
         branch=f"2050.02.01-py58/{branch_name}",
     )
     repo.create_pull.assert_called_once_with(
-        title=ANY, body=ANY, head=f"2050.02.01-py58/{branch_name}", base="master"
+        title=ANY,
+        body=ANY,
+        head=f"2050.02.01-py58/{branch_name}",
+        base="master",
     )
 
 

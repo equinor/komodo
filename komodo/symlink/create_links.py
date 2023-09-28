@@ -22,7 +22,8 @@ def _create_link(src, dst, link_dict):
         _create_link(link_dict[src], src, link_dict)
 
     if not os.path.exists(src):
-        raise ValueError(f"{src} does not exist")
+        msg = f"{src} does not exist"
+        raise ValueError(msg)
 
     if os.path.exists(dst) and os.path.islink(dst):
         existing_link = os.readlink(dst)
@@ -39,10 +40,12 @@ def _create_link(src, dst, link_dict):
 def create_symlinks(links_dict):
     root_folder = links_dict["root_folder"]
     if not os.path.isabs(root_folder):
-        raise ValueError("The root folder specified is not absolute")
+        msg = "The root folder specified is not absolute"
+        raise ValueError(msg)
 
     if not os.path.isdir(root_folder):
-        raise ValueError(f"{root_folder} is not a directory or does not exist")
+        msg = f"{root_folder} is not a directory or does not exist"
+        raise ValueError(msg)
 
     with working_dir(root_folder):
         for dst, src in links_dict["links"].items():
@@ -52,7 +55,9 @@ def create_symlinks(links_dict):
 def symlink_main():
     parser = argparse.ArgumentParser(description="Create symlinks for komodo versions.")
     parser.add_argument(
-        "config", type=str, help="a json file describing symlink structure"
+        "config",
+        type=str,
+        help="a json file describing symlink structure",
     )
 
     args = parser.parse_args()

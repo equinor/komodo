@@ -33,7 +33,9 @@ def _fetch_non_deployed_releases(install_root, release_folder):
 
 
 def fetch_non_deployed(
-    install_root: str, releases_folder: str, limit: Optional[int] = None
+    install_root: str,
+    releases_folder: str,
+    limit: Optional[int] = None,
 ) -> List[str]:
     non_deployed = _fetch_non_deployed_releases(install_root, releases_folder)
     return non_deployed[:limit]

@@ -38,7 +38,7 @@ def cleanup(repository_file_path: str, release_files_path: List[str]):
 
 def main():
     if len(sys.argv) < 3:
-        exit("usage: komodo.cleanup repository.yml rel1.yml rel2.yml ... reln.yml")
+        sys.exit("usage: komodo.cleanup repository.yml rel1.yml rel2.yml ... reln.yml")
 
     repository = sys.argv[1]
     releases = sys.argv[2:]
