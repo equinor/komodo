@@ -32,13 +32,9 @@ jobs:
     - name: Run black
       uses: psf/black@stable
 
-    - name: Run isort
+    - name: Lint with ruff
       run: |
-        isort --check komodo tests
-
-    - name: Lint with flake8
-      run: |
-        flake8 --max-line-length 88 --exclude ./build/lib/komodo/_version.py,./komodo/_version.py
+        ruff check komodo tests
 
     - name: pylint
       run: |

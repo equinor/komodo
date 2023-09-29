@@ -11,7 +11,7 @@ from komodo.release_transpiler import main as release_transpiler_main
 VALID_RELEASE_FOLDER = abspath(dirname(__file__) + "/data/test_releases")
 VALID_RELEASE_BASE = "2020.01.a1"
 VALID_OVERRIDE_MAPPING_FILE = abspath(
-    dirname(dirname(__file__)) + "/examples/stable.yml"
+    dirname(dirname(__file__)) + "/examples/stable.yml",
 )
 VALID_PYTHON_COORDS = "3.6,3.8"
 VALID_MATRIX_FILE = abspath(dirname(__file__) + "/data/test_release_matrix.yml")
@@ -25,7 +25,7 @@ def does_not_raise():
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -88,15 +88,15 @@ def test_combine_py_coords_type(args: List[str], expectation, monkeypatch):
             VALID_RELEASE_BASE,
             "--override-mapping",
             VALID_OVERRIDE_MAPPING_FILE,
-        ]
-        + args,
+            *args,
+        ],
     )
     with expectation:
         release_transpiler_main()
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -157,15 +157,15 @@ def test_combine_py_release_folder_type(args: List[str], expectation, monkeypatc
             VALID_RELEASE_BASE,
             "--override-mapping",
             VALID_OVERRIDE_MAPPING_FILE,
-        ]
-        + args,
+            *args,
+        ],
     )
     with expectation:
         release_transpiler_main()
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -224,8 +224,8 @@ def test_combine_py_override_mapping_type(args: List[str], expectation, monkeypa
             VALID_RELEASE_BASE,
             "--release-folder",
             VALID_RELEASE_FOLDER,
-        ]
-        + args,
+            *args,
+        ],
     )
 
     with expectation:
@@ -233,7 +233,7 @@ def test_combine_py_override_mapping_type(args: List[str], expectation, monkeypa
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -264,15 +264,15 @@ def test_combine_py_release_base_type(args: List[str], expectation, monkeypatch)
             VALID_OVERRIDE_MAPPING_FILE,
             "--py_coords",
             "3.8,3.6",
-        ]
-        + args,
+            *args,
+        ],
     )
     with expectation:
         release_transpiler_main()
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -322,14 +322,16 @@ def test_combine_py_release_base_type(args: List[str], expectation, monkeypatch)
 )
 def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch):
     monkeypatch.setattr(
-        sys, "argv", ["", "transpile", "--output-folder", VALID_RELEASE_FOLDER] + args
+        sys,
+        "argv",
+        ["", "transpile", "--output-folder", VALID_RELEASE_FOLDER, *args],
     )
     with expectation:
         release_transpiler_main()
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -381,20 +383,14 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
     monkeypatch.setattr(
         sys,
         "argv",
-        [
-            "",
-            "transpile",
-            "--matrix-file",
-            VALID_MATRIX_FILE,
-        ]
-        + args,
+        ["", "transpile", "--matrix-file", VALID_MATRIX_FILE, *args],
     )
     with expectation:
         release_transpiler_main()
 
 
 @pytest.mark.parametrize(
-    "args, expectation",
+    ("args", "expectation"),
     [
         (
             [
@@ -431,7 +427,9 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
     ],
 )
 def test_transpile_py_matrix_coordinates_type(
-    args: List[str], expectation, monkeypatch
+    args: List[str],
+    expectation,
+    monkeypatch,
 ):
     monkeypatch.setattr(
         sys,
@@ -443,8 +441,8 @@ def test_transpile_py_matrix_coordinates_type(
             VALID_MATRIX_FILE,
             "--output-folder",
             VALID_RELEASE_FOLDER,
-        ]
-        + args,
+            *args,
+        ],
     )
     with expectation:
         release_transpiler_main()

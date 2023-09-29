@@ -15,7 +15,8 @@ MIGRATION_WARNING = (
 def create_activator_switch(data, prefix, release):
     """Given a prefix and a release, create an activator switch which
     will vary the selected activator based on the RHEL version. The data
-    argument is expected to be a komodo.data.Data instance."""
+    argument is expected to be a komodo.data.Data instance.
+    """
     # drop "-rheln"
     try:
         release_py, _ = release.rsplit("-", 1)
@@ -30,19 +31,23 @@ def create_activator_switch(data, prefix, release):
     os.makedirs(release_path)
 
     with open(os.path.join(release_path, "enable"), "w") as activator, open(
-        data.get("activator_switch.tmpl")
+        data.get("activator_switch.tmpl"),
     ) as activator_tmpl:
         activator.write(
             Template(activator_tmpl.read(), keep_trailing_newline=True).render(
-                prefix=prefix, release=release_py, migration_warning=MIGRATION_WARNING
-            )
+                prefix=prefix,
+                release=release_py,
+                migration_warning=MIGRATION_WARNING,
+            ),
         )
 
     with open(os.path.join(release_path, "enable.csh"), "w") as activator, open(
-        data.get("activator_switch.csh.tmpl")
+        data.get("activator_switch.csh.tmpl"),
     ) as activator_tmpl:
         activator.write(
             Template(activator_tmpl.read(), keep_trailing_newline=True).render(
-                prefix=prefix, release=release_py, migration_warning=MIGRATION_WARNING
-            )
+                prefix=prefix,
+                release=release_py,
+                migration_warning=MIGRATION_WARNING,
+            ),
         )

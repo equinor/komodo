@@ -1,5 +1,6 @@
 import argparse
 import collections
+import contextlib
 import difflib
 import os
 from base64 import b64decode
@@ -49,14 +50,13 @@ def diff_file_and_string(file_contents, string, leftname, rightname):
             leftname,
             rightname,
             n=0,
-        )
+        ),
     )
 
 
 def load_yaml_from_repo(filename, repo, ref) -> bytes:
     sym_conf_content = repo.get_contents(filename, ref=ref)
-    input_dict = b64decode(sym_conf_content.content)
-    return input_dict
+    return b64decode(sym_conf_content.content)
 
 
 def main():
@@ -78,7 +78,8 @@ def verify_branch_does_not_exist(repo: Repository.Repository, branch_name: str) 
     except github.GithubException:
         pass
     else:
-        raise ValueError(f"Branch {branch_name} exists already")
+        msg = f"Branch {branch_name} exists already"
+        raise ValueError(msg)
 
 
 def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
@@ -140,7 +141,10 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
     # making PR
     base_content = repo.get_contents(base_file, ref=git_ref)
     diff = diff_file_and_string(
-        b64decode(base_content.content).decode(), result, base, target
+        b64decode(base_content.content).decode(),
+        result,
+        base,
+        target,
     )
 
     pr_msg = f""":robot: Release {target}
@@ -175,15 +179,16 @@ Source code for this script can be found [here](https://github.com/equinor/komod
         commit_title=f"Add release {target}",
         merge_method="squash",
     )
-    try:
+    with contextlib.suppress(github.GithubException):
         tmp_ref.delete()
-    except github.GithubException:
-        pass  # automatically deleted on PR merge
-    # done with temporary PR
+        # If exception occurs, deletion is automatic
 
-    # making the real PR
+    # done with temporary PR, making the real PR:
     repo.create_pull(
-        title=f"Add release {target}", body=pr_msg, head=target, base=git_ref
+        title=f"Add release {target}",
+        body=pr_msg,
+        head=target,
+        base=git_ref,
     )
 
 
@@ -210,8 +215,7 @@ def parse_args():
     parser.add_argument("--git-fork", help="git fork", default="equinor")
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 if __name__ == "__main__":

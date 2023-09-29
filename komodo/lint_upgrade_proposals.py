@@ -4,13 +4,11 @@ from komodo.yaml_file_types import KomodoException, RepositoryFile, UpgradePropo
 
 
 def verify_package_versions_exist(
-    upgrade_proposals: UpgradeProposalsFile, repository: RepositoryFile
+    upgrade_proposals: UpgradeProposalsFile,
+    repository: RepositoryFile,
 ) -> None:
     releases_with_upgrades_counter = 0
-    for (
-        _release_version,
-        proposed_package_upgrades,
-    ) in upgrade_proposals.content.items():
+    for proposed_package_upgrades in upgrade_proposals.content.values():
         if proposed_package_upgrades is None:
             continue
         releases_with_upgrades_counter += 1
@@ -21,11 +19,12 @@ def verify_package_versions_exist(
         ) in proposed_package_upgrades.items():
             try:
                 repository.validate_package_entry(
-                    upgrade_proposals_package, upgrade_proposals_package_version
+                    upgrade_proposals_package,
+                    upgrade_proposals_package_version,
                 )
                 print(
                     f"Found package: '{upgrade_proposals_package}' with version"
-                    f" {upgrade_proposals_package_version} in repository"
+                    f" {upgrade_proposals_package_version} in repository",
                 )
             except KomodoException as e:
                 errors.append(e.error)
@@ -34,7 +33,8 @@ def verify_package_versions_exist(
     if releases_with_upgrades_counter == 0:
         print("No upgrades found")
     if releases_with_upgrades_counter > 1:
-        raise SystemExit("Found upgrades for more than one release")
+        msg = "Found upgrades for more than one release"
+        raise SystemExit(msg)
 
 
 def get_args() -> argparse.ArgumentParser:
@@ -52,8 +52,7 @@ def get_args() -> argparse.ArgumentParser:
         type=RepositoryFile(),
         help="Repository file to check upgrade_proposals against.",
     )
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():

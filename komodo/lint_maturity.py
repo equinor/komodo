@@ -30,7 +30,10 @@ def print_warning_message(system_warning_msg):
 
 
 def msg_packages_invalid(
-    release_basename, release_version, count_tag_invalid, dict_tag_maturity
+    release_basename,
+    release_version,
+    count_tag_invalid,
+    dict_tag_maturity,
 ):
     exit_msg = ""
     exit_msg += (
@@ -61,9 +64,7 @@ def msg_packages_exception(release_basename, dict_tag_maturity):
 
 def count_invalid_tags(dict_tag_maturity, invalid_tags):
     count_tag_maturity = {tag: len(dict_tag_maturity[tag]) for tag in dict_tag_maturity}
-    invalid_tags_count = sum(count_tag_maturity[tag] for tag in invalid_tags)
-
-    return invalid_tags_count
+    return sum(count_tag_maturity[tag] for tag in invalid_tags)
 
 
 def get_release_type(version: str):
@@ -92,7 +93,7 @@ def get_packages_info(release_file: ReleaseFile, tag_exceptions_package):
         else:
             release_version_package = "exception"
         dict_tag_maturity[release_version_package].append(
-            (package_name, package_version)
+            (package_name, package_version),
         )
 
     return dict_tag_maturity
@@ -100,9 +101,7 @@ def get_packages_info(release_file: ReleaseFile, tag_exceptions_package):
 
 def read_yaml_file(file_path):
     with open(file_path) as yml_file:
-        loaded_yaml_file = yaml.safe_load(yml_file)
-
-    return loaded_yaml_file
+        return yaml.safe_load(yml_file)
 
 
 def msg_release_exception(release_basename, release_version):
@@ -134,7 +133,8 @@ def run(files_to_lint: List[str], tag_exceptions):
     for file_to_lint in files_to_lint:
         release_basename = os.path.basename(file_to_lint)
         release_version = get_release_version(
-            release_basename, tag_exceptions["release"]
+            release_basename,
+            tag_exceptions["release"],
         )
         system_warning_msg += msg_release_exception(release_basename, release_version)
 
@@ -145,14 +145,17 @@ def run(files_to_lint: List[str], tag_exceptions):
         else:
             release_file = read_yaml_file_and_convert_to_release_file(file_to_lint)
             dict_tag_maturity = get_packages_info(
-                release_file, tag_exceptions["package"]
+                release_file,
+                tag_exceptions["package"],
             )
             count_tag_invalid = count_invalid_tags(
-                dict_tag_maturity, _INVALID_TAGS[release_version]
+                dict_tag_maturity,
+                _INVALID_TAGS[release_version],
             )
 
             system_warning_msg += msg_packages_exception(
-                release_basename, dict_tag_maturity
+                release_basename,
+                dict_tag_maturity,
             )
 
             if count_tag_invalid > 0:
@@ -175,8 +178,7 @@ def run(files_to_lint: List[str], tag_exceptions):
 def read_yaml_file_and_convert_to_release_file(release_file_path: str) -> ReleaseFile:
     with open(release_file_path, mode="r+", encoding="utf-8") as f:
         release_file_yaml_string = f.read()
-    release_file = ReleaseFile().from_yaml_string(value=release_file_yaml_string)
-    return release_file
+    return ReleaseFile().from_yaml_string(value=release_file_yaml_string)
 
 
 def get_files_to_lint(release_folder: str, release_file: str) -> List[str]:
@@ -185,9 +187,9 @@ def get_files_to_lint(release_folder: str, release_file: str) -> List[str]:
     else:
         files_to_lint = filter(
             lambda file: os.path.isfile,
-            map(
-                lambda file_path: os.path.join(release_folder, file_path),
-                os.listdir(release_folder),
+            (
+                os.path.join(release_folder, file_path)
+                for file_path in os.listdir(release_folder)
             ),
         )
     return files_to_lint
@@ -245,7 +247,8 @@ def main():
     tag_exceptions = define_tag_exceptions(tag_exception_arg=args.tag_exceptions)
 
     files_to_lint = get_files_to_lint(
-        release_folder=args.release_folder, release_file=args.release_file
+        release_folder=args.release_folder,
+        release_file=args.release_file,
     )
 
     run(files_to_lint, tag_exceptions)

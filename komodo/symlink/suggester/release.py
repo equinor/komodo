@@ -14,7 +14,7 @@ def diff_month(date_1: datetime.date, date_2: datetime.date) -> int:
 
 
 class Release:
-    def __init__(self, release_id: str):
+    def __init__(self, release_id: str) -> None:
         self.release_id = release_id
 
     def __repr__(self) -> str:
@@ -34,20 +34,22 @@ class Release:
 
     def is_concrete(self) -> bool:
         """Return whether or not this is a concrete build. 2019.01-py is not a
-        concrete build: all komodo builds follow the format 2019.01.???-pyN."""
+        concrete build: all komodo builds follow the format 2019.01.???-pyN.
+        """
         return len(repr(self)) > len(self.month_alias())
 
     def py_ver(self) -> str:
         try:
             return re.search("-(py\\d\\.?\\d?)", self.release_id).group(1)
         except TypeError as exc:
-            raise ValueError(f"{self.release_id} has no python version") from exc
-        except AttributeError as attr_error:
+            msg = f"{self.release_id} has no python version"
+            raise ValueError(msg) from exc
+        except AttributeError:
             # In the case that this is a monthly alias without postfix, assume 3.8
             if len(repr(self)) == 7:
                 return "py38"
 
-            raise attr_error
+            raise
 
     @staticmethod
     def id_from_file_name(file_name: str):

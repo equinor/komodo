@@ -4,11 +4,11 @@ from komodo import matrix
 
 
 def test_format_matrix():
-    assert "base-py27-rhel6" == matrix.format_release("base", "rhel6", "py27")
+    assert matrix.format_release("base", "rhel6", "py27") == "base-py27-rhel6"
 
 
 @pytest.mark.parametrize(
-    "test_input,expected",
+    ("test_input", "expected"),
     [
         ("1970.12.01-py38-rhel7", "1970.12.01"),
         ("1970.12.rc0-foo-py38-rhel7", "1970.12.rc0-foo"),

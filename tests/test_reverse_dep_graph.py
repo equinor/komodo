@@ -9,7 +9,7 @@ REPO = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "package_b": {
         "2.3.4": {"maintainer": "a@b.c", "make": "pip", "source": "pypi"},
@@ -21,7 +21,7 @@ REPO = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "package_d": {
         "10.2.1": {
@@ -29,7 +29,7 @@ REPO = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "package_e": {"4.1.2": {"maintainer": "a@b.c", "make": "pip", "source": "pypi"}},
     "package_f": {
@@ -54,8 +54,8 @@ REPO_MISSING_PKG = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
-    }
+        },
+    },
 }
 
 
@@ -67,7 +67,7 @@ def test_extract_reverse_list():
     assert rev_deps["package_c"].difference({("package_a", "1.2.3")}) == set()
     assert (
         rev_deps["package_e"].difference(
-            {("package_c", "0.0.1"), ("package_d", "10.2.1"), ("package_a", "1.2.3")}
+            {("package_c", "0.0.1"), ("package_d", "10.2.1"), ("package_a", "1.2.3")},
         )
         == set()
     )
@@ -89,18 +89,18 @@ def test_extract_reverse_graph():
             {"package_d-10.2.1": [{"package_c-0.0.1": [{"package_a-1.2.3": []}]}]},
             {"package_c-0.0.1": [{"package_a-1.2.3": []}]},
             {"package_a-1.2.3": []},
-        ]
+        ],
     }
 
     assert _sort_graph(rev_dep_graph) == _sort_graph(expected)
 
 
 def _sort_graph(a):
-    for _, v in a.items():
+    for v in a.values():
         v.sort(
             key=lambda dep_graph: (
-                list(dep_graph.keys())[0] if len(dep_graph) == 1 else ""
-            )
+                next(iter(dep_graph.keys())) if len(dep_graph) == 1 else ""
+            ),
         )
         for sub_graph in v:
             _sort_graph(sub_graph)

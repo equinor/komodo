@@ -17,10 +17,12 @@ def does_not_raise():
 
 
 @pytest.mark.parametrize(
-    "content, expectations",
+    ("content", "expectations"),
     [
         pytest.param(
-            'zopfli: "0.3"\npytest: 0.40.1', does_not_raise(), id="valid_release_file"
+            'zopfli: "0.3"\npytest: 0.40.1',
+            does_not_raise(),
+            id="valid_release_file",
         ),
         pytest.param(
             "zopfli",
@@ -38,7 +40,8 @@ def does_not_raise():
         pytest.param(
             '1.2: "0.3"\nzopfli: "0.3"',
             pytest.raises(
-                SystemExit, match=r"Package name .* should be of type string"
+                SystemExit,
+                match=r"Package name .* should be of type string",
             ),
             id="invalid_release_file_float_package_name",
         ),
@@ -50,7 +53,8 @@ def does_not_raise():
         pytest.param(
             'zopfli:\npytest: "0.3"',
             pytest.raises(
-                SystemExit, match=r"Package .* has invalid version.*\(None\)"
+                SystemExit,
+                match=r"Package .* has invalid version.*\(None\)",
             ),
             id="invalid_release_file_None_package_version",
         ),
@@ -622,7 +626,7 @@ INVALID_YAML = "zopfli"
 
 
 @pytest.mark.parametrize(
-    "content, expectations",
+    ("content", "expectations"),
     [
         pytest.param(VALID_REPOSITORY, does_not_raise(), id="valid_repository_file"),
         pytest.param(
@@ -646,7 +650,8 @@ INVALID_YAML = "zopfli"
         pytest.param(
             INVALID_REPOSITORY_FLOAT_PACKAGE_NAME,
             pytest.raises(
-                SystemExit, match=r"Package name .* should be of type string"
+                SystemExit,
+                match=r"Package name .* should be of type string",
             ),
             id="invalid_repository_file_float_package_name",
         ),
@@ -691,21 +696,24 @@ INVALID_YAML = "zopfli"
         pytest.param(
             INVALID_REPOSITORY_MISSING_MAKE,
             pytest.raises(
-                SystemExit, match=r"Package .* has invalid make type \(None\)"
+                SystemExit,
+                match=r"Package .* has invalid make type \(None\)",
             ),
             id="invalid_repository_file_missing_make",
         ),
         pytest.param(
             INVALID_REPOSITORY_MISSING_MAINTAINER,
             pytest.raises(
-                SystemExit, match=r"Package .* has invalid maintainer type \(None\)"
+                SystemExit,
+                match=r"Package .* has invalid maintainer type \(None\)",
             ),
             id="invalid_repository_file_missing_maintainer",
         ),
         pytest.param(
             INVALID_REPOSITORY_MAKE_VALUE,
             pytest.raises(
-                SystemExit, match=r"Package.*has invalid make value \(cargo\)"
+                SystemExit,
+                match=r"Package.*has invalid make value \(cargo\)",
             ),
             id="invalid_repository_file_invalid_make_value",
         ),
@@ -726,7 +734,7 @@ INVALID_YAML = "zopfli"
             INVALID_REPOSITORY_ADDITIONAL_UNKNOWN_UPPERCASE_PROPERTIES,
             pytest.raises(
                 SystemExit,
-                match=(r"invalid property value type" r" \(2.2\).*"),
+                match=(r"invalid property value type \(2.2\).*"),
             ),
             id="invalid_repository_file_additional_unknown_uppercase_properties",
         ),
@@ -771,7 +779,7 @@ LINT_MAINTAINER_TEST_REPO = """
 
 
 @pytest.mark.parametrize(
-    "package_name, package_version, expectation, return_object",
+    ("package_name", "package_version", "expectation", "return_object"),
     [
         pytest.param(
             "python",
@@ -797,7 +805,10 @@ LINT_MAINTAINER_TEST_REPO = """
     ],
 )
 def test_repository_file_lint_maintainer(
-    package_name, package_version, expectation, return_object
+    package_name,
+    package_version,
+    expectation,
+    return_object,
 ):
     repo_file = RepositoryFile().from_yaml_string(LINT_MAINTAINER_TEST_REPO)
     with expectation:
@@ -807,7 +818,7 @@ def test_repository_file_lint_maintainer(
 
 
 @pytest.mark.parametrize(
-    "package_status_file_content, expectation",
+    ("package_status_file_content", "expectation"),
     [
         pytest.param(
             "python:\n  visibility: public\n  maturity: experimental\n  importance:"

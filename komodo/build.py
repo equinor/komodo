@@ -97,7 +97,7 @@ def cmake(
         os.environ["PATH"] = kwargs.get("binpath")
 
         print(f"Installing {pkg} ({ver}) from source with cmake")
-        shell([cmake, path] + flags + [makeopts])
+        shell([cmake, path, *flags, makeopts])
         print(shell(f"make -j{jobs}"))
         print(shell(f"make DESTDIR={fakeroot} install"))
 
@@ -138,7 +138,7 @@ def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
             kwargs.get("makeopts"),
             f"{pkgpath}/",
             kwargs["fakeroot"] + prefix,
-        ]
+        ],
     )
 
 
@@ -147,12 +147,14 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
 
     url = kwargs["url"]
     if not url.startswith("https"):
-        raise ValueError(f"{url} does not use https:// protocol")
+        msg = f"{url} does not use https:// protocol"
+        raise ValueError(msg)
 
     hash_type, hash_value = kwargs["hash"].split(":")
     if hash_type != "sha256":
+        msg = f"Hash type {hash_type} given - only sha256 implemented"
         raise NotImplementedError(
-            f"Hash type {hash_type} given - only sha256 implemented"
+            msg,
         )
 
     fakeprefix = pathlib.Path(kwargs["fakeroot"] + prefix)
@@ -163,8 +165,9 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
     response = session.get(url, stream=True)
 
     if response.status_code != 200:
+        msg = f"GET request to {url} returned status code {response.status_code}"
         raise RuntimeError(
-            f"GET request to {url} returned status code {response.status_code}"
+            msg,
         )
 
     sha256 = hashlib.sha256()
@@ -175,15 +178,15 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
             sha256.update(chunk)
 
     if sha256.hexdigest() != hash_value:
+        msg = f"Hash of downloaded file ({sha256.hexdigest()}) not equal to expected hash."
         raise ValueError(
-            f"Hash of downloaded file ({sha256.hexdigest()}) "
-            "not equal to expected hash."
+            msg,
         )
 
     # Add executable permission if in bin folder:
     if "bin" in dest_path.parts:
         dest_path.chmod(
-            dest_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+            dest_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH,
         )
 
 
@@ -221,7 +224,7 @@ def pypaths(prefix, version):
             f"{prefix}/lib/{pyver}",
             f"{prefix}/lib/{pyver}/site-packages",
             f"{prefix}/lib64/{pyver}/site-packages",
-        ]
+        ],
     )
 
 
@@ -265,9 +268,9 @@ def make(
                 os.path.join(fakeprefix, "lib64"),
                 os.environ.get("LD_LIBRARY_PATH"),
             ],
-        )
+        ),
     )
-    extra_makeopts = os.environ.get("extra_makeopts")
+    extra_makeopts = os.environ.get("EXTRA_MAKEOPTS")
     build_pythonpath = pypaths(fakeprefix, pkgs.get("python"))
     build_path = ":".join([os.path.join(fakeprefix, "bin"), os.environ["PATH"]])
 
@@ -297,21 +300,22 @@ def make(
         download_keys = ["url", "destination", "hash"]
         if any(key in current for key in download_keys) and make != "download":
             raise ValueError(
-                ", ".join(download_keys) + " only valid with 'make: download'"
+                ", ".join(download_keys) + " only valid with 'make: download'",
             )
         if not all(key in current for key in download_keys) and make == "download":
             raise ValueError(
-                ", ".join(download_keys) + " all required with 'make: download'"
+                ", ".join(download_keys) + " all required with 'make: download'",
             )
 
         if "pypi_package_name" in current and make != "pip":
-            raise ValueError("pypi_package_name is only valid when building with pip")
+            msg = "pypi_package_name is only valid when building with pip"
+            raise ValueError(msg)
 
         package_name = current.get("pypi_package_name", pkg)
 
         if extra_makeopts:
             oldopts = current.get("makeopts", "")
-            current["makeopts"] = " ".join((oldopts, extra_makeopts))
+            current["makeopts"] = f"{oldopts} {extra_makeopts}"
 
         current["makeopts"] = resolve(current.get("makeopts", ""))
         build[make](

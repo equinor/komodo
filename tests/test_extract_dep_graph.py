@@ -9,7 +9,7 @@ REPO = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "package_b": {
         "2.3.4": {"maintainer": "a@b.c", "make": "pip", "source": "pypi"},
@@ -21,7 +21,7 @@ REPO = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "package_d": {
         "10.2.1": {
@@ -29,7 +29,7 @@ REPO = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
+        },
     },
     "package_e": {"4.1.2": {"maintainer": "a@b.c", "make": "pip", "source": "pypi"}},
     "package_f": {
@@ -83,8 +83,8 @@ REPO_MISSING_PKG = {
             "maintainer": "a@b.c",
             "make": "pip",
             "source": "pypi",
-        }
-    }
+        },
+    },
 }
 
 
@@ -92,7 +92,7 @@ def test_extract_dep_graph_repo_missing_pkg():
     with pytest.raises(SystemExit) as exit_info:
         extract_dep_graph._iterate_packages(RELEASE, BASE_RELEASE, REPO_MISSING_PKG)
     assert "'package_b' not found in 'repo'. This needs to be resolved." in str(
-        exit_info.value
+        exit_info.value,
     )
 
 
@@ -120,7 +120,9 @@ BASE_RELEASE_DEFINES_VERSION_NOT_EXISTING = {
 def test_extract_dep_graph_base_file_faulty_version():
     with pytest.raises(SystemExit) as exit_info:
         extract_dep_graph._iterate_packages(
-            RELEASE, BASE_RELEASE_DEFINES_VERSION_NOT_EXISTING, REPO
+            RELEASE,
+            BASE_RELEASE_DEFINES_VERSION_NOT_EXISTING,
+            REPO,
         )
     assert (
         "Version '2.4.3' for package 'package_b' not found in 'repo'. "
@@ -134,7 +136,9 @@ RELEASE_DEFINES_VERSION_NOT_EXISTING = {"package_a": "11.2.3"}
 def test_extract_dep_graph_pkgs_file_faulty_version():
     with pytest.raises(SystemExit) as exit_info:
         extract_dep_graph._iterate_packages(
-            RELEASE_DEFINES_VERSION_NOT_EXISTING, BASE_RELEASE, REPO
+            RELEASE_DEFINES_VERSION_NOT_EXISTING,
+            BASE_RELEASE,
+            REPO,
         )
     assert (
         "Version '11.2.3' for package 'package_a' not found in 'repo'. "

@@ -33,7 +33,7 @@ Source code for this script can be found [here](https://github.com/equinor/komod
 
 def _parse_args():
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("release", help="e.g. 2019.12.rc0-py38")
     parser.add_argument("mode", help="stable,testing,unstable")
@@ -48,7 +48,10 @@ def _parse_args():
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
     parser.add_argument(
-        "--verbose", "-v", help="Set loglevel to INFO", action="store_true"
+        "--verbose",
+        "-v",
+        help="Set loglevel to INFO",
+        action="store_true",
     )
     parser.add_argument(
         "--dry-run",
@@ -68,10 +71,13 @@ def _get_repo(token: Optional[str], fork: str, repo: str) -> Repository:
 
 
 def suggest_symlink_configuration(
-    args: argparse.Namespace, repo: Repository, dry_run: bool = False
+    args: argparse.Namespace,
+    repo: Repository,
+    dry_run: bool = False,
 ) -> Optional[Repository]:
     """Returns a pull request if the symlink configuration could be updated,
-    or None if no update was possible."""
+    or None if no update was possible.
+    """
     try:
         sym_conf_content = repo.get_contents(args.symlink_conf_path, ref=args.git_ref)
     except UnknownObjectException:
@@ -83,7 +89,9 @@ def suggest_symlink_configuration(
 
     try:
         new_symlink_content, updated = configuration.update(
-            b64decode(sym_conf_content.content), args.release, args.mode
+            b64decode(sym_conf_content.content),
+            args.release,
+            args.mode,
         )
     except ValueError as exc:
         logger.critical(exc)
@@ -93,10 +101,7 @@ def suggest_symlink_configuration(
         logger.info("Nothing to update")
         return None
 
-    if "azure" in args.symlink_conf_path:
-        platform = "azure"
-    else:
-        platform = "onprem"
+    platform = "azure" if "azure" in args.symlink_conf_path else "onprem"
 
     target_branch = f"{args.release}/{platform}-{args.mode}"
 

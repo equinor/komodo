@@ -5,7 +5,7 @@ from komodo.symlink.suggester.release import Release
 
 
 class Configuration:
-    def __init__(self, conf):
+    def __init__(self, conf) -> None:
         self.conf = conf
         self.links = conf["links"]
 
@@ -52,7 +52,8 @@ class Configuration:
             self.links[release.month_alias()] = repr(release)
             self.links[link] = release.month_alias()
         else:
-            raise ValueError(f"Mode {mode} was not recognized")
+            msg = f"Mode {mode} was not recognized"
+            raise ValueError(msg)
 
     def to_json(self, json_kwargs):
         return json.dumps(self.conf, **json_kwargs)
@@ -66,7 +67,8 @@ def update(symlink_configuration, release_id, mode) -> Tuple[str, bool]:
     """Return a tuple of a string representing the new symlink config json,
     and whether or not an update was made. This function assumes the release_id
     is in the yyyy.mm.[part ...]-py[\\d+] format and that symlink_configuration
-    is a string representing the current symlink config json."""
+    is a string representing the current symlink config json.
+    """
     json_kwargs = {"sort_keys": True, "indent": 4, "separators": (",", ": ")}
     release = Release(release_id)
 

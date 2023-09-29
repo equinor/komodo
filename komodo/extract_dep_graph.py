@@ -33,12 +33,13 @@ def _iterate_packages(pkgs, base_pkgs, repo):
 
 def _extract_dependencies(package, version, base_pkgs, repofile, dependencies):
     if package not in repofile:
-        raise SystemExit(f"'{package}' not found in 'repo'. This needs to be resolved.")
+        msg = f"'{package}' not found in 'repo'. This needs to be resolved."
+        raise SystemExit(msg)
     if version not in repofile[package]:
         available_versions = list(repofile[package].keys())
+        msg = f"Version '{version}' for package '{package}' not found in 'repo'. Available version(s) is: {available_versions}."
         raise SystemExit(
-            f"Version '{version}' for package '{package}' not found in 'repo'. "
-            f"Available version(s) is: {available_versions}."
+            msg,
         )
     if package not in dependencies:
         dependencies[package] = version
@@ -46,13 +47,17 @@ def _extract_dependencies(package, version, base_pkgs, repofile, dependencies):
     if "depends" in repofile[package][version]:
         for dependency in repofile[package][version]["depends"]:
             if dependency not in base_pkgs:
+                msg = f"'{dependency}' not found in 'base_pkgs'. This needs to be in place in order to pick correct version."
                 raise SystemExit(
-                    f"'{dependency}' not found in 'base_pkgs'. "
-                    "This needs to be in place in order to pick correct version."
+                    msg,
                 )
             version = base_pkgs[dependency]
             _extract_dependencies(
-                dependency, version, base_pkgs, repofile, dependencies
+                dependency,
+                version,
+                base_pkgs,
+                repofile,
+                dependencies,
             )
 
     return dependencies

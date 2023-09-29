@@ -32,7 +32,7 @@ from tests import _get_test_root
             os.path.join(_get_test_root(), "data/cli"),
             os.path.join(_get_test_root(), "data/cli/hackres"),
             os.path.join(_get_test_root(), "data/cli/hackgit"),
-        )
+        ),
     ],
 )
 def test_main(args, tmpdir):
@@ -102,8 +102,7 @@ def test_main(args, tmpdir):
     ],
 )
 def test_minimal_main(args, tmpdir):
-    """
-    Check that a minimal example, more like that from the README, also works.
+    """Check that a minimal example, more like that from the README, also works.
 
     Without --locations-config, this should not produce the scripts local & local.csh.
     """
@@ -129,8 +128,7 @@ def test_minimal_main(args, tmpdir):
 
 
 def test_pyver_is_deprecated(capsys):
-    """
-    pyver is not being used anywhere in the code and has been deprecated.
+    """Pyver is not being used anywhere in the code and has been deprecated.
     This test ensures that its use prints a message in stderr.
 
     Note that one can raise a DeprecationWarning instead, and test for it,

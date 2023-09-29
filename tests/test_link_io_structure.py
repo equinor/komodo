@@ -79,7 +79,7 @@ def test_create_symlink_stdout(tmpdir, capsys):
         os.mkdir("2023.07")
         create_symlinks(links_dict)
         captured = capsys.readouterr()
-        assert "Created new symlink 2023 pointing to 2023.07\n" == captured.out
+        assert captured.out == "Created new symlink 2023 pointing to 2023.07\n"
 
 
 def test_overwrite_symlink_stdout(tmpdir, capsys):
@@ -95,7 +95,7 @@ def test_overwrite_symlink_stdout(tmpdir, capsys):
         os.symlink("2023.06", "2023")
         create_symlinks(links_dict)
         captured = capsys.readouterr()
-        assert "Existing symlink 2023 moved from 2023.06 to 2023.07\n" == captured.out
+        assert captured.out == "Existing symlink 2023 moved from 2023.06 to 2023.07\n"
 
 
 def test_integration(tmpdir):
@@ -202,7 +202,7 @@ def test_link_error(tmpdir):
         }
         with pytest.raises(ValueError) as e:
             create_symlinks(test_dict)
-        assert "2012.01.rc2 does not exist" == str(e.value)
+        assert str(e.value) == "2012.01.rc2 does not exist"
 
 
 def test_root_link_error(tmpdir):
@@ -220,7 +220,7 @@ def test_root_link_error(tmpdir):
         }
         with pytest.raises(ValueError) as e:
             create_symlinks(test_dict)
-        assert "2012.01.rc2 does not exist" == str(e.value)
+        assert str(e.value) == "2012.01.rc2 does not exist"
 
 
 def test_executables(tmpdir):

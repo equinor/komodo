@@ -28,7 +28,7 @@ function install_komodo {
     echo "Installing Komodo"
     $python_bin -m venv boot/kmd-env
     boot/kmd-env/bin/python -m pip install -U pip
-    boot/kmd-env/bin/python -m pip install virtualenv pytest .
+    boot/kmd-env/bin/python -m pip install "urllib3<2" virtualenv pytest .
 }
 
 function install_devtoolset {

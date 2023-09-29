@@ -1,4 +1,5 @@
 import argparse
+import contextlib
 import datetime
 import os
 import sys
@@ -28,6 +29,7 @@ def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
     directory komodo_release (in current working directory).
 
     Args:
+    ----
         komodo_prefix: The filesystem path to where the release is to be
             deployed.
         komodo_release: The name of the release.
@@ -50,7 +52,8 @@ def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
 
 
 def _print_timings(
-    timing_element: Tuple[str, datetime.timedelta], adjust: bool = False
+    timing_element: Tuple[str, datetime.timedelta],
+    adjust: bool = False,
 ) -> None:
     if adjust:
         print(f" * {timing_element[0]:50} {timing_element[1]}")
@@ -67,7 +70,10 @@ def _main(args):
     if args.download or (not args.build and not args.install):
         start_time = datetime.datetime.now()
         git_hashes = fetch(
-            args.pkgs.content, args.repo.content, outdir=args.downloads, pip=args.pip
+            args.pkgs.content,
+            args.repo.content,
+            outdir=args.downloads,
+            pip=args.pip,
         )
         timings.append(("Fetching all packages", datetime.datetime.now() - start_time))
         _print_timings(timings[-1])
@@ -77,7 +83,6 @@ def _main(args):
 
     # append root to the temporary build dir, as we want a named root/
     # directory as the distribution root, organised under the distribution name
-    # (release)
     tmp_prefix = abs_prefix / args.release / "root"
     fakeroot = Path(args.release).resolve()
     if args.build or not args.install:
@@ -99,15 +104,13 @@ def _main(args):
             (
                 "Building non-pip part of komodo in workspace",
                 datetime.datetime.now() - start_time,
-            )
+            ),
         )
         _print_timings(timings[-1])
 
         shell(f"mv {args.release + str(tmp_prefix)} {args.release}")
-        try:
+        with contextlib.suppress(OSError):
             os.removedirs(f"{args.release + str(tmp_prefix.parent)}")
-        except OSError:
-            pass
 
     if args.build and not args.install:
         sys.exit(0)
@@ -143,7 +146,7 @@ def _main(args):
         (
             "Rsyncing partial komodo to destination",
             datetime.datetime.now() - start_time,
-        )
+        ),
     )
     _print_timings(timings[-1])
 
@@ -195,7 +198,7 @@ def _main(args):
 
         print(shell(shell_input, sudo=args.sudo))
     timings.append(
-        ("pip install to final destination", datetime.datetime.now() - start_time)
+        ("pip install to final destination", datetime.datetime.now() - start_time),
     )
     _print_timings(timings[-1])
 
@@ -207,7 +210,7 @@ def _main(args):
         start_time = datetime.datetime.now()
         shell([args.postinst, release_path])
         timings.append(
-            ("Running post-install scripts", datetime.datetime.now() - start_time)
+            ("Running post-install scripts", datetime.datetime.now() - start_time),
         )
         _print_timings(timings[-1])
 
@@ -218,7 +221,7 @@ def _main(args):
     print("Setting permissions", [data.get("set_permissions.sh"), release_path])
     shell([data.get("set_permissions.sh"), str(release_path)])
     timings.append(
-        ("Cleanup *.pyc and fix permissions", datetime.datetime.now() - start_time)
+        ("Cleanup *.pyc and fix permissions", datetime.datetime.now() - start_time),
     )
     _print_timings(timings[-1])
 
@@ -228,9 +231,7 @@ def _main(args):
 
 
 def cli_main():
-    """
-    Pass the command-line args to argparse, then set up the workspace.
-    """
+    """Pass the command-line args to argparse, then set up the workspace."""
     args = parse_args(sys.argv[1:])
 
     if args.workspace and not Path(args.workspace).exists():
@@ -241,8 +242,7 @@ def cli_main():
 
 
 def parse_args(args: List[str]) -> argparse.Namespace:
-    """
-    Parse the arguments from the command line into an `argparse.Namespace`.
+    """Parse the arguments from the command line into an `argparse.Namespace`.
     Having a separated function makes it easier to test the CLI.
 
     Set up the command-line interface with three groups of arguments:
@@ -251,9 +251,11 @@ def parse_args(args: List[str]) -> argparse.Namespace:
       - optional named arguments
 
     Args:
+    ----
         args: A sequence of arguments, e.g. as collected from the command line.
 
     Returns:
+    -------
         The `argparse.Namespace`, a mapping of arg names to values.
     """
     parser = argparse.ArgumentParser(

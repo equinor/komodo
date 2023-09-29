@@ -34,7 +34,7 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
             f"-b {strip_version(version)} "
             "--quiet "
             "--recurse-submodules "
-            f"-- {path} {filename}"
+            f"-- {path} {filename}",
         )
 
     elif protocol in ("nfs", "fs-ln"):
@@ -52,7 +52,8 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
     elif protocol in ("rsync"):
         shell(f"rsync -a {path}/ {filename}")
     else:
-        raise NotImplementedError(f"Unknown protocol {protocol}")
+        msg = f"Unknown protocol {protocol}"
+        raise NotImplementedError(msg)
 
 
 def fetch(pkgs, repo, outdir, pip="pip") -> dict:
@@ -68,20 +69,21 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     for pkg in missingver:
         eprint(
             f"missingver: missing version for {pkg}: {pkgs[pkg]} requested, "
-            f"found: {','.join(repo[pkg].keys())}"
+            f"found: {','.join(repo[pkg].keys())}",
         )
 
     if missingpkg or missingver:
         return {}
 
     if not outdir:
+        msg = "The value of `outdir`, the download destination location cannot be None or the empty string."
         raise ValueError(
-            "The value of `outdir`, the download destination location "
-            "cannot be None or the empty string."
+            msg,
         )
     if os.path.exists(outdir) and os.listdir(outdir):
+        msg = f"Downloading to non-empty directory {outdir} is not supported."
         raise RuntimeError(
-            f"Downloading to non-empty directory {outdir} is not supported."
+            msg,
         )
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -93,13 +95,14 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
         for pkg, ver in pkgs.items():
             current = repo[pkg][ver]
             if "pypi_package_name" in current and current["make"] != "pip":
+                msg = "pypi_package_name is only valid when building with pip"
                 raise ValueError(
-                    "pypi_package_name is only valid when building with pip"
+                    msg,
                 )
 
             if "source" in current:
                 templater = jinja2.Environment(loader=jinja2.BaseLoader).from_string(
-                    current.get("source")
+                    current.get("source"),
                 )
                 url = templater.render(os.environ)
             else:
@@ -118,7 +121,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                 package_folder = os.path.abspath(pkgname)
                 print(
                     f"Nothing to fetch for {pkgname}, "
-                    f"but created folder {package_folder}"
+                    f"but created folder {package_folder}",
                 )
                 os.mkdir(pkgname)
                 continue

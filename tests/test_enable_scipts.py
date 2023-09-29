@@ -39,8 +39,9 @@ def test_enable_bash_nopresets(tmpdir):
         with open("test_enable.sh", "w") as test_file:
             test_file.write(
                 TEST_SCRIPT_SIMPLE.format(
-                    set_envs=CLEAN_BASH_ENV, enable_path="bleeding/enable"
-                )
+                    set_envs=CLEAN_BASH_ENV,
+                    enable_path="bleeding/enable",
+                ),
             )
 
         shell(["bash test_enable.sh"])
@@ -66,8 +67,9 @@ def test_enable_csh_no_presets(tmpdir):
         with open("test_enable.sh", "w") as test_file:
             test_file.write(
                 TEST_SCRIPT_SIMPLE.format(
-                    set_envs=CLEAN_CSH_ENV, enable_path="bleeding/enable.csh"
-                )
+                    set_envs=CLEAN_CSH_ENV,
+                    enable_path="bleeding/enable.csh",
+                ),
             )
 
         shell(["csh test_enable.sh"])
@@ -92,7 +94,8 @@ def test_enable_bash_with_presets(tmpdir):
         create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
         Path("test_enable.sh").write_text(
             TEST_SCRIPT_SIMPLE.format(
-                set_envs=BASH_ENVS, enable_path="bleeding/enable"
+                set_envs=BASH_ENVS,
+                enable_path="bleeding/enable",
             ),
             encoding="utf-8",
         )
@@ -118,7 +121,8 @@ def test_enable_csh_with_presets(tmpdir):
         create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
         Path("test_enable.sh").write_text(
             TEST_SCRIPT_SIMPLE.format(
-                set_envs=CSH_ENVS, enable_path="bleeding/enable.csh"
+                set_envs=CSH_ENVS,
+                enable_path="bleeding/enable.csh",
             ),
             encoding="utf-8",
         )

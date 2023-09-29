@@ -21,16 +21,16 @@ VALID_REPOSITORY_CONTENT = {
 }
 
 
-class MockContent(object):
-    def __init__(self, dicty):
+class MockContent:
+    def __init__(self, dicty) -> None:
         self.sha = "testsha"
         self.content = b64encode(yaml.dump(dicty).encode())
 
 
-class MockRepo(object):
+class MockRepo:
     existing_branches = ["git_ref", "2222.22.rc1", "2222.22.rc2"]
 
-    def __init__(self, files):
+    def __init__(self, files) -> None:
         self.files = files
         self.updated_files = {}
         self.created_pulls = {}
@@ -39,7 +39,8 @@ class MockRepo(object):
         if filename in self.files:
             return MockContent(self.files[filename])
         else:
-            raise ValueError(f"unexpected call with file {filename}")
+            msg = f"unexpected call with file {filename}"
+            raise ValueError(msg)
 
     def get_branch(self, ref):
         if ref in MockRepo.existing_branches:
@@ -50,8 +51,7 @@ class MockRepo(object):
             raise github.GithubException(None, None, None)
 
     def create_git_ref(self, ref, sha):
-        o = mock.Mock()
-        return o
+        return mock.Mock()
 
     def create_file(self, target_file, msg, content, branch):
         assert target_file not in self.updated_files
@@ -74,7 +74,15 @@ class MockRepo(object):
 
 
 @pytest.mark.parametrize(
-    "base, target, repo_files, changed_files, prs, return_type, error_message",
+    (
+        "base",
+        "target",
+        "repo_files",
+        "changed_files",
+        "prs",
+        "return_type",
+        "error_message",
+    ),
     [
         pytest.param(
             "1111.11.rc1",
@@ -337,7 +345,13 @@ class MockRepo(object):
     ],
 )
 def test_insert_proposals(
-    base, target, repo_files, changed_files, prs, return_type, error_message
+    base,
+    target,
+    repo_files,
+    changed_files,
+    prs,
+    return_type,
+    error_message,
 ):
     repo = MockRepo(files=repo_files)
 
@@ -360,16 +374,16 @@ def test_insert_proposals(
         assert pr in repo.created_pulls
 
 
-class MockContentYaml(object):
-    def __init__(self, dicty):
+class MockContentYaml:
+    def __init__(self, dicty) -> None:
         self.sha = "testsha"
         self.content = b64encode(bytes(dicty, "utf-8"))
 
 
-class MockRepoYaml(object):
+class MockRepoYaml:
     existing_branches = ["git_ref", "2222.22.rc1", "2222.22.rc2"]
 
-    def __init__(self, files):
+    def __init__(self, files) -> None:
         self.files = files
         self.updated_files = {}
         self.created_pulls = {}
@@ -378,7 +392,8 @@ class MockRepoYaml(object):
         if filename in self.files:
             return MockContentYaml(self.files[filename])
         else:
-            raise ValueError(f"unexpected call with file {filename}")
+            msg = f"unexpected call with file {filename}"
+            raise ValueError(msg)
 
     def get_branch(self, ref):
         if ref in MockRepoYaml.existing_branches:
@@ -389,8 +404,7 @@ class MockRepoYaml(object):
             raise github.GithubException(None, None, None)
 
     def create_git_ref(self, ref, sha):
-        o = mock.Mock()
-        return o
+        return mock.Mock()
 
     def create_file(self, target_file, msg, content, branch):
         assert target_file not in self.updated_files
@@ -413,7 +427,15 @@ class MockRepoYaml(object):
 
 
 @pytest.mark.parametrize(
-    "base, target, repo_files, changed_files, prs, return_type, error_message",
+    (
+        "base",
+        "target",
+        "repo_files",
+        "changed_files",
+        "prs",
+        "return_type",
+        "error_message",
+    ),
     [
         pytest.param(
             "1111.11.rc1",
@@ -485,7 +507,13 @@ class MockRepoYaml(object):
     ],
 )
 def test_duplicate_package_entry_handling(
-    base, target, repo_files, changed_files, prs, return_type, error_message
+    base,
+    target,
+    repo_files,
+    changed_files,
+    prs,
+    return_type,
+    error_message,
 ):
     repo = MockRepoYaml(files=repo_files)
 

@@ -37,9 +37,11 @@ def build_reverse(base, repo):
 
     for pkg, version in base.items():
         if pkg not in repo:
-            raise SystemExit(f"No package {pkg} in repo")
+            msg = f"No package {pkg} in repo"
+            raise SystemExit(msg)
         if version not in repo[pkg]:
-            raise SystemExit(f"No version {version} in package {pkg} in repo")
+            msg = f"No version {version} in package {pkg} in repo"
+            raise SystemExit(msg)
         repo_version = repo[pkg][version]
         if "depends" in repo_version:
             for dep in repo_version["depends"]:
@@ -71,7 +73,7 @@ def _dump_dot_dep(reverse, pkg, version, out, seen):
 
 def build_doc(pkg, reverse):
     rev_list = []
-    if pkg not in reverse.keys():
+    if pkg not in reverse:
         return rev_list
     for rev_dep, rev_version in reverse[pkg]:
         rev_list.append({f"{rev_dep}-{rev_version}": build_doc(rev_dep, reverse)})
@@ -153,7 +155,9 @@ def main():
     elif args.display_dot:
         try:
             dot_proc = subprocess.Popen(
-                ["dot", "-Tpng", "-o"], stdout=subprocess.PIPE, stdin=subprocess.PIPE
+                ["dot", "-Tpng", "-o"],
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE,
             )
             subprocess.Popen(["display"], stdin=dot_proc.stdout)
             out = io.TextIOWrapper(
@@ -167,7 +171,7 @@ def main():
         except FileNotFoundError:
             print(
                 "When using --display-dot You need to have the "
-                "executables dot and display on your path"
+                "executables dot and display on your path",
             )
     else:
         run(args.base_pkgs, args.repo, args.dot, pkg, sys.stdout)

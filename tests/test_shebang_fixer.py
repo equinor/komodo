@@ -7,7 +7,8 @@ def test_fixup_python_shebangs(tmp_path):
     bindir = prefix / "release/root/bin"
     bindir.mkdir(parents=True)
     (bindir / "bad_shebang").write_text(
-        "#!/wildly/wrong/path/to\xe7\x8e\xa9/python\n", encoding="utf-8"
+        "#!/wildly/wrong/path/to\xe7\x8e\xa9/python\n",
+        encoding="utf-8",
     )
 
     # Add noise to the directory that the code should tolerate:
@@ -20,5 +21,5 @@ def test_fixup_python_shebangs(tmp_path):
     # Verify that the shebang got fixed:
     expected_fixed_shebang = f"#!{bindir / 'python'}\n"
     assert (bindir / "bad_shebang").read_text(
-        encoding="utf-8"
+        encoding="utf-8",
     ) == expected_fixed_shebang

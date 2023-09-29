@@ -71,24 +71,27 @@ def _write_file(file_path: str, file_content: str) -> str:
 
 
 def _create_tmp_test_files(
-    repository_file_content: str, release_files_contents: List[str]
+    repository_file_content: str,
+    release_files_contents: List[str],
 ) -> (str, List[str]):
     folder_name = os.path.join(os.getcwd(), "test_cleanup/")
     os.mkdir(folder_name)
     repository_file_path = _write_file(
-        f"{folder_name}/repository.yml", repository_file_content
+        f"{folder_name}/repository.yml",
+        repository_file_content,
     )
     release_files_paths = []
     for file_number, release_file_content in enumerate(release_files_contents):
         release_file_path = _write_file(
-            f"{folder_name}/release_file_{file_number}.yml", release_file_content
+            f"{folder_name}/release_file_{file_number}.yml",
+            release_file_content,
         )
         release_files_paths.append(release_file_path)
     return (repository_file_path, release_files_paths)
 
 
 @pytest.mark.parametrize(
-    "repository_file_content, release_files_content, expected_print",
+    ("repository_file_content", "release_files_content", "expected_print"),
     [
         pytest.param(
             VALID_REPOSITORY_FILE_CONTENT,
@@ -114,17 +117,18 @@ def test_cleanup_main(
 ):
     with tmpdir.as_cwd():
         (repository_file_path, release_file_paths) = _create_tmp_test_files(
-            repository_file_content, release_files_content
+            repository_file_content,
+            release_files_content,
         )
 
-    monkeypatch.setattr(sys, "argv", ["", repository_file_path] + release_file_paths)
+    monkeypatch.setattr(sys, "argv", ["", repository_file_path, *release_file_paths])
     cleanup_main()
     output_print = capsys.readouterr()
     assert expected_print in output_print.out
 
 
 @pytest.mark.parametrize(
-    "repository_file_content, release_files_content, expectation",
+    ("repository_file_content", "release_files_content", "expectation"),
     [
         pytest.param(
             "test_package:\n  1.0",
@@ -149,9 +153,10 @@ def test_cleanup_main_invalid_input_files(
 ):
     with tmpdir.as_cwd():
         (repository_file_path, release_file_paths) = _create_tmp_test_files(
-            repository_file_content, release_files_content
+            repository_file_content,
+            release_files_content,
         )
 
-    monkeypatch.setattr(sys, "argv", ["", repository_file_path] + release_file_paths)
+    monkeypatch.setattr(sys, "argv", ["", repository_file_path, *release_file_paths])
     with expectation:
         cleanup_main()

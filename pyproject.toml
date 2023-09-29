@@ -34,12 +34,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black",
-    "flake8",
     "furo",
-    "isort",
     "myst_parser",
     "pylint",
     "pytest",
+    "ruff",
     "sphinx",
     "sphinxcontrib-apidoc",
     "types-pyyaml"
@@ -71,9 +70,6 @@ komodo-snyk-test = "komodo.snyk_reporting:main"
 komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
 komodo-transpiler = "komodo.release_transpiler:main"
 
-[tool.isort]
-profile = "black"
-
 [tool.pylint.messages_control]
 disable = [
     "bad-inline-option",
@@ -89,6 +85,7 @@ disable = [
     "line-too-long",
     "locally-disabled",
     "logging-not-lazy",
+    "logging-fstring-interpolation",
     "missing-class-docstring",
     "missing-function-docstring",
     "missing-module-docstring",
@@ -111,3 +108,16 @@ disable = [
     "use-symbolic-message-instead",
     "useless-object-inheritance",
 ]
+
+[tool.ruff]
+src = ["src"]
+select = [
+  "W",   # pycodestyle
+  "I",   # isort
+  "B",   # flake-8-bugbear
+  "SIM", # flake-8-simplify
+]
+line-length = 88
+
+[tool.ruff.isort]
+known-first-party = ["komodo"]
