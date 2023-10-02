@@ -2,7 +2,7 @@ import argparse
 import html
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from snyk import SnykClient
 from snyk.managers import OrganizationManager
@@ -42,7 +42,7 @@ def main() -> None:
         print(_format_console(vulnerabilities=vulnerabilities))
 
 
-def parse_args(args: Dict[str, str]) -> argparse.Namespace:
+def parse_args(args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Test a release for security and license issues.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -180,9 +180,9 @@ def _get_org(api_token: str, org_id: str) -> OrganizationManager:
 def snyk_main(
     releases: Dict[str, Dict[str, str]],
     repository: Dict[str, Any],
-    api_token: str,
+    api_token: Optional[str],
     org_id: str,
-) -> None:
+) -> Dict[str, List[Vulnerability]]:
     if api_token is None:
         msg = "No api token given, please set the environment variable SNYK_API_TOKEN."
         raise ValueError(
