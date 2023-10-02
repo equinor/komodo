@@ -100,6 +100,7 @@ def get_upgrade_proposals_from_pypi(
     pypi_responses = get_pypi_info(pypi_packages)
 
     upgrade_proposals_from_pypi = {}
+
     for package_name, response in pypi_responses:
         komodo_version = get_version.parse(strip_version(releases[package_name]))
         if response.ok:
@@ -166,15 +167,43 @@ def run_check_up_to_date(
                 yaml.dump(releases, fout)
             write_to_file(repository, repository_file)
 
-        errors = []
+        major_upgrades, minor_upgrades, patch_upgrades, other_upgrades = [], [], [], []
         for name, versions in upgrade_proposals_from_pypi.items():
-            pypi_latest = versions["suggested"]
-            current_version = versions["previous"]
-            errors.append(
-                f"{name} not at latest pypi version: {pypi_latest}, "
-                f"is at: {current_version}",
+            pypi_latest = get_version.Version(versions["suggested"])
+            current_version = get_version.Version(versions["previous"])
+            if pypi_latest.major > current_version.major:
+                major_upgrades.append(
+                    f"{name} not at latest pypi version: {pypi_latest}, "
+                    f"is at: {current_version}"
+                )
+            elif pypi_latest.minor > current_version.minor:
+                minor_upgrades.append(
+                    f"{name} not at latest pypi version: {pypi_latest}, "
+                    f"is at: {current_version}"
+                )
+            elif pypi_latest.micro > current_version.micro:
+                patch_upgrades.append(
+                    f"{name} not at latest pypi version: {pypi_latest}, "
+                    f"is at: {current_version}"
+                )
+            else:
+                other_upgrades.append(
+                    f"{name} not at latest pypi version: {pypi_latest}, "
+                    f"is at: {current_version}"
+                )
+        print(
+            "\n".join(
+                ["\nMajor upgrades:"]
+                + (major_upgrades if major_upgrades else ["None"])
+                + ["\nMinor upgrades:"]
+                + (minor_upgrades if minor_upgrades else ["None"])
+                + ["\nPatch upgrades:"]
+                + (patch_upgrades if patch_upgrades else ["None"])
+                + ["\nOther upgrades:"]
+                + (other_upgrades if other_upgrades else ["None"])
+                + ["\n\nFound out of date packages!"]
             )
-        print("\n".join(errors) + "\nFound out of date packages!")
+        )
 
     else:
         print("All packages up to date!!!")
@@ -247,9 +276,9 @@ def main():
     )
 
 
-def validate_release_file(release_file_path: str) -> None:
-    ReleaseFile()(release_file_path)
+def validate_release_file(file_path: str) -> None:
+    ReleaseFile()(file_path)
 
 
-def validate_repository_file(repository_file_path: str) -> None:
-    RepositoryFile()(repository_file_path)
+def validate_repository_file(file_path: str) -> None:
+    RepositoryFile()(file_path)
