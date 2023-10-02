@@ -183,7 +183,7 @@ def test_main_happy_path(monkeypatch, tmpdir):
         )
 
 
-def test_main_upgrade_proposal(monkeypatch):
+def test_main_upgrade_proposal(monkeypatch, capsys):
     arguments = [
         "script_name",
         "release_file",
@@ -201,14 +201,15 @@ def test_main_upgrade_proposal(monkeypatch):
         "get_upgrade_proposals_from_pypi",
         output_mock,
     )
-    with pytest.raises(
-        SystemExit,
-        match=r"dummy_package not at latest pypi version: 2.0.0, is at: 1.0.0",
-    ):
-        run_check_up_to_date("release_file", "repository_file")
+
+    run_check_up_to_date("release_file", "repository_file")
+    print_message = capsys.readouterr().out
+    assert (
+        "dummy_package not at latest pypi version: 2.0.0, is at: 1.0.0" in print_message
+    )
 
 
-def test_check_up_to_date_file_output(monkeypatch, tmpdir):
+def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
     yaml = YAML()
     with tmpdir.as_cwd():
         base_path = os.getcwd()
@@ -230,16 +231,17 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
             },
         }
         monkeypatch.setattr(requests, "get", MagicMock(return_value=request_mock))
-        with pytest.raises(
-            SystemExit,
-            match=r"dummy_package not at latest pypi version: 2.0.0, is at: 1.0.0",
-        ):
-            run_check_up_to_date(
-                f"{base_path}/release_file.yml",
-                f"{base_path}/repository_file.yml",
-                propose_upgrade=True,
-            )
 
+        run_check_up_to_date(
+            f"{base_path}/release_file.yml",
+            f"{base_path}/repository_file.yml",
+            propose_upgrade=True,
+        )
+        print_message = capsys.readouterr().out
+        assert (
+            "dummy_package not at latest pypi version: 2.0.0, is at: 1.0.0"
+            in print_message
+        )
         result = {}
 
         with open(f"{base_path}/repository_file.yml") as fin:
@@ -407,6 +409,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir):
 def test_run_up_to_date(
     monkeypatch,
     tmpdir,
+    capsys,
     release,
     repository,
     request_json,
@@ -429,11 +432,12 @@ def test_run_up_to_date(
         request_mock.json.return_value = request_json
         monkeypatch.setattr(requests, "get", MagicMock(return_value=request_mock))
 
-        with pytest.raises(
-            SystemExit,
-            match=r"dummy_package not at latest pypi version: 2.0.0, is at: 1.0.0",
-        ):
-            check_up_to_date_pypi.main()
+        check_up_to_date_pypi.main()
+        print_message = capsys.readouterr().out
+        assert (
+            "dummy_package not at latest pypi version: 2.0.0, is at: 1.0.0"
+            in print_message
+        )
 
         result = {}
         yaml = YAML()
