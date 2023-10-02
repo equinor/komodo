@@ -450,42 +450,100 @@ def test_run_up_to_date(
 
 
 @pytest.mark.parametrize(
-    ("release", "repository", "expectation"),
+    "release_file_content",
     [
         pytest.param(
-            """dummy_package: 1.0.0\ncustom_package: 1.1.1""",
-            """dummy_package:\n  1.0:\n    make: unknown""",
-            pytest.raises(SystemExit, match="does not appear to be a repository file"),
-            id="invalid_repository",
+            """
+                    dummy_package_patch: 1.0.0
+                    dummy_package_minor: 1.0.0
+                    dummy_package_major: 1.0.0
+                """,
+            id="patch_minor_major",
         ),
         pytest.param(
-            """dummy_package: 1.0\ncustom_package: yes""",
-            """dummy_package:\n  1.0:\n    maintainer: unknown""",
-            pytest.raises(SystemExit, match="does not appear to be a release file"),
-            id="invalid_release",
+            """
+                    dummy_package_patch: 1.0.0
+                    dummy_package_major: 1.0.0
+                    dummy_package_minor: 1.0.0
+                """,
+            id="patch_major_minor",
+        ),
+        pytest.param(
+            """
+                    dummy_package_minor: 1.0.0
+                    dummy_package_major: 1.0.0
+                    dummy_package_patch: 1.0.0
+                """,
+            id="minor_major_patch",
         ),
     ],
 )
-def test_integration_with_invalid_yaml_files(
-    tmpdir,
-    monkeypatch,
-    release,
-    repository,
-    expectation,
-):
+def test_upgrade_type_grouping(release_file_content, tmpdir, monkeypatch, capsys):
+    repository_file_content = """
+    dummy_package_patch:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_minor:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_major:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+    """
+
     with tmpdir.as_cwd():
+        with open("repository_file.yml", "w") as fout:
+            fout.write(repository_file_content)
+        with open("release_file.yml", "w") as fout:
+            fout.write(release_file_content)
+        folder_name = os.getcwd()
+
+        def side_effect(url: str, timeout):
+            if "dummy_package_patch" in url.split("/"):
+                request_mock = MagicMock()
+                request_json = {
+                    "releases": {"1.0.1": []},
+                }
+                request_mock.json.return_value = request_json
+                return request_mock
+            elif "dummy_package_minor" in url.split("/"):
+                request_mock = MagicMock()
+                request_json = {
+                    "releases": {"1.1.0": []},
+                }
+                request_mock.json.return_value = request_json
+                return request_mock
+            elif "dummy_package_major" in url.split("/"):
+                request_mock = MagicMock()
+                request_json = {
+                    "releases": {"2.0.0": []},
+                }
+                request_mock.json.return_value = request_json
+                return request_mock
+            else:
+                raise ValueError("INCORRECT PACKAGE NAME ENTERED! " + str(url))
+
         arguments = [
             "script_name",
-            "release_file",
-            "repository_file",
+            f"{folder_name}/release_file.yml",
+            f"{folder_name}/repository_file.yml",
             "--propose-upgrade",
             "new_file",
         ]
         monkeypatch.setattr(sys, "argv", arguments)
-        with open("repository_file", "w") as fout:
-            fout.write(str(repository))
-        with open("release_file", "w") as fout:
-            fout.write(str(release))
+        monkeypatch.setattr(requests, "get", MagicMock(side_effect=side_effect))
+        check_up_to_date_pypi.main()
+        system_print = capsys.readouterr().out
 
-        with expectation:
-            check_up_to_date_pypi.main()
+        assert (
+            "Major upgrades:\ndummy_package_major not at latest pypi version: 2.0.0, is at: 1.0.0\n\nMinor upgrades:\ndummy_package_minor not at latest pypi version: 1.1.0, is at: 1.0.0\n\nPatch upgrades:\ndummy_package_patch not at latest pypi version: 1.0.1, is at: 1.0.0"
+            in system_print
+        )
