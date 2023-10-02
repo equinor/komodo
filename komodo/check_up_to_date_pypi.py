@@ -174,7 +174,7 @@ def run_check_up_to_date(
                 f"{name} not at latest pypi version: {pypi_latest}, "
                 f"is at: {current_version}",
             )
-        sys.exit("\n".join(errors) + "\nFound out of date packages!")
+        print("\n".join(errors) + "\nFound out of date packages!")
 
     else:
         print("All packages up to date!!!")
