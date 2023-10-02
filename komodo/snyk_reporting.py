@@ -31,7 +31,7 @@ def main() -> None:
 
     vulnerabilities = snyk_main(
         releases=releases,
-        repository=args.repo,
+        repository=args.repo.content,
         api_token=api_token,
         org_id=args.orgid,
     )
