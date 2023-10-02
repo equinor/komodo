@@ -1,10 +1,12 @@
 from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
 from komodo.yaml_file_types import (
     KomodoException,
     PackageStatusFile,
+    ReleaseDir,
     ReleaseFile,
     RepositoryFile,
     _komodo_error,
@@ -882,3 +884,21 @@ def test_repository_file_lint_maintainer(
 def test_package_status_file_type(package_status_file_content: str, expectation):
     with expectation:
         PackageStatusFile().from_yaml_string(package_status_file_content)
+
+
+def test_release_dir_with_one_release(tmpdir):
+    with tmpdir.as_cwd():
+        Path("releases").mkdir()
+        Path("releases/somerelease.yml").write_text("foo: 0.4.1", encoding="utf-8")
+        assert ReleaseDir()("releases") == {"somerelease": {"foo": "0.4.1"}}
+
+
+def test_release_dir_with_two_releases(tmpdir):
+    with tmpdir.as_cwd():
+        Path("releases").mkdir()
+        Path("releases/somerelease.yml").write_text("foo: 0.4.1", encoding="utf-8")
+        Path("releases/anotherrelease.yml").write_text("bar: 1.4.1", encoding="utf-8")
+        assert ReleaseDir()("releases") == {
+            "somerelease": {"foo": "0.4.1"},
+            "anotherrelease": {"bar": "1.4.1"},
+        }
