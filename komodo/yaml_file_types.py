@@ -135,8 +135,10 @@ class ReleaseDir:
         if not os.path.isdir(value):
             raise NotADirectoryError(value)
         result = {}
-        for yaml_file in Path(value).glob("*.yaml"):
-            result.update(ReleaseFile()(yaml_file))
+        for yaml_file in Path(value).glob("*.yml"):
+            result[yaml_file.name.replace(".yml", "")] = ReleaseFile()(
+                yaml_file
+            ).content
         return result
 
 
