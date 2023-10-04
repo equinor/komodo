@@ -76,10 +76,6 @@ def suggest_symlink_configuration(
     except UnknownObjectException:
         sys.exit(f"Filename {args.symlink_conf_path} is not in repo {repo.full_name}")
 
-    if args.release.startswith("bleeding"):
-        logger.warning("Symlink to bleeding is not allowed")
-        return None
-
     try:
         new_symlink_content, updated = configuration.update(
             b64decode(sym_conf_content.content), args.release, args.mode
