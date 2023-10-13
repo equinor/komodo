@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from komodo import switch
@@ -8,15 +6,16 @@ from komodo.switch import MIGRATION_WARNING
 
 
 def test_write_activator_switches(tmpdir):
-    tmpdir = str(tmpdir)  # XXX: python2 support
-    prefix = os.path.join(tmpdir, "prefix")
+    prefix = tmpdir / "prefix"
     release = "2020.01.01-py27-rhel6"
     expected_release = "2020.01.01-py27"
     switch.create_activator_switch(Data(), prefix, release)
 
-    actual_bash_activator = os.path.join(prefix, f"{expected_release}/enable")
-    with open(actual_bash_activator) as actual:
-        expected = f"""if [[ $(uname -r) == *el7* ]] ; then
+    actual_bash_activator = prefix / f"{expected_release}/enable"
+    assert (
+        actual_bash_activator.read_text(encoding="utf-8").strip()
+        == f"""
+if [[ $(uname -r) == *el7* ]] ; then
     export KOMODO_ROOT={prefix}
     KOMODO_RELEASE_REAL={expected_release}
 
@@ -26,16 +25,14 @@ def test_write_activator_switches(tmpdir):
 else
     echo -e "{MIGRATION_WARNING}"
 fi
-"""
-
-        assert actual.read() == expected
-
-    actual_csh_activator = os.path.join(
-        prefix,
-        f"{expected_release}/enable.csh",
+""".strip()
     )
-    with open(actual_csh_activator) as actual:
-        expected = f"""if ( `uname -r` =~ *el7* ) then
+
+    actual_csh_activator = prefix / f"{expected_release}/enable.csh"
+    assert (
+        actual_csh_activator.read_text(encoding="utf-8").strip()
+        == f"""
+if ( `uname -r` =~ *el7* ) then
     setenv KOMODO_ROOT {prefix}
     set KOMODO_RELEASE_REAL = "{expected_release}"
 
@@ -47,13 +44,12 @@ fi
 else
     echo -e "{MIGRATION_WARNING}"
 endif
-"""
-        assert actual.read() == expected
+""".strip()
+    )
 
 
 def test_write_activator_switches_for_non_matrix_build(tmpdir):
-    tmpdir = str(tmpdir)  # XXX: python2 support
-    prefix = os.path.join(tmpdir, "prefix")
+    prefix = tmpdir / "prefix"
     release = "foobar"
 
     try:
