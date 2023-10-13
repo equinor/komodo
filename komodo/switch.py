@@ -26,7 +26,10 @@ def create_activator_switch(data, prefix, release):
 
     release_path = os.path.join(prefix, release_py)
     if os.path.exists(release_path):
-        shutil.rmtree(release_path)
+        if os.path.islink(release_path):
+            os.unlink(release_path)
+        else:
+            shutil.rmtree(release_path)
 
     os.makedirs(release_path)
 
