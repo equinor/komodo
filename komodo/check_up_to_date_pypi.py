@@ -109,6 +109,11 @@ def get_upgrade_proposals_from_pypi(
                 response.json()["releases"],
                 python_version,
             )
+            if not pypi_versions:
+                print(
+                    f"Could not process package '{package_name}'. Check package manually"
+                )
+                continue
             pypi_latest_version = max(pypi_versions)
         else:
             msg = f"Response returned non valid return code: {response.reason}"
