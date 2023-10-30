@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from komodo import lint_maturity
+from komodo.lint_maturity import get_release_version
 from komodo.lint_maturity import main as lint_maturity_main
 from komodo.yaml_file_types import ReleaseFile
 
@@ -30,10 +31,10 @@ def _create_tmp_test_files(release_sample, file_names_sample):
 @pytest.mark.parametrize(
     ("release_basename", "release_version", "count_tag_invalid"),
     [
-        ("2020.02.01-py27.yml", "stable", 4),
-        ("2020.02.a1-py27.yml", "a", 1),
-        ("2020.02.b1-py27.yml", "b", 2),
-        ("2020.02.rc1-py27.yml", "rc", 3),
+        ("2020.02.01.yml", "stable", 4),
+        ("2020.02.a1.yml", "a", 1),
+        ("2020.02.b1.yml", "b", 2),
+        ("2020.02.rc1.yml", "rc", 3),
     ],
 )
 def test_msg_packages_invalid(release_basename, release_version, count_tag_invalid):
@@ -51,20 +52,20 @@ def test_msg_packages_invalid(release_basename, release_version, count_tag_inval
         },
     )
 
-    EXPECTED_SYSTEMEXIT = """2020.02.01-py27.yml has 4 packages with invalid maturity tag.
+    EXPECTED_SYSTEMEXIT = """2020.02.01.yml has 4 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag rc packages: [('package_rc1', 'v3.1.rc1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 
-2020.02.a1-py27.yml has 1 packages with invalid maturity tag.
+2020.02.a1.yml has 1 packages with invalid maturity tag.
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 
-2020.02.b1-py27.yml has 2 packages with invalid maturity tag.
+2020.02.b1.yml has 2 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 
-2020.02.rc1-py27.yml has 3 packages with invalid maturity tag.
+2020.02.rc1.yml has 3 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
@@ -76,11 +77,11 @@ def test_msg_packages_invalid(release_basename, release_version, count_tag_inval
 
 def test_msg_packages_exception():
     RELEASE_FILE_NAMES = [
-        "2020.02.01-py27.yml",
-        "2020.02.a1-py27.yml",
-        "2020.02.b1-py27.yml",
-        "2020.02.rc1-py27.yml",
-        "bleeding-py27.yml",
+        "2020.02.01.yml",
+        "2020.02.a1.yml",
+        "2020.02.b1.yml",
+        "2020.02.rc1.yml",
+        "bleeding.yml",
     ]
 
     for file_basename in RELEASE_FILE_NAMES:
@@ -179,7 +180,7 @@ def test_read_yaml_file(tmpdir):
         list_files = _create_tmp_test_files(
             release_sample="""release: ['bleeding', 'rpath']
 package: ['package_ex2']""",
-            file_names_sample=["2020.02.01-py27.yml"],
+            file_names_sample=["2020.02.01.yml"],
         )
 
     loaded_yaml_file = lint_maturity.read_yaml_file(list_files[0])
@@ -191,18 +192,18 @@ package: ['package_ex2']""",
 def test_msg_release_exception():
     EXPECTED_RELEASE_VERSION = ["stable", "a", "b", "rc", "exception"]
     RELEASE_FILE_NAMES = [
-        "2020.02.01-py27.yml",
-        "2020.02.a1-py27.yml",
-        "2020.02.b1-py27.yml",
-        "2020.02.rc1-py27.yml",
-        "bleeding-py27.yml",
+        "2020.02.01.yml",
+        "2020.02.a1.yml",
+        "2020.02.b1.yml",
+        "2020.02.rc1.yml",
+        "bleeding.yml",
     ]
 
     for count, release_basename in enumerate(RELEASE_FILE_NAMES):
         release_version = EXPECTED_RELEASE_VERSION[count]
         expected_warning_msg = ""
 
-        if release_basename == "bleeding-py27.yml":
+        if release_basename == "bleeding.yml":
             expected_warning_msg += (
                 release_basename + " not lint because it is in the exception list.\n"
             )
@@ -218,16 +219,16 @@ def test_msg_release_exception():
 @pytest.mark.parametrize(
     ("release_basename", "expected_release_version"),
     [
-        ("2020.02.01-py27.yml", "stable"),
-        ("2020.02.a1-py27.yml", "a"),
-        ("2020.02.b1-py27.yml", "b"),
-        ("2020.02.rc1-py27.yml", "rc"),
-        ("bleeding-py27.yml", "exception"),
+        ("2020.02.01", "stable"),
+        ("2020.02.a1", "a"),
+        ("2020.02.b1", "b"),
+        ("2020.02.rc1", "rc"),
+        ("bleeding", "exception"),
         ("invalid_tag", "invalid"),
     ],
 )
 def test_get_release_version(release_basename, expected_release_version):
-    release_version = lint_maturity.get_release_version(
+    release_version = get_release_version(
         release_basename=release_basename,
         tag_exceptions_release=["bleeding", "rpath"],
     )
@@ -245,45 +246,45 @@ package_st1: v0.10.4
 package_iv1: 5.13.1-src
 package_ex2: testing/2020.3/rc1""",
             file_names_sample=[
-                "2020.02.01-py27.yml",
-                "2020.02.a1-py27.yml",
-                "2020.02.b1-py27.yml",
-                "2020.02.rc1-py27.yml",
+                "2020.02.01.yml",
+                "2020.02.a1.yml",
+                "2020.02.b1.yml",
+                "2020.02.rc1.yml",
             ],
         )
 
-        EXPECTED_WARNING = """2020.02.01-py27.yml, exception list of packages:
+        EXPECTED_WARNING = """2020.02.01, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
-2020.02.a1-py27.yml, exception list of packages:
+2020.02.a1, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
-2020.02.b1-py27.yml, exception list of packages:
+2020.02.b1, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
-2020.02.rc1-py27.yml, exception list of packages:
+2020.02.rc1, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
-bleeding-py27.yml not lint because it is in the exception list.
-bleeding-py27.yml, exception list of packages:
+bleeding not lint because it is in the exception list.
+bleeding, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
-bleeding-py27.yml has 4 packages with invalid maturity tag.
+bleeding has 4 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag rc packages: [('package_rc1', 'v3.1.rc1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 """
 
-        EXPECTED_SYSTEMEXIT = """2020.02.01-py27.yml has 4 packages with invalid maturity tag.
+        EXPECTED_SYSTEMEXIT = """2020.02.01 has 4 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag rc packages: [('package_rc1', 'v3.1.rc1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 
-2020.02.a1-py27.yml has 1 packages with invalid maturity tag.
+2020.02.a1 has 1 packages with invalid maturity tag.
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 
-2020.02.b1-py27.yml has 2 packages with invalid maturity tag.
+2020.02.b1 has 2 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 
-2020.02.rc1-py27.yml has 3 packages with invalid maturity tag.
+2020.02.rc1 has 3 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
@@ -301,7 +302,7 @@ bleeding-py27.yml has 4 packages with invalid maturity tag.
                     "package": ["package_ex2"],
                 },
             )
-
+        print(warning_info[0].message)
         assert str(warning_info[0].message) in EXPECTED_WARNING
         assert str(exit_info.value) in EXPECTED_SYSTEMEXIT
 
@@ -311,11 +312,11 @@ def test_get_files_to_lint(tmpdir):
         list_files_expected = _create_tmp_test_files(
             release_sample="pytest: 3.1.2",
             file_names_sample=[
-                "2020.02.01-py27.yml",
-                "2020.02.a1-py27.yml",
-                "2020.02.b1-py27.yml",
-                "2020.02.rc1-py27.yml",
-                "bleeding-py27.yml",
+                "2020.02.01.yml",
+                "2020.02.a1.yml",
+                "2020.02.b1.yml",
+                "2020.02.rc1.yml",
+                "bleeding.yml",
             ],
         )
 
@@ -369,11 +370,11 @@ def test_main(monkeypatch, tmpdir):
         list_files_expected = _create_tmp_test_files(
             release_sample="",
             file_names_sample=[
-                "2020.02.01-py27.yml",
-                "2020.02.a1-py27.yml",
-                "2020.02.b1-py27.yml",
-                "2020.02.rc1-py27.yml",
-                "bleeding-py27.yml",
+                "2020.02.01.yml",
+                "2020.02.a1.yml",
+                "2020.02.b1.yml",
+                "2020.02.rc1.yml",
+                "bleeding.yml",
             ],
         )
 
@@ -417,7 +418,7 @@ package_rc1: v3.1.rc1
 package_st1: v0.10.4
 package_iv1: 5.13.1-src
 package_ex2: testing/2020.3/rc1""",
-            file_names_sample=["2020.02.01-py27.yml"],
+            file_names_sample=["2020.02.01.yml"],
         )
     monkeypatch.setattr(
         sys,
@@ -467,7 +468,7 @@ def test_argument_types(yaml_string: str, expectation, monkeypatch, tmpdir):
     with tmpdir.as_cwd():
         list_files_expected = _create_tmp_test_files(
             release_sample=yaml_string,
-            file_names_sample=["2020.02.01-py27.yml"],
+            file_names_sample=["2020.02.01.yml"],
         )
     monkeypatch.setattr(sys, "argv", ["", "--release_file", list_files_expected[0]])
     with expectation:
