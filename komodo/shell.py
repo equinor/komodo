@@ -15,7 +15,7 @@ def pushd(path):
     os.chdir(prev)
 
 
-def shell(cmd, sudo=False):
+def shell(cmd: str, sudo=False, allow_failure=False) -> bytes:
     try:
         cmdlist = cmd.split(" ")
     except AttributeError:
@@ -33,4 +33,6 @@ def shell(cmd, sudo=False):
         return subprocess.check_output(tuple(filter(None, cmdlist)))
     except subprocess.CalledProcessError as e:
         print(e.output, file=sys.stderr)
+        if allow_failure:
+            return e.output
         raise

@@ -3,6 +3,7 @@ import contextlib
 import datetime
 import os
 import sys
+import uuid
 import warnings
 from pathlib import Path
 from typing import List, Tuple
@@ -152,7 +153,8 @@ def _main(args):
 
     if Path(f"{args.prefix}/{args.release}").exists():
         shell(
-            f"mv {args.prefix}/{args.release} {args.prefix}/{args.release}.delete",
+            f"mv {args.prefix}/{args.release} "
+            f"{args.prefix}/{args.release}.delete-{uuid.uuid4()}",
             sudo=args.sudo,
         )
 
@@ -161,7 +163,11 @@ def _main(args):
         sudo=args.sudo,
     )
     start_time = datetime.datetime.now()
-    shell(f"rm -rf {args.prefix}/{args.release}.delete", sudo=args.sudo)
+    shell(
+        f"rm -rf {args.prefix}/{args.release}.delete-*",
+        sudo=args.sudo,
+        allow_failure=True,
+    )
     timings.append(("Deleting previous release", datetime.datetime.now() - start_time))
     _print_timings(timings[-1])
 
