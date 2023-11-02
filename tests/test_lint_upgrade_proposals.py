@@ -95,6 +95,13 @@ VALID_UPGRADE_PROPOSALS = """
 1111-12:
   python: 3.8.6
 """
+
+INVALID_UPGRADE_PROPOSALS_PACKAGE_NOT_IN_REPOSITORY = """
+1111-11:
+1111-12:
+  testlib: 3.8.6
+"""
+
 VALID_EMPTY_UPGRADE_PROPOSALS = """
 1111-11:
 1111-12:
@@ -189,10 +196,7 @@ yaml
         pytest.param(
             VALID_UPGRADE_PROPOSALS_MULTIPLE_RELEASES,
             VALID_REPOSITORY,
-            pytest.raises(
-                SystemExit,
-                match=r"Found upgrades for more than one release",
-            ),
+            does_not_raise(),
             id="upgrades_in_multiple_releases_in_upgrade_proposals",
         ),
         pytest.param(
@@ -243,6 +247,15 @@ yaml
             pytest.raises(
                 SystemExit,
                 match=r"invalid version type",
+            ),
+            id="invalid_upgrade_proposals_float_package_version",
+        ),
+        pytest.param(
+            INVALID_UPGRADE_PROPOSALS_PACKAGE_NOT_IN_REPOSITORY,
+            VALID_REPOSITORY,
+            pytest.raises(
+                SystemExit,
+                match=r"ERROR: Package 'testlib' not found in repository",
             ),
             id="invalid_upgrade_proposals_float_package_version",
         ),
