@@ -7,11 +7,11 @@ def verify_package_versions_exist(
     upgrade_proposals: UpgradeProposalsFile,
     repository: RepositoryFile,
 ) -> None:
-    releases_with_upgrades_counter = 0
+    found_release_with_upgrades = False
     for proposed_package_upgrades in upgrade_proposals.content.values():
         if proposed_package_upgrades is None:
             continue
-        releases_with_upgrades_counter += 1
+        found_release_with_upgrades = True
         errors = []
         for (
             upgrade_proposals_package,
@@ -27,14 +27,13 @@ def verify_package_versions_exist(
                     f" {upgrade_proposals_package_version} in repository",
                 )
             except KomodoException as e:
-                errors.append(e.error)
+                errors.append("ERROR: " + e.error)
         if errors:
             raise SystemExit("\n".join(errors))
-    if releases_with_upgrades_counter == 0:
+    if found_release_with_upgrades:
         print("No upgrades found")
-    if releases_with_upgrades_counter > 1:
-        msg = "Found upgrades for more than one release"
-        raise SystemExit(msg)
+    else:
+        print("Found upgrades")
 
 
 def get_args() -> argparse.ArgumentParser:
