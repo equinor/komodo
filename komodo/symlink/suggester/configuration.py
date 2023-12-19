@@ -51,6 +51,9 @@ class Configuration:
         elif mode == "stable":
             self.links[release.month_alias()] = repr(release)
             self.links[link] = release.month_alias()
+        elif mode == "bleeding":
+            self.links[mode] = link
+            self.links[link] = release.release_id
         else:
             msg = f"Mode {mode} was not recognized"
             raise ValueError(msg)
