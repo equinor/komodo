@@ -81,28 +81,30 @@ To use this environment, type `source builds/stable-0.0.1/enable`.
 As well as the `kmd` command, this package installs several other
 commands, each with its own options:
 
-- `komodo-check-pypi` &mdash; Checks if pypi packages are up to date
-- `komodo-insert-proposals` &mdash; Copy proposals into release and create PR
-- `komodo-post-messages` &mdash; Post messages to a release
 - `komodo-check-symlinks` &mdash; Verify symlinks for komodo versions are
 according to a given config
-- `komodo-lint` &mdash; Lint komodo setup
-- `komodo-reverse-deps` &mdash; Extracts dependencies from a given set of
-packages
+- `komodo-check-pypi` &mdash; Checks if pypi packages are up to date
 - `komodo-clean-repository` &mdash; Clean up unused versions in the repository
 file based on a set of releases
-- `komodo-lint-maturity` &mdash; Lint the maturity of packages
-- `komodo-snyk-test` &mdash; Test a release for security and license issues
 - `komodo-create-symlinks` &mdash; Create symlinks for komodo versions
-- `komodo-lint-package-status` &mdash; Lint the package status file
-- `komodo-suggest-symlinks` &mdash; Returns a pull request if the symlink
-configuration could be updated
 - `komodo-extract-dep-graph` &mdash; Extracts dependencies from a given set of
 packages
+- `komodo-insert-proposals` &mdash; Copy proposals into release and create PR
+- `komodo-lint` &mdash; Lint komodo setup
+- `komodo-lint-maturity` &mdash; Lint the maturity of packages
+- `komodo-lint-package-status` &mdash; Lint the package status file
+- `komodo-lint-upgrade-proposals` &mdash; Lint the upgrade proposals file against
+the repository file
 - `komodo-non-deployed` &mdash; Outputs the name of undeployed matrices given
 an installation root and a release folder
-- `komodo-transpiler` &mdash; Build release files
+- `komodo-post-messages` &mdash; Post messages to a release
+- `komodo-reverse-deps` &mdash; Extracts dependencies from a given set of
+packages
 - `komodo-show-version` &mdash; Return the version of a specified package in the active release
+- `komodo-snyk-test` &mdash; Test a release for security and license issues
+- `komodo-suggest-symlinks` &mdash; Returns a pull request if the symlink
+configuration could be updated
+- `komodo-transpiler` &mdash; Build release files
 
 
 ## Run tests
