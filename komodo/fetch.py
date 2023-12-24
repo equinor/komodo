@@ -134,7 +134,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
             if len(spliturl) > 1 and spliturl[-2] == "tar":
                 ext = f"tar.{spliturl[-1]}"
 
-            if ext in ["rpm", "tar", "gz", "tgz", "tar.gz", "tar.bz2", "tar.xz"]:
+            if ext in ["tar", "gz", "tgz", "tar.gz", "tar.bz2", "tar.xz"]:
                 dst = f"{dst}.{ext}"
 
             if url == "pypi":

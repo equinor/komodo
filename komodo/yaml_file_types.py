@@ -469,7 +469,7 @@ class Package:
     VALID_VISIBILITIES = ["public", "private"]
     VALID_IMPORTANCES = ["low", "medium", "high"]
     VALID_MATURITIES = ["experimental", "stable", "deprecated"]
-    VALID_MAKES = ["rpm", "cmake", "sh", "pip", "rsync", "noop", "download"]
+    VALID_MAKES = ["cmake", "sh", "pip", "rsync", "noop", "download"]
 
     @staticmethod
     def validate_package_name(package_name: str) -> None:
