@@ -142,7 +142,7 @@ def _main(args):
 
     start_time = datetime.datetime.now()
     shell(f"mv {args.release} .{args.release}")
-    shell(f"rsync -a .{args.release} {args.prefix}", sudo=args.sudo)
+    shell(f"rsync -a .{args.release} {args.prefix}")
     timings.append(
         (
             "Rsyncing partial komodo to destination",
@@ -155,17 +155,14 @@ def _main(args):
         shell(
             f"mv {args.prefix}/{args.release} "
             f"{args.prefix}/{args.release}.delete-{uuid.uuid4()}",
-            sudo=args.sudo,
         )
 
     shell(
         f"mv {args.prefix}/.{args.release} {args.prefix}/{args.release}",
-        sudo=args.sudo,
     )
     start_time = datetime.datetime.now()
     shell(
         f"rm -rf {args.prefix}/{args.release}.delete-*",
-        sudo=args.sudo,
         allow_failure=True,
     )
     timings.append(("Deleting previous release", datetime.datetime.now() - start_time))
@@ -202,7 +199,7 @@ def _main(args):
         ]
         shell_input.append(current.get("makeopts"))
 
-        print(shell(shell_input, sudo=args.sudo))
+        print(shell(shell_input))
     timings.append(
         ("pip install to final destination", datetime.datetime.now() - start_time),
     )
@@ -400,14 +397,6 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         "--pyver",
         type=str,
         help="[DEPRECATED] This argument is not used.",  # Message to stderr below.
-    )
-    optional_args.add_argument(
-        "--sudo",
-        action="store_true",
-        help=(
-            "Flag to choose whether to use `sudo` for shell commands when "
-            "installing the environment."
-        ),
     )
     optional_args.add_argument(
         "--workspace",
