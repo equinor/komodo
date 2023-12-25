@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 
+import jinja2
 import pytest
 
 from komodo.cli import cli_main, parse_args
@@ -9,54 +10,48 @@ from komodo.package_version import LATEST_PACKAGE_ALIAS
 from tests import _get_test_root
 
 
-@pytest.mark.parametrize(
-    "args",
-    [
-        (
-            "--download",
-            "--build",
-            "--install",
-            "--prefix",
-            "prefix",
-            "--cache",
-            "cache",
-            "--tmp",
-            "tmp",
-            "--release",
-            "nominal_release",
-            "--pip",
-            "/bin/true",
-            os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
-            os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
-            "--extra-data-dirs",
-            os.path.join(_get_test_root(), "data/cli"),
-            os.path.join(_get_test_root(), "data/cli/hackres"),
-            os.path.join(_get_test_root(), "data/cli/hackgit"),
-        ),
-    ],
-)
-def test_main(args, tmpdir):
-    tmpdir = str(tmpdir)
-    shutil.copytree(
+def test_main(tmp_path):
+    args = [
+        "--download",
+        "--build",
+        "--install",
+        "--prefix",
+        "prefix",
+        "--cache",
+        "cache",
+        "--tmp",
+        "tmp",
+        "--release",
+        "nominal_release",
+        "--pip",
+        "/bin/true",
+        os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
+        str(tmp_path / "nominal_repository.yml"),
+        "--extra-data-dirs",
+        os.path.join(_get_test_root(), "data/cli"),
         os.path.join(_get_test_root(), "data/cli/hackres"),
-        os.path.join(tmpdir, "hackres"),
-    )
-    shutil.copytree(
         os.path.join(_get_test_root(), "data/cli/hackgit"),
-        os.path.join(tmpdir, "hackgit"),
-    )
-
-    sys.argv = [
-        "kmd",
-        "--workspace",
-        tmpdir,
     ]
-    sys.argv.extend(list(args))
 
-    cli_main()
+    template = jinja2.Environment(loader=jinja2.BaseLoader)
+    data_path = os.path.join(_get_test_root(), "data/cli")
+
+    with open(os.path.join(data_path, "nominal_repository.yml.jinja2")) as f:
+        input = template.from_string(f.read())
+        output = input.render(test_data_path=data_path)
+    with open(tmp_path / "nominal_repository.yml", "w") as f:
+        f.write(output)
+
+    cli_main(
+        [
+            "--workspace",
+            str(tmp_path),
+            *args,
+        ]
+    )
 
     release_name = args[10]
-    release_path = os.path.join(tmpdir, "prefix", release_name)
+    release_path = str(tmp_path / "prefix" / release_name)
 
     assert os.path.exists(os.path.join(release_path, "root/lib/hackres.so"))
     assert os.path.exists(os.path.join(release_path, "root/lib/python4.2.so"))

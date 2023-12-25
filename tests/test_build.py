@@ -10,7 +10,7 @@ from komodo.package_version import LATEST_PACKAGE_ALIAS
 def captured_shell_commands(monkeypatch):
     commands = []
     with monkeypatch.context() as m:
-        m.setattr("komodo.build.shell", lambda cmd: commands.append(cmd))
+        m.setattr("komodo.build.run", lambda *args, **kwargs: commands.append(args))
         yield commands
 
 

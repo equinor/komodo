@@ -42,16 +42,10 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
         )
 
     elif protocol in ("nfs", "fs-ln"):
-        if sys.platform == "darwin":
-            run("cp", "-Rs", path, filename)
-        else:
-            run("cp", "--recursive", "--symbolic-link", path, filename)
+        run("cp", "-Rs", path, filename)
 
     elif protocol in ("fs-cp"):
-        if sys.platform == "darwin":
-            run("cp", "-R", path, filename)
-        else:
-            run("cp", "--recursive", path, filename)
+        run("cp", "-R", path, filename)
 
     elif protocol in ("rsync"):
         run("rsync", "-a", f"{path}/", filename)

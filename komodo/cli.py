@@ -6,9 +6,10 @@ import sys
 import uuid
 import warnings
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 import jinja2
+from pytest import OptionGroup
 from ruamel.yaml import YAML
 
 from komodo import switch
@@ -111,7 +112,7 @@ def _main(args):
 
         run("mv", f"{args.release}{tmp_prefix}", args.release)
         with contextlib.suppress(OSError):
-            os.removedirs(f"{args.release + str(tmp_prefix.parent)}")
+            os.removedirs(f"{args.release}{tmp_prefix.parent}")
 
     if args.build and not args.install:
         sys.exit(0)
@@ -160,7 +161,8 @@ def _main(args):
 
     run(
         "mv",
-        f"{args.prefix}/.{args.release}" f"{args.prefix}/{args.release}",
+        f"{args.prefix}/.{args.release}",
+        f"{args.prefix}/{args.release}",
     )
     start_time = datetime.datetime.now()
     run(
@@ -224,7 +226,7 @@ def _main(args):
 
     start_time = datetime.datetime.now()
     print("running", f"find {release_root} -name '*.pyc' -delete")
-    run("find", "{release_root}", "-name", "*.pyc", "-delete")
+    run("find", release_root, "-name", "*.pyc", "-delete")
 
     print("Setting permissions", [data.get("set_permissions.sh"), release_path])
     run(data.get("set_permissions.sh"), str(release_path))
@@ -238,18 +240,24 @@ def _main(args):
         _print_timings(timing_element, adjust=True)
 
 
-def cli_main():
+def cli_main(argv: Optional[Sequence[str]] = None) -> None:
     """Pass the command-line args to argparse, then set up the workspace."""
-    args = parse_args(sys.argv[1:])
+    if argv is None:
+        argv = sys.argv[1:]
+    args = parse_args(argv)
 
     if args.workspace and not Path(args.workspace).exists():
         Path(args.workspace).mkdir()
 
-    os.chdir(args.workspace)
-    _main(args)
+    old_cwd = os.getcwd()
+    try:
+        os.chdir(args.workspace)
+        _main(args)
+    finally:
+        os.chdir(old_cwd)
 
 
-def parse_args(args: List[str]) -> argparse.Namespace:
+def parse_args(args: Sequence[str]) -> argparse.Namespace:
     """Parse the arguments from the command line into an `argparse.Namespace`.
     Having a separated function makes it easier to test the CLI.
 

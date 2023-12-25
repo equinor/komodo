@@ -27,13 +27,15 @@ def run(
 ) -> bytes:
     if cwd is None:
         cwd = os.getcwd()
+    else:
+        os.makedirs(cwd, exist_ok=True)
 
     env: Optional[Mapping[str, str]] = None
     if setenv is not None:
         env = {**os.environ, **setenv}
 
     cmd = [executable]
-    cmd.extend(x for x in args if x is not None)
+    cmd.extend(str(x) for x in args)
 
     try:
         print(f"[{cwd}]> {' '.join(map(str, cmd))}")

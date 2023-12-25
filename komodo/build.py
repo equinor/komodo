@@ -204,12 +204,10 @@ def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, *args, pip="pip", **k
         "--no-index",
         "--no-deps",
         "--ignore-installed",
-        "--cache-dir",
-        dlprefix,
-        "--find-links",
-        dlprefix,
     ]
-    if (makeopts := kwargs.get("makeopts")) is not None:
+    if dlprefix:
+        cmd.extend(["--cache-dir", dlprefix, "--find-links", dlprefix])
+    if makeopts := kwargs.get("makeopts"):
         cmd.append(makeopts)
 
     print(f"Installing {pkg} ({ver}) from pip")

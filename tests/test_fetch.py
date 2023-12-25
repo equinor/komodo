@@ -11,7 +11,8 @@ from komodo.package_version import LATEST_PACKAGE_ALIAS
 def captured_shell_commands(monkeypatch):
     commands = []
     with monkeypatch.context() as m:
-        m.setattr("komodo.fetch.shell", lambda cmd: commands.append(cmd))
+        m.setattr("komodo.fetch.run", lambda *args, **kwargs: commands.append(args))
+        m.setattr("komodo.shell.run", lambda *args, **kwargs: commands.append(args))
         yield commands
 
 
@@ -166,7 +167,7 @@ def test_fetch_git_hash(captured_shell_commands, tmpdir):
         )
         git_hashes = fetch(packages, repositories, str(tmpdir))
         assert (
-            captured_shell_commands[0]
+            " ".join(captured_shell_commands[0])
             == "git clone -b main --quiet --recurse-submodules -- "
             "git://github.com/equinor/ert.git ert-main"
         )
@@ -191,5 +192,9 @@ def test_expand_jinja2_templates_in_source(captured_shell_commands, tmpdir):
     with patch("komodo.fetch.get_git_revision_hash") as mock_get_git_revision_hash:
         mock_get_git_revision_hash.return_value = ""
         fetch(packages, repositories, str(tmpdir))
-        assert captured_shell_commands[0].startswith("git clone")
-        assert "https://VERYSECRETTOKEN@github.com" in captured_shell_commands[0]
+        assert captured_shell_commands[0][0] == "git"
+        assert captured_shell_commands[0][1] == "clone"
+        assert (
+            "https://VERYSECRETTOKEN@github.com/equinor/secrettool.git"
+            in captured_shell_commands[0]
+        )

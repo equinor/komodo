@@ -28,6 +28,7 @@ def latest_pypi_version(package):
     except subprocess.CalledProcessError as e:
         stderr = e.stderr.decode(sys.getfilesystemencoding())
         matches = re.match(_PYPI_LATEST_VERSION_RE, stderr)
+        assert matches is not None
         if matches.lastindex == 0:
             msg = f"got unexpected output from {cmd} using {_PYPI_LATEST_VERSION_RE}: {stderr}"
             raise ValueError(

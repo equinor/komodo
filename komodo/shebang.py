@@ -1,6 +1,6 @@
 import os
 
-from komodo.shell import run, shell
+from komodo.shell import run
 
 
 def _is_shebang(s):
