@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
+from subprocess import run
 
 from komodo.cli import create_enable_scripts
-from komodo.shell import shell
 
 
 def _load_envs():
@@ -44,7 +44,7 @@ def test_enable_bash_nopresets(tmpdir):
                 ),
             )
 
-        shell(["bash test_enable.sh"])
+        run(["bash", "test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
 
         assert "LD_LIBRARY_PATH" not in pre_env
@@ -72,7 +72,7 @@ def test_enable_csh_no_presets(tmpdir):
                 ),
             )
 
-        shell(["csh test_enable.sh"])
+        run(["csh", "test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
 
         assert "LD_LIBRARY_PATH" not in pre_env
@@ -100,7 +100,7 @@ def test_enable_bash_with_presets(tmpdir):
             encoding="utf-8",
         )
 
-        shell(["bash test_enable.sh"])
+        run(["bash", "test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
         assert pre_env["LD_LIBRARY_PATH"] == "/some/path"
         assert sourced_env["LD_LIBRARY_PATH"] == "prefix/lib:prefix/lib64:/some/path"
@@ -127,7 +127,7 @@ def test_enable_csh_with_presets(tmpdir):
             encoding="utf-8",
         )
 
-        shell(["csh test_enable.sh"])
+        run(["csh", "test_enable.sh"])
         pre_env, sourced_env, post_env = _load_envs()
 
         assert pre_env["LD_LIBRARY_PATH"] == "/some/path"

@@ -21,7 +21,7 @@ from komodo.package_version import (
     strip_version,
 )
 from komodo.shebang import fixup_python_shebangs
-from komodo.shell import pushd, shell
+from komodo.shell import run
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
@@ -109,7 +109,7 @@ def _main(args):
         )
         _print_timings(timings[-1])
 
-        shell(f"mv {args.release + str(tmp_prefix)} {args.release}")
+        run("mv", f"{args.release}{tmp_prefix}", args.release)
         with contextlib.suppress(OSError):
             os.removedirs(f"{args.release + str(tmp_prefix.parent)}")
 
@@ -141,8 +141,8 @@ def _main(args):
     print(f"Installing {args.release} to {args.prefix}")
 
     start_time = datetime.datetime.now()
-    shell(f"mv {args.release} .{args.release}")
-    shell(f"rsync -a .{args.release} {args.prefix}")
+    run(f"mv", args.release, f".{args.release}")
+    run(f"rsync", "-a", f".{args.release}", args.prefix)
     timings.append(
         (
             "Rsyncing partial komodo to destination",
@@ -152,18 +152,22 @@ def _main(args):
     _print_timings(timings[-1])
 
     if Path(f"{args.prefix}/{args.release}").exists():
-        shell(
-            f"mv {args.prefix}/{args.release} "
+        run(
+            "mv",
+            f"{args.prefix}/{args.release}",
             f"{args.prefix}/{args.release}.delete-{uuid.uuid4()}",
         )
 
-    shell(
-        f"mv {args.prefix}/.{args.release} {args.prefix}/{args.release}",
+    run(
+        "mv",
+        f"{args.prefix}/.{args.release}" f"{args.prefix}/{args.release}",
     )
     start_time = datetime.datetime.now()
-    shell(
-        f"rm -rf {args.prefix}/{args.release}.delete-*",
-        allow_failure=True,
+    run(
+        "rm",
+        "-rf",
+        f"{args.prefix}/{args.release}.delete-*",
+        check=False,
     )
     timings.append(("Deleting previous release", datetime.datetime.now() - start_time))
     _print_timings(timings[-1])
@@ -187,7 +191,8 @@ def _main(args):
             ver = latest_pypi_version(package_name)
         shell_input = [
             args.pip,
-            f"install {package_name}=={strip_version(ver)}",
+            "install",
+            f"{package_name}=={strip_version(ver)}",
             "--prefix",
             str(release_root),
             "--no-index",
@@ -199,7 +204,7 @@ def _main(args):
         ]
         shell_input.append(current.get("makeopts"))
 
-        print(shell(shell_input))
+        print(run(*shell_input))
     timings.append(
         ("pip install to final destination", datetime.datetime.now() - start_time),
     )
@@ -211,7 +216,7 @@ def _main(args):
 
     if args.postinst:
         start_time = datetime.datetime.now()
-        shell([args.postinst, release_path])
+        run(args.postinst, release_path)
         timings.append(
             ("Running post-install scripts", datetime.datetime.now() - start_time),
         )
@@ -219,10 +224,10 @@ def _main(args):
 
     start_time = datetime.datetime.now()
     print("running", f"find {release_root} -name '*.pyc' -delete")
-    shell(f"find {release_root} -name '*.pyc' -delete")
+    run("find", "{release_root}", "-name", "*.pyc", "-delete")
 
     print("Setting permissions", [data.get("set_permissions.sh"), release_path])
-    shell([data.get("set_permissions.sh"), str(release_path)])
+    run(data.get("set_permissions.sh"), str(release_path))
     timings.append(
         ("Cleanup *.pyc and fix permissions", datetime.datetime.now() - start_time),
     )
@@ -240,8 +245,8 @@ def cli_main():
     if args.workspace and not Path(args.workspace).exists():
         Path(args.workspace).mkdir()
 
-    with pushd(args.workspace):
-        _main(args)
+    os.chdir(args.workspace)
+    _main(args)
 
 
 def parse_args(args: List[str]) -> argparse.Namespace:

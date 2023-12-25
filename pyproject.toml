@@ -29,7 +29,6 @@ dependencies = [
     "requests",
     "urllib3<2", #Pinned under v2 due to RHEL7 incompability
     "ruamel.yaml",
-    "shell",
 ]
 
 [project.optional-dependencies]

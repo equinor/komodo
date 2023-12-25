@@ -13,7 +13,7 @@ from komodo.package_version import (
     latest_pypi_version,
     strip_version,
 )
-from komodo.shell import pushd, shell
+from komodo.shell import run, run_env
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
@@ -27,30 +27,34 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
         protocol = path.split(":")[0]
 
     if protocol in ("http", "https", "ftp"):
-        shell(f"wget --quiet {path} -O {filename}")
+        run("wget", "--quiet", path, "-O", filename)
     elif protocol in ("git"):
-        shell(
-            "git clone "
-            f"-b {strip_version(version)} "
-            "--quiet "
-            "--recurse-submodules "
-            f"-- {path} {filename}",
+        run(
+            "git",
+            "clone",
+            "-b",
+            strip_version(version),
+            "--quiet",
+            "--recurse-submodules",
+            "--",
+            path,
+            filename,
         )
 
     elif protocol in ("nfs", "fs-ln"):
         if sys.platform == "darwin":
-            shell(f"cp -Rs {path} {filename}")
+            run("cp", "-Rs", path, filename)
         else:
-            shell(f"cp --recursive --symbolic-link {path} {filename}")
+            run("cp", "--recursive", "--symbolic-link", path, filename)
 
     elif protocol in ("fs-cp"):
         if sys.platform == "darwin":
-            shell(f"cp -R {path} {filename}")
+            run("cp", "-R", path, filename)
         else:
-            shell(f"cp --recursive {path} {filename}")
+            run("cp", "--recursive", path, filename)
 
     elif protocol in ("rsync"):
-        shell(f"rsync -a {path}/ {filename}")
+        run("rsync", "-a", f"{path}/", filename)
     else:
         msg = f"Unknown protocol {protocol}"
         raise NotImplementedError(msg)
@@ -91,7 +95,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     pypi_packages = []
 
     git_hashes = {}
-    with pushd(outdir):
+    with run_env(cwd=outdir) as run:
         for pkg, ver in pkgs.items():
             current = repo[pkg][ver]
             if "pypi_package_name" in current and current["make"] != "pip":
@@ -150,7 +154,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
 
             if ext in ["tgz", "tar.gz", "tar.bz2", "tar.xz"]:
                 print(f"Extracting {dst} ...")
-                topdir = shell(f"tar -xvf {dst}").decode("utf-8").split()[0]
+                topdir = run("tar", "-xvf", dst).decode("utf-8").split()[0]
                 normalised_dir = topdir.split("/")[0]
 
                 if not os.path.exists(pkgname):
@@ -158,7 +162,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     os.symlink(normalised_dir, pkgname)
 
         print(f"Downloading {len(pypi_packages)} pypi packages")
-        shell([pip, "download", "--no-deps", "--dest .", " ".join(pypi_packages)])
+        run(pip, "download", "--no-deps", "--dest", ".", *pypi_packages)
 
     return git_hashes
 

@@ -8,6 +8,7 @@ import pathlib
 import stat
 import sys
 from pathlib import Path
+from typing import Dict
 
 import requests
 
@@ -16,7 +17,7 @@ from komodo.package_version import (
     latest_pypi_version,
     strip_version,
 )
-from komodo.shell import pushd, shell
+from komodo.shell import run, run_env
 
 flatten = itr.chain.from_iterable
 
@@ -82,54 +83,61 @@ def cmake(
     ]
 
     Path(bdir).mkdir(parents=True, exist_ok=True)
-    with pushd(bdir):
-        os.environ["LD_LIBRARY_PATH"] = kwargs.get("ld_lib_path")
-        _pre_PATH = os.environ["PATH"]
-        os.environ["PATH"] = kwargs.get("binpath")
+    setenv: Dict[str, str] = {}
+    if var := kwargs.get("ld_lib_path"):
+        setenv["LD_LIBRARY_PATH"] = var
+    if var := kwargs.get("binpath"):
+        setenv["PATH"] = var
 
-        print(f"Installing {pkg} ({ver}) from source with cmake")
-        shell([cmake, path, *flags, makeopts])
-        print(shell(f"make -j{jobs}"))
-        print(shell(f"make DESTDIR={fakeroot} install"))
-
-        del os.environ["LD_LIBRARY_PATH"]
-        os.environ["PATH"] = _pre_PATH
+    print(f"Installing {pkg} ({ver}) from source with cmake")
+    with run_env(setenv=setenv, cwd=bdir) as run:
+        run(cmake, path, *flags, makeopts)
+        print(run("make", f"-j{jobs}"))
+        print(run("make", f"DESTDIR={fakeroot}", "install"))
 
 
 def sh(pkg, ver, pkgpath, data, prefix, makefile, *args, **kwargs):
     makefile = data.get(makefile)
 
-    with pushd(pkgpath):
-        cmd = [
-            f"bash {makefile} --prefix {prefix}",
-            f"--fakeroot {kwargs['fakeroot']}",
-            f"--python {prefix}/bin/python",
-        ]
-        if "jobs" in kwargs:
-            cmd.append(f"--jobs {kwargs['jobs']}")
-        if "cmake" in kwargs:
-            cmd.append(f"--cmake {kwargs['cmake']}")
-        cmd.append(f"--pythonpath {kwargs['pythonpath']}")
-        cmd.append(f"--path {kwargs['binpath']}")
-        cmd.append(f"--pip {kwargs['pip']}")
-        cmd.append(f"--virtualenv {kwargs['virtualenv']}")
-        cmd.append(f"--ld-library-path {kwargs['ld_lib_path']}")
-        cmd.append(kwargs.get("makeopts"))
+    cmd = [
+        "bash",
+        makefile,
+        "--prefix",
+        prefix,
+        "--fakeroot",
+        kwargs["fakeroot"],
+        "--python",
+        prefix + "/bin/python",
+        "--pythonpath",
+        kwargs["pythonpath"],
+        "--binpath",
+        kwargs["binpath"],
+        "--pip",
+        kwargs["pip"],
+        "--virtualenv",
+        kwargs["virtualenv"],
+        "--ld-library-path",
+        kwargs["ld_lib_path"],
+    ]
+    if (jobs := kwargs.get("jobs")) is not None:
+        cmd.extend(["--jobs", jobs])
+    if (cmake := kwargs.get("cmake")) is not None:
+        cmd.extend(["--cmake", cmake])
+    cmd.append(kwargs["makeopts"])
 
-        print(f"Installing {pkg} ({ver}) from sh")
-        shell(cmd)
+    print(f"Installing {pkg} ({ver}) from sh")
+    run(*cmd, cwd=prefix)
 
 
 def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
     print(f"Installing {pkg} ({ver}) with rsync")
     # assume a root-like layout in the pkgpath dir, and just copy it
-    shell(
-        [
-            "rsync -am",
-            kwargs.get("makeopts"),
-            f"{pkgpath}/",
-            kwargs["fakeroot"] + prefix,
-        ],
+    run(
+        "rsync",
+        "-am",
+        kwargs.get("makeopts"),
+        f"{pkgpath}/",
+        kwargs["fakeroot"] + prefix,
     )
 
 
@@ -187,19 +195,25 @@ def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, *args, pip="pip", **k
         ver = latest_pypi_version(pkg)
     cmd = [
         pip,
-        f"install {pkg}=={strip_version(ver)}",
-        f"--root {kwargs['fakeroot']}",
-        f"--prefix {prefix}",
+        "install",
+        f"{pkg}=={strip_version(ver)}",
+        "--root",
+        kwargs["fakeroot"],
+        "--prefix",
+        prefix,
         "--no-index",
         "--no-deps",
         "--ignore-installed",
-        f"--cache-dir {dlprefix}",
-        f"--find-links {dlprefix}",
-        kwargs.get("makeopts", ""),
+        "--cache-dir",
+        dlprefix,
+        "--find-links",
+        dlprefix,
     ]
+    if (makeopts := kwargs.get("makeopts")) is not None:
+        cmd.append(makeopts)
 
     print(f"Installing {pkg} ({ver}) from pip")
-    shell(cmd)
+    run(*cmd)
 
 
 def noop(pkg, ver, *args, **kwargs):
@@ -243,7 +257,7 @@ def make(
         pkgorder.append(x)
 
     fakeprefix = fakeroot + prefix
-    shell(["mkdir -p", fakeprefix])
+    run("mkdir", "-p", fakeprefix)
     prefix = os.path.abspath(prefix)
 
     # assuming there always is a python *and* that python will be installed

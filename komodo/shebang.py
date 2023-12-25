@@ -1,6 +1,6 @@
 import os
 
-from komodo.shell import shell
+from komodo.shell import run, shell
 
 
 def _is_shebang(s):
@@ -45,4 +45,4 @@ def fixup_python_shebangs(prefix, release):
     for bin_ in bins_:
         binpath_ = os.path.join(prefix, release, "root", "bin", bin_)
         if os.path.exists(binpath_):
-            shell(f"""sed -i 1c#!{python_} {binpath_}""")
+            run("sed", "-i", f"1c#!{python_}", binpath_)
