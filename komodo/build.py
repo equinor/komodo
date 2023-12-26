@@ -123,7 +123,7 @@ def sh(pkg, ver, pkgpath, data, prefix, makefile, *args, **kwargs):
         cmd.extend(["--jobs", jobs])
     if (cmake := kwargs.get("cmake")) is not None:
         cmd.extend(["--cmake", cmake])
-    cmd.append(kwargs["makeopts"])
+    cmd.extend(kwargs["makeopts"].split())
 
     print(f"Installing {pkg} ({ver}) from sh")
     run(*cmd, cwd=prefix)

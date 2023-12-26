@@ -195,16 +195,15 @@ def _main(args):
             args.pip,
             "install",
             f"{package_name}=={strip_version(ver)}",
-            "--prefix",
-            str(release_root),
+            f"--prefix={release_root}",
             "--no-index",
             "--no-deps",
             "--ignore-installed",
             # assuming fetch.py has done "pip download" to this directory:
-            f"--cache-dir {args.downloads}",
-            f"--find-links {args.downloads}",
+            f"--cache-dir={args.downloads}",
+            f"--find-links={args.downloads}",
         ]
-        shell_input.append(current.get("makeopts"))
+        shell_input.extend(current.get("makeotps", "").split())
 
         print(run(*shell_input))
     timings.append(

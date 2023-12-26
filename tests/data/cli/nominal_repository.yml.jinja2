@@ -17,7 +17,7 @@ setuptools:
 
 hackres:
   0.0.5289:
-    source: {{ test_data_path }}/hackres
+    source: "{{ test_data_path }}/hackres"
     fetch: fs-cp
     make: sh
     makefile: test_build_script.sh
@@ -25,7 +25,7 @@ hackres:
 
 hackgit:
   test-hash:
-    source: {{ test_data_path }}/hackgit/.git-hack
+    source: "{{ test_data_path }}/hackgit/.git-hack"
     fetch: git
     make: sh
     makefile: dummy.sh

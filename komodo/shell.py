@@ -42,9 +42,9 @@ def run(
         return subprocess.check_output(cmd, env=env, cwd=cwd)
     except subprocess.CalledProcessError as e:
         print(e.output, file=sys.stderr)
-        if not check:
-            return e.output
-        raise
+        if check:
+            raise
+        return e.output
 
 
 @contextlib.contextmanager

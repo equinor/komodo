@@ -11,29 +11,7 @@ from tests import _get_test_root
 
 
 def test_main(tmp_path):
-    args = [
-        "--download",
-        "--build",
-        "--install",
-        "--prefix",
-        "prefix",
-        "--cache",
-        "cache",
-        "--tmp",
-        "tmp",
-        "--release",
-        "nominal_release",
-        "--pip",
-        "/bin/true",
-        os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
-        str(tmp_path / "nominal_repository.yml"),
-        "--extra-data-dirs",
-        os.path.join(_get_test_root(), "data/cli"),
-        os.path.join(_get_test_root(), "data/cli/hackres"),
-        os.path.join(_get_test_root(), "data/cli/hackgit"),
-    ]
-
-    template = jinja2.Environment(loader=jinja2.BaseLoader)
+    template = jinja2.Environment(loader=jinja2.BaseLoader())
     data_path = os.path.join(_get_test_root(), "data/cli")
 
     with open(os.path.join(data_path, "nominal_repository.yml.jinja2")) as f:
@@ -41,17 +19,29 @@ def test_main(tmp_path):
         output = input.render(test_data_path=data_path)
     with open(tmp_path / "nominal_repository.yml", "w") as f:
         f.write(output)
+    release_name ="nominal_release"
+    release_path = str(tmp_path / "prefix" / release_name)
 
     cli_main(
         [
             "--workspace",
             str(tmp_path),
-            *args,
+            "--download",
+            "--build",
+            "--install",
+            "--prefix=prefix",
+            "--cache=cache",
+            "--tmp=tmp",
+            f"--release={release_name}",
+            "--pip=/bin/true",
+            os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
+            str(tmp_path / "nominal_repository.yml"),
+            "--extra-data-dirs",
+            os.path.join(_get_test_root(), "data/cli"),
+            os.path.join(_get_test_root(), "data/cli/hackres"),
+            os.path.join(_get_test_root(), "data/cli/hackgit"),
         ]
     )
-
-    release_name = args[10]
-    release_path = str(tmp_path / "prefix" / release_name)
 
     assert os.path.exists(os.path.join(release_path, "root/lib/hackres.so"))
     assert os.path.exists(os.path.join(release_path, "root/lib/python4.2.so"))
@@ -81,39 +71,24 @@ def test_main(tmp_path):
         assert "version: 7f4405928bd16de496522d9301c377c7bcca5ef0" in releasedoc_content
 
 
-@pytest.mark.parametrize(
-    "args",
-    [
-        (
-            os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
-            os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
-            "--prefix",
-            "prefix",
-            "--release",
-            "minimal_release",
-            "--extra-data-dirs",  # Required to find test_python_builtin.sh.
-            os.path.join(_get_test_root(), "data/cli"),
-        ),
-    ],
-)
-def test_minimal_main(args, tmpdir):
+def test_minimal_main(tmpdir):
     """Check that a minimal example, more like that from the README, also works.
 
     Without --locations-config, this should not produce the scripts local & local.csh.
     """
-    tmpdir = str(tmpdir)
+    release_name = "minimal_release"
 
-    sys.argv = [
-        "kmd",
+    cli_main([
         "--workspace",
-        tmpdir,
-    ]
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix=prefix",
+        f"--release={release_name}",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ])
 
-    sys.argv.extend(list(args))
-
-    cli_main()
-
-    release_name = args[5]
     release_path = os.path.join(tmpdir, "prefix", release_name)
 
     assert os.path.exists(os.path.join(release_path, "enable"))
@@ -130,7 +105,7 @@ def test_pyver_is_deprecated(capsys):
     but it does not show up in the CLI.
     """
     pkgs = os.path.join(_get_test_root(), "data/cli/nominal_release.yml")
-    repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml")
+    repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml.jinja2")
     cmd = f"{pkgs} {repo} --prefix pfx --release rel --pyver 3.8"
     with pytest.warns(FutureWarning) as record:
         _ = parse_args(cmd.split())
