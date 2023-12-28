@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import AbstractSet, Sequence, Tuple
+from typing import AbstractSet, Tuple
 
 from ruamel.yaml import YAML
 

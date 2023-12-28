@@ -6,7 +6,7 @@ import re
 import sys
 import textwrap
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Union
+from typing import Any, List, Mapping, Optional, Union
 
 from ruamel.yaml import YAML
 

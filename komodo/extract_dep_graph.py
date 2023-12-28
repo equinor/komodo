@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import Any, Mapping, MutableMapping, Optional, Sequence
+from typing import Any, Mapping, MutableMapping, Optional
 
 from ruamel.yaml import YAML
 

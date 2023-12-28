@@ -3,7 +3,7 @@
 import argparse
 import itertools
 import os
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 import yaml
 from packaging import version as version_parser

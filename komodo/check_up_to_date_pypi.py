@@ -5,7 +5,6 @@ import re
 import sys
 from typing import (
     Any,
-    Dict,
     Mapping,
     MutableMapping,
     MutableSequence,

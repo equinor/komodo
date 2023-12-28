@@ -1,7 +1,7 @@
 import argparse
 import json
 import os
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from komodo.matrix import get_matrix_base
 from komodo.yaml_file_types import ReleaseDir

@@ -61,7 +61,7 @@ class _Make(Protocol):
         ld_lib_path: Optional[str],
         url: Optional[str],
         destination: Optional[str],
-        hash: Optional[str],
+        hash_: Optional[str],
     ) -> None:
         ...
 
@@ -117,7 +117,7 @@ def cmake(
     ld_lib_path: Optional[str],
     url: Optional[str],
     destination: Optional[str],
-    hash: Optional[str],
+    hash_: Optional[str],
 ) -> None:
     bdir = f"{pkg}-{ver}-build"
     if builddir is not None:
@@ -170,7 +170,7 @@ def sh(
     ld_lib_path: Optional[str],
     url: Optional[str],
     destination: Optional[str],
-    hash: Optional[str],
+    hash_: Optional[str],
 ) -> None:
     assert makefile is not None
 
@@ -216,7 +216,7 @@ def rsync(
     ld_lib_path: Optional[str],
     url: Optional[str],
     destination: Optional[str],
-    hash: Optional[str],
+    hash_: Optional[str],
 ) -> None:
     print(f"Installing {pkg} ({ver}) with rsync")
     # assume a root-like layout in the pkgpath dir, and just copy it
@@ -250,10 +250,10 @@ def download(
     ld_lib_path: Optional[str],
     url: Optional[str],
     destination: Optional[str],
-    hash: Optional[str],
+    hash_: Optional[str],
 ) -> None:
     assert url is not None
-    assert hash is not None
+    assert hash_ is not None
     assert destination is not None
 
     print(f"Installing {pkg} ({ver}) with download")
@@ -262,7 +262,7 @@ def download(
         msg = f"{url} does not use https:// protocol"
         raise ValueError(msg)
 
-    hash_type, hash_value = hash.split(":")
+    hash_type, hash_value = hash_.split(":")
     if hash_type != "sha256":
         msg = f"Hash type {hash_type} given - only sha256 implemented"
         raise NotImplementedError(
@@ -323,7 +323,7 @@ def pip_install(
     ld_lib_path: Optional[str],
     url: Optional[str],
     destination: Optional[str],
-    hash: Optional[str],
+    hash_: Optional[str],
 ) -> None:
     ver = strip_version(ver)
     if ver == LATEST_PACKAGE_ALIAS:
@@ -413,9 +413,6 @@ def make(
     if dlprefix:
         pkgpaths = [os.path.join(dlprefix, path) for path in pkgpaths]
 
-    def resolve(x: str) -> str:
-        return x.replace("$(prefix)", prefix)
-
     build: Mapping[str, _Make] = {
         "cmake": cmake,
         "sh": sh,
@@ -471,5 +468,5 @@ def make(
             ld_lib_path=build_ld_lib_path,
             url=current.get("url"),
             destination=current.get("destination"),
-            hash=current.get("hash"),
+            hash_=current.get("hash"),
         )

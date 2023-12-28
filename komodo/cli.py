@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import List, Optional, Sequence, Tuple
 
 import jinja2
-from pytest import OptionGroup
 from ruamel.yaml import YAML
 
 from komodo import switch
@@ -142,8 +141,8 @@ def _main(args: argparse.Namespace) -> None:
     print(f"Installing {args.release} to {args.prefix}")
 
     start_time = datetime.datetime.now()
-    run(f"mv", args.release, f".{args.release}")
-    run(f"rsync", "-a", f".{args.release}", args.prefix)
+    run("mv", args.release, f".{args.release}")
+    run("rsync", "-a", f".{args.release}", args.prefix)
     timings.append(
         (
             "Rsyncing partial komodo to destination",

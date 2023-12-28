@@ -3,7 +3,7 @@ import json
 import os
 import sys
 from contextlib import contextmanager
-from typing import Generator, List, MutableSequence, Sequence
+from typing import Generator, MutableSequence, Sequence
 
 from komodo.symlink.types import LinkDict
 

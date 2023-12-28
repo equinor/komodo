@@ -4,7 +4,7 @@ import argparse
 import os
 import sys
 import warnings
-from typing import Any, Iterable, List, Mapping, MutableSequence, Sequence, Tuple
+from typing import Iterable, Mapping, MutableSequence, Sequence, Tuple
 
 import yaml
 from packaging.version import InvalidVersion, Version

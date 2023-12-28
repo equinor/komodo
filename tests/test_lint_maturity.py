@@ -175,20 +175,6 @@ def test_get_packages_info():
         assert dict_tag_maturity[tag] == EXPECTED_DICT_TAG_MATURITY[tag]
 
 
-def test_read_yaml_file(tmpdir):
-    with tmpdir.as_cwd():
-        list_files = _create_tmp_test_files(
-            release_sample="""release: ['bleeding', 'rpath']
-package: ['package_ex2']""",
-            file_names_sample=["2020.02.01.yml"],
-        )
-
-    loaded_yaml_file = lint_maturity.read_yaml_file(list_files[0])
-
-    assert loaded_yaml_file["release"] == ["bleeding", "rpath"]
-    assert loaded_yaml_file["package"] == ["package_ex2"]
-
-
 def test_msg_release_exception():
     EXPECTED_RELEASE_VERSION = ["stable", "a", "b", "rc", "exception"]
     RELEASE_FILE_NAMES = [

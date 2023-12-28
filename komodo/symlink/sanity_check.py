@@ -7,11 +7,8 @@ import sys
 from typing import (
     AbstractSet,
     Any,
-    Mapping,
-    MutableMapping,
     MutableSequence,
     Sequence,
-    TypedDict,
 )
 
 from komodo.symlink.types import LinkDict

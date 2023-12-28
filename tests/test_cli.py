@@ -1,6 +1,4 @@
 import os
-import shutil
-import sys
 
 import jinja2
 import pytest
@@ -15,8 +13,8 @@ def test_main(tmp_path):
     data_path = os.path.join(_get_test_root(), "data/cli")
 
     with open(os.path.join(data_path, "nominal_repository.yml.jinja2")) as f:
-        input = template.from_string(f.read())
-        output = input.render(test_data_path=data_path)
+        input_ = template.from_string(f.read())
+        output = input_.render(test_data_path=data_path)
     with open(tmp_path / "nominal_repository.yml", "w") as f:
         f.write(output)
     release_name = "nominal_release"
