@@ -63,7 +63,7 @@ def _print_timings(
         print(f" * {timing_element[0]} took {timing_element[1]}")
 
 
-def _main(args):
+def _main(args: argparse.Namespace) -> None:
     timings: List[Tuple[str, datetime.timedelta]] = []
     abs_prefix = Path(args.prefix).resolve()
 
@@ -256,7 +256,7 @@ def cli_main(argv: Optional[Sequence[str]] = None) -> None:
         os.chdir(old_cwd)
 
 
-def parse_args(args: Sequence[str]) -> argparse.Namespace:
+def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     """Parse the arguments from the command line into an `argparse.Namespace`.
     Having a separated function makes it easier to test the CLI.
 
@@ -439,7 +439,7 @@ def parse_args(args: Sequence[str]) -> argparse.Namespace:
         ),
     )
 
-    args = parser.parse_args(args)
+    args = parser.parse_args(argv)
 
     if args.pyver is not None:
         message = (

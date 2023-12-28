@@ -8,7 +8,9 @@ from datetime import datetime
 from typing import Optional
 
 from github import Github
+from github.ContentFile import ContentFile
 from github.GithubException import UnknownObjectException
+from github.PullRequest import PullRequest
 from github.Repository import Repository
 
 from komodo.symlink.suggester import configuration
@@ -31,7 +33,7 @@ Source code for this script can be found [here](https://github.com/equinor/komod
 """  # noqa
 
 
-def _parse_args():
+def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -74,7 +76,7 @@ def suggest_symlink_configuration(
     args: argparse.Namespace,
     repo: Repository,
     dry_run: bool = False,
-) -> Optional[Repository]:
+) -> Optional[PullRequest]:
     """Returns a pull request if the symlink configuration could be updated,
     or None if no update was possible.
     """
@@ -88,6 +90,7 @@ def suggest_symlink_configuration(
         return None
 
     try:
+        assert isinstance(sym_conf_content, ContentFile)
         new_symlink_content, updated = configuration.update(
             b64decode(sym_conf_content.content),
             args.release,
@@ -139,7 +142,7 @@ def suggest_symlink_configuration(
     return repo.create_pull(title=msg, body=body, head=target_branch, base=args.git_ref)
 
 
-def main():
+def main() -> None:
     args = _parse_args()
     repo = _get_repo(os.getenv("GITHUB_TOKEN"), args.git_fork, args.git_repo)
 

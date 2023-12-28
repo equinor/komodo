@@ -3,13 +3,15 @@ import json
 import os
 import sys
 from contextlib import contextmanager
-from typing import List
+from typing import Generator, List, MutableSequence, Sequence
+
+from komodo.symlink.types import LinkDict
 
 from .sanity_check import verify_integrity
 
 
 @contextmanager
-def working_dir(path):
+def working_dir(path: str) -> Generator[None, None, None]:
     prev_dir = os.getcwd()
     os.chdir(path)
     try:
@@ -18,9 +20,9 @@ def working_dir(path):
         os.chdir(prev_dir)
 
 
-def get_implicitly_moved_symlinks(key: str, link_dict: dict) -> List[str]:
+def get_implicitly_moved_symlinks(key: str, link_dict: LinkDict) -> Sequence[str]:
     sources = [src for src, dst in link_dict.items() if dst == key]
-    implicitly_moved_symlinks = []
+    implicitly_moved_symlinks: MutableSequence[str] = []
     for source in sources:
         implicitly_moved_symlinks.extend(
             get_implicitly_moved_symlinks(source, link_dict)
@@ -31,9 +33,9 @@ def get_implicitly_moved_symlinks(key: str, link_dict: dict) -> List[str]:
     return implicitly_moved_symlinks
 
 
-def _create_link(src, dst, link_dict):
+def _create_link(src: str, dst: str, link_dict: LinkDict) -> None:
     if src in link_dict and not os.path.exists(src):
-        _create_link(link_dict[src], src, link_dict)
+        _create_link(link_dict["links"][src], src, link_dict)
 
     if not os.path.exists(src):
         msg = f"{src} does not exist"
@@ -44,7 +46,7 @@ def _create_link(src, dst, link_dict):
         if existing_link == src:
             return
         os.remove(dst)
-        implicitly_moved_sources = get_implicitly_moved_symlinks(dst, link_dict)
+        implicitly_moved_sources = [*get_implicitly_moved_symlinks(dst, link_dict)]
         if dst in implicitly_moved_sources:
             implicitly_moved_sources.remove(dst)
 
@@ -63,7 +65,7 @@ def _create_link(src, dst, link_dict):
     os.symlink(src, dst)
 
 
-def create_symlinks(links_dict):
+def create_symlinks(links_dict: LinkDict) -> None:
     root_folder = links_dict["root_folder"]
     if not os.path.isabs(root_folder):
         msg = "The root folder specified is not absolute"
@@ -75,10 +77,10 @@ def create_symlinks(links_dict):
 
     with working_dir(root_folder):
         for dst, src in links_dict["links"].items():
-            _create_link(src, dst, links_dict["links"])
+            _create_link(src, dst, links_dict)
 
 
-def symlink_main():
+def symlink_main() -> None:
     parser = argparse.ArgumentParser(description="Create symlinks for komodo versions.")
     parser.add_argument(
         "config",

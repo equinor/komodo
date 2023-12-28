@@ -2,8 +2,9 @@
 
 import argparse
 import os
+import sys
 import warnings
-from typing import List
+from typing import Any, Iterable, List, Mapping, MutableSequence, Sequence, Tuple
 
 import yaml
 from packaging.version import InvalidVersion, Version
@@ -19,22 +20,16 @@ _INVALID_TAGS = {
 }
 
 
-def print_system_exit_message(system_exit_msg):
-    if system_exit_msg != "":
-        raise SystemExit(system_exit_msg)
-
-
-def print_warning_message(system_warning_msg):
-    if system_warning_msg != "":
-        warnings.warn(system_warning_msg, UserWarning, stacklevel=2)
+_Maturities = Mapping[str, Sequence[Tuple[str, str]]]
+_Tags = Mapping[str, Sequence[str]]
 
 
 def msg_packages_invalid(
-    release_basename,
-    release_version,
-    count_tag_invalid,
-    dict_tag_maturity,
-):
+    release_basename: str,
+    release_version: str,
+    count_tag_invalid: int,
+    dict_tag_maturity: _Maturities,
+) -> str:
     exit_msg = ""
     exit_msg += (
         release_basename
@@ -52,7 +47,9 @@ def msg_packages_invalid(
     return exit_msg
 
 
-def msg_packages_exception(release_basename, dict_tag_maturity):
+def msg_packages_exception(
+    release_basename: str, dict_tag_maturity: _Maturities
+) -> str:
     msg_exception = ""
 
     if len(dict_tag_maturity["exception"]) > 0:
@@ -62,23 +59,28 @@ def msg_packages_exception(release_basename, dict_tag_maturity):
     return msg_exception
 
 
-def count_invalid_tags(dict_tag_maturity, invalid_tags):
+def count_invalid_tags(
+    dict_tag_maturity: Mapping[str, Sequence[Tuple[str, str]]],
+    invalid_tags: Sequence[str],
+) -> int:
     count_tag_maturity = {tag: len(dict_tag_maturity[tag]) for tag in dict_tag_maturity}
     return sum(count_tag_maturity[tag] for tag in invalid_tags)
 
 
-def get_release_type(version: str):
+def get_release_type(version: str) -> str:
     try:
-        version = Version(version)
-        release_type = "stable" if version.pre is None else version.pre[0]
+        parsed = Version(version)
+        release_type = "stable" if parsed.pre is None else parsed.pre[0]
     except InvalidVersion:
         release_type = "invalid"
 
     return release_type
 
 
-def get_packages_info(release_file: ReleaseFile, tag_exceptions_package):
-    dict_tag_maturity = {
+def get_packages_info(
+    release_file: ReleaseFile, tag_exceptions_package: Sequence[str]
+) -> Mapping[str, Sequence[Tuple[str, str]]]:
+    dict_tag_maturity: Mapping[str, MutableSequence[Tuple[str, str]]] = {
         "a": [],
         "b": [],
         "rc": [],
@@ -99,12 +101,7 @@ def get_packages_info(release_file: ReleaseFile, tag_exceptions_package):
     return dict_tag_maturity
 
 
-def read_yaml_file(file_path):
-    with open(file_path) as yml_file:
-        return yaml.safe_load(yml_file)
-
-
-def msg_release_exception(release_basename, release_version):
+def msg_release_exception(release_basename: str, release_version: str) -> str:
     msg_exception = ""
 
     if release_version == "exception":
@@ -115,7 +112,9 @@ def msg_release_exception(release_basename, release_version):
     return msg_exception
 
 
-def get_release_version(release_basename, tag_exceptions_release):
+def get_release_version(
+    release_basename: str, tag_exceptions_release: Sequence[str]
+) -> str:
     if release_basename not in tag_exceptions_release:
         release_version = get_release_type(release_basename)
     else:
@@ -124,7 +123,9 @@ def get_release_version(release_basename, tag_exceptions_release):
     return release_version
 
 
-def run(files_to_lint: List[str], tag_exceptions):
+def run(
+    files_to_lint: Iterable[str], tag_exceptions: Mapping[str, Sequence[str]]
+) -> None:
     system_exit_msg = ""
     system_warning_msg = ""
 
@@ -141,7 +142,9 @@ def run(files_to_lint: List[str], tag_exceptions):
                 release_basename + " is incompatible with version name.\n"
             )
         else:
-            release_file = read_yaml_file_and_convert_to_release_file(file_to_lint)
+            with open(file_to_lint, encoding="utf-8") as f:
+                release_file = ReleaseFile().from_yaml_string(f.read())
+
             dict_tag_maturity = get_packages_info(
                 release_file,
                 tag_exceptions["package"],
@@ -169,8 +172,10 @@ def run(files_to_lint: List[str], tag_exceptions):
                 else:
                     system_warning_msg += packages_msg
 
-    print_warning_message(system_warning_msg)
-    print_system_exit_message(system_exit_msg)
+    if system_warning_msg:
+        warnings.warn(system_warning_msg, UserWarning, stacklevel=2)
+    if system_exit_msg:
+        sys.exit(system_exit_msg)
 
 
 def read_yaml_file_and_convert_to_release_file(release_file_path: str) -> ReleaseFile:
@@ -179,7 +184,7 @@ def read_yaml_file_and_convert_to_release_file(release_file_path: str) -> Releas
     return ReleaseFile().from_yaml_string(value=release_file_yaml_string)
 
 
-def get_files_to_lint(release_folder: str, release_file: str) -> List[str]:
+def get_files_to_lint(release_folder: str, release_file: str) -> Iterable[str]:
     if release_folder is None:
         files_to_lint = [release_file]
     else:
@@ -193,9 +198,10 @@ def get_files_to_lint(release_folder: str, release_file: str) -> List[str]:
     return files_to_lint
 
 
-def define_tag_exceptions(tag_exception_arg):
+def define_tag_exceptions(tag_exception_arg: Sequence[str]) -> _Tags:
     if os.path.isfile(tag_exception_arg[0]):
-        tag_exceptions = read_yaml_file(file_path=tag_exception_arg[0])
+        with open(tag_exception_arg[0]) as f:
+            tag_exceptions = yaml.safe_load(f)
     elif tag_exception_arg[0] == "":
         tag_exceptions = {"release": [], "package": []}
     else:
@@ -238,7 +244,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main():
+def main() -> None:
     parser = get_parser()
     args = parser.parse_args()
 

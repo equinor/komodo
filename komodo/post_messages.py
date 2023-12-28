@@ -4,24 +4,38 @@ import fnmatch
 import hashlib
 import os
 import shutil
+from dataclasses import dataclass, field
+from typing import Mapping, MutableSequence, Optional, Sequence, Tuple
 
 from ruamel.yaml import YAML
 
 
-def get_messages_and_scripts(release_name, motd_db):
-    scripts = []
-    messages = []
-    inline = []
+@dataclass
+class _Motd:
+    scripts: Sequence[str] = field(default_factory=list)
+    messages: Sequence[str] = field(default_factory=list)
+    inline: Sequence[str] = field(default_factory=list)
+
+
+_MotdDb = Mapping[str, _Motd]
+
+
+def get_messages_and_scripts(
+    release_name: str, motd_db: _MotdDb
+) -> Tuple[Sequence[str], Sequence[str], Sequence[str]]:
+    scripts: MutableSequence[str] = []
+    messages: MutableSequence[str] = []
+    inline: MutableSequence[str] = []
     for key in motd_db:
         if fnmatch.fnmatch(release_name, key):
-            scripts.extend(motd_db[key].get("scripts", []))
-            messages.extend(motd_db[key].get("messages", []))
-            inline.extend(motd_db[key].get("inline", []))
+            scripts.extend(motd_db[key].scripts)
+            messages.extend(motd_db[key].messages)
+            inline.extend(motd_db[key].inline)
 
     return scripts, messages, inline
 
 
-def create_inline_messages(messages, dst_path):
+def create_inline_messages(messages: Sequence[str], dst_path: str) -> None:
     if not os.path.isdir(dst_path):
         os.makedirs(dst_path)
     for msg in messages:
@@ -31,7 +45,7 @@ def create_inline_messages(messages, dst_path):
             new_file.write(msg)
 
 
-def copy_files(file_list, dst_path, src_path):
+def copy_files(file_list: Sequence[str], dst_path: str, src_path: str) -> None:
     if not os.path.isdir(dst_path):
         os.makedirs(dst_path)
     for file_name in file_list:
@@ -43,7 +57,7 @@ def copy_files(file_list, dst_path, src_path):
         shutil.copy(file_path, os.path.join(dst_path, file_name))
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Post messages to a release.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -73,9 +87,9 @@ def get_parser():
     return parser
 
 
-def main(args=None):
+def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = get_parser()
-    args = parser.parse_args(args=args)
+    args = parser.parse_args(args=argv)
 
     if not os.path.isfile(args.motd_db):
         msg = f"ERROR: The message-database {args.motd_db} was not found"

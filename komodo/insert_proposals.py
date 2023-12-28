@@ -5,9 +5,12 @@ import difflib
 import os
 from base64 import b64decode
 from datetime import datetime
+from typing import Any
 
 import github
-from github import Github, Repository, UnknownObjectException
+from github import Github, UnknownObjectException
+from github.ContentFile import ContentFile
+from github.Repository import Repository
 
 from komodo.prettier import write_to_string
 from komodo.yaml_file_types import (
@@ -18,7 +21,7 @@ from komodo.yaml_file_types import (
 )
 
 
-def recursive_update(left, right):
+def recursive_update(left: Any, right: Any) -> Any:
     if right is None:
         return None
     for k, v in right.items():
@@ -33,7 +36,7 @@ def recursive_update(left, right):
     return left
 
 
-def _get_repo(token, fork, repo):
+def _get_repo(token: str, fork: str, repo: str) -> Repository:
     client = Github(token)
     try:
         return client.get_repo(f"{fork}/{repo}")
@@ -42,7 +45,9 @@ def _get_repo(token, fork, repo):
         return org.get_repo(repo)
 
 
-def diff_file_and_string(file_contents, string, leftname, rightname):
+def diff_file_and_string(
+    file_contents: str, string: str, leftname: str, rightname: str
+) -> str:
     return "".join(
         difflib.unified_diff(
             file_contents.splitlines(True),
@@ -54,14 +59,15 @@ def diff_file_and_string(file_contents, string, leftname, rightname):
     )
 
 
-def load_yaml_from_repo(filename, repo, ref) -> bytes:
+def load_yaml_from_repo(filename: str, repo: Repository, ref: str) -> bytes:
     sym_conf_content = repo.get_contents(filename, ref=ref)
+    assert isinstance(sym_conf_content, ContentFile)
     return b64decode(sym_conf_content.content)
 
 
-def main():
+def main() -> None:
     args = parse_args()
-    repo = _get_repo(os.getenv("GITHUB_TOKEN"), args.git_fork, args.git_repo)
+    repo = _get_repo(os.environ["GITHUB_TOKEN"], args.git_fork, args.git_repo)
     insert_proposals(
         repo,
         args.base,
@@ -72,7 +78,7 @@ def main():
     )
 
 
-def verify_branch_does_not_exist(repo: Repository.Repository, branch_name: str) -> None:
+def verify_branch_does_not_exist(repo: Repository, branch_name: str) -> None:
     try:
         repo.get_branch(branch_name)
     except github.GithubException:
@@ -82,7 +88,9 @@ def verify_branch_does_not_exist(repo: Repository.Repository, branch_name: str) 
         raise ValueError(msg)
 
 
-def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
+def insert_proposals(
+    repo: Repository, base: str, target: str, git_ref: str, jobname: str, joburl: str
+) -> None:
     year = target.split(".")[0]
     month = target.split(".")[1]
     tmp_target = target + ".tmp"
@@ -112,7 +120,7 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
             except KomodoException as e:
                 errors.append(e.error)
         if errors:
-            raise SystemExit("\n".join(errors))
+            raise SystemExit("\n".join(map(str, errors)))
     recursive_update(base_dict.content, upgrade)
     result = write_to_string(base_dict.content)
 
@@ -130,6 +138,8 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
     proposal_file.content[upgrade_key] = None
     cleaned_upgrade = write_to_string(proposal_file.content, False)
     upgrade_contents = repo.get_contents("upgrade_proposals.yml", ref=git_ref)
+    assert isinstance(upgrade_contents, ContentFile)
+
     repo.update_file(
         "upgrade_proposals.yml",
         "Clean proposals",
@@ -140,6 +150,7 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
 
     # making PR
     base_content = repo.get_contents(base_file, ref=git_ref)
+    assert isinstance(base_content, ContentFile)
     diff = diff_file_and_string(
         b64decode(base_content.content).decode(),
         result,
@@ -192,7 +203,7 @@ Source code for this script can be found [here](https://github.com/equinor/komod
     )
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Copy proposals into release and create PR.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,

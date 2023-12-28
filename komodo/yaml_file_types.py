@@ -1,24 +1,44 @@
+from __future__ import annotations
+
 import argparse
 import os
-from collections import namedtuple
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Mapping,
+    MutableSequence,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
 
-komodo_error = namedtuple(
-    "KomodoError",
-    ["package", "version", "maintainer", "depends", "err"],
-)
-report = namedtuple(
-    "LintReport",
-    ["release_name", "maintainers", "dependencies", "versions"],
-)
+
+@dataclass
+class komodo_error:
+    package: Optional[str] = None
+    version: Optional[str] = None
+    maintainer: Optional[str] = None
+    depends: Optional[Sequence[str]] = None
+    err: Union[None, KomodoException, str] = None
+
+
+@dataclass
+class report:
+    release_name: str
+    maintainers: Sequence[str]
+    dependencies: Sequence[str]
+    versions: Sequence[str]
 
 
 class KomodoException(Exception):
-    def __init__(self, error_message: komodo_error) -> None:
+    def __init__(self, error_message: Union[komodo_error, str]) -> None:
         self.error = error_message
 
 
@@ -33,7 +53,13 @@ MASTER_VERSION = "dangerous version (master branch)"
 FLOAT_VERSION = "dangerous version (float interpretable)"
 
 
-def _komodo_error(package=None, version=None, maintainer=None, depends=None, err=None):
+def _komodo_error(
+    package: Optional[str] = None,
+    version: Optional[str] = None,
+    maintainer: Optional[str] = None,
+    depends: Optional[str] = None,
+    err: Union[None, KomodoException, str] = None,
+) -> komodo_error:
     return komodo_error(
         package=package,
         version=version,
@@ -43,16 +69,7 @@ def _komodo_error(package=None, version=None, maintainer=None, depends=None, err
     )
 
 
-def __reg_version_err(errs, package, version, maintainer, err=MALFORMED_VERSION):
-    return _komodo_error(
-        package=package,
-        version=version,
-        maintainer=maintainer,
-        err=err,
-    )
-
-
-def load_yaml_from_string(value: str) -> dict:
+def load_yaml_from_string(value: Any) -> Any:
     try:
         return YAML().load(value)
     except DuplicateKeyError as e:
@@ -60,10 +77,12 @@ def load_yaml_from_string(value: str) -> dict:
 
 
 class YamlFile(argparse.FileType):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__("r", *args, **kwargs)
+    def __init__(
+        self,
+    ) -> None:
+        super().__init__("r")
 
-    def __call__(self, value):
+    def __call__(self, value: Any) -> Any:
         file_handle = super().__call__(value)
         yml = load_yaml_from_string(file_handle)
         file_handle.close()
@@ -73,24 +92,26 @@ class YamlFile(argparse.FileType):
 class ReleaseFile(YamlFile):
     """Return the data from 'release' YAML file, but validate it first."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.content: dict = None
+    def __init__(
+        self,
+    ) -> None:
+        super().__init__()
+        self.content: Any = None
 
-    def __call__(self, value: str):
-        yml: dict = super().__call__(value)
+    def __call__(self, value: Any) -> Any:
+        yml = super().__call__(value)
         self.validate_release_file(yml)
-        self.content: dict = yml
+        self.content = yml
         return self
 
-    def from_yaml_string(self, value: bytes):
+    def from_yaml_string(self, value: Any) -> Any:
         yml = load_yaml_from_string(value)
         self.validate_release_file(yml)
-        self.content: dict = yml
+        self.content = yml
         return self
 
     @staticmethod
-    def validate_release_file(release_file_content: dict) -> None:
+    def validate_release_file(release_file_content: Any) -> None:
         message = (
             "The file you provided does not appear to be a release file "
             "produced by komodo. It may be a repository file. Release files "
@@ -145,17 +166,17 @@ class ReleaseDir:
 class ManifestFile(YamlFile):
     """Return the data from 'manifest' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.content: dict = None
+    def __init__(self) -> None:
+        super().__init__()
+        self.content: Any = None
 
-    def __call__(self, value: str) -> Dict[str, Dict[str, str]]:
+    def __call__(self, value: Any) -> Any:
         yml = super().__call__(value)
         self.validate_manifest_file(yml)
         return yml
 
     @staticmethod
-    def validate_manifest_file(manifest_file_content: dict):
+    def validate_manifest_file(manifest_file_content: Any) -> None:
         message = (
             "The file you provided does not appear to be a manifest file "
             "produced by komodo. It may be a release file. Manifest files "
@@ -179,18 +200,18 @@ class ManifestFile(YamlFile):
 class RepositoryFile(YamlFile):
     """Return the data from 'repository' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.content: dict = None
+    def __init__(self) -> None:
+        super().__init__()
+        self.content: Any = None
 
-    def __call__(self, value: str):
-        self.content: dict = super().__call__(value)
+    def __call__(self, value: Any) -> Any:
+        self.content = super().__call__(value)
         self.validate_repository_file()
         return self
 
-    def from_yaml_string(self, value: bytes):
+    def from_yaml_string(self, value: Any) -> Any:
         yml = load_yaml_from_string(value)
-        self.content: dict = yml
+        self.content = yml
         self.validate_repository_file()
         return self
 
@@ -198,7 +219,7 @@ class RepositoryFile(YamlFile):
         self,
         package_name: str,
         package_version: str,
-    ) -> komodo_error:
+    ) -> None:
         repository_entries = self.content
         if package_name not in repository_entries:
             for real_packagename in [
@@ -223,7 +244,7 @@ class RepositoryFile(YamlFile):
                 msg,
             )
 
-    def lint_maintainer(self, package, version) -> komodo_error:
+    def lint_maintainer(self, package: str, version: str) -> komodo_error:
         repository_entries = self.content
         try:
             self.validate_package_entry(package, version)
@@ -238,7 +259,7 @@ class RepositoryFile(YamlFile):
         )
 
     def validate_repository_file(self) -> None:
-        repository_file_content: dict = self.content
+        repository_file_content = self.content
         message = (
             "The file you provided does not appear to be a repository file "
             "produced by komodo. It may be a release file. Repository files "
@@ -266,7 +287,9 @@ class RepositoryFile(YamlFile):
 
         handle_validation_errors(errors, message)
 
-    def validate_versions(self, package_name: str, versions: dict) -> List[str]:
+    def validate_versions(
+        self, package_name: str, versions: Mapping[str, Any]
+    ) -> Sequence[str]:
         """Validates versions-dictionary of a package and returns a list of error messages."""
         errors = []
         for version, version_metadata in versions.items():
@@ -302,12 +325,12 @@ class RepositoryFile(YamlFile):
         package_version: str,
         package_property: str,
         package_property_value: str,
-    ) -> List[str]:
+    ) -> Sequence[str]:
         """Validates package properties of the specified package
         and returns a list of error messages.
         """
         pre_checked_properties = ["make", "maintainer"]
-        errors = []
+        errors: MutableSequence[str] = []
         if package_property in pre_checked_properties:
             return errors
         if package_property == "depends":
@@ -345,20 +368,20 @@ class RepositoryFile(YamlFile):
 class UpgradeProposalsFile(YamlFile):
     """Return the data from 'upgrade_proposals' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.content: dict = None
+    def __init__(self) -> None:
+        super().__init__()
+        self.content: Any = None
 
-    def __call__(self, value: str) -> Dict[str, Dict[str, str]]:
+    def __call__(self, value: Any) -> Any:
         yml = super().__call__(value)
         self.validate_upgrade_proposals_file(yml)
-        self.content: dict = yml
+        self.content = yml
         return self
 
-    def from_yaml_string(self, value):
+    def from_yaml_string(self, value: Any) -> Any:
         yml = load_yaml_from_string(value)
         self.validate_upgrade_proposals_file(yml)
-        self.content: dict = yml
+        self.content = yml
         return self
 
     def validate_upgrade_key(self, upgrade_key: str) -> None:
@@ -367,7 +390,9 @@ class UpgradeProposalsFile(YamlFile):
         ), f"No section for this release ({upgrade_key}) in upgrade_proposals.yml"
 
     @staticmethod
-    def validate_upgrade_proposals_file(upgrade_proposals_file_content: dict) -> None:
+    def validate_upgrade_proposals_file(
+        upgrade_proposals_file_content: Mapping[str, str]
+    ) -> None:
         message = (
             "The file you provided does not appear to be an upgrade_proposals file"
             " produced by komodo. It may be a release file. Upgrade_proposals files"
@@ -406,19 +431,19 @@ class UpgradeProposalsFile(YamlFile):
 class PackageStatusFile(YamlFile):
     """Return the data from 'package_status' YAML, but validate it first."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.content: dict = None
+    def __init__(self) -> None:
+        super().__init__()
+        self.content: Any = None
 
-    def __call__(self, value: str):
+    def __call__(self, value: Any) -> Any:
         yml = super().__call__(value)
-        self.content: dict = yml
+        self.content = yml
         self.validate_package_status_file()
         return self
 
-    def from_yaml_string(self, value: str):
+    def from_yaml_string(self, value: str) -> PackageStatusFile:
         yml = load_yaml_from_string(value)
-        self.content: dict = yml
+        self.content = yml
         self.validate_package_status_file()
         return self
 
@@ -443,7 +468,7 @@ class PackageStatusFile(YamlFile):
                     continue
                 Package.validate_package_visibility(
                     package_name,
-                    status.get("visibility"),
+                    status.get("visibility", ""),
                 )
             except (ValueError, TypeError) as e:
                 errors.append(str(e))
@@ -452,13 +477,13 @@ class PackageStatusFile(YamlFile):
             if visibility == "public":
                 maturity_errors = Package.validate_package_maturity_with_errors(
                     package_name,
-                    status.get("maturity"),
+                    status.get("maturity", ""),
                 )
                 errors.extend(maturity_errors)
 
                 importance_errors = Package.validate_package_importance_with_errors(
                     package_name,
-                    status.get("importance"),
+                    status.get("importance", ""),
                 )
                 errors.extend(importance_errors)
 
@@ -488,7 +513,7 @@ class Package:
         )
 
     @staticmethod
-    def validate_package_entry(package_name: str, package_version) -> None:
+    def validate_package_entry(package_name: str, package_version: str) -> None:
         Package.validate_package_name(package_name)
         Package.validate_package_version(package_name, package_version)
 
@@ -521,7 +546,7 @@ class Package:
 
     @staticmethod
     def validate_package_importance_with_errors(
-        package_name,
+        package_name: str,
         package_importance: str,
     ) -> List[str]:
         """Validates package importance of a package and returns a list of error messages."""
@@ -673,7 +698,7 @@ class Package:
         package_version: str,
         package_property: str,
         package_property_value: str,
-    ):
+    ) -> None:
         if not isinstance(package_property, str):
             msg = f"Package '{package_name}' version has invalid property type ({package_property})"
             raise TypeError(
@@ -686,14 +711,14 @@ class Package:
             )
 
 
-def handle_validation_errors(errors: List[str], message: str):
+def handle_validation_errors(errors: List[str], message: str) -> None:
     if errors:
         raise SystemExit("\n".join([*errors, message]))
 
 
-def load_package_status_file(package_status_string: str):
+def load_package_status_file(package_status_string: str) -> PackageStatusFile:
     return PackageStatusFile().from_yaml_string(package_status_string)
 
 
-def load_repository_file(repository_file_string):
+def load_repository_file(repository_file_string: bytes) -> RepositoryFile:
     return RepositoryFile().from_yaml_string(repository_file_string)

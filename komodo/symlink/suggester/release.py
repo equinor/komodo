@@ -4,7 +4,7 @@ import os
 import re
 
 
-def path_leaf(path):
+def path_leaf(path: str) -> str:
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 
@@ -40,7 +40,7 @@ class Release:
 
     def py_ver(self) -> str:
         try:
-            return re.search("-(py\\d\\.?\\d?)", self.release_id).group(1)
+            return re.search("-(py\\d\\.?\\d?)", self.release_id).group(1)  # type: ignore
         except TypeError as exc:
             msg = f"{self.release_id} has no python version"
             raise ValueError(msg) from exc
@@ -52,7 +52,7 @@ class Release:
             raise
 
     @staticmethod
-    def id_from_file_name(file_name: str):
+    def id_from_file_name(file_name: str) -> str:
         no_ext = os.path.splitext(file_name)[0]
         return path_leaf(no_ext)
 

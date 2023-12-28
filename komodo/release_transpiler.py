@@ -3,7 +3,7 @@
 import argparse
 import itertools
 import os
-from typing import Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 import yaml
 from packaging import version as version_parser
@@ -15,7 +15,7 @@ from komodo.prettier import load_yaml, write_to_file
 def build_matrix_file(
     release_base: str,
     release_folder: str,
-    builtins: dict,
+    builtins: Any,
     py_coords: Optional[Sequence[str]],
 ) -> None:
     """Combine release files from the release_folder into one single matrix_file."""
@@ -64,10 +64,10 @@ def get_py_coords(release_base: str, release_folder: str) -> Sequence[str]:
 
 
 def _pick_package_versions_for_release(
-    packages: dict,
+    packages: Dict[str, Any],
     rhel_ver: str,
     py_ver: str,
-) -> dict:
+) -> Dict[str, Any]:
     """Consolidate the packages for a given combination of rhel and python version
     into a dictionary.
     """
@@ -92,7 +92,7 @@ def _pick_package_versions_for_release(
 
 
 def _check_version_exists_for_coordinates(
-    pkg_versions: dict,
+    pkg_versions: Dict[str, Any],
     rhel_coordinate: str,
     py_coordinate: str,
 ) -> None:
@@ -139,7 +139,9 @@ def _check_version_exists_for_coordinates(
         raise KeyError(msg)
 
 
-def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> None:
+def transpile_releases(
+    matrix_file: str, output_folder: str, matrix: Dict[str, Any]
+) -> None:
     """Transpile a matrix file possibly containing different os and framework
     versions (e.g. rhel6 and rhel7, py3.6 and py3.8).
     Write one dimension file for each element in the matrix
@@ -165,7 +167,7 @@ def transpile_releases_for_pip(
     matrix_file: str,
     output_folder: str,
     repository_file: str,
-    matrix: dict,
+    matrix: Dict[str, Any],
 ) -> None:
     rhel_versions = matrix["rhel"]
     python_versions = matrix["py"]
@@ -193,7 +195,7 @@ def transpile_releases_for_pip(
             filehandler.write("\n".join(pip_packages))
 
 
-def combine(args):
+def combine(args: argparse.Namespace) -> None:
     build_matrix_file(
         args.release_base,
         args.release_folder,
@@ -202,11 +204,11 @@ def combine(args):
     )
 
 
-def transpile(args):
+def transpile(args: argparse.Namespace) -> None:
     transpile_releases(args.matrix_file, args.output_folder, args.matrix_coordinates)
 
 
-def transpile_for_pip(args: Dict):
+def transpile_for_pip(args: argparse.Namespace) -> None:
     transpile_releases_for_pip(
         args.matrix_file,
         args.output_folder,
@@ -215,7 +217,7 @@ def transpile_for_pip(args: Dict):
     )
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Build release files.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,

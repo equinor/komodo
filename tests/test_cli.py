@@ -19,7 +19,7 @@ def test_main(tmp_path):
         output = input.render(test_data_path=data_path)
     with open(tmp_path / "nominal_repository.yml", "w") as f:
         f.write(output)
-    release_name ="nominal_release"
+    release_name = "nominal_release"
     release_path = str(tmp_path / "prefix" / release_name)
 
     cli_main(
@@ -78,16 +78,18 @@ def test_minimal_main(tmpdir):
     """
     release_name = "minimal_release"
 
-    cli_main([
-        "--workspace",
-        str(tmpdir),
-        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
-        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
-        "--prefix=prefix",
-        f"--release={release_name}",
-        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
-        os.path.join(_get_test_root(), "data/cli"),
-    ])
+    cli_main(
+        [
+            "--workspace",
+            str(tmpdir),
+            os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+            os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+            "--prefix=prefix",
+            f"--release={release_name}",
+            "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+            os.path.join(_get_test_root(), "data/cli"),
+        ]
+    )
 
     release_path = os.path.join(tmpdir, "prefix", release_name)
 

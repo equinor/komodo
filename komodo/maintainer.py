@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+from typing import AbstractSet, Sequence, Tuple
+
 from ruamel.yaml import YAML
 
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
-def maintainers(pkgfile, repofile):
+def maintainers(pkgfile: str, repofile: str) -> AbstractSet[Tuple[str, str, str]]:
     with open(pkgfile) as p, open(repofile) as r:
         yml = YAML()
         pkgs, repo = yml.load(p), yml.load(r)

@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "jinja2",
     "packaging",
+    "pydantic",
     "PyGithub >= 1.55",
     "pysnyk",
     "PyYAML",
@@ -34,6 +35,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black",
+    "mypy",
     "furo",
     "myst_parser",
     "pylint",
@@ -41,7 +43,9 @@ dev = [
     "ruff",
     "sphinx",
     "sphinxcontrib-apidoc",
-    "types-pyyaml"
+    "types-pyyaml",
+    "types-requests",
+    "types-setuptools",
 ]
 
 [tool.setuptools.packages.find]

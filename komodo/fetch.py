@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+from typing import Any, Mapping, Optional
 
 import jinja2
 
@@ -17,11 +18,9 @@ from komodo.shell import run, run_env
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
-def eprint(*args, **kwargs):
-    return print(*args, file=sys.stderr, **kwargs)
-
-
-def grab(path, filename=None, version=None, protocol=None, pip="pip"):
+def grab(
+    path: str, filename: str, version: str, protocol: str, pip: str = "pip"
+) -> None:
     # guess protocol if it's obvious from the url (usually is)
     if protocol is None:
         protocol = path.split(":")[0]
@@ -54,20 +53,23 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
         raise NotImplementedError(msg)
 
 
-def fetch(pkgs, repo, outdir, pip="pip") -> dict:
+def fetch(
+    pkgs: Mapping[str, str], repo: Mapping[str, Any], outdir: str, pip: str = "pip"
+) -> Mapping[str, str]:
     missingpkg = [pkg for pkg in pkgs if pkg not in repo]
     missingver = [
         pkg for pkg, ver in pkgs.items() if pkg in repo and ver not in repo[pkg]
     ]
 
     if missingpkg:
-        eprint("Packages requested, but not found in the repository:")
-        eprint("missingpkg: " + ",".join(missingpkg))
+        print("Packages requested, but not found in the repository:", file=sys.stderr)
+        print("missingpkg: " + ",".join(missingpkg), file=sys.stderr)
 
     for pkg in missingver:
-        eprint(
+        print(
             f"missingver: missing version for {pkg}: {pkgs[pkg]} requested, "
             f"found: {','.join(repo[pkg].keys())}",
+            file=sys.stderr,
         )
 
     if missingpkg or missingver:
@@ -98,19 +100,18 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     msg,
                 )
 
+            url: Optional[str] = None
             if "source" in current:
-                templater = jinja2.Environment(loader=jinja2.BaseLoader).from_string(
+                templater = jinja2.Environment(loader=jinja2.BaseLoader()).from_string(
                     current.get("source"),
                 )
                 url = templater.render(os.environ)
-            else:
-                url = None
 
             protocol = current.get("fetch")
             pkg_alias = current.get("pypi_package_name", pkg)
 
             if url == "pypi" and ver == LATEST_PACKAGE_ALIAS:
-                ver = latest_pypi_version(pkg_alias)
+                ver = latest_pypi_version(pkg_alias) or ""
 
             name = f"{pkg_alias} ({ver}): {url}"
             pkgname = f"{pkg_alias}-{ver}"
@@ -126,6 +127,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
 
             dst = pkgname
 
+            assert url is not None
             spliturl = url.split("?")[0].split(".")
             ext = spliturl[-1]
 

@@ -3,6 +3,16 @@ import copy
 import pathlib
 import re
 import sys
+from typing import (
+    Any,
+    Dict,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
 import requests
 import ruamel.yaml
@@ -18,19 +28,21 @@ class YankedException(Exception):
     pass
 
 
-def yaml_parser():
+def yaml_parser() -> ruamel.yaml.YAML:
     yaml = ruamel.yaml.YAML()
     yaml.indent(mapping=2, sequence=4, offset=2)
     yaml.preserve_quotes = True
     return yaml
 
 
-def load_from_file(yaml, fname):
+def load_from_file(yaml: ruamel.yaml.YAML, fname: str) -> Any:
     with open(fname, encoding="utf-8") as fin:
         return yaml.load(fin)
 
 
-def get_pypi_info(package_names):
+def get_pypi_info(
+    package_names: Sequence[str],
+) -> Sequence[Tuple[str, requests.Response]]:
     return [
         (
             package,
@@ -40,7 +52,7 @@ def get_pypi_info(package_names):
     ]
 
 
-def get_python_requirement(sources: list):
+def get_python_requirement(sources: Sequence[Any]) -> str:
     """Goes through the different sources of the package and returns the first
     python requirement
     :param sources:
@@ -56,8 +68,10 @@ def get_python_requirement(sources: list):
     return ""
 
 
-def compatible_versions(releases: dict, python_version):
-    compatible_versions = []
+def compatible_versions(
+    releases: Mapping[str, str], python_version: str
+) -> Sequence[get_version.Version]:
+    compatible_versions: MutableSequence[get_version.Version] = []
     for version_str, build_info in releases.items():
         try:
             package_version = get_version.parse(version_str)
@@ -76,7 +90,9 @@ def compatible_versions(releases: dict, python_version):
     return compatible_versions
 
 
-def get_pypi_packages(release: dict, repository: dict) -> list:
+def get_pypi_packages(
+    release: Mapping[str, str], repository: Mapping[str, Any]
+) -> Sequence[str]:
     pypi_packages = []
     for package, version in release.items():
         if LATEST_PACKAGE_ALIAS in strip_version(version):
@@ -93,14 +109,14 @@ def get_pypi_packages(release: dict, repository: dict) -> list:
 
 
 def get_upgrade_proposals_from_pypi(
-    releases: dict,
-    repository: dict,
+    releases: Mapping[str, str],
+    repository: Mapping[str, Any],
     python_version: str,
-) -> dict:
+) -> Mapping[str, Any]:
     pypi_packages = get_pypi_packages(releases, repository)
     pypi_responses = get_pypi_info(pypi_packages)
 
-    upgrade_proposals_from_pypi = {}
+    upgrade_proposals_from_pypi: MutableMapping[str, Any] = {}
 
     for package_name, response in pypi_responses:
         komodo_version = get_version.parse(strip_version(releases[package_name]))
@@ -129,7 +145,11 @@ def get_upgrade_proposals_from_pypi(
     return upgrade_proposals_from_pypi
 
 
-def insert_upgrade_proposals(upgrade_proposals, repository, releases):
+def insert_upgrade_proposals(
+    upgrade_proposals: Mapping[str, Any],
+    repository: Mapping[str, Any],
+    releases: MutableMapping[str, Any],
+) -> None:
     for package, version in upgrade_proposals.items():
         suggested_version = version["suggested"]
         if suggested_version not in repository[package]:
@@ -145,18 +165,18 @@ def insert_upgrade_proposals(upgrade_proposals, repository, releases):
 
 
 def run_check_up_to_date(
-    release_file,
-    repository_file,
-    python_version=(
+    release_file: str,
+    repository_file: str,
+    python_version: str = (
         f"{sys.version_info.major}."
         f"{sys.version_info.minor}."
         f"{sys.version_info.micro}"
     ),
-    propose_upgrade=False,
-    ignore=None,
-):
+    propose_upgrade: bool = False,
+    ignore: Optional[str] = None,
+) -> None:
     yaml = yaml_parser()
-    releases: dict = load_from_file(yaml, release_file)
+    releases = load_from_file(yaml, release_file)
 
     if ignore:
         releases = {
@@ -285,7 +305,7 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main():
+def main() -> None:
     args = get_args()
 
     print(f"Checking against python version: {args.python_version}")

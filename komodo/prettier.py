@@ -2,12 +2,13 @@ import argparse
 import functools
 import os
 import re
+from typing import Any
 
 import ruamel.yaml
 from ruamel.yaml.compat import StringIO
 
 
-def repository_specific_formatting(empty_line_top_level, yaml_string):
+def repository_specific_formatting(empty_line_top_level: bool, yaml_string: str) -> str:
     """Transform function to ruamel.yaml's dump function. Makes sure there are
     only empty lines inbetween different top level keys (if empty_line_top_level
     is True, otherwise no empty lines).
@@ -24,7 +25,7 @@ def repository_specific_formatting(empty_line_top_level, yaml_string):
     return yaml_string
 
 
-def is_repository(config):
+def is_repository(config: Any) -> bool:
     """Returns `False` if the configuration corresponds to a Komodo release
     (all config elements below top level key are strings). Returns `True` if
     it corresponds to a _repository_ (all config elements below top level key are
@@ -45,7 +46,7 @@ def is_repository(config):
     return False
 
 
-def prettier(yaml_input_dict, check_type=True):
+def prettier(yaml_input_dict: Any, check_type: bool = True) -> str:
     """Takes in a string corresponding to a YAML Komodo configuration, and returns
     the corresponding prettified YAML string.
     """
@@ -75,7 +76,7 @@ def prettier(yaml_input_dict, check_type=True):
     return yaml_output.getvalue()
 
 
-def prettified_yaml(filepath, check_only=True):
+def prettified_yaml(filepath: str, check_only: bool = True) -> Any:
     """Returns `True` if the file is already "prettified", `False` otherwise.
     If `check_only` is False, the input file will be "prettified" in place if necessary.
     """
@@ -98,20 +99,20 @@ def prettified_yaml(filepath, check_only=True):
     return True
 
 
-def write_to_string(repository, check_type=True):
+def write_to_string(repository: Any, check_type: bool = True) -> str:
     if isinstance(repository, dict):
         repository = dict(sorted(repository.items(), key=lambda t: t[0]))
         repository = ruamel.yaml.comments.CommentedMap(repository)
     return prettier(repository, check_type)
 
 
-def write_to_file(repository, filename, check_type=True):
+def write_to_file(repository: Any, filename: str, check_type: bool = True) -> None:
     output_str = write_to_string(repository, check_type)
     with open(filename, mode="w") as output_file:
         output_file.write(output_str)
 
 
-def load_yaml(filename):
+def load_yaml(filename: str) -> Any:
     if not os.path.isfile(os.path.realpath(filename)):
         msg = f"{filename} is not a valid file"
         raise argparse.ArgumentTypeError(msg)

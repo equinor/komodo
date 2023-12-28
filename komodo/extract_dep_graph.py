@@ -1,12 +1,15 @@
 import argparse
 import os
+from typing import Any, Mapping, MutableMapping, Optional, Sequence
 
 from ruamel.yaml import YAML
 
 from komodo.yaml_file_types import RepositoryFile
 
 
-def run(pkgfile, base_pkgfile, repofile, outfile=None):
+def run(
+    pkgfile: str, base_pkgfile: str, repofile: str, outfile: Optional[str] = None
+) -> None:
     with open(pkgfile) as p, open(base_pkgfile) as bp, open(repofile) as r:
         yaml = YAML()
         pkgs, base_pkgs, repo = (
@@ -24,14 +27,22 @@ def run(pkgfile, base_pkgfile, repofile, outfile=None):
         print(yaml.dump(result))
 
 
-def _iterate_packages(pkgs, base_pkgs, repo):
-    dependencies = {}
+def _iterate_packages(
+    pkgs: Mapping[str, str], base_pkgs: str, repo: Mapping[str, str]
+) -> Mapping[str, str]:
+    dependencies: MutableMapping[str, str] = {}
     for package, version in pkgs.items():
         _extract_dependencies(package, version, base_pkgs, repo, dependencies)
     return dependencies
 
 
-def _extract_dependencies(package, version, base_pkgs, repofile, dependencies):
+def _extract_dependencies(
+    package: str,
+    version: str,
+    base_pkgs: str,
+    repofile: Mapping[str, Any],
+    dependencies: MutableMapping[str, str],
+) -> Mapping[str, str]:
     if package not in repofile:
         msg = f"'{package}' not found in 'repo'. This needs to be resolved."
         raise SystemExit(msg)
@@ -63,7 +74,7 @@ def _extract_dependencies(package, version, base_pkgs, repofile, dependencies):
     return dependencies
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Extracts dependencies from a given set of packages where "

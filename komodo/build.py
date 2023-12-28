@@ -8,10 +8,11 @@ import pathlib
 import stat
 import sys
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict, Iterable, Mapping, Optional, Protocol, Sequence, TypedDict
 
 import requests
 
+from komodo.data import Data
 from komodo.package_version import (
     LATEST_PACKAGE_ALIAS,
     latest_pypi_version,
@@ -22,7 +23,50 @@ from komodo.shell import run, run_env
 flatten = itr.chain.from_iterable
 
 
-def dfs(pkg, version, pkgs, repo):
+class _PackageInfo(TypedDict):
+    pypi_package_name: str
+    depends: Sequence[str]
+    make: str
+    makeopts: str
+    makefile: str
+    url: str
+    destination: str
+    hash: str
+
+
+_Packages = Mapping[str, str]
+_Repository = Mapping[str, Mapping[str, _PackageInfo]]
+
+
+class _Make(Protocol):
+    def __call__(
+        self,
+        pkg: str,
+        ver: str,
+        path: str,
+        data: Data,
+        *,
+        prefix: str,
+        builddir: Optional[str],
+        makeopts: Optional[str],
+        makefile: Optional[str],
+        dlprefix: Optional[str],
+        jobs: int,
+        cmake: str,
+        pip: str,
+        virtualenv: Optional[str],
+        fakeroot: str,
+        pythonpath: str,
+        binpath: str,
+        ld_lib_path: Optional[str],
+        url: Optional[str],
+        destination: Optional[str],
+        hash: Optional[str],
+    ) -> None:
+        ...
+
+
+def dfs(pkg: str, version: str, pkgs: _Packages, repo: _Repository) -> Iterable[str]:
     # package has no more dependencies - add the package itself
     if "depends" not in repo[pkg][version]:
         return [pkg]
@@ -53,23 +97,32 @@ def dfs(pkg, version, pkgs, repo):
 
 
 def cmake(
-    pkg,
-    ver,
-    path,
-    data,
-    prefix,
-    builddir,
-    makeopts,
-    jobs,
-    *args,
-    cmake="cmake",
-    **kwargs,
-):
+    pkg: str,
+    ver: str,
+    path: str,
+    data: Data,
+    *,
+    prefix: str,
+    builddir: Optional[str],
+    makeopts: Optional[str],
+    makefile: Optional[str],
+    dlprefix: Optional[str],
+    jobs: int,
+    cmake: str,
+    pip: str,
+    virtualenv: Optional[str],
+    fakeroot: str,
+    pythonpath: str,
+    binpath: str,
+    ld_lib_path: Optional[str],
+    url: Optional[str],
+    destination: Optional[str],
+    hash: Optional[str],
+) -> None:
     bdir = f"{pkg}-{ver}-build"
     if builddir is not None:
         bdir = os.path.join(builddir, bdir)
 
-    fakeroot = kwargs["fakeroot"]
     fakeprefix = fakeroot + prefix
 
     flags = [
@@ -84,80 +137,140 @@ def cmake(
 
     Path(bdir).mkdir(parents=True, exist_ok=True)
     setenv: Dict[str, str] = {}
-    if var := kwargs.get("ld_lib_path"):
-        setenv["LD_LIBRARY_PATH"] = var
-    if var := kwargs.get("binpath"):
-        setenv["PATH"] = var
+    if ld_lib_path:
+        setenv["LD_LIBRARY_PATH"] = ld_lib_path
+    if binpath:
+        setenv["PATH"] = binpath
 
     print(f"Installing {pkg} ({ver}) from source with cmake")
     with run_env(setenv=setenv, cwd=bdir) as run:
-        run(cmake, path, *flags, makeopts)
+        run(cmake, path, *flags, *((makeopts or "").split()))
         print(run("make", f"-j{jobs}"))
         print(run("make", f"DESTDIR={fakeroot}", "install"))
 
 
-def sh(pkg, ver, pkgpath, data, prefix, makefile, *args, **kwargs):
-    makefile = data.get(makefile)
+def sh(
+    pkg: str,
+    ver: str,
+    path: str,
+    data: Data,
+    *,
+    prefix: str,
+    builddir: Optional[str],
+    makeopts: Optional[str],
+    makefile: Optional[str],
+    dlprefix: Optional[str],
+    jobs: int,
+    cmake: str,
+    pip: str,
+    virtualenv: Optional[str],
+    fakeroot: str,
+    pythonpath: str,
+    binpath: str,
+    ld_lib_path: Optional[str],
+    url: Optional[str],
+    destination: Optional[str],
+    hash: Optional[str],
+) -> None:
+    assert makefile is not None
 
     cmd = [
         "bash",
         makefile,
         "--prefix",
         prefix,
-        "--fakeroot",
-        kwargs["fakeroot"],
-        "--python",
-        prefix + "/bin/python",
-        "--pythonpath",
-        kwargs["pythonpath"],
-        "--binpath",
-        kwargs["binpath"],
-        "--pip",
-        kwargs["pip"],
-        "--virtualenv",
-        kwargs["virtualenv"],
-        "--ld-library-path",
-        kwargs["ld_lib_path"],
+        f"--fakeroot={fakeroot}",
+        f"--python={prefix}/bin/python",
+        f"--pythonpath={pythonpath}",
+        f"--binpath={binpath}",
+        f"--pip={pip}",
+        f"--virtualenv={virtualenv}",
+        f"--ld-library-path={ld_lib_path}",
+        f"--jobs={jobs}",
+        f"--cmake={cmake}",
+        *(makeopts or "").split(),
     ]
-    if (jobs := kwargs.get("jobs")) is not None:
-        cmd.extend(["--jobs", jobs])
-    if (cmake := kwargs.get("cmake")) is not None:
-        cmd.extend(["--cmake", cmake])
-    cmd.extend(kwargs["makeopts"].split())
 
     print(f"Installing {pkg} ({ver}) from sh")
     run(*cmd, cwd=prefix)
 
 
-def rsync(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
+def rsync(
+    pkg: str,
+    ver: str,
+    path: str,
+    data: Data,
+    *,
+    prefix: str,
+    builddir: Optional[str],
+    makeopts: Optional[str],
+    makefile: Optional[str],
+    dlprefix: Optional[str],
+    jobs: int,
+    cmake: str,
+    pip: str,
+    virtualenv: Optional[str],
+    fakeroot: str,
+    pythonpath: str,
+    binpath: str,
+    ld_lib_path: Optional[str],
+    url: Optional[str],
+    destination: Optional[str],
+    hash: Optional[str],
+) -> None:
     print(f"Installing {pkg} ({ver}) with rsync")
     # assume a root-like layout in the pkgpath dir, and just copy it
     run(
         "rsync",
         "-am",
-        kwargs.get("makeopts"),
-        f"{pkgpath}/",
-        kwargs["fakeroot"] + prefix,
+        *(makeopts or "").split(),
+        f"{path}/",
+        f"{fakeroot}{prefix}",
     )
 
 
-def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
+def download(
+    pkg: str,
+    ver: str,
+    path: str,
+    data: Data,
+    *,
+    prefix: str,
+    builddir: Optional[str],
+    makeopts: Optional[str],
+    makefile: Optional[str],
+    dlprefix: Optional[str],
+    jobs: int,
+    cmake: str,
+    pip: str,
+    virtualenv: Optional[str],
+    fakeroot: str,
+    pythonpath: str,
+    binpath: str,
+    ld_lib_path: Optional[str],
+    url: Optional[str],
+    destination: Optional[str],
+    hash: Optional[str],
+) -> None:
+    assert url is not None
+    assert hash is not None
+    assert destination is not None
+
     print(f"Installing {pkg} ({ver}) with download")
 
-    url = kwargs["url"]
     if not url.startswith("https"):
         msg = f"{url} does not use https:// protocol"
         raise ValueError(msg)
 
-    hash_type, hash_value = kwargs["hash"].split(":")
+    hash_type, hash_value = hash.split(":")
     if hash_type != "sha256":
         msg = f"Hash type {hash_type} given - only sha256 implemented"
         raise NotImplementedError(
             msg,
         )
 
-    fakeprefix = pathlib.Path(kwargs["fakeroot"] + prefix)
-    dest_path = fakeprefix / kwargs["destination"]
+    fakeprefix = pathlib.Path(fakeroot + prefix)
+    dest_path = fakeprefix / destination
 
     session = requests.Session()
     session.mount("https://", requests.adapters.HTTPAdapter(max_retries=20))
@@ -189,36 +302,55 @@ def download(pkg, ver, pkgpath, data, prefix, *args, **kwargs):
         )
 
 
-def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, *args, pip="pip", **kwargs):
+def pip_install(
+    pkg: str,
+    ver: str,
+    path: str,
+    data: Data,
+    *,
+    prefix: str,
+    builddir: Optional[str],
+    makeopts: Optional[str],
+    makefile: Optional[str],
+    dlprefix: Optional[str],
+    jobs: int,
+    cmake: str,
+    pip: str,
+    virtualenv: Optional[str],
+    fakeroot: str,
+    pythonpath: str,
+    binpath: str,
+    ld_lib_path: Optional[str],
+    url: Optional[str],
+    destination: Optional[str],
+    hash: Optional[str],
+) -> None:
     ver = strip_version(ver)
     if ver == LATEST_PACKAGE_ALIAS:
-        ver = latest_pypi_version(pkg)
+        ver = latest_pypi_version(pkg) or "none"
     cmd = [
         pip,
         "install",
         f"{pkg}=={strip_version(ver)}",
-        "--root",
-        kwargs["fakeroot"],
-        "--prefix",
-        prefix,
+        f"--root={fakeroot}",
+        f"--prefix={prefix}",
         "--no-index",
         "--no-deps",
         "--ignore-installed",
     ]
     if dlprefix:
         cmd.extend(["--cache-dir", dlprefix, "--find-links", dlprefix])
-    if makeopts := kwargs.get("makeopts"):
-        cmd.append(makeopts)
+    cmd.extend((makeopts or "").split())
 
     print(f"Installing {pkg} ({ver}) from pip")
     run(*cmd)
 
 
-def noop(pkg, ver, *args, **kwargs):
+def noop(pkg: str, ver: str, *args: Any, **kwargs: Any) -> None:
     print(f"Doing nothing for noop package {pkg} ({ver})")
 
 
-def pypaths(prefix, version):
+def pypaths(prefix: str, version: Optional[str]) -> str:
     if version is None:
         return ""
     pyver = "python" + ".".join(version.split(".")[:-1])
@@ -232,18 +364,18 @@ def pypaths(prefix, version):
 
 
 def make(
-    pkgs,
-    repo,
-    data,
-    prefix,
-    dlprefix=None,
-    builddir=None,
-    jobs=1,
-    cmk="cmake",
-    pip="pip",
-    virtualenv=None,
-    fakeroot=".",
-):
+    pkgs: _Packages,
+    repo: _Repository,
+    data: Data,
+    prefix: str,
+    dlprefix: Optional[str] = None,
+    builddir: Optional[str] = None,
+    jobs: int = 1,
+    cmk: str = "cmake",
+    pip: str = "pip",
+    virtualenv: Optional[str] = None,
+    fakeroot: str = ".",
+) -> None:
     xs = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
 
     seen = set()
@@ -281,10 +413,10 @@ def make(
     if dlprefix:
         pkgpaths = [os.path.join(dlprefix, path) for path in pkgpaths]
 
-    def resolve(x):
+    def resolve(x: str) -> str:
         return x.replace("$(prefix)", prefix)
 
-    build = {
+    build: Mapping[str, _Make] = {
         "cmake": cmake,
         "sh": sh,
         "pip": pip_install,
@@ -319,7 +451,6 @@ def make(
             oldopts = current.get("makeopts", "")
             current["makeopts"] = f"{oldopts} {extra_makeopts}"
 
-        current["makeopts"] = resolve(current.get("makeopts", ""))
         build[make](
             package_name,
             ver,

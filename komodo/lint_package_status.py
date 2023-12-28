@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
+from typing import Set
 
 from komodo.yaml_file_types import PackageStatusFile, RepositoryFile
 
 
-def run(package_status: PackageStatusFile, repository: RepositoryFile):
+def run(package_status: PackageStatusFile, repository: RepositoryFile) -> None:
     package_status_set = set(package_status.content.keys())
     repository_set = set(repository.content.keys())
 
@@ -28,12 +29,12 @@ def run(package_status: PackageStatusFile, repository: RepositoryFile):
     )
 
 
-def compare_sets(set_a: set, set_b: set, message: str) -> None:
+def compare_sets(set_a: Set[str], set_b: Set[str], message: str) -> None:
     if set_a.difference(set_b):
         raise SystemExit(message + str(list(set_a.difference(set_b))))
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Lint the package status file.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -54,7 +55,7 @@ def get_parser():
     return parser
 
 
-def main():
+def main() -> None:
     parser = get_parser()
     args = parser.parse_args()
 

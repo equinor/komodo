@@ -1,12 +1,21 @@
 import argparse
 import os
 import sys
+from typing import (
+    Any,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    NoReturn,
+    Optional,
+    Sequence,
+)
 
 from komodo.prettier import load_yaml, prettier, prettified_yaml, write_to_file
 
 
-def load_all_releases(files):
-    used_versions = {}
+def load_all_releases(files: Sequence[str]) -> Mapping[str, Sequence[str]]:
+    used_versions: MutableMapping[str, MutableSequence[str]] = {}
 
     for filename in files:
         current_release = load_yaml(filename)
@@ -20,8 +29,11 @@ def load_all_releases(files):
     return used_versions
 
 
-def find_unused_versions(used_versions, repository):
-    unused_versions = {}
+def find_unused_versions(
+    used_versions: Mapping[str, Sequence[str]], repository: Mapping[str, Any]
+) -> Mapping[str, Sequence[str]]:
+    unused_versions: MutableMapping[str, MutableSequence[str]] = {}
+
     for lib, versions in repository.items():
         for version in versions:
             if lib in used_versions and version in used_versions[lib]:
@@ -35,7 +47,9 @@ def find_unused_versions(used_versions, repository):
     return unused_versions
 
 
-def remove_unused_versions(repository, unused_versions):
+def remove_unused_versions(
+    repository: MutableMapping[str, Any], unused_versions: Mapping[str, Sequence[str]]
+) -> None:
     for lib, versions in unused_versions.items():
         for version in versions:
             repository[lib].pop(version)
@@ -43,12 +57,12 @@ def remove_unused_versions(repository, unused_versions):
             repository.pop(lib)
 
 
-def _is_yml(path):
+def _is_yml(path: str) -> bool:
     _, ext = os.path.splitext(path)
     return ext == ".yml"
 
 
-def _get_yml_files(path_name):
+def _get_yml_files(path_name: str) -> Sequence[str]:
     current_path = os.path.realpath(path_name)
     files = os.listdir(path_name)
     yml_files = []
@@ -61,8 +75,8 @@ def _get_yml_files(path_name):
     return yml_files
 
 
-def _valid_path_or_files(path):
-    yml_files = []
+def _valid_path_or_files(path: str) -> Sequence[str]:
+    yml_files: MutableSequence[str] = []
 
     full_path = os.path.realpath(path)
     if os.path.isdir(full_path):
@@ -75,7 +89,7 @@ def _valid_path_or_files(path):
     return yml_files
 
 
-def add_cleanup_parser(subparsers):
+def add_cleanup_parser(subparsers: Any) -> None:
     cleanup_parser = subparsers.add_parser(
         "cleanup",
         description=(
@@ -113,7 +127,7 @@ def add_cleanup_parser(subparsers):
     )
 
 
-def add_prettier_parser(subparsers):
+def add_prettier_parser(subparsers: Any) -> None:
     prettier_parser = subparsers.add_parser(
         "prettier",
         description=(
@@ -143,7 +157,7 @@ def add_prettier_parser(subparsers):
     )
 
 
-def run_cleanup(args, parser):
+def run_cleanup(args: argparse.Namespace, parser: Any) -> None:
     if args.check and args.stdout:
         parser.error(
             argparse.ArgumentError(
@@ -182,7 +196,7 @@ def run_cleanup(args, parser):
             print(lib, versions)
 
 
-def run_prettier(args, _):
+def run_prettier(args: argparse.Namespace, _: Any) -> NoReturn:
     release_files = [filename for sublist in args.files for filename in sublist]
 
     if all(
@@ -198,7 +212,7 @@ def run_prettier(args, _):
     sys.exit(1)
 
 
-def main(args=None):
+def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = argparse.ArgumentParser(
         description="Tidy up release and repository files.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -212,7 +226,7 @@ def main(args=None):
     )
     add_cleanup_parser(subparsers)
     add_prettier_parser(subparsers)
-    args = parser.parse_args(args)
+    args = parser.parse_args(argv)
 
     args.func(args, parser)
 

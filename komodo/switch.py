@@ -3,6 +3,8 @@ import shutil
 
 from jinja2 import Template
 
+from komodo.data import Data
+
 MIGRATION_WARNING = (
     "Attention! Your machine is running on an environment "
     "that is not supported. RHEL6 has been phased out.\n"
@@ -12,7 +14,7 @@ MIGRATION_WARNING = (
 )
 
 
-def create_activator_switch(data, prefix, release):
+def create_activator_switch(data: Data, prefix: str, release: str) -> None:
     """Given a prefix and a release, create an activator switch which
     will vary the selected activator based on the RHEL version. The data
     argument is expected to be a komodo.data.Data instance.

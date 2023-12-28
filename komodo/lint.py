@@ -1,24 +1,34 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import argparse
 import logging
 import sys
 import warnings
-from collections import namedtuple
+from dataclasses import dataclass
+from typing import Any, Mapping, MutableSequence, Optional, Sequence, Union
 
 from pkg_resources import PkgResourcesDeprecationWarning, parse_version
 
 from komodo.yaml_file_types import KomodoException, ReleaseFile, RepositoryFile
 
-komodo_error = namedtuple(
-    "KomodoError",
-    ["package", "version", "maintainer", "depends", "err"],
-)
 
-report = namedtuple(
-    "LintReport",
-    ["release_name", "maintainers", "dependencies", "versions"],
-)
+@dataclass
+class komodo_error:
+    package: Optional[str] = None
+    version: Optional[str] = None
+    maintainer: Optional[str] = None
+    depends: Optional[Sequence[str]] = None
+    err: Union[None, KomodoException, str] = None
+
+
+@dataclass
+class report:
+    release_name: Sequence[str]
+    maintainers: Sequence[Any]
+    dependencies: Sequence[Any]
+    versions: Sequence[Any]
 
 
 MISSING_PACKAGE = "missing package"
@@ -32,7 +42,13 @@ MASTER_VERSION = "dangerous version (master branch)"
 FLOAT_VERSION = "dangerous version (float interpretable)"
 
 
-def _komodo_error(package=None, version=None, maintainer=None, depends=None, err=None):
+def _komodo_error(
+    package: Optional[str] = None,
+    version: Optional[str] = None,
+    maintainer: Optional[str] = None,
+    depends: Optional[Sequence[str]] = None,
+    err: Union[None, KomodoException, str] = None,
+) -> komodo_error:
     return komodo_error(
         package=package,
         version=version,
@@ -42,7 +58,9 @@ def _komodo_error(package=None, version=None, maintainer=None, depends=None, err
     )
 
 
-def lint_version_numbers(package, version, repo):
+def lint_version_numbers(
+    package: str, version: str, repo: Mapping[str, Any]
+) -> Optional[komodo_error]:
     pv = repo[package][version]
     maintainer = pv.get("maintainer", MISSING_MAINTAINER)
 
@@ -64,8 +82,10 @@ def lint_version_numbers(package, version, repo):
     return None
 
 
-def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
-    mns, deps, versions = [], [], []
+def lint(release_file: ReleaseFile, repository_file: RepositoryFile) -> report:
+    maintainers: MutableSequence[Any] = []
+    dependencies: MutableSequence[Any] = []
+    versions: MutableSequence[Any] = []
     for package_name, package_version in release_file.content.items():
         try:
             lint_maintainer = repository_file.lint_maintainer(
@@ -73,7 +93,7 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
                 package_version,
             )  # throws komodoexception on missing package or version in repository
             if lint_maintainer:
-                mns.append(lint_maintainer)
+                maintainers.append(lint_maintainer)
 
             lint_version_number = lint_version_numbers(
                 package_name,
@@ -90,7 +110,7 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
                 if dependency not in release_file.content:
                     missing.append(dependency)
             if missing:
-                deps.append(
+                dependencies.append(
                     _komodo_error(
                         package=package_name,
                         version=package_version,
@@ -101,17 +121,17 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
                     ),
                 )
         except KomodoException as e:
-            mns.append(e.error)
+            maintainers.append(e.error)
 
     return report(
         release_name=[],
-        maintainers=mns,
-        dependencies=deps,
+        maintainers=maintainers,
+        dependencies=dependencies,
         versions=versions,
     )
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Lint komodo setup.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -136,26 +156,26 @@ def get_args():
     return parser.parse_args()
 
 
-def lint_main():
+def lint_main() -> None:
     args = get_args()
     logging.basicConfig(format="%(message)s", level=args.loglevel)
 
     try:
         report = lint(args.packagefile, args.repofile)
-        mns, deps, versions = report.maintainers, report.dependencies, report.versions
     except ValueError as err:
         sys.exit(str(err))
-    print("%d packages" % len(mns))
-    if not any(err.err for err in mns + deps + versions):
+    print("%d packages" % len(report.maintainers))
+    errors = [*report.maintainers, *report.dependencies, *report.versions]
+    if not any(err.err for err in errors):
         print("No errors found")
         sys.exit(0)
 
-    for err in mns + deps + versions:
-        if err.err:
-            dep = ": %s" % ", ".join(err.depends) if err.depends else ""
-            print(f"{err.err}{dep}")
+    for error in errors:
+        if error.err:
+            dep = ": %s" % ", ".join(error.depends) if error.depends else ""
+            print(f"{error.err}{dep}")
 
-    if not any(err.err for err in mns + deps):
+    if not any(err.err for err in (*report.maintainers, *report.dependencies)):
         sys.exit(0)  # currently we allow erronous version numbers
 
     sys.exit("Error in komodo configuration.")

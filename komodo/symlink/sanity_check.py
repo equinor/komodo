@@ -4,9 +4,20 @@ import json
 import os
 import pprint
 import sys
+from typing import (
+    AbstractSet,
+    Any,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+    TypedDict,
+)
+
+from komodo.symlink.types import LinkDict
 
 
-def equal_links(a, b):
+def equal_links(a: LinkDict, b: LinkDict) -> bool:
     if a["root_folder"] != b["root_folder"]:
         return False
 
@@ -16,7 +27,7 @@ def equal_links(a, b):
     return a["links"] == b["links"]
 
 
-def _linked_to(s_link, list_of_files):
+def _linked_to(s_link: str, list_of_files: Sequence[str]) -> bool:
     for file_name in list_of_files:
         if os.path.islink(file_name) and os.readlink(file_name) == s_link:
             return True
@@ -24,8 +35,8 @@ def _linked_to(s_link, list_of_files):
     return False
 
 
-def read_link_structure(path):
-    link_structure = {
+def read_link_structure(path: str) -> LinkDict:
+    link_structure: Any = {
         "root_folder": os.path.realpath(path),
         "root_links": [],
         "links": {},
@@ -44,7 +55,12 @@ def read_link_structure(path):
     return link_structure
 
 
-def _check_link(link, link_dict, errors, visited):
+def _check_link(
+    link: str,
+    link_dict: LinkDict,
+    errors: MutableSequence[str],
+    visited: MutableSequence[str],
+) -> None:
     if link in visited:
         error = f"{link} is part of a cyclic symlink"
         if error not in errors:
@@ -62,8 +78,8 @@ def _check_link(link, link_dict, errors, visited):
             errors.append(error)
 
 
-def verify_integrity(link_dict):
-    errors = []
+def verify_integrity(link_dict: LinkDict) -> Sequence[str]:
+    errors: MutableSequence[str] = []
 
     for link in link_dict["links"].values():
         _check_link(link, link_dict, errors, [])
@@ -71,13 +87,13 @@ def verify_integrity(link_dict):
     return errors
 
 
-def _get_root_nodes(link_dict):
+def _get_root_nodes(link_dict: LinkDict) -> AbstractSet[str]:
     keys = set(link_dict["links"].keys())
     values = set(link_dict["links"].values())
     return keys.difference(values)
 
 
-def assert_root_nodes(link_dict):
+def assert_root_nodes(link_dict: LinkDict) -> None:
     input_roots = link_dict["root_links"]
     inferred_roots = _get_root_nodes(link_dict)
     if set(input_roots) != inferred_roots:
@@ -89,13 +105,13 @@ def assert_root_nodes(link_dict):
         )
 
 
-def _compare_dicts(d1, d2):
+def _compare_dicts(d1: Any, d2: Any) -> str:
     return "\n" + "\n".join(
         difflib.ndiff(pprint.pformat(d1).splitlines(), pprint.pformat(d2).splitlines()),
     )
 
 
-def sanity_main():
+def sanity_main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Verify symlinks for komodo versions are according to a given config."

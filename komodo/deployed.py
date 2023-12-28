@@ -1,20 +1,20 @@
 import argparse
 import json
 import os
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from komodo.matrix import get_matrix_base
 from komodo.yaml_file_types import ReleaseDir
 
 
-def _is_release(path):
+def _is_release(path: str) -> bool:
     # some releases, like 1970.12.01-py27, will, in a matrix world, not have
     # root, which means it's just container for activation switchers.
     has_root = os.path.exists(os.path.join(path, "root"))
     return os.path.isdir(os.path.realpath(path)) and has_root
 
 
-def _fetch_deployed_releases(install_root):
+def _fetch_deployed_releases(install_root: str) -> Sequence[str]:
     return [
         get_matrix_base(name)
         for name in os.listdir(install_root)
@@ -22,11 +22,13 @@ def _fetch_deployed_releases(install_root):
     ]
 
 
-def _fetch_releases(release_folder):
+def _fetch_releases(release_folder: str) -> Sequence[str]:
     return [os.path.splitext(path)[0] for path in os.listdir(release_folder)]
 
 
-def _fetch_non_deployed_releases(install_root, release_folder):
+def _fetch_non_deployed_releases(
+    install_root: str, release_folder: str
+) -> Sequence[str]:
     deployed = _fetch_deployed_releases(install_root)
     releases = _fetch_releases(release_folder)
     return list(set(releases) - set(deployed))
@@ -36,18 +38,18 @@ def fetch_non_deployed(
     install_root: str,
     releases_folder: str,
     limit: Optional[int] = None,
-) -> List[str]:
+) -> Sequence[str]:
     non_deployed = _fetch_non_deployed_releases(install_root, releases_folder)
     return non_deployed[:limit]
 
 
-def output_formatter(release_list: List[str], do_json: bool = False) -> str:
+def output_formatter(release_list: Sequence[str], do_json: bool = False) -> str:
     if do_json:
         return json.dumps(release_list, separators=(",", ":"))
     return "\n".join(release_list)
 
 
-def deployed_main():
+def deployed_main() -> None:
     parser = argparse.ArgumentParser(
         description="""Outputs the name of undeployed matrices given an installation
             root and a release folder. A partially deployed matrix is

@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import sys
+from typing import Optional
 
 LATEST_PACKAGE_ALIAS = "*"
 _PYPI_LATEST_VERSION_RE = r".+from\ versions\:\ (.+)\)"
@@ -10,7 +11,7 @@ _PYPI_LATEST_VERSION_RE = r".+from\ versions\:\ (.+)\)"
 _PYPI_LATEST_VERSION_CMD = "python -m pip install --use-deprecated=legacy-resolver {}=="
 
 
-def strip_version(version):
+def strip_version(version: str) -> str:
     """In order to be able to support both py2 and py3 we need to be able
     to have multiple versions of the same package/version due to
     differences in dependencies. This is achieved by adding i.e '+py3'
@@ -21,7 +22,7 @@ def strip_version(version):
     return version.split("+")[0]
 
 
-def latest_pypi_version(package):
+def latest_pypi_version(package: str) -> Optional[str]:
     cmd = _PYPI_LATEST_VERSION_CMD.format(package)
     try:
         subprocess.check_output(cmd.split(" "), stderr=subprocess.PIPE)
@@ -43,7 +44,7 @@ def latest_pypi_version(package):
     raise ValueError(msg)
 
 
-def get_git_revision_hash(path):
+def get_git_revision_hash(path: str) -> str:
     env = os.environ.copy()
     env["GIT_DIR"] = f"{path}/.git"
     return (

@@ -4,13 +4,29 @@ import argparse
 import io
 import subprocess
 import sys
+from typing import (
+    IO,
+    AbstractSet,
+    Any,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    MutableSet,
+    Sequence,
+    Tuple,
+)
 
 import yaml
 
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
+_Reverse = Mapping[str, AbstractSet[Tuple[str, str]]]
+_MutableReverse = MutableMapping[str, MutableSet[Tuple[str, str]]]
 
-def run(base_pkgfile, repofile, dot, display_pkg, out):
+
+def run(
+    base_pkgfile: str, repofile: str, dot: bool, display_pkg: str, out: IO[str]
+) -> None:
     with open(base_pkgfile) as bp, open(repofile) as r:
         base_pkgs, repo = yaml.safe_load(bp), yaml.safe_load(r)
 
@@ -25,15 +41,17 @@ def run(base_pkgfile, repofile, dot, display_pkg, out):
         yaml.dump(result, out)
 
 
-def reverse_deps(display_pkg, display_version, reverse):
+def reverse_deps(
+    display_pkg: str, display_version: str, reverse: _Reverse
+) -> Mapping[str, Any]:
     return {
         f"{display_pkg}-{display_version}": build_doc(display_pkg, reverse)
         for pkg, version in reverse.items()
     }
 
 
-def build_reverse(base, repo):
-    reverse = {}
+def build_reverse(base: Mapping[str, str], repo: Mapping[str, Any]) -> _Reverse:
+    reverse: _MutableReverse = {}
 
     for pkg, version in base.items():
         if pkg not in repo:
@@ -52,13 +70,15 @@ def build_reverse(base, repo):
     return reverse
 
 
-def _dump_dot(reverse, pkg, version, out):
+def _dump_dot(reverse: _Reverse, pkg: str, version: str, out: IO[str]) -> None:
     out.write("digraph G {\n")
     _dump_dot_dep(reverse, pkg, version, out, set())
     out.write("}")
 
 
-def _dump_dot_dep(reverse, pkg, version, out, seen):
+def _dump_dot_dep(
+    reverse: _Reverse, pkg: str, version: str, out: IO[str], seen: MutableSet[str]
+) -> None:
     if pkg in seen:
         return
     _id = pkg.lower().replace("-", "_")
@@ -71,8 +91,8 @@ def _dump_dot_dep(reverse, pkg, version, out, seen):
             _dump_dot_dep(reverse, rev_dep, rev_version, out, seen)
 
 
-def build_doc(pkg, reverse):
-    rev_list = []
+def build_doc(pkg: str, reverse: _Reverse) -> Sequence[Mapping[str, Any]]:
+    rev_list: MutableSequence[Mapping[str, Any]] = []
     if pkg not in reverse:
         return rev_list
     for rev_dep, rev_version in reverse[pkg]:
@@ -80,7 +100,7 @@ def build_doc(pkg, reverse):
     return rev_list
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Extracts dependencies from a given set of packages where "
@@ -160,6 +180,7 @@ def main():
                 stdin=subprocess.PIPE,
             )
             subprocess.Popen(["display"], stdin=dot_proc.stdout)
+            assert dot_proc.stdin is not None
             out = io.TextIOWrapper(
                 dot_proc.stdin,
                 encoding="utf-8",

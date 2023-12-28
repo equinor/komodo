@@ -3,12 +3,12 @@ import os
 from komodo.shell import run
 
 
-def _is_shebang(s):
+def _is_shebang(s: str) -> bool:
     """Checks if the string potentially is a Python shebang."""
     return s.startswith("#!/") and "python" in s
 
 
-def fixup_python_shebangs(prefix, release):
+def fixup_python_shebangs(prefix: str, release: str) -> None:
     """Fix shebang to $PREFIX/bin/python.
 
     Some packages installed with pip do not respect target executable, that is,

@@ -51,7 +51,22 @@ def run(
 def run_env(
     *, setenv: Optional[Mapping[str, str]] = None, cwd: Union[None, str, Path] = None
 ) -> Generator[_Run, None, None]:
-    def fn(executable: Union[str, Path], *args: Union[str, Path]) -> bytes:
-        return run(executable, *args, setenv=setenv, cwd=cwd)
+    outer_setenv = setenv
+    outer_cwd = cwd
+
+    def fn(
+        executable: Union[str, Path],
+        *args: Union[str, Path],
+        setenv: Optional[Mapping[str, str]] = None,
+        cwd: Union[None, str, Path] = None,
+        check: bool = False,
+    ) -> bytes:
+        return run(
+            executable,
+            *args,
+            setenv=setenv or outer_setenv,
+            cwd=cwd or outer_cwd,
+            check=check,
+        )
 
     yield fn

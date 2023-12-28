@@ -6,7 +6,7 @@ import re
 import sys
 import textwrap
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Mapping, Optional, Union
 
 from ruamel.yaml import YAML
 
@@ -40,7 +40,7 @@ def get_release() -> str:
         sys.exit(message)
 
 
-def read_config(fname: Union[str, Path]) -> dict:
+def read_config(fname: Union[str, Path]) -> Mapping[str, Any]:
     """Read an INI file (aka config file) that does not have sections.
     Sections are part of the INI file format specification and cannot be read
     by a `configparser.ConfigParser` without them. This function creates a
@@ -106,7 +106,7 @@ def get_komodo_path(release: str) -> Path:
     return Path(path)
 
 
-def get_version(pkg: str, manifest: Optional[Dict] = None) -> str:
+def get_version(pkg: str, manifest: Optional[Mapping[str, Any]] = None) -> str:
     """Get the release number (or git commit hash) for a package in a
     komodo release file. If no file is specified, the current release
     is used. If no environment is active, the path to the release

@@ -27,7 +27,7 @@ def verify_package_versions_exist(
                     f" {upgrade_proposals_package_version} in repository",
                 )
             except KomodoException as e:
-                errors.append("ERROR: " + e.error)
+                errors.append("ERROR: " + e.error)  # type: ignore
         if errors:
             raise SystemExit("\n".join(errors))
     if found_release_with_upgrades:
@@ -36,7 +36,7 @@ def verify_package_versions_exist(
         print("Found upgrades")
 
 
-def get_args() -> argparse.ArgumentParser:
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Validate upgrade proposals against the repository file",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -54,7 +54,7 @@ def get_args() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 
-def main():
+def main() -> None:
     args = get_args()
     verify_package_versions_exist(args.upgrade_proposals_file, args.repofile)
     print("Upgrade proposals file is valid!")

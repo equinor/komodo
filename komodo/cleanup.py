@@ -6,7 +6,7 @@ from typing import List
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
-def cleanup(repository_file_path: str, release_files_path: List[str]):
+def cleanup(repository_file_path: str, release_files_path: List[str]) -> None:
     repository_file = RepositoryFile()(repository_file_path)
     repository = repository_file.content
 
@@ -36,7 +36,7 @@ def cleanup(repository_file_path: str, release_files_path: List[str]):
         print("ok")
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 3:
         sys.exit("usage: komodo.cleanup repository.yml rel1.yml rel2.yml ... reln.yml")
 
