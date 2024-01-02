@@ -82,10 +82,11 @@ def assert_root_nodes(link_dict):
     inferred_roots = _get_root_nodes(link_dict)
     if set(input_roots) != inferred_roots:
         raise AssertionError(
-            "The roots in the link-tree is not matching "
-            + "the roots defined in link_roots in dict\n"
+            "The roots in the link-tree do not match "
+            + "the roots defined in the root_links dict\n"
             + f"Roots defined: {set(input_roots)}\n"
-            + f"Roots expected: {inferred_roots}",
+            + f"Roots expected: {inferred_roots}\n"
+            + f"Missing root(s): {str(set(inferred_roots).difference(input_roots))}"
         )
 
 
