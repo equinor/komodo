@@ -128,7 +128,6 @@ git apply --ignore-space-change --ignore-whitespace no_docs_patch.patch
 
 # Get libclang (required only for building)
 # Jenkins seems to have the uppercase version, while wget wants the lowercase version
-export http_proxy=http://www-proxy.statoil.no:80
 wget --quiet http://download.qt.io/development_releases/prebuilt/libclang/libclang-release_40-linux-Rhel6.6-gcc4.9-x86_64.7z -O libclang-4.0.7z
 
 rm -rf libclang
