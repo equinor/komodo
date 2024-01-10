@@ -84,7 +84,7 @@ def get_komodo_path(release: str) -> Path:
     """Use the release name to find the 'real' release path in an ordinary
     komodo environment. E.g., the release may be something like
     '2023.01.02-py38' but the 'real' release (where the release manifest
-    is stored) might be platform-specific, e.g. '2023.01.02-py38-rhel7'.
+    is stored) might be platform-specific, e.g. '2023.01.02-py38'.
     The real path is in the PATH, so we try to get it from there.
 
     Args:

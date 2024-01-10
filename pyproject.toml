@@ -69,7 +69,6 @@ komodo-reverse-deps = "komodo.reverse_dep_graph:main"
 komodo-show-version = "komodo.show_version:main"
 komodo-snyk-test = "komodo.snyk_reporting:main"
 komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
-komodo-transpiler = "komodo.release_transpiler:main"
 
 [tool.pylint.messages_control]
 disable = [
@@ -116,6 +115,7 @@ select = [
   "B",   # flake-8-bugbear
   "SIM", # flake-8-simplify
 ]
+ignore = ["SIM112"]  # allow non-uppercase environment variables
 line-length = 88
 
 [tool.ruff.isort]

@@ -7,13 +7,13 @@ jobs:
     env:
       RELEASE: release-py3x.yml
 
-
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.8', '3.10', '3.11']
+        target-python-bin: ['/usr/bin/python3.8']
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v4
@@ -30,27 +30,21 @@ jobs:
         sudo apt update
         sudo apt install csh
 
-    - name: Setup Komodo
+    - name: Install Komodo
       run: |
-        ./bootstrap.sh $(which python)
+        pip install .[dev]
 
     - name: Unit tests
       run: |
-        source boot/build-env/bin/activate
-        boot/kmd-env/bin/python -m pytest tests
+        pytest tests
 
     - name: Lint examples
       run: |
-        boot/kmd-env/bin/python -m komodo.lint examples/stable.yml examples/repository.yml
+        python -m komodo.lint examples/stable.yml examples/repository.yml
 
     - name: Full integration test
       run: |
-        ./run_kmd.sh \
-            ci/${RELEASE} \
-            ci/repository.yml \
-            --workspace ${{ runner.temp }}/kmd-ws \
-            --prefix ${{ runner.temp }}/prefix \
-            --release ci \
+        kmd ci/${RELEASE} ci/repository.yml --python ${{ matrix.target-python-bin }} --workspace ${{ runner.temp }}/kmd-ws --prefix ${{ runner.temp }}/prefix --release ci
 
     - name: Build libkmd.so (a dummy C library) for testing
       run: |
@@ -72,10 +66,10 @@ jobs:
     - name: Test enable script
       run: |
         source ${{ runner.temp }}/prefix/ci/enable
-        [[ "$(which python)" == "${{ runner.temp }}/prefix/ci/root/bin/python" ]]
+        [[ "${{ matrix.target-python-bin }}" == "${{ runner.temp }}/prefix/ci/root/bin/python" ]]
 
     - name: Test Python version
       run: |
         source ${{ runner.temp }}/prefix/ci/enable
-        pyver=$(python -c 'from sys import version_info as v;print(f"{v[0]}.{v[1]}")')
+        pyver=$(${{ matrix.target-python-bin }} -c 'from sys import version_info as v;print(f"{v[0]}.{v[1]}")')
         [[ "${pyver}" == "${{ matrix.python-version }}" ]]

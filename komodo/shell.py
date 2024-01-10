@@ -32,7 +32,7 @@ def shell(cmd: str, sudo=False, allow_failure=False) -> bytes:
     try:
         return subprocess.check_output(tuple(filter(None, cmdlist)))
     except subprocess.CalledProcessError as e:
-        print(e.output, file=sys.stderr)
+        print(e.output.decode("utf-8", "replace"), file=sys.stderr)
         if allow_failure:
             return e.output
         raise

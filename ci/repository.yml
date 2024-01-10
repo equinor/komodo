@@ -8,11 +8,10 @@ numpy:
       - python
 
 python:
-  3-builtin:
+  3.8-venv:
     make: sh
-    makefile: build__python-virtualenv.sh
+    makefile: build__python3.8-venv.sh
     maintainer: ci
-    makeopts: --virtualenv-interpreter python3
 
 setuptools:
   65.6.3:

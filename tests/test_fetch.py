@@ -1,4 +1,5 @@
 import os
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -26,7 +27,7 @@ def test_make_one_pip_package(captured_shell_commands, tmpdir):
 
     command = " ".join(captured_shell_commands[0])
 
-    assert command.startswith("pip download")
+    assert command.startswith(f"pip --python {sys.executable} download")
     assert "pyaml" in command
 
 
@@ -46,7 +47,7 @@ def test_version_plus_marker(captured_shell_commands, tmpdir):
     assert len(captured_shell_commands) == 1
 
     command = " ".join(captured_shell_commands[0])
-    assert command.startswith("pip download")
+    assert command.startswith(f"pip --python {sys.executable} download")
     assert "ert==2.25.0" in command
 
 
@@ -69,7 +70,7 @@ def test_allow_pre_release_with_dash(captured_shell_commands, tmpdir):
 
     command = " ".join(captured_shell_commands[0])
 
-    assert command.startswith("pip download")
+    assert command.startswith(f"pip --python {sys.executable} download")
     assert "ert==2.25.0-rc1" in command
 
 
@@ -92,7 +93,7 @@ def test_fetch_with_empty_pypi_package_name(captured_shell_commands, tmpdir):
 
     command = " ".join(captured_shell_commands[0])
 
-    assert command.startswith("pip download")
+    assert command.startswith(f"pip --python {sys.executable} download")
     assert "PyYaml" in command
 
 

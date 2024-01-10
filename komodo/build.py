@@ -21,16 +21,22 @@ from komodo.shell import pushd, shell
 flatten = itr.chain.from_iterable
 
 
+def python_bin(fakeroot: str, prefix: str) -> str:
+    """Return the path to Python as installed in the komodo release"""
+    return f"{fakeroot}/{prefix}/bin/python"
+
+
 def dfs(pkg, version, pkgs, repo):
     # package has no more dependencies - add the package itself
     if "depends" not in repo[pkg][version]:
         return [pkg]
 
-    if not all(map(pkgs.__contains__, repo[pkg][version]["depends"])):
+    depends = set(repo[pkg][version]["depends"]) - set(pkgs)
+    if depends:
         print(
             "error: "
-            + ",".join(repo[pkg][version]["depends"])
-            + " required as dependency, is not in distribution",
+            + ",".join(depends)
+            + f" required as dependency for package '{pkg}', is not in distribution",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -121,7 +127,6 @@ def sh(pkg, ver, pkgpath, data, prefix, makefile, *args, **kwargs):
         cmd.append(f"--pythonpath {kwargs['pythonpath']}")
         cmd.append(f"--path {kwargs['binpath']}")
         cmd.append(f"--pip {kwargs['pip']}")
-        cmd.append(f"--virtualenv {kwargs['virtualenv']}")
         cmd.append(f"--ld-library-path {kwargs['ld_lib_path']}")
         cmd.append(kwargs.get("makeopts"))
 
@@ -196,9 +201,9 @@ def pip_install(pkg, ver, pkgpath, data, prefix, dlprefix, *args, pip="pip", **k
         ver = latest_pypi_version(pkg)
     cmd = [
         pip,
+        "--python",
+        python_bin(kwargs["fakeroot"], prefix),
         f"install {pkg}=={strip_version(ver)}",
-        f"--root {kwargs['fakeroot']}",
-        f"--prefix {prefix}",
         "--no-index",
         "--no-deps",
         "--ignore-installed",
@@ -238,7 +243,6 @@ def make(
     jobs=1,
     cmk="cmake",
     pip="pip",
-    virtualenv=None,
     fakeroot=".",
 ):
     xs = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
@@ -331,7 +335,6 @@ def make(
             jobs=jobs,
             cmake=cmk,
             pip=pip,
-            virtualenv=virtualenv,
             fakeroot=fakeroot,
             pythonpath=build_pythonpath,
             binpath=build_path,
