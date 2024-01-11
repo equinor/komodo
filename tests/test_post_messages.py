@@ -122,7 +122,7 @@ def test_main_missing_message_file(tmpdir):
         ]
         with pytest.raises(SystemExit) as excinfo:
             main(args)
-            assert "message file {} does not exisit".format("not-existing") in str(
+            assert "message file not-existing does not exisit" in str(
                 excinfo.value,
             )
 
