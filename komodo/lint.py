@@ -145,14 +145,14 @@ def lint_main():
         mns, deps, versions = report.maintainers, report.dependencies, report.versions
     except ValueError as err:
         sys.exit(str(err))
-    print("%d packages" % len(mns))
+    print(f"{len(mns)} packages")
     if not any(err.err for err in mns + deps + versions):
         print("No errors found")
         sys.exit(0)
 
     for err in mns + deps + versions:
         if err.err:
-            dep = ": %s" % ", ".join(err.depends) if err.depends else ""
+            dep = f": {', '.join(err.depends)}" if err.depends else ""
             print(f"{err.err}{dep}")
 
     if not any(err.err for err in mns + deps):

@@ -71,11 +71,7 @@ def test_transpile_add_argument(tmpdir, matrix):
             for py_coordinate in matrix["py"]:
                 py_coordinate_filename_format = f"py{py_coordinate.replace('.', '')}"
                 assert os.path.isfile(
-                    "{}-{}-{}.yml".format(
-                        release_base,
-                        py_coordinate_filename_format,
-                        rhel_coordinate_filename_format,
-                    ),
+                    f"{release_base}-{py_coordinate_filename_format}-{rhel_coordinate_filename_format}.yml"
                 )
 
 

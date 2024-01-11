@@ -75,7 +75,6 @@ komodo-transpiler = "komodo.release_transpiler:main"
 disable = [
     "bad-inline-option",
     "consider-using-dict-items",
-    "consider-using-f-string",
     "consider-using-sys-exit",
     "consider-using-with",
     "deprecated-pragma",
