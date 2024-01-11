@@ -7,14 +7,6 @@ from komodo.fetch import fetch
 from komodo.package_version import LATEST_PACKAGE_ALIAS
 
 
-@pytest.fixture()
-def captured_shell_commands(monkeypatch):
-    commands = []
-    with monkeypatch.context() as m:
-        m.setattr("komodo.fetch.shell", lambda cmd: commands.append(cmd))
-        yield commands
-
-
 def test_make_one_pip_package(captured_shell_commands, tmpdir):
     packages = {"pyaml": "20.4.0"}
     repositories = {

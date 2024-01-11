@@ -79,3 +79,12 @@ def mock_release_file():
     m = mock_open(read_data=read_data)
     with patch("builtins.open", m):
         yield m
+
+
+@pytest.fixture()
+def captured_shell_commands(monkeypatch):
+    commands = []
+    with monkeypatch.context() as m:
+        m.setattr("komodo.build.shell", lambda cmd: commands.append(cmd))
+        m.setattr("komodo.fetch.shell", lambda cmd: commands.append(cmd))
+        yield commands

@@ -6,14 +6,6 @@ from komodo.build import make
 from komodo.package_version import LATEST_PACKAGE_ALIAS
 
 
-@pytest.fixture()
-def captured_shell_commands(monkeypatch):
-    commands = []
-    with monkeypatch.context() as m:
-        m.setattr("komodo.build.shell", lambda cmd: commands.append(cmd))
-        yield commands
-
-
 def test_make_with_empty_pkgs(captured_shell_commands, tmpdir):
     make({}, {}, {}, str(tmpdir))
     assert len(captured_shell_commands) == 1
