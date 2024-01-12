@@ -69,7 +69,7 @@ def test_main(args, tmpdir):
     assert os.path.exists(downloaded_file)
     assert os.access(downloaded_file, os.X_OK)
 
-    with open(os.path.join(release_path, release_name)) as releasedoc:
+    with open(os.path.join(release_path, release_name), encoding="utf-8") as releasedoc:
         releasedoc_content = releasedoc.read()
 
         # test specifically for the regression introduced by

@@ -90,7 +90,7 @@ def symlink_main():
     if not os.path.isfile(args.config):
         sys.exit(f"The file {args.config} can not be found")
 
-    with open(args.config) as input_file:
+    with open(args.config, encoding="utf-8") as input_file:
         input_dict = json.load(input_file)
 
     errors = verify_integrity(input_dict)

@@ -112,7 +112,7 @@ def test_write_to_file(tmpdir):
         unused_versions = find_unused_versions(used_versions, repository)
         remove_unused_versions(repository, unused_versions)
         write_to_file(repository, "output_repo.yml")
-        with open("output_repo.yml") as output:
+        with open("output_repo.yml", encoding="utf-8") as output:
             assert output.read() == expected_result
 
 

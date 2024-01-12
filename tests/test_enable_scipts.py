@@ -6,11 +6,11 @@ from komodo.shell import shell
 
 
 def _load_envs():
-    with open("pre_source.env") as pre:
+    with open("pre_source.env", encoding="utf-8") as pre:
         pre_env = json.loads(pre.read())
-    with open("sourced.env") as sourced:
+    with open("sourced.env", encoding="utf-8") as sourced:
         sourced_env = json.loads(sourced.read())
-    with open("post_disable.env") as post:
+    with open("post_disable.env", encoding="utf-8") as post:
         post_env = json.loads(post.read())
 
     return pre_env, sourced_env, post_env
@@ -36,7 +36,7 @@ def test_enable_bash_nopresets(tmpdir):
     with tmpdir.as_cwd():
         Path("bleeding").mkdir()
         create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
-        with open("test_enable.sh", "w") as test_file:
+        with open("test_enable.sh", "w", encoding="utf-8") as test_file:
             test_file.write(
                 TEST_SCRIPT_SIMPLE.format(
                     set_envs=CLEAN_BASH_ENV,
@@ -64,7 +64,7 @@ def test_enable_csh_no_presets(tmpdir):
     with tmpdir.as_cwd():
         Path("bleeding").mkdir()
         create_enable_scripts(komodo_prefix="prefix", komodo_release="bleeding")
-        with open("test_enable.sh", "w") as test_file:
+        with open("test_enable.sh", "w", encoding="utf-8") as test_file:
             test_file.write(
                 TEST_SCRIPT_SIMPLE.format(
                     set_envs=CLEAN_CSH_ENV,

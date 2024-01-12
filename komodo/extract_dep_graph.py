@@ -7,7 +7,9 @@ from komodo.yaml_file_types import RepositoryFile
 
 
 def run(pkgfile, base_pkgfile, repofile, outfile=None):
-    with open(pkgfile) as p, open(base_pkgfile) as bp, open(repofile) as r:
+    with open(pkgfile, encoding="utf-8") as p, open(
+        base_pkgfile, encoding="utf-8"
+    ) as bp, open(repofile, encoding="utf-8") as r:
         yaml = YAML()
         pkgs, base_pkgs, repo = (
             yaml.load(p),

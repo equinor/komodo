@@ -47,9 +47,13 @@ def test_non_deployed(tmpdir):
         os.makedirs(os.path.join(install_root, "2019.11.05-py38-rhel7/root"))
 
         # Create matrix files
-        with open(os.path.join(release_folder, "2019.11.05.yml"), "a"):
+        with open(
+            os.path.join(release_folder, "2019.11.05.yml"), "a", encoding="utf-8"
+        ):
             pass
-        with open(os.path.join(release_folder, "2019.12.02.yml"), "a"):
+        with open(
+            os.path.join(release_folder, "2019.12.02.yml"), "a", encoding="utf-8"
+        ):
             pass
 
         expected = ("2019.12.02",)
@@ -74,9 +78,13 @@ def test_links_ignored(tmpdir):
             ),
             root=install_root,
         )
-        with open(os.path.join(release_folder, "2019.12.01.yml"), "a"):
+        with open(
+            os.path.join(release_folder, "2019.12.01.yml"), "a", encoding="utf-8"
+        ):
             pass
-        with open(os.path.join(release_folder, "2022.02.02.yml"), "a"):
+        with open(
+            os.path.join(release_folder, "2022.02.02.yml"), "a", encoding="utf-8"
+        ):
             pass
 
         non_deployed = fetch_non_deployed(install_root, release_folder)

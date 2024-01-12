@@ -100,7 +100,7 @@ def get_packages_info(release_file: ReleaseFile, tag_exceptions_package):
 
 
 def read_yaml_file(file_path):
-    with open(file_path) as yml_file:
+    with open(file_path, encoding="utf-8") as yml_file:
         return yaml.safe_load(yml_file)
 
 

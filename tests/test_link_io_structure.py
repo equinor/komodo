@@ -131,7 +131,7 @@ def test_integration(tmpdir):
     test_folder = _get_test_root()
     shutil.copy(os.path.join(test_folder, "data/links.json"), tmpdir)
     with tmpdir.as_cwd():
-        with open("links.json") as link_file:
+        with open("links.json", encoding="utf-8") as link_file:
             input_dict = json.load(link_file)
 
         input_dict["root_folder"] = os.path.realpath(input_dict["root_folder"])
@@ -150,7 +150,7 @@ def test_root_links(tmpdir):
     test_folder = _get_test_root()
     shutil.copy(os.path.join(test_folder, "data/links.json"), tmpdir)
     with tmpdir.as_cwd():
-        with open("links.json") as link_file:
+        with open("links.json", encoding="utf-8") as link_file:
             input_dict = json.load(link_file)
 
         assert_root_nodes(input_dict)
@@ -257,12 +257,14 @@ def test_executables(tmpdir):
     sys.argv = ["run", "links_test.json"]
     try:
         test_folder = _get_test_root()
-        with open(os.path.join(test_folder, "data/links_full.json")) as input_file:
+        with open(
+            os.path.join(test_folder, "data/links_full.json"), encoding="utf-8"
+        ) as input_file:
             input_data = json.load(input_file)
 
         with tmpdir.as_cwd():
             input_data["root_folder"] = str(tmpdir)
-            with open("links_test.json", "w") as test_file:
+            with open("links_test.json", "w", encoding="utf-8") as test_file:
                 test_file.write(json.dumps(input_data))
 
             with pytest.raises(SystemExit):
