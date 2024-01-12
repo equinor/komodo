@@ -25,7 +25,7 @@ from tests import _get_test_root
             "--release",
             "nominal_release",
             "--pip",
-            "/bin/true",
+            "/usr/bin/true",
             os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
             os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
             "--extra-data-dirs",
