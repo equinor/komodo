@@ -96,7 +96,8 @@ def test_fetch_with_empty_pypi_package_name(captured_shell_commands, tmpdir):
     assert "PyYaml" in command
 
 
-def test_fetch_git_does_not_accept_pypi_package_name(captured_shell_commands, tmpdir):
+@pytest.mark.usefixtures("captured_shell_commands")
+def test_fetch_git_does_not_accept_pypi_package_name(tmpdir):
     packages = {"ert": "2.16.0"}
     repositories = {
         "ert": {
