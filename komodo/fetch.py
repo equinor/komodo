@@ -21,7 +21,7 @@ def eprint(*args, **kwargs):
     return print(*args, file=sys.stderr, **kwargs)
 
 
-def grab(path, filename=None, version=None, protocol=None, pip="pip"):
+def grab(path, filename=None, version=None, protocol=None):
     # guess protocol if it's obvious from the url (usually is)
     if protocol is None:
         protocol = path.split(":")[0]
@@ -143,7 +143,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                 continue
 
             print(f"Downloading {name}")
-            grab(url, filename=dst, version=ver, protocol=protocol, pip=pip)
+            grab(url, filename=dst, version=ver, protocol=protocol)
 
             if protocol == "git":
                 git_hashes[pkg] = get_git_revision_hash(path=dst)
