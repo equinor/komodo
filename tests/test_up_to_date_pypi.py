@@ -244,7 +244,7 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
         )
         result = {}
 
-        with open(f"{base_path}/repository_file.yml") as fin:
+        with open(f"{base_path}/repository_file.yml", encoding="utf-8") as fin:
             result["updated_repo"] = yaml.load(fin)
 
         assert result == {
@@ -441,9 +441,9 @@ def test_run_up_to_date(
 
         result = {}
         yaml = YAML()
-        with open("new_file") as fin:
+        with open("new_file", encoding="utf-8") as fin:
             result["release"] = yaml.load(fin)
-        with open("repository_file") as fin:
+        with open("repository_file", encoding="utf-8") as fin:
             result["repo"] = yaml.load(fin)
 
         assert result == expected

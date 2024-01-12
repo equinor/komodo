@@ -15,5 +15,5 @@ def _load_yaml(filename):
         offset=2,
     )
     ruamel_instance.width = 1000  # Avoid ruamel wrapping long
-    with open(filename) as repo_handle:
+    with open(filename, encoding="utf-8") as repo_handle:
         return ruamel_instance.load(repo_handle)

@@ -80,7 +80,7 @@ def prettified_yaml(filepath, check_only=True):
     If `check_only` is False, the input file will be "prettified" in place if necessary.
     """
     print(f"Checking {filepath}... ", end="")
-    with open(file=filepath) as input_file:
+    with open(file=filepath, encoding="utf-8") as input_file:
         yaml_original = input_file.read()
 
     yaml_input = load_yaml(filepath)
@@ -90,7 +90,7 @@ def prettified_yaml(filepath, check_only=True):
     if yaml_prettified_string != yaml_original:
         print(f"{'would be' if check_only else ''} reformatted!")
         if not check_only:
-            with open(filepath, "w") as fh:
+            with open(filepath, "w", encoding="utf-8") as fh:
                 fh.write(yaml_prettified_string)
         return False
 
@@ -107,7 +107,7 @@ def write_to_string(repository, check_type=True):
 
 def write_to_file(repository, filename, check_type=True):
     output_str = write_to_string(repository, check_type)
-    with open(filename, mode="w") as output_file:
+    with open(filename, mode="w", encoding="utf-8") as output_file:
         output_file.write(output_str)
 
 
@@ -125,7 +125,7 @@ def load_yaml(filename):
     ruamel_instance.width = 1000  # Avoid ruamel wrapping long
 
     try:
-        with open(filename) as repo_handle:
+        with open(filename, encoding="utf-8") as repo_handle:
             return ruamel_instance.load(repo_handle)
 
     except (

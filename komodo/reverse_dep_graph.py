@@ -11,7 +11,9 @@ from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def run(base_pkgfile, repofile, dot, display_pkg, out):
-    with open(base_pkgfile) as bp, open(repofile) as r:
+    with open(base_pkgfile, encoding="utf-8") as bp, open(
+        repofile, encoding="utf-8"
+    ) as r:
         base_pkgs, repo = yaml.safe_load(bp), yaml.safe_load(r)
 
     reverse = build_reverse(base_pkgs, repo)
@@ -150,7 +152,7 @@ def main():
         print(f"you entered {pkg}")
 
     if args.out:
-        with open(args.out, "w") as out:
+        with open(args.out, "w", encoding="utf-8") as out:
             run(args.base_pkgs, args.repo, args.dot, pkg, out)
     elif args.display_dot:
         try:

@@ -11,7 +11,7 @@ from tests import _get_test_root
 def test_get_messages():
     motd_db_file = os.path.join(_get_test_root(), "data/test_messages/motd_db.yml")
     yaml = YAML()
-    with open(motd_db_file) as f:
+    with open(motd_db_file, encoding="utf-8") as f:
         motd_db = yaml.load(f)
 
     release = "2020.01.01-py27-rhel6"
@@ -148,7 +148,7 @@ def test_main_success_symlinks(tmpdir):
             os.path.join("2020.01.01-py27-rhel6", "motd", "scripts"),
         )
         yaml = YAML()
-        with open(motd_db_file) as f:
+        with open(motd_db_file, encoding="utf-8") as f:
             motd_db = yaml.load(f)
         msg = motd_db["stable"]["inline"][0]
         filename = hashlib.md5(msg.encode()).hexdigest()

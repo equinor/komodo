@@ -27,7 +27,7 @@ def create_inline_messages(messages, dst_path):
     for msg in messages:
         filename = hashlib.md5(msg.encode()).hexdigest()
         filename = "0Z" + filename  # for orderings sake
-        with open(os.path.join(dst_path, filename), "w") as new_file:
+        with open(os.path.join(dst_path, filename), "w", encoding="utf-8") as new_file:
             new_file.write(msg)
 
 
@@ -80,7 +80,7 @@ def main(args=None):
     if not os.path.isfile(args.motd_db):
         msg = f"ERROR: The message-database {args.motd_db} was not found"
         raise SystemExit(msg)
-    with open(args.motd_db) as motd_db_file:
+    with open(args.motd_db, encoding="utf-8") as motd_db_file:
         yml = YAML()
         motd_db = yml.load(motd_db_file)
     motd_path = os.path.dirname(args.motd_db)

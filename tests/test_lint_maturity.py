@@ -22,7 +22,7 @@ def _create_tmp_test_files(release_sample, file_names_sample):
     for file_name in file_names_sample:
         list_files.append(folder_name + file_name)
 
-        with open(folder_name + file_name, "w") as file_sample:
+        with open(folder_name + file_name, "w", encoding="utf-8") as file_sample:
             file_sample.write(release_sample)
 
     return list_files
