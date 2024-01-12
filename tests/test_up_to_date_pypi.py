@@ -529,7 +529,9 @@ def test_upgrade_type_grouping(release_file_content, tmpdir, monkeypatch, capsys
                 request_mock.json.return_value = request_json
                 return request_mock
             else:
-                raise ValueError("INCORRECT PACKAGE NAME ENTERED! " + str(url))
+                raise ValueError(
+                    f"INCORRECT PACKAGE NAME ENTERED! {str(url)} Called with timeout={timeout}"
+                )
 
         arguments = [
             "script_name",
@@ -654,7 +656,9 @@ def test_upgrade_ignore_flag(
             request_mock.json.return_value = request_json
             return request_mock
         else:
-            raise ValueError("INCORRECT PACKAGE NAME ENTERED! " + str(url))
+            raise ValueError(
+                f"INCORRECT PACKAGE NAME ENTERED! {str(url)} Called with timeout={timeout}"
+            )
 
     arguments = [
         "",

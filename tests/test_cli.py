@@ -127,7 +127,7 @@ def test_minimal_main(args, tmpdir):
     assert not os.path.exists(os.path.join(release_path, "local.csh"))
 
 
-def test_pyver_is_deprecated(capsys):
+def test_pyver_is_deprecated():
     """Pyver is not being used anywhere in the code and has been deprecated.
     This test ensures that its use prints a message in stderr.
 

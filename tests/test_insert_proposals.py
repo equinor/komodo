@@ -39,7 +39,7 @@ class MockRepo:
         if filename in self.files:
             return MockContent(self.files[filename])
         else:
-            msg = f"unexpected call with file {filename}"
+            msg = f"unexpected call with file {filename} and ref {ref}"
             raise ValueError(msg)
 
     def get_branch(self, ref):
@@ -51,13 +51,17 @@ class MockRepo:
             raise github.GithubException(None, None, None)
 
     def create_git_ref(self, ref, sha):
-        return mock.Mock()
+        _mock = mock.Mock()
+        _mock.ref = ref
+        _mock.sha = sha
+        return _mock
 
     def create_file(self, target_file, msg, content, branch):
         assert target_file not in self.updated_files
         self.updated_files[target_file] = {
             "content": yaml.load(content, Loader=yaml.CLoader),
             "branch": branch,
+            "msg": msg,
         }
 
     def update_file(self, target_file, msg, content, sha, branch):
@@ -65,11 +69,13 @@ class MockRepo:
         self.updated_files[target_file] = {
             "content": yaml.load(content, Loader=yaml.CLoader),
             "branch": branch,
+            "msg": msg,
+            "sha": sha,
         }
 
     def create_pull(self, title, body, head, base):
         o = mock.Mock()
-        self.created_pulls[title] = {"head": head}
+        self.created_pulls[title] = {"head": head, "body": body, "base": base}
         return o
 
 
@@ -392,7 +398,7 @@ class MockRepoYaml:
         if filename in self.files:
             return MockContentYaml(self.files[filename])
         else:
-            msg = f"unexpected call with file {filename}"
+            msg = f"unexpected call with file {filename} and ref {ref}"
             raise ValueError(msg)
 
     def get_branch(self, ref):
@@ -404,13 +410,17 @@ class MockRepoYaml:
             raise github.GithubException(None, None, None)
 
     def create_git_ref(self, ref, sha):
-        return mock.Mock()
+        _mock = mock.Mock()
+        _mock.ref = ref
+        _mock.sha = sha
+        return _mock
 
     def create_file(self, target_file, msg, content, branch):
         assert target_file not in self.updated_files
         self.updated_files[target_file] = {
             "content": yaml.load(content, Loader=yaml.CLoader),
             "branch": branch,
+            "msg": msg,
         }
 
     def update_file(self, target_file, msg, content, sha, branch):
@@ -418,11 +428,13 @@ class MockRepoYaml:
         self.updated_files[target_file] = {
             "content": yaml.load(content, Loader=yaml.CLoader),
             "branch": branch,
+            "msg": msg,
+            "sha": sha,
         }
 
     def create_pull(self, title, body, head, base):
         o = mock.Mock()
-        self.created_pulls[title] = {"head": head}
+        self.created_pulls[title] = {"head": head, "body": body, "base": base}
         return o
 
 

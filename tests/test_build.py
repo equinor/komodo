@@ -76,7 +76,8 @@ def test_make_pip_package_from_latest(captured_shell_commands, tmpdir):
     assert "pip install PyYaml==1.0.0" in " ".join(captured_shell_commands[1])
 
 
-def test_make_sh_does_not_accept_pypi_package_name(captured_shell_commands, tmpdir):
+@pytest.mark.usefixtures("captured_shell_commands")
+def test_make_sh_does_not_accept_pypi_package_name(tmpdir):
     packages = {"ert": "2.16.0"}
     repositories = {
         "ert": {

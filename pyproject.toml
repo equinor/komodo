@@ -101,7 +101,6 @@ disable = [
     "too-many-locals",
     "too-many-statements",
     "unnecessary-lambda",
-    "unused-argument",
     "use-a-generator",
     "use-implicit-booleaness-not-comparison",
     "use-symbolic-message-instead",
