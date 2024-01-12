@@ -43,15 +43,6 @@ def _komodo_error(package=None, version=None, maintainer=None, depends=None, err
     )
 
 
-def __reg_version_err(errs, package, version, maintainer, err=MALFORMED_VERSION):
-    return _komodo_error(
-        package=package,
-        version=version,
-        maintainer=maintainer,
-        err=err,
-    )
-
-
 def load_yaml_from_string(value: str) -> dict:
     try:
         return YAML().load(value)
