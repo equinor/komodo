@@ -93,5 +93,5 @@ def test_write_activator_switches_for_non_matrix_build(tmpdir):
 
     try:
         switch.create_activator_switch(Data(), prefix, release)
-    except ValueError as e:
-        pytest.fail("Unexpected ValueError " + e)
+    except ValueError as value_error:
+        pytest.fail(f"Unexpected ValueError {value_error}")

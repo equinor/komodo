@@ -46,8 +46,8 @@ def test_build_release_matrix_py_coords(
         build_matrix_file(release_base, release_folder, builtins, py_coords_input)
         new_release_file = f"{release_base}.yml"
         assert os.path.isfile(new_release_file)
-        with open(new_release_file, encoding="utf-8") as f:
-            release_matrix = yaml.safe_load(f)
+        with open(new_release_file, encoding="utf-8") as new_release_file_stream:
+            release_matrix = yaml.safe_load(new_release_file_stream)
 
         assert release_matrix["lib1"] == builtins["lib1"]
         assert release_matrix["lib2"] == packages_lib2

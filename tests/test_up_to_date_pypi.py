@@ -213,15 +213,22 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
     yaml = YAML()
     with tmpdir.as_cwd():
         base_path = os.getcwd()
-        with open("release_file.yml", mode="w", encoding="utf-8") as f:
-            yaml.dump({"dummy_package": "1.0.0", "custom_package": "1.1.1"}, f)
-        with open("repository_file.yml", mode="w", encoding="utf-8") as f:
+        with open(
+            "release_file.yml", mode="w", encoding="utf-8"
+        ) as release_file_stream:
+            yaml.dump(
+                {"dummy_package": "1.0.0", "custom_package": "1.1.1"},
+                release_file_stream,
+            )
+        with open(
+            "repository_file.yml", mode="w", encoding="utf-8"
+        ) as repository_file_stream:
             yaml.dump(
                 {
                     "dummy_package": {"1.0.0": {"source": "pypi"}},
                     "custom_package": {"1.1.1": {"maintainer": "some_person"}},
                 },
-                f,
+                repository_file_stream,
             )
         request_mock = MagicMock()
         request_mock.json.return_value = {
