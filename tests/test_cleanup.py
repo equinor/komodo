@@ -65,8 +65,8 @@ testpackage_e: 1.10.0
 
 
 def _write_file(file_path: str, file_content: str) -> str:
-    with open(file_path, mode="w", encoding="utf-8") as f:
-        f.write(file_content)
+    with open(file_path, mode="w", encoding="utf-8") as file_stream:
+        file_stream.write(file_content)
     return file_path
 
 

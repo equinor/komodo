@@ -95,12 +95,12 @@ def test_extract_reverse_graph():
     assert _sort_graph(rev_dep_graph) == _sort_graph(expected)
 
 
-def _sort_graph(a):
-    for v in a.values():
-        v.sort(
+def _sort_graph(graph_dict):
+    for graph_node in graph_dict.values():
+        graph_node.sort(
             key=lambda dep_graph: (
                 next(iter(dep_graph.keys())) if len(dep_graph) == 1 else ""
             ),
         )
-        for sub_graph in v:
+        for sub_graph in graph_node:
             _sort_graph(sub_graph)

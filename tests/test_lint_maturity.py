@@ -52,7 +52,7 @@ def test_msg_packages_invalid(release_basename, release_version, count_tag_inval
         },
     )
 
-    EXPECTED_SYSTEMEXIT = """2020.02.01.yml has 4 packages with invalid maturity tag.
+    expected_system_exit = """2020.02.01.yml has 4 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag rc packages: [('package_rc1', 'v3.1.rc1')]
@@ -72,11 +72,11 @@ def test_msg_packages_invalid(release_basename, release_version, count_tag_inval
 
 """  # noqa
 
-    assert exit_msg in EXPECTED_SYSTEMEXIT
+    assert exit_msg in expected_system_exit
 
 
 def test_msg_packages_exception():
-    RELEASE_FILE_NAMES = [
+    release_file_names = [
         "2020.02.01.yml",
         "2020.02.a1.yml",
         "2020.02.b1.yml",
@@ -84,7 +84,7 @@ def test_msg_packages_exception():
         "bleeding.yml",
     ]
 
-    for file_basename in RELEASE_FILE_NAMES:
+    for file_basename in release_file_names:
         expected_warning_msg = file_basename + ", exception list of packages:\n"
         expected_warning_msg += (
             "\t" + str([("package_ex2", "testing/2020.3/rc1")]) + "\n"
@@ -162,7 +162,7 @@ def test_get_packages_info():
         tag_exceptions_package=["package_ex2"],
     )
 
-    EXPECTED_DICT_TAG_MATURITY = {
+    expected_dict_tag_maturity = {
         "a": [("package_a1", "v3.1.a1")],
         "b": [("package_b1", "v3.1.b1")],
         "rc": [("package_rc1", "v3.1.rc1")],
@@ -171,8 +171,8 @@ def test_get_packages_info():
         "exception": [("package_ex2", "testing/2020.3/rc1")],
     }
 
-    for tag in EXPECTED_DICT_TAG_MATURITY:
-        assert dict_tag_maturity[tag] == EXPECTED_DICT_TAG_MATURITY[tag]
+    for tag in expected_dict_tag_maturity:
+        assert dict_tag_maturity[tag] == expected_dict_tag_maturity[tag]
 
 
 def test_read_yaml_file(tmpdir):
@@ -190,8 +190,8 @@ package: ['package_ex2']""",
 
 
 def test_msg_release_exception():
-    EXPECTED_RELEASE_VERSION = ["stable", "a", "b", "rc", "exception"]
-    RELEASE_FILE_NAMES = [
+    expected_release_version = ["stable", "a", "b", "rc", "exception"]
+    release_file_names = [
         "2020.02.01.yml",
         "2020.02.a1.yml",
         "2020.02.b1.yml",
@@ -199,8 +199,8 @@ def test_msg_release_exception():
         "bleeding.yml",
     ]
 
-    for count, release_basename in enumerate(RELEASE_FILE_NAMES):
-        release_version = EXPECTED_RELEASE_VERSION[count]
+    for count, release_basename in enumerate(release_file_names):
+        release_version = expected_release_version[count]
         expected_warning_msg = ""
 
         if release_basename == "bleeding.yml":
@@ -253,7 +253,7 @@ package_ex2: testing/2020.3/rc1""",
             ],
         )
 
-        EXPECTED_WARNING = """2020.02.01, exception list of packages:
+        expected_warning = """2020.02.01, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
 2020.02.a1, exception list of packages:
 \t[('package_ex2', 'testing/2020.3/rc1')]
@@ -271,7 +271,7 @@ bleeding has 4 packages with invalid maturity tag.
 \tTag invalid packages: [('package_iv1', '5.13.1-src')]
 """
 
-        EXPECTED_SYSTEMEXIT = """2020.02.01 has 4 packages with invalid maturity tag.
+        expected_system_exit = """2020.02.01 has 4 packages with invalid maturity tag.
 \tTag a packages: [('package_a1', 'v3.1.a1')]
 \tTag b packages: [('package_b1', 'v3.1.b1')]
 \tTag rc packages: [('package_rc1', 'v3.1.rc1')]
@@ -303,8 +303,8 @@ bleeding has 4 packages with invalid maturity tag.
                 },
             )
         print(warning_info[0].message)
-        assert str(warning_info[0].message) in EXPECTED_WARNING
-        assert str(exit_info.value) in EXPECTED_SYSTEMEXIT
+        assert str(warning_info[0].message) in expected_warning
+        assert str(exit_info.value) in expected_system_exit
 
 
 def test_get_files_to_lint(tmpdir):

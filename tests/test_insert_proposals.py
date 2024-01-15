@@ -44,9 +44,9 @@ class MockRepo:
 
     def get_branch(self, ref):
         if ref in MockRepo.existing_branches:
-            o = mock.Mock()
-            o.commit.sha = "testsha1"
-            return o
+            output_mock = mock.Mock()
+            output_mock.commit.sha = "testsha1"
+            return output_mock
         else:
             raise github.GithubException(None, None, None)
 
@@ -74,9 +74,9 @@ class MockRepo:
         }
 
     def create_pull(self, title, body, head, base):
-        o = mock.Mock()
+        output_mock = mock.Mock()
         self.created_pulls[title] = {"head": head, "body": body, "base": base}
-        return o
+        return output_mock
 
 
 @pytest.mark.parametrize(
@@ -85,7 +85,7 @@ class MockRepo:
         "target",
         "repo_files",
         "changed_files",
-        "prs",
+        "pull_requests",
         "return_type",
         "error_message",
     ),
@@ -355,7 +355,7 @@ def test_insert_proposals(
     target,
     repo_files,
     changed_files,
-    prs,
+    pull_requests,
     return_type,
     error_message,
 ):
@@ -375,9 +375,9 @@ def test_insert_proposals(
         assert file in repo.updated_files
         assert repo.updated_files[file]["content"] == content
 
-    assert len(prs) == len(repo.created_pulls)
-    for pr in prs:
-        assert pr in repo.created_pulls
+    assert len(pull_requests) == len(repo.created_pulls)
+    for pull_request in pull_requests:
+        assert pull_request in repo.created_pulls
 
 
 class MockContentYaml:
@@ -403,9 +403,9 @@ class MockRepoYaml:
 
     def get_branch(self, ref):
         if ref in MockRepoYaml.existing_branches:
-            o = mock.Mock()
-            o.commit.sha = "testsha1"
-            return o
+            output_mock = mock.Mock()
+            output_mock.commit.sha = "testsha1"
+            return output_mock
         else:
             raise github.GithubException(None, None, None)
 
@@ -433,9 +433,9 @@ class MockRepoYaml:
         }
 
     def create_pull(self, title, body, head, base):
-        o = mock.Mock()
+        output_mock = mock.Mock()
         self.created_pulls[title] = {"head": head, "body": body, "base": base}
-        return o
+        return output_mock
 
 
 @pytest.mark.parametrize(
@@ -444,7 +444,7 @@ class MockRepoYaml:
         "target",
         "repo_files",
         "changed_files",
-        "prs",
+        "pull_requests",
         "return_type",
         "error_message",
     ),
@@ -523,7 +523,7 @@ def test_duplicate_package_entry_handling(
     target,
     repo_files,
     changed_files,
-    prs,
+    pull_requests,
     return_type,
     error_message,
 ):
@@ -543,6 +543,6 @@ def test_duplicate_package_entry_handling(
         assert file in repo.updated_files
         assert repo.updated_files[file]["content"] == content
 
-    assert len(prs) == len(repo.created_pulls)
-    for pr in prs:
-        assert pr in repo.created_pulls
+    assert len(pull_requests) == len(repo.created_pulls)
+    for pull_request in pull_requests:
+        assert pull_request in repo.created_pulls

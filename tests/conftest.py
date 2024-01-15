@@ -57,9 +57,9 @@ def mock_config_file():
         "komodo-root = /foo/bar\n"
         "linux-dist = rhel7\n"
     )
-    m = mock_open(read_data=read_data)
-    with patch("builtins.open", m):
-        yield m
+    mock = mock_open(read_data=read_data)
+    with patch("builtins.open", mock):
+        yield mock
 
 
 @pytest.fixture()
@@ -69,9 +69,9 @@ def mock_version_manifest():
         "foo:\n  maintainer: jdoe\n  version: 1.2.3\n"
         "bar:\n  maintainer: jbloggs\n  version: 99.99.99"
     )
-    m = mock_open(read_data=read_data)
-    with patch("builtins.open", m):
-        yield m
+    mock = mock_open(read_data=read_data)
+    with patch("builtins.open", mock):
+        yield mock
 
 
 @pytest.fixture()
@@ -80,15 +80,19 @@ def mock_release_file():
     an environment. Passing it to komodo-show-version raises an error.
     """
     read_data = "foo: 1.2.3\nbar: 99.99.99"
-    m = mock_open(read_data=read_data)
-    with patch("builtins.open", m):
-        yield m
+    mock = mock_open(read_data=read_data)
+    with patch("builtins.open", mock):
+        yield mock
 
 
 @pytest.fixture()
 def captured_shell_commands(monkeypatch):
     commands = []
-    with monkeypatch.context() as m:
-        m.setattr("komodo.build.shell", lambda cmd: commands.append(cmd))
-        m.setattr("komodo.fetch.shell", lambda cmd: commands.append(cmd))
+    with monkeypatch.context() as monkeypatch_context:
+        monkeypatch_context.setattr(
+            "komodo.build.shell", lambda cmd: commands.append(cmd)
+        )
+        monkeypatch_context.setattr(
+            "komodo.fetch.shell", lambda cmd: commands.append(cmd)
+        )
         yield commands

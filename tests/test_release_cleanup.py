@@ -13,7 +13,7 @@ from komodo.release_cleanup import (
 )
 from tests import _get_test_root, _load_yaml
 
-expected_result = """lib1:
+EXPECTED_RESULT = """lib1:
   1.2.3:
     source: pypi
     make: pip
@@ -113,7 +113,7 @@ def test_write_to_file(tmpdir):
         remove_unused_versions(repository, unused_versions)
         write_to_file(repository, "output_repo.yml")
         with open("output_repo.yml", encoding="utf-8") as output:
-            assert output.read() == expected_result
+            assert output.read() == EXPECTED_RESULT
 
 
 def test_return_values_of_prettier(tmpdir):

@@ -205,14 +205,14 @@ def test_root_folder_error(tmpdir):
             },
         }
 
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError) as value_error:
             create_symlinks(test_dict)
-        assert "does not exist" in str(e.value)
+        assert "does not exist" in str(value_error.value)
 
         test_dict["root_folder"] = os.path.relpath(str(tmpdir))
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError) as value_error:
             create_symlinks(test_dict)
-        assert "is not absolute" in str(e.value)
+        assert "is not absolute" in str(value_error.value)
 
 
 def test_link_error(tmpdir):
@@ -229,9 +229,9 @@ def test_link_error(tmpdir):
                 "unstable": "2012.01.rc2",
             },
         }
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError) as value_error:
             create_symlinks(test_dict)
-        assert str(e.value) == "2012.01.rc2 does not exist"
+        assert str(value_error.value) == "2012.01.rc2 does not exist"
 
 
 def test_root_link_error(tmpdir):
@@ -247,9 +247,9 @@ def test_root_link_error(tmpdir):
                 "unstable": "2012.01.rc2",
             },
         }
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(ValueError) as value_error:
             create_symlinks(test_dict)
-        assert str(e.value) == "2012.01.rc2 does not exist"
+        assert str(value_error.value) == "2012.01.rc2 does not exist"
 
 
 def test_executables(tmpdir):
