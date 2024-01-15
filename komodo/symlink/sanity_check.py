@@ -6,14 +6,14 @@ import pprint
 import sys
 
 
-def equal_links(a, b):
-    if a["root_folder"] != b["root_folder"]:
+def equal_links(dict_a, dict_b):
+    if dict_a["root_folder"] != dict_b["root_folder"]:
         return False
 
-    if set(a["root_links"]) != set(b["root_links"]):
+    if set(dict_a["root_links"]) != set(dict_b["root_links"]):
         return False
 
-    return a["links"] == b["links"]
+    return dict_a["links"] == dict_b["links"]
 
 
 def _linked_to(s_link, list_of_files):
@@ -90,9 +90,11 @@ def assert_root_nodes(link_dict):
         )
 
 
-def _compare_dicts(d1, d2):
+def _compare_dicts(dict_1, dict_2):
     return "\n" + "\n".join(
-        difflib.ndiff(pprint.pformat(d1).splitlines(), pprint.pformat(d2).splitlines()),
+        difflib.ndiff(
+            pprint.pformat(dict_1).splitlines(), pprint.pformat(dict_2).splitlines()
+        ),
     )
 
 

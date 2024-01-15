@@ -96,8 +96,8 @@ def symlink_main():
     errors = verify_integrity(input_dict)
     if errors:
         print("The following errors where found in the config file:")
-        for e in errors:
-            print(e)
+        for error in errors:
+            print(error)
         sys.exit(1)
 
     create_symlinks(input_dict)

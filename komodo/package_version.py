@@ -25,14 +25,14 @@ def latest_pypi_version(package):
     cmd = _PYPI_LATEST_VERSION_CMD.format(package)
     try:
         subprocess.check_output(cmd.split(" "), stderr=subprocess.PIPE)
-    except subprocess.CalledProcessError as e:
-        stderr = e.stderr.decode(sys.getfilesystemencoding())
+    except subprocess.CalledProcessError as called_process_error:
+        stderr = called_process_error.stderr.decode(sys.getfilesystemencoding())
         matches = re.match(_PYPI_LATEST_VERSION_RE, stderr)
         if matches.lastindex == 0:
             msg = f"got unexpected output from {cmd} using {_PYPI_LATEST_VERSION_RE}: {stderr}"
             raise ValueError(
                 msg,
-            ) from e
+            ) from called_process_error
         versions = matches.group(1).split(",")
         version = versions[len(versions) - 1].strip()
         if version == "none":

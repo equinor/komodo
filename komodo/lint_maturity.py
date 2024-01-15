@@ -174,8 +174,8 @@ def run(files_to_lint: List[str], tag_exceptions):
 
 
 def read_yaml_file_and_convert_to_release_file(release_file_path: str) -> ReleaseFile:
-    with open(release_file_path, mode="r+", encoding="utf-8") as f:
-        release_file_yaml_string = f.read()
+    with open(release_file_path, mode="r+", encoding="utf-8") as release_file_stream:
+        release_file_yaml_string = release_file_stream.read()
     return ReleaseFile().from_yaml_string(value=release_file_yaml_string)
 
 

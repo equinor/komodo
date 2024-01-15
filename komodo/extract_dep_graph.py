@@ -7,14 +7,16 @@ from komodo.yaml_file_types import RepositoryFile
 
 
 def run(pkgfile, base_pkgfile, repofile, outfile=None):
-    with open(pkgfile, encoding="utf-8") as p, open(
+    with open(pkgfile, encoding="utf-8") as package_file_stream, open(
         base_pkgfile, encoding="utf-8"
-    ) as bp, open(repofile, encoding="utf-8") as r:
+    ) as base_package_file_stream, open(
+        repofile, encoding="utf-8"
+    ) as repository_file_stream:
         yaml = YAML()
         pkgs, base_pkgs, repo = (
-            yaml.load(p),
-            yaml.load(bp),
-            yaml.load(r),
+            yaml.load(package_file_stream),
+            yaml.load(base_package_file_stream),
+            yaml.load(repository_file_stream),
         )
 
     result = _iterate_packages(pkgs, base_pkgs, repo)

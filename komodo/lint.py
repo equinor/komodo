@@ -10,12 +10,12 @@ from pkg_resources import PkgResourcesDeprecationWarning, parse_version
 
 from komodo.yaml_file_types import KomodoException, ReleaseFile, RepositoryFile
 
-komodo_error = namedtuple(
+KomodoError = namedtuple(
     "KomodoError",
     ["package", "version", "maintainer", "depends", "err"],
 )
 
-report = namedtuple(
+Report = namedtuple(
     "LintReport",
     ["release_name", "maintainers", "dependencies", "versions"],
 )
@@ -33,7 +33,7 @@ FLOAT_VERSION = "dangerous version (float interpretable)"
 
 
 def _komodo_error(package=None, version=None, maintainer=None, depends=None, err=None):
-    return komodo_error(
+    return KomodoError(
         package=package,
         version=version,
         maintainer=maintainer,
@@ -43,8 +43,8 @@ def _komodo_error(package=None, version=None, maintainer=None, depends=None, err
 
 
 def lint_version_numbers(package, version, repo):
-    pv = repo[package][version]
-    maintainer = pv.get("maintainer", MISSING_MAINTAINER)
+    package_release = repo[package][version]
+    maintainer = package_release.get("maintainer", MISSING_MAINTAINER)
 
     try:
         logging.info(f"Using {package} {version}")
@@ -54,9 +54,11 @@ def lint_version_numbers(package, version, repo):
             return _komodo_error(package, version, maintainer, err=MASTER_VERSION)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
-            v = parse_version(version)
+            parsed_version = parse_version(version)
             # A warning coincides with finding "Legacy" in repr(v)
-        if "Legacy" in repr(v):  # don't know if possible to check otherwise
+        if "Legacy" in repr(
+            parsed_version
+        ):  # don't know if possible to check otherwise
             return _komodo_error(package, version, maintainer)
     except:  # pylint: disable=bare-except  # noqa
         # Log any exception:
@@ -65,7 +67,7 @@ def lint_version_numbers(package, version, repo):
 
 
 def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
-    mns, deps, versions = [], [], []
+    maintainers, deps, versions = [], [], []
     for package_name, package_version in release_file.content.items():
         try:
             lint_maintainer = repository_file.lint_maintainer(
@@ -73,7 +75,7 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
                 package_version,
             )  # throws komodoexception on missing package or version in repository
             if lint_maintainer:
-                mns.append(lint_maintainer)
+                maintainers.append(lint_maintainer)
 
             lint_version_number = lint_version_numbers(
                 package_name,
@@ -100,12 +102,12 @@ def lint(release_file: ReleaseFile, repository_file: RepositoryFile):
                         ),
                     ),
                 )
-        except KomodoException as e:
-            mns.append(e.error)
+        except KomodoException as komodo_exception:
+            maintainers.append(komodo_exception.error)
 
-    return report(
+    return Report(
         release_name=[],
-        maintainers=mns,
+        maintainers=maintainers,
         dependencies=deps,
         versions=versions,
     )
@@ -142,20 +144,24 @@ def lint_main():
 
     try:
         report = lint(args.packagefile, args.repofile)
-        mns, deps, versions = report.maintainers, report.dependencies, report.versions
+        maintainers, deps, versions = (
+            report.maintainers,
+            report.dependencies,
+            report.versions,
+        )
     except ValueError as err:
         sys.exit(str(err))
-    print(f"{len(mns)} packages")
-    if not any(err.err for err in mns + deps + versions):
+    print(f"{len(maintainers)} packages")
+    if not any(err.err for err in maintainers + deps + versions):
         print("No errors found")
         sys.exit(0)
 
-    for err in mns + deps + versions:
+    for err in maintainers + deps + versions:
         if err.err:
             dep = f": {', '.join(err.depends)}" if err.depends else ""
             print(f"{err.err}{dep}")
 
-    if not any(err.err for err in mns + deps):
+    if not any(err.err for err in maintainers + deps):
         sys.exit(0)  # currently we allow erronous version numbers
 
     sys.exit("Error in komodo configuration.")

@@ -21,15 +21,15 @@ from komodo.yaml_file_types import (
 def recursive_update(left, right):
     if right is None:
         return None
-    for k, v in right.items():
-        if isinstance(v, collections.abc.Mapping):
-            d_val = left.get(k)
+    for key, value in right.items():
+        if isinstance(value, collections.abc.Mapping):
+            d_val = left.get(key)
             if not d_val:
-                left[k] = v
+                left[key] = value
             else:
-                recursive_update(d_val, v)
+                recursive_update(d_val, value)
         else:
-            left[k] = v
+            left[key] = value
     return left
 
 
@@ -109,8 +109,8 @@ def insert_proposals(repo, base, target, git_ref, jobname, joburl) -> None:
         for package_name, package_version in upgrade.items():
             try:
                 repofile.validate_package_entry(package_name, package_version)
-            except KomodoException as e:
-                errors.append(e.error)
+            except KomodoException as komodo_exception:
+                errors.append(komodo_exception.error)
         if errors:
             raise SystemExit("\n".join(errors))
     recursive_update(base_dict.content, upgrade)

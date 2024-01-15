@@ -31,8 +31,8 @@ def shell(cmd: str, sudo=False, allow_failure=False) -> bytes:
 
     try:
         return subprocess.check_output(tuple(filter(None, cmdlist)))
-    except subprocess.CalledProcessError as e:
-        print(e.output, file=sys.stderr)
+    except subprocess.CalledProcessError as called_process_error:
+        print(called_process_error.output, file=sys.stderr)
         if allow_failure:
-            return e.output
+            return called_process_error.output
         raise

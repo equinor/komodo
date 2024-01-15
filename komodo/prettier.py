@@ -90,8 +90,8 @@ def prettified_yaml(filepath, check_only=True):
     if yaml_prettified_string != yaml_original:
         print(f"{'would be' if check_only else ''} reformatted!")
         if not check_only:
-            with open(filepath, "w", encoding="utf-8") as fh:
-                fh.write(yaml_prettified_string)
+            with open(filepath, "w", encoding="utf-8") as yaml_file_stream:
+                yaml_file_stream.write(yaml_prettified_string)
         return False
 
     print("looking good!")
@@ -131,6 +131,6 @@ def load_yaml(filename):
     except (
         ruamel.yaml.scanner.ScannerError,
         ruamel.yaml.constructor.DuplicateKeyError,
-    ) as e:
+    ) as yaml_error:
         msg = f"The file: <{filename}> contains invalid YAML syntax"
-        raise SystemExit(msg) from e
+        raise SystemExit(msg) from yaml_error

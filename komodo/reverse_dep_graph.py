@@ -11,10 +11,12 @@ from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def run(base_pkgfile, repofile, dot, display_pkg, out):
-    with open(base_pkgfile, encoding="utf-8") as bp, open(
+    with open(base_pkgfile, encoding="utf-8") as base_package_file_stream, open(
         repofile, encoding="utf-8"
-    ) as r:
-        base_pkgs, repo = yaml.safe_load(bp), yaml.safe_load(r)
+    ) as repository_file_stream:
+        base_pkgs, repo = yaml.safe_load(base_package_file_stream), yaml.safe_load(
+            repository_file_stream
+        )
 
     reverse = build_reverse(base_pkgs, repo)
 
