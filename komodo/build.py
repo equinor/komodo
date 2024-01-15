@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import hashlib
 import itertools as itr
 import os
@@ -8,6 +7,7 @@ import pathlib
 import stat
 import sys
 from pathlib import Path
+from typing import Dict
 
 import requests
 
@@ -21,7 +21,7 @@ from komodo.shell import pushd, shell
 flatten = itr.chain.from_iterable
 
 
-def dfs(package_name, ver, pkgs, repo):
+def dfs(package_name: str, ver: str, pkgs: Dict[str, str], repo: Dict[str, Dict]):
     # package has no more dependencies - add the package itself
     if "depends" not in repo[package_name][ver]:
         return [package_name]
@@ -94,7 +94,7 @@ def cmake(
     Path(bdir).mkdir(parents=True, exist_ok=True)
     with pushd(bdir):
         os.environ["LD_LIBRARY_PATH"] = ld_lib_path
-        _pre_PATH = os.environ["PATH"]
+        _pre_PATH = os.environ["PATH"]  # pylint: disable=invalid-name
         os.environ["PATH"] = bin_path
 
         print(f"Installing {package_name} ({ver}) from source with cmake")
@@ -122,7 +122,7 @@ def sh(
     jobs=None,
     cmake=None,
     makeopts=None,
-):
+):  # pylint: disable=invalid-name
     makefile = data.get(makefile)
 
     with pushd(pkgpath):
@@ -245,7 +245,7 @@ def pypaths(prefix, version):
 
 
 def make(
-    pkgs,
+    pkgs: Dict[str, str],
     repo,
     data,
     prefix,
@@ -257,17 +257,15 @@ def make(
     virtualenv=None,
     fakeroot=".",
 ):
-    xs = flatten(
-        dfs(package_name, ver, pkgs, repo) for package_name, ver in pkgs.items()
-    )
+    packages_needed = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
 
-    seen = set()
+    seen_package = set()
     pkgorder = []
-    for x in xs:
-        if x in seen:
+    for package_needed in packages_needed:
+        if package_needed in seen_package:
             continue
-        seen.add(x)
-        pkgorder.append(x)
+        seen_package.add(package_needed)
+        pkgorder.append(package_needed)
 
     fakeprefix = fakeroot + prefix
     shell(["mkdir -p", fakeprefix])
@@ -296,8 +294,8 @@ def make(
     if dlprefix:
         pkgpaths = [os.path.join(dlprefix, path) for path in pkgpaths]
 
-    def resolve(x):
-        return x.replace("$(prefix)", prefix)
+    def resolve(input_str):
+        return input_str.replace("$(prefix)", prefix)
 
     for package_name, path in zip(pkgorder, pkgpaths):
         ver = pkgs[package_name]

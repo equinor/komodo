@@ -6,9 +6,11 @@ from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def maintainers(pkgfile, repofile):
-    with open(pkgfile, encoding="utf-8") as p, open(repofile, encoding="utf-8") as r:
+    with open(pkgfile, encoding="utf-8") as package_file_stream, open(
+        repofile, encoding="utf-8"
+    ) as repository_file_stream:
         yml = YAML()
-        pkgs, repo = yml.load(p), yml.load(r)
+        pkgs, repo = yml.load(package_file_stream), yml.load(repository_file_stream)
 
     maints = set()
     for pkg, ver in pkgs.items():

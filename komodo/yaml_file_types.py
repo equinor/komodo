@@ -7,18 +7,19 @@ from typing import Dict, List
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
 
-komodo_error = namedtuple(
+KomodoError = namedtuple(
     "KomodoError",
     ["package", "version", "maintainer", "depends", "err"],
 )
-report = namedtuple(
+
+Report = namedtuple(
     "LintReport",
     ["release_name", "maintainers", "dependencies", "versions"],
 )
 
 
 class KomodoException(Exception):
-    def __init__(self, error_message: komodo_error) -> None:
+    def __init__(self, error_message: KomodoError) -> None:
         self.error = error_message
 
 
@@ -34,7 +35,7 @@ FLOAT_VERSION = "dangerous version (float interpretable)"
 
 
 def _komodo_error(package=None, version=None, maintainer=None, depends=None, err=None):
-    return komodo_error(
+    return KomodoError(
         package=package,
         version=version,
         maintainer=maintainer,
@@ -46,8 +47,8 @@ def _komodo_error(package=None, version=None, maintainer=None, depends=None, err
 def load_yaml_from_string(value: str) -> dict:
     try:
         return YAML().load(value)
-    except DuplicateKeyError as e:
-        raise SystemExit(e) from None
+    except DuplicateKeyError as duplicate_key_error:
+        raise SystemExit(duplicate_key_error) from None
 
 
 class YamlFile(argparse.FileType):
@@ -99,7 +100,7 @@ class ReleaseFile(YamlFile):
         handle_validation_errors(errors, message)
 
     @staticmethod
-    def lint_release_name(packagefile_path: str) -> List[komodo_error]:
+    def lint_release_name(packagefile_path: str) -> List[KomodoError]:
         relname = os.path.basename(packagefile_path)
         found = False
         for py_suffix in "-py27", "-py36", "-py38", "-py310":
@@ -189,7 +190,7 @@ class RepositoryFile(YamlFile):
         self,
         package_name: str,
         package_version: str,
-    ) -> komodo_error:
+    ) -> KomodoError:
         repository_entries = self.content
         if package_name not in repository_entries:
             for real_packagename in [
@@ -214,14 +215,14 @@ class RepositoryFile(YamlFile):
                 msg,
             )
 
-    def lint_maintainer(self, package, version) -> komodo_error:
+    def lint_maintainer(self, package, version) -> KomodoError:
         repository_entries = self.content
         try:
             self.validate_package_entry(package, version)
-        except KomodoException as e:
+        except KomodoException as komodo_exception:
             raise KomodoException(
-                _komodo_error(package=package, version=version, err=e),
-            ) from e
+                _komodo_error(package=package, version=version, err=komodo_exception),
+            ) from komodo_exception
         return _komodo_error(
             package=package,
             version=version,
@@ -252,8 +253,8 @@ class RepositoryFile(YamlFile):
                 validation_errors = self.validate_versions(package_name, versions)
                 if validation_errors:
                     errors.extend(validation_errors)
-            except (ValueError, TypeError) as e:
-                errors.append(str(e))
+            except (ValueError, TypeError) as value_or_type_error:
+                errors.append(str(value_or_type_error))
 
         handle_validation_errors(errors, message)
 
@@ -328,8 +329,8 @@ class RepositoryFile(YamlFile):
                     package_property,
                     package_property_value,
                 )
-            except (ValueError, TypeError) as e:
-                errors.append(str(e))
+            except (ValueError, TypeError) as value_or_type_error:
+                errors.append(str(value_or_type_error))
         return errors
 
 
@@ -436,8 +437,8 @@ class PackageStatusFile(YamlFile):
                     package_name,
                     status.get("visibility"),
                 )
-            except (ValueError, TypeError) as e:
-                errors.append(str(e))
+            except (ValueError, TypeError) as value_or_type_error:
+                errors.append(str(value_or_type_error))
                 continue
             visibility = status["visibility"]
             if visibility == "public":
@@ -492,8 +493,8 @@ class Package:
         errors = []
         try:
             Package.validate_package_entry(package_name, package_version)
-        except (ValueError, TypeError) as e:
-            errors.append(str(e))
+        except (ValueError, TypeError) as value_or_type_error:
+            errors.append(str(value_or_type_error))
         return errors
 
     @staticmethod
@@ -519,8 +520,8 @@ class Package:
         errors = []
         try:
             Package.validate_package_importance(package_name, package_importance)
-        except (ValueError, TypeError) as e:
-            errors.append(str(e))
+        except (ValueError, TypeError) as value_or_type_error:
+            errors.append(str(value_or_type_error))
         return errors
 
     @staticmethod
@@ -560,8 +561,8 @@ class Package:
         errors = []
         try:
             Package.validate_package_maturity(package_name, package_maturity)
-        except (ValueError, TypeError) as e:
-            errors.append(str(e))
+        except (ValueError, TypeError) as value_or_type_error:
+            errors.append(str(value_or_type_error))
         return errors
 
     @staticmethod
@@ -592,8 +593,8 @@ class Package:
         errors = []
         try:
             Package.validate_package_make(package_name, package_version, package_make)
-        except (ValueError, TypeError) as e:
-            errors.append(str(e))
+        except (ValueError, TypeError) as value_or_type_error:
+            errors.append(str(value_or_type_error))
         return errors
 
     @staticmethod
@@ -623,8 +624,8 @@ class Package:
                 package_version,
                 package_maintainer,
             )
-        except TypeError as e:
-            errors.append(str(e))
+        except TypeError as type_error:
+            errors.append(str(type_error))
         return errors
 
     @staticmethod
@@ -654,8 +655,8 @@ class Package:
                 package_version,
                 package_source,
             )
-        except TypeError as e:
-            errors.append(str(e))
+        except TypeError as type_error:
+            errors.append(str(type_error))
         return errors
 
     @staticmethod

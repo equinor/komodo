@@ -26,8 +26,8 @@ def verify_package_versions_exist(
                     f"Found package: '{upgrade_proposals_package}' with version"
                     f" {upgrade_proposals_package_version} in repository",
                 )
-            except KomodoException as e:
-                errors.append("ERROR: " + e.error)
+            except KomodoException as komodo_exception:
+                errors.append("ERROR: " + komodo_exception.error)
         if errors:
             raise SystemExit("\n".join(errors))
     if found_release_with_upgrades:

@@ -17,8 +17,8 @@ class Data:
             self._dirs.extend(extra_data_dirs)
 
     def get(self, file_name):
-        for d in self._dirs:
-            path = os.path.join(d, file_name)
+        for directory in self._dirs:
+            path = os.path.join(directory, file_name)
             if os.path.exists(path):
                 return path
         msg = f"no such file {file_name} in {self._dirs}"
