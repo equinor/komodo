@@ -75,8 +75,12 @@ def get_komodoenv_path(release: str) -> Path:
     -------
         The path to the release, where the 'root/bin' folder is.
     """
-    config = read_config(Path(release) / "root" / "pyvenv.cfg")
-    path, *_ = config["home"].split("/root/bin")
+    if (sys.version_info.major,sys.version_info.minor) == (3,11):
+        config = read_config(Path(release) / "root" / "pyvenv.cfg")
+        path, *_ = config["executable"].rsplit("root/bin")
+    else:
+        config = read_config(Path(release) / "root" / "pyvenv.cfg")
+        path, *_ = config["home"].split("/root/bin")
     return Path(path)
 
 
