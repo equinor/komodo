@@ -112,10 +112,9 @@ class ReleaseFile(YamlFile):
         relname = os.path.basename(packagefile_path)
         found = False
         for py_suffix in "-py27", "-py36", "-py38", "-py310":
-            for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
-                if relname.endswith(py_suffix + rh_suffix + ".yml"):
-                    found = True
-                    break
+            if relname.endswith(f"{py_suffix}.yml"):
+                found = True
+                break
         if not found:
             return [
                 _komodo_error(

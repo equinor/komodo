@@ -4,9 +4,14 @@ import sys
 
 import pytest
 
-from komodo.cli import cli_main, parse_args
+from komodo.cli import cli_main
 from komodo.package_version import LATEST_PACKAGE_ALIAS
 from tests import _get_test_root
+
+
+@pytest.fixture(autouse=True)
+def dummy_python(monkeypatch):
+    monkeypatch.setattr(sys, "executable", "/usr/bin/true")
 
 
 @pytest.mark.parametrize(
@@ -24,7 +29,7 @@ from tests import _get_test_root
             "tmp",
             "--release",
             "nominal_release",
-            "--pip",
+            "--python",
             "/bin/true",
             os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
             os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
@@ -86,58 +91,32 @@ def test_main(args, tmpdir):
         assert "version: 7f4405928bd16de496522d9301c377c7bcca5ef0" in releasedoc_content
 
 
-@pytest.mark.parametrize(
-    "args",
-    [
-        (
+def test_minimal_main(tmp_path):
+    """Check that a minimal example, more like that from the README, also works.
+
+    Without --locations-config, this should not produce the scripts local & local.csh.
+    """
+    release_name = "minimal_release"
+    release_path = tmp_path / "prefix" / release_name
+
+    cli_main(
+        [
+            "--workspace",
+            str(tmp_path),
             os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
             os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
             "--prefix",
             "prefix",
             "--release",
-            "minimal_release",
+            release_name,
+            "--python",
+            sys.executable,
             "--extra-data-dirs",  # Required to find test_python_builtin.sh.
             os.path.join(_get_test_root(), "data/cli"),
-        ),
-    ],
-)
-def test_minimal_main(args, tmpdir):
-    """Check that a minimal example, more like that from the README, also works.
+        ]
+    )
 
-    Without --locations-config, this should not produce the scripts local & local.csh.
-    """
-    tmpdir = str(tmpdir)
-
-    sys.argv = [
-        "kmd",
-        "--workspace",
-        tmpdir,
-    ]
-
-    sys.argv.extend(list(args))
-
-    cli_main()
-
-    release_name = args[5]
-    release_path = os.path.join(tmpdir, "prefix", release_name)
-
-    assert os.path.exists(os.path.join(release_path, "enable"))
-    assert os.path.exists(os.path.join(release_path, "enable.csh"))
-    assert not os.path.exists(os.path.join(release_path, "local"))
-    assert not os.path.exists(os.path.join(release_path, "local.csh"))
-
-
-def test_pyver_is_deprecated(capsys):
-    """Pyver is not being used anywhere in the code and has been deprecated.
-    This test ensures that its use prints a message in stderr.
-
-    Note that one can raise a DeprecationWarning instead, and test for it,
-    but it does not show up in the CLI.
-    """
-    pkgs = os.path.join(_get_test_root(), "data/cli/nominal_release.yml")
-    repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml")
-    cmd = f"{pkgs} {repo} --prefix pfx --release rel --pyver 3.8"
-    with pytest.warns(FutureWarning) as record:
-        _ = parse_args(cmd.split())
-
-    assert "The --pyver option is deprecated" in record[0].message.args[0]
+    assert (release_path / "enable").exists()
+    assert (release_path / "enable.csh").exists()
+    assert not (release_path / "local").exists()
+    assert not (release_path / "local.csh").exists()

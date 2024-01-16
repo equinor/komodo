@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -29,7 +30,9 @@ def test_make_one_pip_package(captured_shell_commands, tmpdir):
 
     assert len(captured_shell_commands) == 2
     assert "mkdir" in " ".join(captured_shell_commands[0])
-    assert "pip install pyaml" in " ".join(captured_shell_commands[1])
+    assert f"pip --python {sys.executable} install pyaml" in " ".join(
+        captured_shell_commands[1]
+    )
 
 
 def test_make_one_pip_package_different_name(captured_shell_commands, tmpdir):
@@ -50,7 +53,9 @@ def test_make_one_pip_package_different_name(captured_shell_commands, tmpdir):
 
     assert len(captured_shell_commands) == 2
     assert "mkdir" in " ".join(captured_shell_commands[0])
-    assert "pip install PyYaml==20.4.0" in " ".join(captured_shell_commands[1])
+    assert f"pip --python {sys.executable} install PyYaml==20.4.0" in " ".join(
+        captured_shell_commands[1]
+    )
 
 
 def test_make_pip_package_from_latest(captured_shell_commands, tmpdir):
@@ -73,7 +78,9 @@ def test_make_pip_package_from_latest(captured_shell_commands, tmpdir):
         mock_latest_version.assert_called_once_with("PyYaml")
     assert len(captured_shell_commands) == 2
     assert "mkdir" in " ".join(captured_shell_commands[0])
-    assert "pip install PyYaml==1.0.0" in " ".join(captured_shell_commands[1])
+    assert f"pip --python {sys.executable} install PyYaml==1.0.0" in " ".join(
+        captured_shell_commands[1]
+    )
 
 
 def test_make_sh_does_not_accept_pypi_package_name(captured_shell_commands, tmpdir):

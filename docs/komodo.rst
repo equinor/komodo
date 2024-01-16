@@ -205,14 +205,6 @@ komodo.snyk\_reporting module
    :undoc-members:
    :show-inheritance:
 
-komodo.switch module
---------------------
-
-.. automodule:: komodo.switch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 komodo.yaml\_file\_type module
 ------------------------------
 

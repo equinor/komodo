@@ -29,6 +29,8 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
     if protocol in ("http", "https", "ftp"):
         shell(f"wget --quiet {path} -O {filename}")
     elif protocol in ("git"):
+        if os.path.exists(filename):
+            return
         shell(
             "git clone "
             f"-b {strip_version(version)} "
@@ -57,6 +59,7 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
 
 
 def fetch(pkgs, repo, outdir, pip="pip") -> dict:
+    python = os.environ["python"]
     missingpkg = [pkg for pkg in pkgs if pkg not in repo]
     missingver = [
         pkg for pkg, ver in pkgs.items() if pkg in repo and ver not in repo[pkg]
@@ -78,11 +81,6 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     if not outdir:
         msg = "The value of `outdir`, the download destination location cannot be None or the empty string."
         raise ValueError(
-            msg,
-        )
-    if os.path.exists(outdir) and os.listdir(outdir):
-        msg = f"Downloading to non-empty directory {outdir} is not supported."
-        raise RuntimeError(
             msg,
         )
     if not os.path.exists(outdir):
@@ -123,7 +121,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     f"Nothing to fetch for {pkgname}, "
                     f"but created folder {package_folder}",
                 )
-                os.mkdir(pkgname)
+                os.makedirs(pkgname, exist_ok=True)
                 continue
 
             dst = pkgname
@@ -158,7 +156,17 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     os.symlink(normalised_dir, pkgname)
 
         print(f"Downloading {len(pypi_packages)} pypi packages")
-        shell([pip, "download", "--no-deps", "--dest .", " ".join(pypi_packages)])
+        shell(
+            [
+                pip,
+                "--python",
+                python,
+                "download",
+                "--no-deps",
+                "--dest .",
+                " ".join(pypi_packages),
+            ]
+        )
 
     return git_hashes
 
@@ -199,5 +207,4 @@ if __name__ == "__main__":
         args.content.pkgfile,
         args.content.repofile,
         outdir=args.content.output,
-        pip=args.pip,
     )
