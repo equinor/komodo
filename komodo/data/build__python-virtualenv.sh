@@ -26,4 +26,5 @@ while test $# -gt 0; do
     esac
     shift
 done
-$VIRTUALENV -p $VIRTUALENV_INTERPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}/${PREFIX} 1>&2
+# $VIRTUALENV -p $VIRTUALENV_INTERPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}/${PREFIX} 1>&2
+$VIRTUALENV_INTERPRETER -m venv --copies --without-pip ${FAKEROOT}/${PREFIX} >&2
