@@ -1,7 +1,6 @@
 import argparse
 import contextlib
 import datetime
-import glob
 import os
 import sys
 import uuid
@@ -152,7 +151,10 @@ def _main(args):
     )
     _print_timings(timings[-1])
 
-    if Path(f"{args.prefix}/{args.release}").exists():
+    prefix_path = Path(f"{args.prefix}")
+    release_path = Path(f"{args.prefix}/{args.release}")
+
+    if release_path.exists():
         shell(
             f"mv {args.prefix}/{args.release} "
             f"{args.prefix}/{args.release}.delete-{uuid.uuid4()}",
@@ -165,9 +167,12 @@ def _main(args):
     )
     start_time = datetime.datetime.now()
 
-    delete_files_glob = glob.glob(f"{args.prefix}/{args.release}.delete-*")
+    release_dir_glob = [
+        str(p.absolute()) for p in list(prefix_path.glob("{args.release}.delete-*"))
+    ]
+
     shell(
-        "rm -rf -- " + " ".join(delete_files_glob),
+        "rm -rf -- " + " ".join(release_dir_glob),
         sudo=args.sudo,
         allow_failure=True,
     )
