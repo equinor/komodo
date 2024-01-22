@@ -82,6 +82,9 @@ def _main(args):
     if args.download and not args.build:
         sys.exit(0)
 
+    if (Path(args.prefix) / args.release).exists() and "bleeding" not in args.release:
+        raise RuntimeError("Only bleeding builds can be overwritten")
+
     # append root to the temporary build dir, as we want a named root/
     # directory as the distribution root, organised under the distribution name
     tmp_prefix = abs_prefix / args.release / "root"

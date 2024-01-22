@@ -127,6 +127,57 @@ def test_minimal_main(args, tmpdir):
     assert not os.path.exists(os.path.join(release_path, "local.csh"))
 
 
+def test_no_overwrite_by_default(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "existing_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    with pytest.raises(
+        RuntimeError, match="Downloading to non-empty directory downloads"
+    ):
+        cli_main()
+
+    # Try another rerun after we have removed the downloads and remainder from
+    # failed build above:
+    shutil.rmtree(tmpdir / "downloads")
+    shutil.rmtree(tmpdir / ".existing_release")
+    with pytest.raises(RuntimeError, match="Only bleeding builds can be overwritten"):
+        cli_main()
+
+
+def test_bleeding_overwrite_by_default(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "some_bleeding_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    # Remove non-interesting leftovers from first build:
+    shutil.rmtree(tmpdir / "downloads")
+    shutil.rmtree(tmpdir / ".some_bleeding_release")
+
+    # Assert that we can overwrite the build inside "some_bleeding_release"
+    cli_main()
+
+
 def test_pyver_is_deprecated():
     """Pyver is not being used anywhere in the code and has been deprecated.
     This test ensures that its use prints a message in stderr.
