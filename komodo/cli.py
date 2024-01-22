@@ -1,6 +1,7 @@
 import argparse
 import contextlib
 import datetime
+import glob
 import os
 import sys
 import uuid
@@ -163,8 +164,10 @@ def _main(args):
         sudo=args.sudo,
     )
     start_time = datetime.datetime.now()
+
+    delete_files_glob = glob.glob(f"{args.prefix}/{args.release}.delete-*")
     shell(
-        f"rm -rf {args.prefix}/{args.release}.delete-*",
+        "rm -rf -- " + " ".join(delete_files_glob),
         sudo=args.sudo,
         allow_failure=True,
     )
