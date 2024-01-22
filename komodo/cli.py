@@ -151,8 +151,8 @@ def _main(args):
     )
     _print_timings(timings[-1])
 
-    prefix_path = Path(f"{args.prefix}")
-    release_path = Path(f"{args.prefix}/{args.release}")
+    prefix_path = Path(args.prefix)
+    release_path = prefix_path / Path(args.release)
 
     if release_path.exists():
         shell(
@@ -185,7 +185,6 @@ def _main(args):
         # undesired when building on nfs.
         os.environ["TMPDIR"] = args.tmp
 
-    release_path = Path(args.prefix) / Path(args.release)
     release_root = release_path / "root"
     start_time = datetime.datetime.now()
     for pkg, ver in args.pkgs.content.items():
