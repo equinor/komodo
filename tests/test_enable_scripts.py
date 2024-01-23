@@ -18,11 +18,11 @@ def _load_envs():
 
 TEST_SCRIPT_SIMPLE = """\
 {set_envs}
-python -c 'import os, json; print(json.dumps(dict(os.environ)))' > pre_source.env
+python3 -c 'import os, json; print(json.dumps(dict(os.environ)))' > pre_source.env
 source {enable_path}
-python -c 'import os, json; print(json.dumps(dict(os.environ)))' > sourced.env
+python3 -c 'import os, json; print(json.dumps(dict(os.environ)))' > sourced.env
 disable_komodo
-python -c 'import os, json; print(json.dumps(dict(os.environ)))' > post_disable.env
+python3 -c 'import os, json; print(json.dumps(dict(os.environ)))' > post_disable.env
 """
 
 
