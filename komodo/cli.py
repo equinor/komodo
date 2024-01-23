@@ -82,8 +82,14 @@ def _main(args):
     if args.download and not args.build:
         sys.exit(0)
 
-    if (Path(args.prefix) / args.release).exists() and "bleeding" not in args.release:
-        raise RuntimeError("Only bleeding builds can be overwritten")
+    if (
+        not args.overwrite
+        and (Path(args.prefix) / args.release).exists()
+        and "bleeding" not in args.release
+    ):
+        raise RuntimeError(
+            "Only bleeding builds can be overwritten unless --overwrite is supplied"
+        )
 
     # append root to the temporary build dir, as we want a named root/
     # directory as the distribution root, organised under the distribution name
@@ -386,6 +392,14 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         help=(
             "Flag to choose whether stop before installing the environment. "
             "to the `prefix` location."
+        ),
+    )
+    optional_args.add_argument(
+        "--overwrite",
+        action="store_true",
+        help=(
+            "If set, any existing release will be overwritten. "
+            "If `bleeding` is part of the release name, this is impliclity true."
         ),
     )
     optional_args.add_argument(
