@@ -6,7 +6,7 @@ python:
     makeopts: --python-version 3.10
 
 treelib:
-  1.6.1:
+  1.7.0:
     source: pypi
     make: pip
     maintainer: bar@example.com
