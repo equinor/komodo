@@ -178,6 +178,30 @@ def test_bleeding_overwrite_by_default(tmpdir):
     cli_main()
 
 
+def test_overwrite_if_option_is_set(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        "--overwrite",
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "some_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    # Remove non-interesting leftovers from first build:
+    shutil.rmtree(tmpdir / "downloads")
+    shutil.rmtree(tmpdir / ".some_release")
+
+    # Assert that we can overwrite the build inside "some_release"
+    cli_main()
+
+
 def test_pyver_is_deprecated():
     """Pyver is not being used anywhere in the code and has been deprecated.
     This test ensures that its use prints a message in stderr.
