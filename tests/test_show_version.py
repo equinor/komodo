@@ -16,7 +16,7 @@ def test_read_config_file(mock_config_file):
     """Test the function that reads sectionless INI files."""
     config = read_config("foo.cfg")
     mock_config_file.assert_called_once_with("foo.cfg", encoding="utf-8")
-    assert config["home"] == "/foo/bar/komodo-release-0.0.1/root/bin"
+    assert config["current-release"] == "komodo-release-0.0.1"
 
 
 @pytest.mark.usefixtures("mock_komodo_env_vars")
@@ -50,9 +50,9 @@ def test_get_komodoenv_path(mock_config_file):
     the actual manifest file path from the `pyvenv.cfg` file.
     """
     release = get_release()
-    path = Path("/foo/bar/komodo-release-0.0.1")
+    path = Path("/foo/bar/komodo-release-0.0.1-rhel7")
     assert get_komodoenv_path(release) == path
-    fname = Path("/quux/komodo-release/root/pyvenv.cfg")
+    fname = Path("/quux/komodo-release/komodoenv.conf")
     mock_config_file.assert_called_once_with(fname, encoding="utf-8")
 
 
