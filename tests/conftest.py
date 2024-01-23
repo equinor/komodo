@@ -46,12 +46,16 @@ def mock_komodoenv_env_vars():
 @pytest.fixture()
 def mock_config_file():
     """Mock a sectionless INI file, which is the format komodoenv writes into
-    the pyvenv.cfg file that points to the real komodo root.
+    the komodoenv.conf file that points to the real komodo root.
     """
     read_data = (
-        "home = /foo/bar/komodo-release-0.0.1/root/bin\n"
-        "include-system-site-packages = false\n"
-        "version = 3.8.14\n"
+        "current-release = komodo-release-0.0.1\n"
+        "tracked-release = stable-py38\n"
+        "mtime-release = 9999999999\n"
+        "python-version = 3.8\n"
+        "komodoenv-version = 0.0.1\n"
+        "komodo-root = /foo/bar\n"
+        "linux-dist = rhel7\n"
     )
     m = mock_open(read_data=read_data)
     with patch("builtins.open", m):
