@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -216,3 +217,42 @@ def test_pyver_is_deprecated():
         _ = parse_args(cmd.split())
 
     assert "The --pyver option is deprecated" in record[0].message.args[0]
+
+
+def test_bleeding_builds_marked_for_deletion_are_removed(tmpdir):
+    prefix_path = Path(tmpdir).absolute()
+    prefix_path_str = str(prefix_path)
+
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        prefix_path_str,
+        "--release",
+        "some_bleeding_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+
+    test_dirs = [
+        prefix_path_str + "/some_bleeding_release.delete-7632",
+        prefix_path_str + "/some_bleeding_release.delete-4342",
+        prefix_path_str + "/some_bleeding_release.delete-1234",
+    ]
+
+    def count_release_folders_to_be_deleted() -> int:
+        release_dir_glob = [
+            str(p.absolute())
+            for p in list(Path(prefix_path).glob("some_bleeding_release.delete-*"))
+        ]
+        return len(release_dir_glob) if release_dir_glob else 0
+
+    for d in test_dirs:
+        os.makedirs(d)
+
+    assert count_release_folders_to_be_deleted() == len(test_dirs)
+    cli_main()
+    assert count_release_folders_to_be_deleted() == 0

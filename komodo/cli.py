@@ -177,7 +177,7 @@ def _main(args):
     start_time = datetime.datetime.now()
 
     release_dir_glob = [
-        str(p.absolute()) for p in list(prefix_path.glob("{args.release}.delete-*"))
+        str(p.absolute()) for p in list(prefix_path.glob(f"{args.release}.delete-*"))
     ]
 
     shell(
