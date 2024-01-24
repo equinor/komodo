@@ -50,7 +50,7 @@ if ( `uname -r` =~ *el7* ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-elif ( `uname -r` =~ *el8* ) then
+else if ( `uname -r` =~ *el8* ) then
     setenv KOMODO_ROOT {prefix}
     set KOMODO_RELEASE_REAL = "{expected_release}"
 
@@ -59,7 +59,7 @@ elif ( `uname -r` =~ *el8* ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-elif ( `uname -r` =~ *el6* ) then
+else if ( `uname -r` =~ *el6* ) then
     echo -e "{MIGRATION_WARNING}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
