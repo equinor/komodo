@@ -281,7 +281,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.build.dfs">
-<span class="sig-prename descclassname"><span class="pre">komodo.build.</span></span><span class="sig-name descname"><span class="pre">dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pkgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.build.dfs" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">komodo.build.</span></span><span class="sig-name descname"><span class="pre">dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pkgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.build.dfs" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -297,7 +297,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.build.make">
-<span class="sig-prename descclassname"><span class="pre">komodo.build.</span></span><span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pkgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlprefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builddir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cmake'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtualenv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fakeroot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.build.make" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">komodo.build.</span></span><span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pkgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlprefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builddir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cmake'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtualenv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fakeroot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.build.make" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -564,16 +564,52 @@ Having a separated function makes it easier to test the CLI.</p>
 </section>
 <section id="module-komodo.lint">
 <span id="komodo-lint-module"></span><h2>komodo.lint module<a class="headerlink" href="#module-komodo.lint" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.lint.KomodoError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.lint.</span></span><span class="sig-name descname"><span class="pre">KomodoError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maintainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.lint.KomodoError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.lint.KomodoError.depends">
+<span class="sig-name descname"><span class="pre">depends</span></span><a class="headerlink" href="#komodo.lint.KomodoError.depends" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.lint.KomodoError.err">
+<span class="sig-name descname"><span class="pre">err</span></span><a class="headerlink" href="#komodo.lint.KomodoError.err" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.lint.KomodoError.maintainer">
+<span class="sig-name descname"><span class="pre">maintainer</span></span><a class="headerlink" href="#komodo.lint.KomodoError.maintainer" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.lint.KomodoError.package">
+<span class="sig-name descname"><span class="pre">package</span></span><a class="headerlink" href="#komodo.lint.KomodoError.package" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.lint.KomodoError.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#komodo.lint.KomodoError.version" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.lint.Report">
+<span class="sig-prename descclassname"><span class="pre">komodo.lint.</span></span><span class="sig-name descname"><span class="pre">Report</span></span><a class="headerlink" href="#komodo.lint.Report" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LintReport</span></code></p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.lint.get_args">
 <span class="sig-prename descclassname"><span class="pre">komodo.lint.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#komodo.lint.get_args" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="komodo.lint.komodo_error">
-<span class="sig-prename descclassname"><span class="pre">komodo.lint.</span></span><span class="sig-name descname"><span class="pre">komodo_error</span></span><a class="headerlink" href="#komodo.lint.komodo_error" title="Link to this definition">#</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">KomodoError</span></code></p>
-</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.lint.lint">
@@ -589,12 +625,6 @@ Having a separated function makes it easier to test the CLI.</p>
 <dt class="sig sig-object py" id="komodo.lint.lint_version_numbers">
 <span class="sig-prename descclassname"><span class="pre">komodo.lint.</span></span><span class="sig-name descname"><span class="pre">lint_version_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.lint.lint_version_numbers" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="komodo.lint.report">
-<span class="sig-prename descclassname"><span class="pre">komodo.lint.</span></span><span class="sig-name descname"><span class="pre">report</span></span><a class="headerlink" href="#komodo.lint.report" title="Link to this definition">#</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LintReport</span></code></p>
-</dd></dl>
 
 </section>
 <section id="module-komodo.lint_maturity">
@@ -1205,9 +1235,45 @@ argument is expected to be a komodo.data.Data instance.</p>
 </section>
 <section id="module-komodo.yaml_file_types">
 <span id="komodo-yaml-file-types-module"></span><h2>komodo.yaml_file_types module<a class="headerlink" href="#module-komodo.yaml_file_types" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">KomodoError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maintainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.KomodoError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoError.depends">
+<span class="sig-name descname"><span class="pre">depends</span></span><a class="headerlink" href="#komodo.yaml_file_types.KomodoError.depends" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoError.err">
+<span class="sig-name descname"><span class="pre">err</span></span><a class="headerlink" href="#komodo.yaml_file_types.KomodoError.err" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoError.maintainer">
+<span class="sig-name descname"><span class="pre">maintainer</span></span><a class="headerlink" href="#komodo.yaml_file_types.KomodoError.maintainer" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoError.package">
+<span class="sig-name descname"><span class="pre">package</span></span><a class="headerlink" href="#komodo.yaml_file_types.KomodoError.package" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoError.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#komodo.yaml_file_types.KomodoError.version" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py exception">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.KomodoException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">KomodoException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">KomodoError</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.KomodoException" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">KomodoException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.KomodoError" title="komodo.yaml_file_types.KomodoError"><span class="pre">KomodoError</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.KomodoException" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
@@ -1370,7 +1436,7 @@ argument is expected to be a komodo.data.Data instance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile.lint_release_name">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lint_release_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packagefile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">KomodoError</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.lint_release_name" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lint_release_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packagefile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#komodo.yaml_file_types.KomodoError" title="komodo.yaml_file_types.KomodoError"><span class="pre">KomodoError</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.lint_release_name" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1378,6 +1444,12 @@ argument is expected to be a komodo.data.Data instance.</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_release_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_file_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.validate_release_file" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.Report">
+<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">Report</span></span><a class="headerlink" href="#komodo.yaml_file_types.Report" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LintReport</span></code></p>
 </dd></dl>
 
 <dl class="py class">
@@ -1392,12 +1464,12 @@ argument is expected to be a komodo.data.Data instance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.lint_maintainer">
-<span class="sig-name descname"><span class="pre">lint_maintainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">KomodoError</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.lint_maintainer" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">lint_maintainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#komodo.yaml_file_types.KomodoError" title="komodo.yaml_file_types.KomodoError"><span class="pre">KomodoError</span></a></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.lint_maintainer" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.validate_package_entry">
-<span class="sig-name descname"><span class="pre">validate_package_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">KomodoError</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.validate_package_entry" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">validate_package_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#komodo.yaml_file_types.KomodoError" title="komodo.yaml_file_types.KomodoError"><span class="pre">KomodoError</span></a></span></span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.validate_package_entry" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1453,12 +1525,6 @@ and returns a list of error messages.</p>
 <span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">handle_validation_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.handle_validation_errors" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="komodo.yaml_file_types.komodo_error">
-<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">komodo_error</span></span><a class="headerlink" href="#komodo.yaml_file_types.komodo_error" title="Link to this definition">#</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">KomodoError</span></code></p>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.load_package_status_file">
 <span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">load_package_status_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_status_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.load_package_status_file" title="Link to this definition">#</a></dt>
@@ -1473,12 +1539,6 @@ and returns a list of error messages.</p>
 <dt class="sig sig-object py" id="komodo.yaml_file_types.load_yaml_from_string">
 <span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">load_yaml_from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#komodo.yaml_file_types.load_yaml_from_string" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="komodo.yaml_file_types.report">
-<span class="sig-prename descclassname"><span class="pre">komodo.yaml_file_types.</span></span><span class="sig-name descname"><span class="pre">report</span></span><a class="headerlink" href="#komodo.yaml_file_types.report" title="Link to this definition">#</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LintReport</span></code></p>
-</dd></dl>
 
 </section>
 <section id="module-komodo">
@@ -1614,12 +1674,19 @@ and returns a list of error messages.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-komodo.lint">komodo.lint module</a><ul>
+<li><a class="reference internal" href="#komodo.lint.KomodoError"><code class="docutils literal notranslate"><span class="pre">KomodoError</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.lint.KomodoError.depends"><code class="docutils literal notranslate"><span class="pre">KomodoError.depends</span></code></a></li>
+<li><a class="reference internal" href="#komodo.lint.KomodoError.err"><code class="docutils literal notranslate"><span class="pre">KomodoError.err</span></code></a></li>
+<li><a class="reference internal" href="#komodo.lint.KomodoError.maintainer"><code class="docutils literal notranslate"><span class="pre">KomodoError.maintainer</span></code></a></li>
+<li><a class="reference internal" href="#komodo.lint.KomodoError.package"><code class="docutils literal notranslate"><span class="pre">KomodoError.package</span></code></a></li>
+<li><a class="reference internal" href="#komodo.lint.KomodoError.version"><code class="docutils literal notranslate"><span class="pre">KomodoError.version</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#komodo.lint.Report"><code class="docutils literal notranslate"><span class="pre">Report</span></code></a></li>
 <li><a class="reference internal" href="#komodo.lint.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
-<li><a class="reference internal" href="#komodo.lint.komodo_error"><code class="docutils literal notranslate"><span class="pre">komodo_error</span></code></a></li>
 <li><a class="reference internal" href="#komodo.lint.lint"><code class="docutils literal notranslate"><span class="pre">lint()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.lint.lint_main"><code class="docutils literal notranslate"><span class="pre">lint_main()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.lint.lint_version_numbers"><code class="docutils literal notranslate"><span class="pre">lint_version_numbers()</span></code></a></li>
-<li><a class="reference internal" href="#komodo.lint.report"><code class="docutils literal notranslate"><span class="pre">report</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-komodo.lint_maturity">komodo.lint_maturity module</a><ul>
@@ -1754,6 +1821,14 @@ and returns a list of error messages.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-komodo.yaml_file_types">komodo.yaml_file_types module</a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoError"><code class="docutils literal notranslate"><span class="pre">KomodoError</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoError.depends"><code class="docutils literal notranslate"><span class="pre">KomodoError.depends</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoError.err"><code class="docutils literal notranslate"><span class="pre">KomodoError.err</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoError.maintainer"><code class="docutils literal notranslate"><span class="pre">KomodoError.maintainer</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoError.package"><code class="docutils literal notranslate"><span class="pre">KomodoError.package</span></code></a></li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.KomodoError.version"><code class="docutils literal notranslate"><span class="pre">KomodoError.version</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.KomodoException"><code class="docutils literal notranslate"><span class="pre">KomodoException</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ManifestFile"><code class="docutils literal notranslate"><span class="pre">ManifestFile</span></code></a><ul>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ManifestFile.validate_manifest_file"><code class="docutils literal notranslate"><span class="pre">ManifestFile.validate_manifest_file()</span></code></a></li>
@@ -1794,6 +1869,7 @@ and returns a list of error messages.</p>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.validate_release_file"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.validate_release_file()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#komodo.yaml_file_types.Report"><code class="docutils literal notranslate"><span class="pre">Report</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile"><code class="docutils literal notranslate"><span class="pre">RepositoryFile</span></code></a><ul>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.from_yaml_string()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.lint_maintainer"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.lint_maintainer()</span></code></a></li>
@@ -1811,11 +1887,9 @@ and returns a list of error messages.</p>
 </li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.YamlFile"><code class="docutils literal notranslate"><span class="pre">YamlFile</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.handle_validation_errors"><code class="docutils literal notranslate"><span class="pre">handle_validation_errors()</span></code></a></li>
-<li><a class="reference internal" href="#komodo.yaml_file_types.komodo_error"><code class="docutils literal notranslate"><span class="pre">komodo_error</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.load_package_status_file"><code class="docutils literal notranslate"><span class="pre">load_package_status_file()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.load_repository_file"><code class="docutils literal notranslate"><span class="pre">load_repository_file()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.load_yaml_from_string"><code class="docutils literal notranslate"><span class="pre">load_yaml_from_string()</span></code></a></li>
-<li><a class="reference internal" href="#komodo.yaml_file_types.report"><code class="docutils literal notranslate"><span class="pre">report</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-komodo">Module contents</a></li>
