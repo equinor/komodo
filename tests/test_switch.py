@@ -60,7 +60,9 @@ else if ( `uname -r` =~ *el8* ) then
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else if ( `uname -r` =~ *el6* ) then
-    echo -e "{MIGRATION_WARNING}"
+    echo "Attention! Your machine is running on an environment that is not supported. RHEL6 has been phased out."
+    echo "From October 2020, komodo versions only support RHEL7."
+    echo "Please migrate as soon as possible. If you have any questions or issues - contact us on #ert-users on Slack or Equinor's Yammer."
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 endif
