@@ -3,6 +3,7 @@ release matrix system. It should allow other parts of komodo to be capable of
 handling an arbitrary large and funky matrix, without having to guess and/or
 repeat itself.
 """
+
 import itertools
 import re
 from typing import Iterator, Sequence, Tuple
