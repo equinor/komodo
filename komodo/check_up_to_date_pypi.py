@@ -3,6 +3,7 @@ import copy
 import pathlib
 import re
 import sys
+from typing import Dict, List
 
 import requests
 import ruamel.yaml
@@ -56,7 +57,21 @@ def get_python_requirement(sources: list):
     return ""
 
 
-def compatible_versions(releases: dict, python_version):
+def is_platform_compatible(build_info: List[Dict], platform: str) -> bool:
+    if platform == "darwin":
+        platform = "macos"
+    if platform == "linux2":
+        platform = "linux"
+    for build in build_info:
+        filename: str = build.get("filename", "")
+        if platform in filename.lower():
+            return True
+        if "none-any" in filename or ".tar.gz" in filename:
+            return True
+    return False
+
+
+def compatible_versions(releases: dict, python_version, platform: str):
     compatible_versions = []
     for version_str, build_info in releases.items():
         try:
@@ -71,7 +86,9 @@ def compatible_versions(releases: dict, python_version):
             continue
         except InvalidSpecifier:
             continue
-        if python_version in required_python:
+        if python_version in required_python and is_platform_compatible(
+            build_info, platform
+        ):
             compatible_versions.append(package_version)
     return compatible_versions
 
@@ -93,9 +110,7 @@ def get_pypi_packages(release: dict, repository: dict) -> list:
 
 
 def get_upgrade_proposals_from_pypi(
-    releases: dict,
-    repository: dict,
-    python_version: str,
+    releases: dict, repository: dict, python_version: str, platform: str
 ) -> dict:
     pypi_packages = get_pypi_packages(releases, repository)
     pypi_responses = get_pypi_info(pypi_packages)
@@ -106,8 +121,7 @@ def get_upgrade_proposals_from_pypi(
         komodo_version = get_version.parse(strip_version(releases[package_name]))
         if response.ok:
             pypi_versions = compatible_versions(
-                response.json()["releases"],
-                python_version,
+                response.json()["releases"], python_version, platform
             )
             if not pypi_versions:
                 print(
@@ -154,6 +168,7 @@ def run_check_up_to_date(
     ),
     propose_upgrade=False,
     ignore=None,
+    platform=sys.platform,
 ):
     yaml = yaml_parser()
     releases: dict = load_from_file(yaml, release_file)
@@ -166,9 +181,7 @@ def run_check_up_to_date(
         }
     repository = load_from_file(yaml, repository_file)
     upgrade_proposals_from_pypi = get_upgrade_proposals_from_pypi(
-        releases,
-        repository,
-        python_version,
+        releases, repository, python_version, platform
     )
     if upgrade_proposals_from_pypi:
         if propose_upgrade:
@@ -281,6 +294,15 @@ def get_args() -> argparse.Namespace:
             "If given, will ignore packages with names that match the regex expression"
         ),
     )
+    parser.add_argument(
+        "--target-platform",
+        default=sys.platform,
+        choices=["darwin", "linux", "linux2", "win32"],
+        help=(
+            "Which OS the new package version should be compatible with. Should be either darwin (macos),"
+            " linux, linux2, or win32. Defaults to OS of host machine"
+        ),
+    )
 
     return parser.parse_args()
 
@@ -299,6 +321,7 @@ def main():
         args.python_version,
         args.propose_upgrade,
         args.ignore,
+        args.target_platform,
     )
 
 
