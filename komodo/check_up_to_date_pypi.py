@@ -71,7 +71,9 @@ def is_platform_compatible(build_info: List[Dict], platform: str) -> bool:
     return False
 
 
-def compatible_versions(releases: dict, python_version, platform: str):
+def compatible_versions(
+    releases: dict, python_version, platform: str
+) -> List[get_version.Version]:
     compatible_versions = []
     for version_str, build_info in releases.items():
         try:
@@ -110,7 +112,12 @@ def get_pypi_packages(release: dict, repository: dict) -> list:
 
 
 def get_upgrade_proposals_from_pypi(
-    releases: dict, repository: dict, python_version: str, platform: str
+    releases: dict,
+    repository: dict,
+    python_version: str,
+    platform: str,
+    minor_upgrade_only: bool = False,
+    patch_upgrade_only: bool = False,
 ) -> dict:
     pypi_packages = get_pypi_packages(releases, repository)
     pypi_responses = get_pypi_info(pypi_packages)
@@ -128,7 +135,22 @@ def get_upgrade_proposals_from_pypi(
                     f"Could not process package '{package_name}'. Check package manually"
                 )
                 continue
-            pypi_latest_version = max(pypi_versions)
+            if minor_upgrade_only:
+                pypi_versions = [
+                    ver for ver in pypi_versions if komodo_version.major == ver.major
+                ]
+            elif patch_upgrade_only:
+                pypi_versions = [
+                    ver
+                    for ver in pypi_versions
+                    if komodo_version.minor == ver.minor
+                    and komodo_version.major == ver.major
+                ]
+
+            if len(pypi_versions) > 0:
+                pypi_latest_version = max(pypi_versions)
+            else:
+                pypi_latest_version = komodo_version
         else:
             msg = f"Response returned non valid return code: {response.reason}"
             raise ValueError(
@@ -169,6 +191,8 @@ def run_check_up_to_date(
     propose_upgrade=False,
     ignore=None,
     platform=sys.platform,
+    minor_upgrade_only=False,
+    patch_upgrade_only=False,
 ):
     yaml = yaml_parser()
     releases: dict = load_from_file(yaml, release_file)
@@ -181,7 +205,12 @@ def run_check_up_to_date(
         }
     repository = load_from_file(yaml, repository_file)
     upgrade_proposals_from_pypi = get_upgrade_proposals_from_pypi(
-        releases, repository, python_version, platform
+        releases,
+        repository,
+        python_version,
+        platform,
+        minor_upgrade_only,
+        patch_upgrade_only,
     )
     if upgrade_proposals_from_pypi:
         if propose_upgrade:
@@ -287,7 +316,6 @@ def get_args() -> argparse.Namespace:
             " if a package requires >3.6, py-version 3.6 will not be considered valid)"
         ),
     )
-
     parser.add_argument(
         "--ignore",
         help=(
@@ -302,6 +330,18 @@ def get_args() -> argparse.Namespace:
             "Which OS the new package version should be compatible with. Should be either darwin (macos),"
             " linux, linux2, or win32. Defaults to OS of host machine"
         ),
+    )
+    specify_upgrade_mode_group = parser.add_mutually_exclusive_group()
+    specify_upgrade_mode_group.add_argument(
+        "--patch-upgrade",
+        default=False,
+        action="store_true",
+        help="Option to only upgrade patch versions 0.0.X",
+    )
+    specify_upgrade_mode_group.add_argument(
+        "--minor-upgrade",
+        action="store_true",
+        help="Option to upgrade minor and patch versions 0.X.X",
     )
 
     return parser.parse_args()
@@ -322,6 +362,8 @@ def main():
         args.propose_upgrade,
         args.ignore,
         args.target_platform,
+        args.minor_upgrade,
+        args.patch_upgrade,
     )
 
 
