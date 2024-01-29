@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 import functools
 import os
 import pathlib
@@ -919,3 +920,105 @@ def test_suggestor_shows_platform_independent_packages_and_source_distributions(
     system_exit_message = capsys.readouterr().out
     assert "dummy_package_compatible_upgrade_exists" in system_exit_message
     assert "dummy_package_compatible_upgrade_does_not_exist" not in system_exit_message
+
+
+@pytest.mark.parametrize(
+    "flag, expected_messages, unexpected_messages",
+    [
+        pytest.param(
+            "--patch-upgrade",
+            ["dummy_package_patch"],
+            ["dummy_package_minor", "dummy_package_major"],
+            id="Upgrade_patch_versions",
+        ),
+        pytest.param(
+            "--minor-upgrade",
+            ["dummy_package_minor", "dummy_package_patch"],
+            ["dummy_package_major"],
+            id="Upgrade_minor_and_patch_versions",
+        ),
+    ],
+)
+def test_upgrade_specific_versions_flag(
+    flag, expected_messages, unexpected_messages, tmpdir, monkeypatch, capsys
+):
+    repository_file_content = """
+    dummy_package_patch:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_minor:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+
+    dummy_package_major:
+      1.0.0:
+        source: pypi
+        make: pip
+        maintainer: scout
+    """
+
+    release_file_content = """
+                    dummy_package_patch: 1.0.0
+                    dummy_package_minor: 1.0.0
+                    dummy_package_major: 1.0.0
+    """
+    with tmpdir.as_cwd():
+        with open("repository_file.yml", mode="w", encoding="utf-8") as fout:
+            fout.write(repository_file_content)
+        with open("release_file.yml", mode="w", encoding="utf-8") as fout:
+            fout.write(release_file_content)
+        folder_name = os.getcwd()
+
+    def side_effect(url: str, timeout):
+        if "dummy_package_patch" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {
+                    "1.0.1": [{"filename": f"wheel_for_macos_{sys.platform}.whl"}]
+                },
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        elif "dummy_package_minor" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {
+                    "1.1.0": [{"filename": f"wheel_for_macos_{sys.platform}.whl"}]
+                },
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        elif "dummy_package_major" in url.split("/"):
+            request_mock = MagicMock()
+            request_json = {
+                "releases": {
+                    "2.0.0": [{"filename": f"wheel_for_macos_{sys.platform}.whl"}]
+                },
+            }
+            request_mock.json.return_value = request_json
+            return request_mock
+        else:
+            raise ValueError(
+                f"INCORRECT PACKAGE NAME ENTERED! {str(url)} Called with timeout={timeout}"
+            )
+
+    arguments = [
+        "",
+        f"{folder_name}/release_file.yml",
+        f"{folder_name}/repository_file.yml",
+        flag,
+    ]
+    monkeypatch.setattr(sys, "argv", arguments)
+    monkeypatch.setattr(requests, "get", MagicMock(side_effect=side_effect))
+
+    check_up_to_date_pypi.main()
+    system_exit_message = capsys.readouterr().out
+    for message in expected_messages:
+        assert message in system_exit_message
+    for message in unexpected_messages:
+        assert message not in system_exit_message
