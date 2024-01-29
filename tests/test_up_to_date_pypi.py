@@ -1,3 +1,4 @@
+import functools
 import os
 import pathlib
 import sys
@@ -22,24 +23,54 @@ from komodo.check_up_to_date_pypi import (
 @pytest.mark.parametrize(
     "input_dict",
     [
-        pytest.param({"1.0.0": []}, id="Just valid tag"),
-        pytest.param({"1.0.0": [], "2.0.0a0": []}, id="Pre-release tag"),
-        pytest.param({"1.0.0": [], "2.0.0.dev": []}, id="Dev tag"),
         pytest.param(
-            {"1.0.0": [], "2.0.0": [{"requires_python": ">3.7"}]},
+            {"1.0.0": [{"filename": "wheel_for_stub_platform.whl"}]},
+            id="Just valid tag",
+        ),
+        pytest.param(
+            {
+                "1.0.0": [{"filename": "wheel_for_stub_platform.whl"}],
+                "2.0.0a0": [{"filename": "wheel_for_stub_platform.whl"}],
+            },
+            id="Pre-release tag",
+        ),
+        pytest.param(
+            {
+                "1.0.0": [{"filename": "wheel_for_stub_platform.whl"}],
+                "2.0.0.dev": [{"filename": "wheel_for_stub_platform.whl"}],
+            },
+            id="Dev tag",
+        ),
+        pytest.param(
+            {
+                "1.0.0": [{"filename": "wheel_for_stub_platform.whl"}],
+                "2.0.0": [
+                    {
+                        "filename": "wheel_for_stub_platform.whl",
+                        "requires_python": ">3.7",
+                    }
+                ],
+            },
             id="Too high python requirement on 2.0",
         ),
         pytest.param(
             {
-                "1.0.0": [{"requires_python": ">3"}],
-                "2.0.0": [{"requires_python": ">3.7"}],
+                "1.0.0": [
+                    {"requires_python": ">3", "filename": "wheel_for_stub_platform.whl"}
+                ],
+                "2.0.0": [
+                    {
+                        "requires_python": ">3.7",
+                        "filename": "wheel_for_stub_platform.whl",
+                    }
+                ],
             },
             id="Latest version not compatible",
         ),
     ],
 )
 def test_compatible_versions(input_dict):
-    result = compatible_versions(input_dict, "3.6.10")
+    result = compatible_versions(input_dict, "3.6.10", "stub_platform")
     assert result == [version.parse("1.0.0")]
 
 
@@ -131,11 +162,7 @@ def test_insert_upgrade_proposals(release, repository, suggestions, expected):
     yaml = yaml_parser()
     repository = yaml.load(str(repository))
     release = yaml.load(str(release))
-    insert_upgrade_proposals(
-        suggestions,
-        repository,
-        release,
-    )
+    insert_upgrade_proposals(suggestions, repository, release)
     assert {"release": release, "repo": repository} == expected
 
 
@@ -154,7 +181,9 @@ def test_run(monkeypatch):
         "compatible_versions",
         compatible_versions,
     )
-    result = get_upgrade_proposals_from_pypi(release, repository, "3.6.8")
+    result = get_upgrade_proposals_from_pypi(
+        release, repository, "3.6.8", "stub_platform"
+    )
     assert result == {"dummy_package": {"previous": "1.0.0", "suggested": "2.0.0"}}
 
 
@@ -234,7 +263,12 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
         request_mock.json.return_value = {
             "releases": {
                 "2.2.0": [{"yanked": True}],
-                "2.0.0": [{"requires_python": ">=3.8"}],
+                "2.0.0": [
+                    {
+                        "requires_python": ">=3.8",
+                        "filename": f"valid_upgrade_for_macos_{sys.platform}",
+                    }
+                ],
             },
         }
         monkeypatch.setattr(requests, "get", MagicMock(return_value=request_mock))
@@ -283,7 +317,9 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
                 },
             },
             {
-                "releases": {"2.0.0": []},
+                "releases": {
+                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             },
             {
                 "release": {"dummy_package": "2.0.0", "custom_package": "1.1.1"},
@@ -322,7 +358,9 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
                 },
             },
             {
-                "releases": {"2.0.0": []},
+                "releases": {
+                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             },
             {
                 "release": {
@@ -361,7 +399,9 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
                 },
             },
             {
-                "releases": {"2.0.0": []},
+                "releases": {
+                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             },
             {
                 "release": {"dummy_package": "2.0.0"},
@@ -390,7 +430,10 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
                 },
             },
             {
-                "releases": {"2.2.0": [{"yanked": True}], "2.0.0": []},
+                "releases": {
+                    "2.2.0": [{"yanked": True}],
+                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}],
+                },
             },
             {
                 "release": {"dummy_package": "2.0.0"},
@@ -517,21 +560,33 @@ def test_upgrade_type_grouping(release_file_content, tmpdir, monkeypatch, capsys
             if "dummy_package_patch" in url.split("/"):
                 request_mock = MagicMock()
                 request_json = {
-                    "releases": {"1.0.1": []},
+                    "releases": {
+                        "1.0.1": [
+                            {"filename": f"valid_upgrade_for_macos_{sys.platform}"}
+                        ]
+                    },
                 }
                 request_mock.json.return_value = request_json
                 return request_mock
             elif "dummy_package_minor" in url.split("/"):
                 request_mock = MagicMock()
                 request_json = {
-                    "releases": {"1.1.0": []},
+                    "releases": {
+                        "1.1.0": [
+                            {"filename": f"valid_upgrade_for_macos_{sys.platform}"}
+                        ]
+                    },
                 }
                 request_mock.json.return_value = request_json
                 return request_mock
             elif "dummy_package_major" in url.split("/"):
                 request_mock = MagicMock()
                 request_json = {
-                    "releases": {"2.0.0": []},
+                    "releases": {
+                        "2.0.0": [
+                            {"filename": f"valid_upgrade_for_macos_{sys.platform}"}
+                        ]
+                    },
                 }
                 request_mock.json.return_value = request_json
                 return request_mock
@@ -630,35 +685,45 @@ def test_upgrade_ignore_flag(
         if "dummy_package_patch" in url.split("/"):
             request_mock = MagicMock()
             request_json = {
-                "releases": {"1.0.1": []},
+                "releases": {
+                    "1.0.1": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             }
             request_mock.json.return_value = request_json
             return request_mock
         elif "dummy_package_minor" in url.split("/"):
             request_mock = MagicMock()
             request_json = {
-                "releases": {"1.1.0": []},
+                "releases": {
+                    "1.1.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             }
             request_mock.json.return_value = request_json
             return request_mock
         elif "dummy_package_major" in url.split("/"):
             request_mock = MagicMock()
             request_json = {
-                "releases": {"2.0.0": []},
+                "releases": {
+                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             }
             request_mock.json.return_value = request_json
             return request_mock
         elif "dummy_package_main_should_not_update" in url.split("/"):
             request_mock = MagicMock()
             request_json = {
-                "releases": {"4.4.3": []},
+                "releases": {
+                    "4.4.3": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             }
             request_mock.json.return_value = request_json
             return request_mock
         elif "dummy_package_should_not_update" in url.split("/"):
             request_mock = MagicMock()
             request_json = {
-                "releases": {"2.0.0": []},
+                "releases": {
+                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
+                },
             }
             request_mock.json.return_value = request_json
             return request_mock
@@ -681,3 +746,176 @@ def test_upgrade_ignore_flag(
     system_exit_message = capsys.readouterr().out
     assert "dummy_package_should_not_update" not in system_exit_message
     assert "dummy_package_main_should_not_update" not in system_exit_message
+
+
+def create_stub_files(tmpdir) -> str:
+    stub_release_file_content = """
+        dummy_package_compatible_upgrade_exists: 1.0.0
+        dummy_package_compatible_upgrade_does_not_exist: 1.0.0
+    """
+
+    stub_repository_file_content = """
+        dummy_package_compatible_upgrade_exists:
+          1.0.0:
+            source: pypi
+            make: pip
+            maintainer: scout
+
+        dummy_package_compatible_upgrade_does_not_exist:
+          1.0.0:
+            source: pypi
+            make: pip
+            maintainer: scout
+    """
+    with tmpdir.as_cwd():
+        with open("repository_file.yml", mode="w", encoding="utf-8") as fout:
+            fout.write(stub_repository_file_content)
+        with open("release_file.yml", mode="w", encoding="utf-8") as fout:
+            fout.write(stub_release_file_content)
+        return os.getcwd()
+
+
+def side_effect(url: str, timeout, target_platform):
+    request_mock = MagicMock()
+    if "dummy_package_compatible_upgrade_exists" in url.split("/"):
+        request_json = {
+            "releases": {
+                "1.1.0": [{"filename": f"valid_upgrade_for_macos_{target_platform}"}],
+            },
+        }
+    elif "dummy_package_compatible_upgrade_does_not_exist" in url.split("/"):
+        request_json = {
+            "releases": {
+                "1.1.0": [{"filename": "valid_upgrade_for_different_os"}],
+                "1.0.0": [
+                    {"filename": f"valid_old_version_for_macos_{target_platform}"}
+                ],
+            },
+        }
+    else:
+        raise ValueError(
+            f"INCORRECT PACKAGE NAME ENTERED! {str(url)} Called with timeout={timeout}"
+        )
+    request_mock.json.return_value = request_json
+    return request_mock
+
+
+@pytest.mark.parametrize(
+    "target_platform",
+    [
+        pytest.param("darwin", id="macos"),
+        pytest.param("win32", id="windows"),
+        pytest.param("linux", id="linux"),
+        pytest.param("linux2", id="linux2"),
+    ],
+)
+def test_suggestor_filters_out_os_incompatible_versions_for_host_platform_by_default(
+    target_platform, tmpdir, monkeypatch, capsys
+):
+    monkeypatch.setattr(sys, "platform", target_platform)
+
+    folder_name = create_stub_files(tmpdir)
+
+    arguments = [
+        "",
+        f"{folder_name}/release_file.yml",
+        f"{folder_name}/repository_file.yml",
+    ]
+    monkeypatch.setattr(sys, "argv", arguments)
+    monkeypatch.setattr(
+        requests,
+        "get",
+        MagicMock(
+            side_effect=functools.partial(side_effect, target_platform=target_platform)
+        ),
+    )
+    check_up_to_date_pypi.main()
+    system_exit_message = capsys.readouterr().out
+    assert "dummy_package_compatible_upgrade_exists" in system_exit_message
+    assert "dummy_package_compatible_upgrade_does_not_exist" not in system_exit_message
+
+
+@pytest.mark.parametrize(
+    "target_platform",
+    [
+        pytest.param("darwin", id="macos"),
+        pytest.param("win32", id="windows"),
+        pytest.param("linux", id="linux"),
+        pytest.param("linux2", id="linux2"),
+    ],
+)
+def test_suggestor_filters_out_os_incompatible_versions_on_specific_platform_flag(
+    target_platform, tmpdir, monkeypatch, capsys
+):
+    folder_name = create_stub_files(tmpdir)
+
+    arguments = [
+        "",
+        f"{folder_name}/release_file.yml",
+        f"{folder_name}/repository_file.yml",
+        "--target-platform",
+        target_platform,
+    ]
+    monkeypatch.setattr(sys, "argv", arguments)
+    monkeypatch.setattr(
+        requests,
+        "get",
+        MagicMock(
+            side_effect=functools.partial(side_effect, target_platform=target_platform)
+        ),
+    )
+    check_up_to_date_pypi.main()
+    system_exit_message = capsys.readouterr().out
+    assert "dummy_package_compatible_upgrade_exists" in system_exit_message
+    assert "dummy_package_compatible_upgrade_does_not_exist" not in system_exit_message
+
+
+@pytest.mark.parametrize(
+    "filename",
+    ["package_sdist.tar.gz", "universal_wheel-none-any.whl"],
+)
+def test_suggestor_shows_platform_independent_packages_and_source_distributions(
+    filename, tmpdir, monkeypatch, capsys
+):
+    folder_name = create_stub_files(tmpdir)
+
+    arguments = [
+        "",
+        f"{folder_name}/release_file.yml",
+        f"{folder_name}/repository_file.yml",
+    ]
+    monkeypatch.setattr(sys, "argv", arguments)
+
+    def side_effect(url: str, timeout):
+        request_mock = MagicMock()
+        if "dummy_package_compatible_upgrade_exists" in url.split("/"):
+            request_json = {
+                "releases": {
+                    "1.1.0": [{"filename": f"{filename}"}],
+                },
+            }
+        elif "dummy_package_compatible_upgrade_does_not_exist" in url.split("/"):
+            request_json = {
+                "releases": {
+                    "1.1.0": [{"filename": "valid_upgrade_for_different_os"}],
+                    "1.0.0": [
+                        {"filename": f"valid_old_version_for_macos_{sys.platform}"}
+                    ],
+                },
+            }
+        else:
+            raise ValueError(
+                f"INCORRECT PACKAGE NAME ENTERED! {str(url)} Called with timeout={timeout}"
+            )
+        request_mock.json.return_value = request_json
+        return request_mock
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        MagicMock(side_effect=side_effect),
+    )
+    check_up_to_date_pypi.main()
+    system_exit_message = capsys.readouterr().out
+    assert "dummy_package_compatible_upgrade_exists" in system_exit_message
+    assert "dummy_package_compatible_upgrade_does_not_exist" not in system_exit_message
