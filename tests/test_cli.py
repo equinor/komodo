@@ -250,8 +250,8 @@ def test_bleeding_builds_marked_for_deletion_are_removed(tmpdir):
         ]
         return len(release_dir_glob) if release_dir_glob else 0
 
-    for d in test_dirs:
-        os.makedirs(d)
+    for test_dir in test_dirs:
+        os.makedirs(test_dir)
 
     assert count_release_folders_to_be_deleted() == len(test_dirs)
     cli_main()
