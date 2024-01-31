@@ -32,7 +32,7 @@ jobs:
 
     - name: Setup Komodo
       run: |
-        pip install -U pip wheel setuptools virtualenv
+        pip install -U pip wheel setuptools
         pip install ".[dev]"
 
     - name: Unit tests

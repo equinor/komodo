@@ -12,10 +12,6 @@ while test $# -gt 0; do
             shift
             export PREFIX=$1
             ;;
-        --virtualenv)
-            shift
-            export VIRTUALENV=$1
-            ;;
         --virtualenv-interpreter)
             shift
             export VIRTUALENV_INTERPRETER=$1
@@ -26,4 +22,4 @@ while test $# -gt 0; do
     esac
     shift
 done
-$VIRTUALENV -p $VIRTUALENV_INTERPRETER -v --always-copy --never-download --no-setuptools --no-pip --no-wheel ${FAKEROOT}/${PREFIX} 1>&2
+$VIRTUALENV_INTERPRETER -m venv --copies --without-pip ${FAKEROOT}/${PREFIX} >&2
