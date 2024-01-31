@@ -116,8 +116,10 @@ def msg_release_exception(release_basename, release_version):
 
 
 def get_release_version(release_basename, tag_exceptions_release):
-    if release_basename not in tag_exceptions_release:
-        release_version = get_release_type(release_basename)
+    release_cleanname = release_basename.split("-")[0]
+
+    if release_cleanname not in tag_exceptions_release:
+        release_version = get_release_type(release_cleanname)
     else:
         release_version = "exception"
 
@@ -129,7 +131,7 @@ def run(files_to_lint: List[str], tag_exceptions):
     system_warning_msg = ""
 
     for file_to_lint in files_to_lint:
-        release_basename = ".".join(os.path.basename(file_to_lint).split(".")[0:-1])
+        release_basename = os.path.basename(file_to_lint)
         release_version = get_release_version(
             release_basename,
             tag_exceptions["release"],
