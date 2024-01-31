@@ -117,7 +117,6 @@ def sh(
     pythonpath,
     bin_path,
     pip,
-    virtualenv,
     ld_lib_path,
     jobs=None,
     cmake=None,
@@ -138,7 +137,6 @@ def sh(
         cmd.append(f"--pythonpath {pythonpath}")
         cmd.append(f"--path {bin_path}")
         cmd.append(f"--pip {pip}")
-        cmd.append(f"--virtualenv {virtualenv}")
         cmd.append(f"--ld-library-path {ld_lib_path}")
         cmd.append(makeopts)
 
@@ -254,7 +252,6 @@ def make(
     jobs=1,
     cmk="cmake",
     pip="pip",
-    virtualenv=None,
     fakeroot=".",
 ):
     packages_needed = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
@@ -362,7 +359,6 @@ def make(
                 pythonpath=build_pythonpath,
                 bin_path=bin_path,
                 pip=pip,
-                virtualenv=virtualenv,
                 ld_lib_path=ld_lib_path,
                 jobs=jobs,
                 cmake=cmk,

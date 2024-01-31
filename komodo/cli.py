@@ -107,7 +107,6 @@ def _main(args):
             jobs=args.jobs,
             cmk=args.cmake,
             pip=args.pip,
-            virtualenv=args.virtualenv,
             fakeroot=str(fakeroot),
         )
         timings.append(
@@ -413,12 +412,6 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         type=str,
         default="pip",
         help="The command to use for pip builds.",
-    )
-    optional_args.add_argument(
-        "--virtualenv",
-        type=str,
-        default="virtualenv",
-        help="The command to use for virtual environment construction.",
     )
     optional_args.add_argument(
         "--pyver",
