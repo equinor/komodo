@@ -5,8 +5,7 @@ import sys
 from typing import Any, Dict, List, Optional
 
 from snyk import SnykClient
-from snyk.managers import OrganizationManager
-from snyk.models import Vulnerability
+from snyk.models import Organization, Vulnerability
 
 from komodo.yaml_file_types import ReleaseDir, ReleaseFile, RepositoryFile
 
@@ -109,10 +108,22 @@ def get_unique_issues(issues: List[Vulnerability]) -> List[Vulnerability]:
     return result
 
 
+def filter_vulnerability_issues(
+    snyk_issues: List[Vulnerability], release_packages: Dict[str, str]
+):
+    filtered_vulnerability_issues = []
+    for snyk_issue in snyk_issues:
+        vulnerable_package_name = snyk_issue.package
+        vulnerable_package_version = snyk_issue.version
+        if release_packages.get(vulnerable_package_name) == vulnerable_package_version:
+            filtered_vulnerability_issues.append(snyk_issue)
+    return filtered_vulnerability_issues
+
+
 def find_vulnerabilities(
     releases: Dict[str, Dict[str, str]],
     repository: Dict[str, Any],
-    org: OrganizationManager,
+    org: Organization,
 ) -> Dict[str, List[Vulnerability]]:
     result = {}
 
@@ -121,8 +132,10 @@ def find_vulnerabilities(
         snyk_search_string = create_snyk_search_string(pip_packages)
         snyk_result = org.test_pipfile(snyk_search_string)
         vulnerability_issues = get_unique_issues(snyk_result.issues.vulnerabilities)
-        result[release_name] = vulnerability_issues
-
+        filtered_vulnerabity_issues = filter_vulnerability_issues(
+            vulnerability_issues, packages
+        )
+        result[release_name] = filtered_vulnerabity_issues
     return result
 
 
@@ -172,7 +185,7 @@ def _format_github(vulnerabilities: Dict[str, List[Vulnerability]]) -> str:
     return html.escape(result)
 
 
-def _get_org(api_token: str, org_id: str) -> OrganizationManager:
+def _get_org(api_token: str, org_id: str) -> Organization:
     client = SnykClient(api_token)
     return client.organizations.get(org_id)
 
