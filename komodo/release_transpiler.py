@@ -3,7 +3,7 @@
 import argparse
 import itertools
 import os
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Union
 
 import yaml
 from packaging import version as version_parser
@@ -78,21 +78,20 @@ def _pick_package_versions_for_release(
         except KeyError as err:
             error_msg = f"{err!s}. Failed for {pkg_name}."
             raise KeyError(error_msg) from None
-
-        if rhel_ver in versions:
-            version = versions[rhel_ver][py_ver]
-        elif py_ver in versions:
-            version = versions[py_ver]
+        if isinstance(versions, dict):
+            if rhel_ver in versions:
+                version = versions[rhel_ver][py_ver]
+            elif py_ver in versions:
+                version = versions[py_ver]
         else:
             version = versions
-
         if version:
             release_dict[pkg_name] = version
     return release_dict
 
 
 def _check_version_exists_for_coordinates(
-    pkg_versions: dict,
+    pkg_versions: Union[dict, str],
     rhel_coordinate: str,
     py_coordinate: str,
 ) -> None:
@@ -117,6 +116,8 @@ def _check_version_exists_for_coordinates(
         {1.1.1}.
 
     """
+    if isinstance(pkg_versions, str):
+        return None
     first_level_versions = []
     for version in pkg_versions:
         first_level_versions.append(version)
@@ -133,10 +134,15 @@ def _check_version_exists_for_coordinates(
             raise KeyError(
                 msg,
             )
-    elif "py" in first_level_versions[0] and py_coordinate not in first_level_versions:
-        # Only python has different versions
-        msg = f"Python version {py_coordinate} not found."
+    elif "py" in first_level_versions[0]:
+        if py_coordinate not in first_level_versions:
+            # Only python has different versions
+            msg = f"Python version {py_coordinate} not found."
+            raise KeyError(msg)
+    else:
+        msg = """Invalid package versioning structure."""
         raise KeyError(msg)
+    return None
 
 
 def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> None:
