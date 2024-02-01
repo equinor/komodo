@@ -16,7 +16,9 @@ from komodo.yaml_file_types import ReleaseFile
 
 def _create_tmp_test_files(release_sample, file_names_sample):
     folder_name = os.path.join(os.getcwd(), "test_lint_maturity/")
+    dummy_folder_name = os.path.join(os.getcwd(), "test_lint_maturity/dummy_folder")
     os.mkdir(folder_name)
+    os.mkdir(dummy_folder_name)
     list_files = []
 
     for file_name in file_names_sample:
