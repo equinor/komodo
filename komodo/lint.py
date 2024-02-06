@@ -6,7 +6,7 @@ import sys
 import warnings
 from collections import namedtuple
 
-from pkg_resources import PkgResourcesDeprecationWarning, parse_version
+from packaging.version import parse
 
 from komodo.yaml_file_types import KomodoException, ReleaseFile, RepositoryFile
 
@@ -53,8 +53,8 @@ def lint_version_numbers(package, version, repo):
         if "master" in version:
             return _komodo_error(package, version, maintainer, err=MASTER_VERSION)
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
-            parsed_version = parse_version(version)
+            warnings.simplefilter("ignore", DeprecationWarning)
+            parsed_version = parse(version)
             # A warning coincides with finding "Legacy" in repr(v)
         if "Legacy" in repr(
             parsed_version
