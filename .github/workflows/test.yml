@@ -27,32 +27,32 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install csh
+        sudo apt-get update
+        sudo apt-get install csh
 
     - name: Setup Komodo
       run: |
-        ./bootstrap.sh $(which python)
+        pip install -U pip wheel setuptools virtualenv
+        pip install ".[dev]"
 
     - name: Unit tests
       run: |
-        source boot/build-env/bin/activate
-        boot/kmd-env/bin/python -m pytest tests
+        pytest tests
 
     - name: Lint examples
       run: |
-        boot/kmd-env/bin/python -m komodo.lint examples/stable.yml examples/repository.yml
+        komodo-lint examples/stable.yml examples/repository.yml
 
     - name: Transpile file
       run: |
-        boot/kmd-env/bin/python -m komodo.release_transpiler transpile \
+        komodo-transpiler transpile \
             --matrix-file="ci/${{env.RELEASE_NAME}}.yml" \
             --output ci --matrix-coordinates "{rhel: ['7'], py: ['${{matrix.python-version}}']}"
             
     - name: Full integration test
       run: |
         py_version_number=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
-        ./run_kmd.sh \
+        kmd \
             ci/${{env.RELEASE_NAME}}-py$py_version_number-rhel7.yml \
             ci/${{env.REPOSITORY}} \
             --workspace ${{ runner.temp }}/kmd-ws \
