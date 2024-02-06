@@ -1,8 +1,8 @@
-from pkg_resources import DistributionNotFound, get_distribution
+import importlib_metadata
 
 try:
-    VERSION = get_distribution(__name__).version
-except DistributionNotFound:
+    VERSION = importlib_metadata.distribution(__name__).version
+except importlib_metadata.PackageNotFoundError:
     try:
         from ._version import version as VERSION
     except ImportError:
