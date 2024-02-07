@@ -158,20 +158,20 @@ def main():
             run(args.base_pkgs, args.repo, args.dot, pkg, out)
     elif args.display_dot:
         try:
-            dot_proc = subprocess.Popen(
+            with subprocess.Popen(
                 ["dot", "-Tpng", "-o"],
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
-            )
-            subprocess.Popen(["display"], stdin=dot_proc.stdout)
-            out = io.TextIOWrapper(
-                dot_proc.stdin,
-                encoding="utf-8",
-                line_buffering=True,
-            )
-            run(args.base_pkgs, args.repo, True, pkg, out)
-            out.close()
-            dot_proc.stdin.close()
+            ) as dot_proc:
+                subprocess.Popen(  # pylint: disable=consider-using-with
+                    ["display"], stdin=dot_proc.stdout
+                )
+                with io.TextIOWrapper(
+                    dot_proc.stdin,
+                    encoding="utf-8",
+                    line_buffering=True,
+                ) as out:
+                    run(args.base_pkgs, args.repo, True, pkg, out)
         except FileNotFoundError:
             print(
                 "When using --display-dot You need to have the "

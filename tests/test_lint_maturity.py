@@ -173,8 +173,8 @@ def test_get_packages_info():
         "exception": [("package_ex2", "testing/2020.3/rc1")],
     }
 
-    for tag in expected_dict_tag_maturity:
-        assert dict_tag_maturity[tag] == expected_dict_tag_maturity[tag]
+    for tag, packages in expected_dict_tag_maturity.items():
+        assert dict_tag_maturity[tag] == packages
 
 
 def test_read_yaml_file(tmpdir):
