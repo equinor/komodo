@@ -89,10 +89,6 @@ def mock_release_file():
 def captured_shell_commands(monkeypatch):
     commands = []
     with monkeypatch.context() as monkeypatch_context:
-        monkeypatch_context.setattr(
-            "komodo.build.shell", lambda cmd: commands.append(cmd)
-        )
-        monkeypatch_context.setattr(
-            "komodo.fetch.shell", lambda cmd: commands.append(cmd)
-        )
+        monkeypatch_context.setattr("komodo.build.shell", commands.append)
+        monkeypatch_context.setattr("komodo.fetch.shell", commands.append)
         yield commands

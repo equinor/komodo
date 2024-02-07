@@ -77,9 +77,7 @@ komodo-transpiler = "komodo.release_transpiler:main"
 [tool.pylint.messages_control]
 disable = [
     "bad-inline-option",
-    "consider-using-dict-items",
     "consider-using-sys-exit",
-    "consider-using-with",
     "deprecated-pragma",
     "duplicate-code",
     "file-ignored",
@@ -87,7 +85,7 @@ disable = [
     "line-too-long",
     "locally-disabled",
     "logging-not-lazy",
-    "logging-fstring-interpolation",
+    "logging-fstring-interpolation", # Do not remove; it greatly decreases readability
     "missing-class-docstring",
     "missing-function-docstring",
     "missing-module-docstring",
@@ -102,7 +100,6 @@ disable = [
     "too-many-branches",
     "too-many-locals",
     "too-many-statements",
-    "unnecessary-lambda",
     "use-a-generator",
     "use-implicit-booleaness-not-comparison",
     "use-symbolic-message-instead",

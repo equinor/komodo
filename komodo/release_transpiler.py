@@ -19,7 +19,7 @@ def build_matrix_file(
     py_coords: Optional[Sequence[str]],
 ) -> None:
     """Combine release files from the release_folder into one single matrix_file."""
-    files = {}
+    files: Dict[str, Dict] = {}
     if py_coords is None:
         py_keys = get_py_coords(release_base, release_folder)
     else:
@@ -29,7 +29,9 @@ def build_matrix_file(
         files[key] = load_yaml(f"{release_folder}/{release_base}-{key}.yml")
 
     all_packages = set(
-        itertools.chain.from_iterable(files[key].keys() for key in files),
+        itertools.chain.from_iterable(
+            release_file_content.keys() for release_file_content in files.values()
+        ),
     )
     compiled = {}
 
@@ -38,7 +40,7 @@ def build_matrix_file(
             compiled[package] = builtins[package]
             continue
 
-        if len({files[key].get(package) for key in files}) == 1:
+        if len({release_file.get(package) for release_file in files.values()}) == 1:
             compiled[package] = next(iter(files.values()))[package]
         else:
             compiled[package] = {key: files[key].get(package) for key in py_keys}
