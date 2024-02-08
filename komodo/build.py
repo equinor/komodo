@@ -44,15 +44,6 @@ def dfs(package_name: str, ver: str, pkgs: Dict[str, str], repo: Dict[str, Dict]
     return flatten(dependencies)
 
 
-def rpm(package_name, ver, pkgpath, prefix):
-    # cpio always outputs to cwd, can't be overriden with switches
-    with pushd(prefix):
-        print(f"Installing {package_name} ({ver}) from rpm")
-        shell(f"rpm2cpio {pkgpath}.rpm | cpio -imd --quiet")
-        shell("rsync -a usr/* .")
-        shell("rm -rf usr")
-
-
 # When running cmake we pass the option -DDEST_PREFIX=fakeroot, this is an
 # absolute hack to be able to build opm-common and sunbeam with the ~fakeroot
 # implementation used by komodo.
@@ -321,8 +312,6 @@ def make(
             makeopts = f"{makeopts} {extra_makeopts}"
         makeopts = resolve(makeopts)
 
-        if make == "rpm":
-            rpm(package_name=package_name, ver=ver, pkgpath=pkgpath, prefix=prefix)
         if make == "cmake":
             cmake(
                 package_name=package_name,
