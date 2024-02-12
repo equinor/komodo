@@ -2,7 +2,7 @@ import argparse
 import os
 from collections import namedtuple
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Mapping, MutableSet, Sequence, Union
 
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
@@ -82,14 +82,14 @@ class ReleaseFile(YamlFile):
         return self
 
     @staticmethod
-    def validate_release_file(release_file_content: dict) -> None:
+    def validate_release_file(release_file_content: Mapping) -> None:
         message = (
             "The file you provided does not appear to be a release file "
             "produced by komodo. It may be a repository file. Release files "
             "have a format like the following:\n\n"
             'python: 3.8.6-builtin\nsetuptools: 68.0.0\nwheel: 0.40.0\nzopfli: "0.3"'
         )
-        assert isinstance(release_file_content, dict), message
+        assert isinstance(release_file_content, Mapping), message
         errors = []
         for package_name, package_version in release_file_content.items():
             error = Package.validate_package_entry_with_errors(
@@ -97,6 +97,64 @@ class ReleaseFile(YamlFile):
                 package_version,
             )
             errors.extend(error)
+        handle_validation_errors(errors, message)
+
+    @staticmethod
+    def lint_release_name(packagefile_path: str) -> List[KomodoError]:
+        relname = os.path.basename(packagefile_path)
+        found = False
+        for py_suffix in "-py27", "-py36", "-py38", "-py310":
+            for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
+                if relname.endswith(py_suffix + rh_suffix + ".yml"):
+                    found = True
+                    break
+        if not found:
+            return [
+                _komodo_error(
+                    package=packagefile_path,
+                    err=(
+                        "Invalid release name suffix. "
+                        "Must be of the form -pyXX[X] or -pyXX[X]-rhelY"
+                    ),
+                ),
+            ]
+
+        return []
+
+
+class ReleaseMatrixFile(YamlFile):
+    """Return the data from 'release' YAML file, but validate it first."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.content: dict = None
+
+    def __call__(self, value: str):
+        yml: dict = super().__call__(value)
+        self.validate_release_matrix_file(yml)
+        self.content: dict = yml
+        return self
+
+    @classmethod
+    def from_yaml_string(cls, value: bytes):
+        yml = load_yaml_from_string(value)
+        cls.validate_release_matrix_file(yml)
+        release_matrix_file = cls()
+        release_matrix_file.content: dict = yml
+        return release_matrix_file
+
+    @staticmethod
+    def validate_release_matrix_file(release_matrix_file_content: Mapping) -> None:
+        message = (
+            "The file you provided does not appear to be a release matrix file "
+            "produced by komodo. It may be a repository file. Release matrix files "
+            "have a format like the following:\n\n"
+            "python: 3.8.6-builtin\nsetuptools: 68.0.0\nwheel:\n  rhel7: 0.40.0\n  rhel8: 0.40.1"
+        )
+        assert isinstance(release_matrix_file_content, dict), message
+        errors = set()
+        for package_name, package_version in release_matrix_file_content.items():
+            _recursive_validate_version_matrix(package_version, package_name, errors)
         handle_validation_errors(errors, message)
 
     @staticmethod
@@ -364,7 +422,7 @@ class UpgradeProposalsFile(YamlFile):
             "The file you provided does not appear to be an upgrade_proposals file"
             " produced by komodo. It may be a release file. Upgrade_proposals files"
             ' have a format like the following:\n2022-08:\n2022-09:\n  python: "3.9"\n'
-            '  zopfli: "0.3"\n  libecalc: 8.2.9'
+            '  zopfli:\n    rhel7: "0.3"\n    rhel8: 0.2.9\n  libecalc: 8.2.9'
         )
         errors = []
         assert isinstance(upgrade_proposals_file_content, dict), message
@@ -385,12 +443,10 @@ class UpgradeProposalsFile(YamlFile):
                     f" ({packages_to_upgrade})",
                 )
                 continue
+            errors = set()
             for package_name, package_version in packages_to_upgrade.items():
-                errors.extend(
-                    Package.validate_package_entry_with_errors(
-                        package_name,
-                        package_version,
-                    ),
+                _recursive_validate_version_matrix(
+                    package_version, package_name, errors
                 )
         handle_validation_errors(errors, message)
 
@@ -678,7 +734,7 @@ class Package:
             )
 
 
-def handle_validation_errors(errors: List[str], message: str):
+def handle_validation_errors(errors: Sequence[str], message: str):
     if errors:
         raise SystemExit("\n".join([*errors, message]))
 
@@ -689,3 +745,19 @@ def load_package_status_file(package_status_string: str):
 
 def load_repository_file(repository_file_string):
     return RepositoryFile().from_yaml_string(repository_file_string)
+
+
+def _recursive_validate_version_matrix(
+    version_or_matrix: Union[dict, str], package_name: str, errors: MutableSet
+) -> None:
+    if isinstance(version_or_matrix, Mapping):
+        for nested_version_or_matrix in version_or_matrix.values():
+            _recursive_validate_version_matrix(
+                nested_version_or_matrix, package_name, errors
+            )
+    else:
+        new_errors = Package.validate_package_entry_with_errors(
+            package_name, version_or_matrix
+        )
+        for new_error in new_errors:
+            errors.add(new_error)
