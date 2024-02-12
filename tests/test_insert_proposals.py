@@ -1,11 +1,21 @@
 from base64 import b64encode
+from contextlib import ExitStack as does_not_raise
 from unittest import mock
 
 import github
 import pytest
 import yaml
 
-from komodo.insert_proposals import insert_proposals
+from komodo.insert_proposals import (
+    clean_proposals_file,
+    create_new_release_file,
+    create_pr_with_changes,
+    generate_contents_of_new_release_matrix,
+    insert_proposals,
+    recursive_update,
+    validate_upgrades,
+)
+from komodo.yaml_file_types import RepositoryFile
 
 VALID_REPOSITORY_CONTENT = {
     "addlib": {
@@ -148,6 +158,56 @@ class MockRepo:
             type(None),
             "",
             id="with_upgrade_proposal",
+        ),
+        pytest.param(
+            "1111.11.rc1",
+            "1111.11.rc2",
+            {
+                "releases/matrices/1111.11.rc1.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": "1.1.1",
+                },
+                "upgrade_proposals.yml": {
+                    "1111-11": {"testlib2": {"rhel7": "1.1.2", "rhel8": "1.1.1"}},
+                },
+                "repository.yml": VALID_REPOSITORY_CONTENT,
+            },
+            {
+                "releases/matrices/1111.11.rc2.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": {"rhel7": "1.1.2", "rhel8": "1.1.1"},
+                },
+                "upgrade_proposals.yml": {"1111-11": None},
+            },
+            ["Temporary PR 1111.11.rc2", "Add release 1111.11.rc2"],
+            type(None),
+            "",
+            id="update_from_version_to_matrix",
+        ),
+        pytest.param(
+            "1111.11.rc1",
+            "1111.11.rc2",
+            {
+                "releases/matrices/1111.11.rc1.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": {"rhel7": "1.1.2", "rhel8": "1.1.1"},
+                },
+                "upgrade_proposals.yml": {
+                    "1111-11": {"testlib2": "1.1.2"},
+                },
+                "repository.yml": VALID_REPOSITORY_CONTENT,
+            },
+            {
+                "releases/matrices/1111.11.rc2.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": "1.1.2",
+                },
+                "upgrade_proposals.yml": {"1111-11": None},
+            },
+            ["Temporary PR 1111.11.rc2", "Add release 1111.11.rc2"],
+            type(None),
+            "",
+            id="update_from_matrix_to_version",
         ),
         pytest.param(
             "1111.11.rc1",
@@ -383,7 +443,8 @@ def test_insert_proposals(
 class MockContentYaml:
     def __init__(self, dicty) -> None:
         self.sha = "testsha"
-        self.content = b64encode(bytes(dicty, "utf-8"))
+        print(f"{dicty=}")
+        self.content = b64encode(bytes(dicty, encoding="utf-8"))
 
 
 class MockRepoYaml:
@@ -546,3 +607,338 @@ def test_duplicate_package_entry_handling(
     assert len(pull_requests) == len(repo.created_pulls)
     for pull_request in pull_requests:
         assert pull_request in repo.created_pulls
+
+
+@pytest.mark.parametrize(
+    "release_dict, upgrade_dict, expected_dict",
+    [
+        pytest.param(
+            {"package_a": "version_a"},
+            {"package_a": "version_b"},
+            {"package_a": "version_b"},
+            id="update_version",
+        ),
+        pytest.param(
+            {"package_a": "version_a"}, {}, {"package_a": "version_a"}, id="no_update"
+        ),
+        pytest.param(
+            {"package_a": "version_a"},
+            {"package_b": "version_a"},
+            {"package_a": "version_a", "package_b": "version_a"},
+            id="update_with_new_package",
+        ),
+        pytest.param(
+            {"package_a": {"py38": "version_a"}},
+            {"package_a": {"py38": "version_b"}},
+            {"package_a": {"py38": "version_b"}},
+            id="update_one_level_deep_matrix",
+        ),
+        pytest.param(
+            {"package_a": {"rhel8": {"py38": "version_a"}}},
+            {"package_a": {"rhel8": {"py38": "version_b"}}},
+            {"package_a": {"rhel8": {"py38": "version_b"}}},
+            id="update_two_level_deep_matrix",
+        ),
+        pytest.param(
+            {"package_a": {"rhel8": {"py38": "version_a"}}},
+            {"package_a": "version_b"},
+            {"package_a": "version_b"},
+            id="update_from_matrix_to_version",
+        ),
+        pytest.param(
+            {"package_a": "version_a"},
+            {"package_a": {"rhel8": {"py38": "version_b"}}},
+            {"package_a": {"rhel8": {"py38": "version_b"}}},
+            id="update_from_version_to_matrix",
+        ),
+        pytest.param(
+            {"package_a": {"py38": "version_a", "py312": "version_b"}},
+            {"package_a": {"py38": "version_b"}},
+            {"package_a": {"py38": "version_b", "py312": "version_b"}},
+            id="update_only_one_matrix_version_one_level_deep",
+        ),
+        pytest.param(
+            {
+                "package_a": {
+                    "rhel7": {"py38": "version_a", "py312": "version_b"},
+                    "rhel8": "version_b",
+                }
+            },
+            {"package_a": {"rhel8": {"py38": "version_b"}}},
+            {
+                "package_a": {
+                    "rhel7": {"py38": "version_a", "py312": "version_b"},
+                    "rhel8": {"py38": "version_b"},
+                }
+            },
+            id="update_only_one_matrix_version_two_levels_deep",
+        ),
+        pytest.param(
+            {
+                "package_a": {
+                    "rhel7": {"py38": "version_a", "py312": None},
+                    "rhel8": {"py38": "version_b"},
+                }
+            },
+            {"package_a": {"rhel8": {"py38": None, "py312": None}}},
+            {
+                "package_a": {
+                    "rhel7": {"py38": "version_a", "py312": None},
+                    "rhel8": {"py38": None, "py312": None},
+                }
+            },
+            id="none_versions",
+        ),
+    ],
+)
+def test_recursive_update(release_dict, upgrade_dict, expected_dict):
+    recursive_update(release_dict, upgrade_dict)
+    assert release_dict == expected_dict
+
+
+@pytest.mark.parametrize(
+    "upgrade_section, repofile_content, expectation",
+    [
+        pytest.param(
+            {"package1": "1.0.1", "package2": "2.0.3"},
+            {
+                "package1": {
+                    "1.0.1": {"make": "pip", "maintainer": "scout"},
+                    "1.0.0": {"make": "pip", "maintainer": "scout"},
+                },
+                "package2": {
+                    "2.0.3": {
+                        "make": "pip",
+                        "maintainer": "scout",
+                        "depends": ["package1"],
+                    },
+                    "2.0.2": {
+                        "make": "pip",
+                        "maintainer": "scout",
+                        "depends": ["package1"],
+                    },
+                },
+            },
+            does_not_raise(),
+            id="validate_upgrades_does_not_raise",
+        ),
+        pytest.param(
+            {"package1": "1.0.2"},
+            {
+                "package1": {
+                    "1.0.1": {"make": "pip", "maintainer": "scout"},
+                    "1.0.0": {"make": "pip", "maintainer": "scout"},
+                },
+                "package2": {
+                    "2.0.3": {
+                        "make": "pip",
+                        "maintainer": "scout",
+                        "depends": ["package1"],
+                    },
+                    "2.0.2": {
+                        "make": "pip",
+                        "maintainer": "scout",
+                        "depends": ["package1"],
+                    },
+                },
+            },
+            pytest.raises(
+                SystemExit,
+                match=r"Version '1.0.2' of package 'package1' not found in repository.",
+            ),
+            id="validate_upgrades_raises_systemexit_on_missing_package_version",
+        ),
+    ],
+)
+def test_validate_upgrades(upgrade_section, repofile_content, expectation):
+    repofile = RepositoryFile()
+    repofile.content = repofile_content
+    with expectation:
+        validate_upgrades(upgrade_section, repofile)
+
+
+@pytest.mark.parametrize(
+    "upgrade, expected_result",
+    [
+        pytest.param(
+            {"package3": "1.0.2"},
+            {
+                "package1": "1.0.0",
+                "package2": "2.0.3",
+                "package3": "1.0.2",
+                "package4": {"rhel7": "0.0.9", "rhel8": "0.0.9"},
+            },
+            id="addition_of_new_package",
+        ),
+        pytest.param(
+            {"package1": "1.0.1"},
+            {
+                "package1": "1.0.1",
+                "package2": "2.0.3",
+                "package4": {"rhel7": "0.0.9", "rhel8": "0.0.9"},
+            },
+            id="upgrade_package_version",
+        ),
+        pytest.param(
+            {"package1": {"rhel7": "1.0.0", "rhel8": "1.0.1"}},
+            {
+                "package1": {"rhel7": "1.0.0", "rhel8": "1.0.1"},
+                "package2": "2.0.3",
+                "package4": {"rhel7": "0.0.9", "rhel8": "0.0.9"},
+            },
+            id="change_from_version_to_version_matrix",
+        ),
+        pytest.param(
+            {"package4": "1.0.0"},
+            {
+                "package1": "1.0.0",
+                "package2": "2.0.3",
+                "package4": "1.0.0",
+            },
+            id="change_from_version_matrix_to_version",
+        ),
+        pytest.param(
+            None,
+            {
+                "package1": "1.0.0",
+                "package2": "2.0.3",
+                "package4": {"rhel7": "0.0.9", "rhel8": "0.0.9"},
+            },
+            id="no_upgrade",
+        ),
+    ],
+)
+def test_generate_contents_of_new_release_returns_valid(upgrade, expected_result):
+    release_matrix_file_content = {
+        "package1": "1.0.0",
+        "package2": "2.0.3",
+        "package4": {"rhel7": "0.0.9", "rhel8": "0.0.9"},
+    }
+    repository_file_content = {
+        "package1": {
+            "1.0.1": {"make": "pip", "maintainer": "scout"},
+            "1.0.0": {"make": "pip", "maintainer": "scout"},
+        },
+        "package2": {
+            "2.0.3": {
+                "make": "pip",
+                "maintainer": "scout",
+                "depends": ["package1"],
+            },
+            "2.0.2": {
+                "make": "pip",
+                "maintainer": "scout",
+                "depends": ["package1"],
+            },
+        },
+        "package3": {"1.0.2": {"make": "pip", "maintainer": "scout"}},
+        "package4": {
+            "1.0.0": {"make": "pip", "maintainer": "scout"},
+            "0.0.9": {"make": "pip", "maintainer": "scout"},
+        },
+    }
+    repofile = RepositoryFile()
+    repofile.content = repository_file_content
+    result = generate_contents_of_new_release_matrix(
+        release_matrix_file_content, repofile, upgrade
+    )
+    assert result == yaml.dump(expected_result)
+
+
+@pytest.mark.parametrize(
+    "propose_upgrade_content, upgrade_key, expected_upgrade_proposals_end_content",
+    [
+        pytest.param(
+            {
+                "1111-11": {"testlib2": "1.1.1"},
+                "1111-12": {"testlib2": "1.1.2"},
+            },
+            "1111-11",
+            {
+                "1111-11": None,
+                "1111-12": {"testlib2": "1.1.2"},
+            },
+            id="clean_upgrade_older_release",
+        ),
+        pytest.param(
+            {
+                "1111-11": None,
+                "1111-12": {"testlib2": "1.1.2"},
+            },
+            "1111-11",
+            {
+                "1111-11": None,
+                "1111-12": {"testlib2": "1.1.2"},
+            },
+            id="clean_empty_upgrade",
+        ),
+        pytest.param(
+            {
+                "1111-11": None,
+                "1111-12": {"testlib2": {"rhel7": "1.1.1", "rhel8": "1.1.0"}},
+            },
+            "1111-12",
+            {
+                "1111-11": None,
+                "1111-12": None,
+            },
+            id="clean_nested_upgrade",
+        ),
+        pytest.param(
+            {
+                "1111-11": {"testlib2": "1.1.1"},
+                "1111-12": {"testlib2": "1.1.2"},
+            },
+            "1111-12",
+            {
+                "1111-11": {"testlib2": "1.1.1"},
+                "1111-12": None,
+            },
+            id="clean_upgrade",
+        ),
+    ],
+)
+def test_clean_proposals_file(
+    propose_upgrade_content, upgrade_key, expected_upgrade_proposals_end_content
+):
+    repo_files = {
+        "releases/matrices/1111.11.rc1.yml": {
+            "testlib1": "1.1.1",
+            "testlib2": "1.1.1",
+        },
+        "upgrade_proposals.yml": propose_upgrade_content,
+        "repository.yml": VALID_REPOSITORY_CONTENT,
+    }
+    repo = MockRepo(files=repo_files)
+    clean_proposals_file(
+        propose_upgrade_content, upgrade_key, repo, "git_ref", "tmp_target"
+    )
+    assert propose_upgrade_content == expected_upgrade_proposals_end_content
+    assert (
+        repo.updated_files["upgrade_proposals.yml"]["content"]
+        == expected_upgrade_proposals_end_content
+    )
+
+
+def test_create_pr_with_changes():
+    mock_repo = MockRepo({})
+    tmp_ref = mock.Mock()
+    create_pr_with_changes(
+        mock_repo, mock.Mock(), "target", "from_sha", "tmp_target", tmp_ref, "pr_msg"
+    )
+    tmp_ref.delete.assert_called_once()
+    assert len(mock_repo.created_pulls.keys()) == 2
+    assert "Add release target" in mock_repo.created_pulls
+    assert "Temporary PR target" in mock_repo.created_pulls
+
+
+def test_create_new_release_file():
+    mock_repo = MockRepo({})
+    stub_file_content = "setuptools: 0.14.9\npython: 3.8.6"
+    new_release_file_name = create_new_release_file(
+        mock_repo, "1111.11", stub_file_content, "branchy"
+    )
+    assert new_release_file_name == "releases/matrices/1111.11.yml"
+    assert mock_repo.updated_files[new_release_file_name]["content"] == yaml.load(
+        stub_file_content, Loader=yaml.CLoader
+    )
