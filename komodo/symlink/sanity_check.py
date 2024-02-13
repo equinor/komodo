@@ -86,7 +86,8 @@ def assert_root_nodes(link_dict):
             + "the roots defined in the root_links dict\n"
             + f"Roots defined: {set(input_roots)}\n"
             + f"Roots expected: {inferred_roots}\n"
-            + f"Missing root(s): {str(set(inferred_roots).difference(input_roots))}"
+            + f"Missing root(s): {str(list(set(inferred_roots).difference(input_roots)))}\n"
+            + f"Incorrectly added root(s): {str(list(set(input_roots).difference(inferred_roots)))}"
         )
 
 
