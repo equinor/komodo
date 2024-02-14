@@ -101,6 +101,14 @@ komodo.lint\_package\_status module
    :undoc-members:
    :show-inheritance:
 
+komodo.lint\_symlink\_config module
+-----------------------------------
+
+.. automodule:: komodo.lint_symlink_config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 komodo.lint\_upgrade\_proposals module
 --------------------------------------
 
