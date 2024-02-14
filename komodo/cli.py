@@ -324,7 +324,6 @@ def set_permissions(set_permissions_script: Path, release_path: Path) -> None:
     shell([str(set_permissions_script), str(release_path)])
 
 
-@profile_time("Cleanup *.pyc and fix permissions")
 def cleanup_python_bytecode_files_and_fix_permissions(
     release_root: Path, set_permissions_script_path, release_path: Path
 ):
