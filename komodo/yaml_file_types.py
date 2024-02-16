@@ -514,7 +514,7 @@ class PackageStatusFile(YamlFile):
 
 
 class Package:
-    VALID_VISIBILITIES = ["public", "private"]
+    VALID_VISIBILITIES = ["public", "private", "private-plugin"]
     VALID_IMPORTANCES = ["low", "medium", "high"]
     VALID_MATURITIES = ["experimental", "stable", "deprecated"]
     VALID_MAKES = ["cmake", "sh", "pip", "rsync", "noop", "download"]

@@ -74,6 +74,7 @@ komodo-show-version = "komodo.show_version:main"
 komodo-snyk-test = "komodo.snyk_reporting:main"
 komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
 komodo-transpiler = "komodo.release_transpiler:main"
+komodo-check-unused = "komodo.check_unused_package:main"
 
 [tool.pylint.messages_control]
 disable = [
@@ -114,13 +115,14 @@ ignore-paths = [
 
 [tool.ruff]
 src = ["src"]
+line-length = 88
+[tool.ruff.lint]
 select = [
   "W",   # pycodestyle
   "I",   # isort
   "B",   # flake-8-bugbear
   "SIM", # flake-8-simplify
 ]
-line-length = 88
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["komodo"]
