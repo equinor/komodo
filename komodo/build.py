@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
 import hashlib
-import itertools as itr
 import os
-import pathlib
 import stat
 import sys
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Optional, Set
 
 import requests
 
@@ -18,30 +16,40 @@ from komodo.package_version import (
 )
 from komodo.shell import pushd, shell
 
-flatten = itr.chain.from_iterable
 
+def full_dfs(
+    all_packages: Dict[str, str],
+    repo: Dict[str, Dict],
+    packages_to_check: Optional[List[str]] = None,
+) -> List[str]:
+    if packages_to_check is None:
+        packages_to_check = list(all_packages.keys())
+    all_packages_set = set(all_packages)
 
-def dfs(package_name: str, ver: str, pkgs: Dict[str, str], repo: Dict[str, Dict]):
-    # package has no more dependencies - add the package itself
-    if "depends" not in repo[package_name][ver]:
-        return [package_name]
+    def dfs(package_name: str, pkg_order: List[str], visited: Set[str]):
+        if package_name in visited:
+            return
+        visited.add(package_name)
+        ver = all_packages[package_name]
+        dependencies = repo[package_name][ver].get("depends", [])
+        missing_depends = set(dependencies) - all_packages_set
+        if missing_depends:
+            print(
+                "error: "
+                + ",".join(missing_depends)
+                + f" required as dependency for {package_name}, is not in distribution",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        for dep in dependencies:
+            dfs(dep, pkg_order, visited)
+        pkg_order.append(package_name)
 
-    if not all(map(pkgs.__contains__, repo[package_name][ver]["depends"])):
-        print(
-            "error: "
-            + ",".join(repo[package_name][ver]["depends"])
-            + " required as dependency, is not in distribution",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    # dependencies can change based on version (i.e. version 2 depends on
-    # package X, but version 3 depends on X and Y)
-    dependencies = [
-        dfs(x, pkgs[x], pkgs, repo) for x in repo[package_name][ver]["depends"]
-    ]
-    dependencies.append([package_name])
-    return flatten(dependencies)
+    visited = set()
+    pkg_order = []
+    for package in packages_to_check:
+        dfs(package, pkg_order, visited)
+    return pkg_order
 
 
 # When running cmake we pass the option -DDEST_PREFIX=fakeroot, this is an
@@ -162,7 +170,7 @@ def download(package_name, ver, prefix, url, hash_str, fakeroot, destination):
             msg,
         )
 
-    fakeprefix = pathlib.Path(fakeroot + prefix)
+    fakeprefix = Path(fakeroot + prefix)
     dest_path = fakeprefix / destination
 
     session = requests.Session()
@@ -245,16 +253,8 @@ def make(
     pip="pip",
     fakeroot=".",
 ):
-    packages_needed = flatten(dfs(pkg, ver, pkgs, repo) for pkg, ver in pkgs.items())
-
-    seen_package = set()
-    pkgorder = []
-    for package_needed in packages_needed:
-        if package_needed in seen_package:
-            continue
-        seen_package.add(package_needed)
-        pkgorder.append(package_needed)
-
+    pkgorder = full_dfs(pkgs, repo)
+    assert len(set(pkgorder)) == len(pkgs)
     fakeprefix = fakeroot + prefix
     shell(["mkdir -p", fakeprefix])
     prefix = os.path.abspath(prefix)
