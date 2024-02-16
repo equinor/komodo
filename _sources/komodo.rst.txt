@@ -21,6 +21,14 @@ komodo.build module
    :undoc-members:
    :show-inheritance:
 
+komodo.check\_unused\_package module
+------------------------------------
+
+.. automodule:: komodo.check_unused_package
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 komodo.check\_up\_to\_date\_pypi module
 ---------------------------------------
 
