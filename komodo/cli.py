@@ -232,10 +232,11 @@ def generate_release_packages(
         yaml.dump(release, filehandle)
 
 
-@profile_time("Rsyncing partial komodo to destination")
-def rsync_komodo_to_destination(release_name: str, destination: str) -> None:
+@profile_time("Copying partial komodo to destination")
+def copy_komodo_to_destination(release_name: str, destination: str) -> None:
     shell(f"mv {release_name} .{release_name}")
-    shell(f"rsync -a .{release_name} {destination}")
+    shell(f"mkdir -p {destination}")
+    shell(f"cp -a .{release_name} {destination}")
 
 
 def move_old_release_from_release_path_if_exists(release_path: Path) -> None:
@@ -377,7 +378,7 @@ def _main(args: KomodoNamespace) -> None:
 
     print(f"Installing {args.release} to {args.prefix}")
 
-    rsync_komodo_to_destination(args.release, destination=prefix_path)
+    copy_komodo_to_destination(args.release, destination=prefix_path)
 
     move_old_release_from_release_path_if_exists(release_path)
     move_new_release_to_release_path(args, release_path)
