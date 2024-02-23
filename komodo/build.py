@@ -113,7 +113,6 @@ def sh(
     prefix,
     makefile,
     fakeroot,
-    pythonpath,
     bin_path,
     pip,
     ld_lib_path,
@@ -127,13 +126,11 @@ def sh(
         cmd = [
             f"bash {makefile} --prefix {prefix}",
             f"--fakeroot {fakeroot}",
-            f"--python {prefix}/bin/python",
         ]
         if jobs:
             cmd.append(f"--jobs {jobs}")
         if cmake:
             cmd.append(f"--cmake {cmake}")
-        cmd.append(f"--pythonpath {pythonpath}")
         cmd.append(f"--path {bin_path}")
         cmd.append(f"--pip {pip}")
         cmd.append(f"--ld-library-path {ld_lib_path}")
@@ -228,19 +225,6 @@ def noop(package_name, ver):
     print(f"Doing nothing for noop package {package_name} ({ver})")
 
 
-def pypaths(prefix, version):
-    if version is None:
-        return ""
-    pyver = "python" + ".".join(version.split(".")[:-1])
-    return ":".join(
-        [
-            f"{prefix}/lib/{pyver}",
-            f"{prefix}/lib/{pyver}/site-packages",
-            f"{prefix}/lib64/{pyver}/site-packages",
-        ],
-    )
-
-
 def make(
     pkgs: Dict[str, str],
     repo,
@@ -275,7 +259,6 @@ def make(
         ),
     )
     extra_makeopts = os.environ.get("EXTRA_MAKEOPTS")
-    build_pythonpath = pypaths(fakeprefix, pkgs.get("python"))
     bin_path = ":".join([os.path.join(fakeprefix, "bin"), os.environ["PATH"]])
 
     pkgpaths = [f"{package_name}-{pkgs[package_name]}" for package_name in pkgorder]
@@ -345,7 +328,6 @@ def make(
                 prefix=prefix,
                 makefile=current.get("makefile"),
                 fakeroot=fakeroot,
-                pythonpath=build_pythonpath,
                 bin_path=bin_path,
                 pip=pip,
                 ld_lib_path=ld_lib_path,
