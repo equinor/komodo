@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+import re
 import stat
 import sys
 from pathlib import Path
@@ -231,7 +232,11 @@ def noop(package_name, ver):
 def pypaths(prefix, version):
     if version is None:
         return ""
-    pyver = "python" + ".".join(version.split(".")[:-1])
+    pattern = r"^(\d+)\.(\d+)"
+    match = re.match(pattern, version)
+    if not match:
+        return ""
+    pyver = "python" + ".".join(match.groups())
     return ":".join(
         [
             f"{prefix}/lib/{pyver}",
