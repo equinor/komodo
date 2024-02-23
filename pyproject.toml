@@ -34,6 +34,7 @@ dependencies = [
     "urllib3; '.el7.' not in platform_release",
     "ruamel.yaml",
     "shell",
+    "pkginfo",
 ]
 
 [project.optional-dependencies]

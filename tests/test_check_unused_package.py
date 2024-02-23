@@ -9,7 +9,6 @@ test_case = [
         {
             "package_a": {
                 "1.0": {
-                    "source": "pypi",
                     "make": "pip",
                     "maintainer": "scout",
                     "depends": ["package_b", "package_c"],
@@ -17,7 +16,6 @@ test_case = [
             },
             "package_b": {
                 "1.0": {
-                    "source": "pypi",
                     "make": "pip",
                     "maintainer": "scout",
                     "depends": ["package_d", "package_e"],
@@ -25,7 +23,6 @@ test_case = [
             },
             "package_c": {
                 "1.0": {
-                    "source": "pypi",
                     "make": "pip",
                     "maintainer": "scout",
                     "depends": ["package_d"],
@@ -33,7 +30,6 @@ test_case = [
             },
             "package_d": {
                 "1.0": {
-                    "source": "pypi",
                     "make": "pip",
                     "maintainer": "scout",
                     "depends": ["package_e"],
@@ -41,14 +37,12 @@ test_case = [
             },
             "package_e": {
                 "1.0": {
-                    "source": "pypi",
                     "make": "pip",
                     "maintainer": "scout",
                 },
             },
             "package_f": {
                 "1.0": {
-                    "source": "pypi",
                     "make": "pip",
                     "maintainer": "scout",
                     "depends": ["package_c"],
@@ -87,6 +81,9 @@ test_case = [
 
 @pytest.mark.parametrize("repo, release, package_status", test_case)
 def test_check_unused_package(repo, release, package_status, capsys, tmpdir):
+    package_status["python"] = {"visibility": "public"}
+    release["python"] = "3.8.6-builtin"
+
     # Use tmpdir to create a temporary file for package status
     package_status_file = tmpdir.join("package_status.yml")
 

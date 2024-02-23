@@ -4,49 +4,12 @@ import hashlib
 import os
 import re
 import stat
-import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict
 
 import requests
 
 from komodo.shell import pushd, shell
-
-
-def full_dfs(
-    all_packages: Dict[str, str],
-    repo: Dict[str, Dict],
-    packages_to_check: Optional[List[str]] = None,
-) -> List[str]:
-    if packages_to_check is None:
-        packages_to_check = list(all_packages.keys())
-    all_packages_set = set(all_packages)
-
-    def dfs(package_name: str, pkg_order: List[str], visited: Set[str]):
-        if package_name in visited:
-            return
-        visited.add(package_name)
-        ver = all_packages[package_name]
-        dependencies = repo[package_name][ver].get("depends", [])
-        missing_depends = set(dependencies) - all_packages_set
-        if missing_depends:
-            print(
-                "error: "
-                + ",".join(missing_depends)
-                + f" required as dependency for {package_name}, is not in distribution",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-        for dep in dependencies:
-            dfs(dep, pkg_order, visited)
-        pkg_order.append(package_name)
-
-    visited = set()
-    pkg_order = []
-    for package in packages_to_check:
-        dfs(package, pkg_order, visited)
-    return pkg_order
-
 
 # When running cmake we pass the option -DDEST_PREFIX=fakeroot, this is an
 # absolute hack to be able to build opm-common and sunbeam with the ~fakeroot
@@ -232,8 +195,7 @@ def make(
     pip="pip",
     fakeroot=".",
 ):
-    pkgorder = full_dfs(pkgs, repo)
-    assert len(set(pkgorder)) == len(pkgs)
+    pkgorder = list(pkgs.keys())
     fakeprefix = fakeroot + prefix
     shell(["mkdir -p", fakeprefix])
     prefix = os.path.abspath(prefix)

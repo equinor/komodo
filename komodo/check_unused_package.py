@@ -4,38 +4,39 @@ import argparse
 import os
 import sys
 
-from komodo.build import full_dfs
 from komodo.prettier import load_yaml
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
+
+from .pypi_dependencies import PypiDependencies
 
 
 def check_for_unused_package(
     release_file: ReleaseFile, package_status_file: str, repository: RepositoryFile
 ):
     package_status = load_yaml(package_status_file)
-    private_packages = [
+    public_and_plugin_packages = [
+        (pkg, version)
+        for pkg, version in release_file.content.items()
+        if package_status[pkg]["visibility"] in ("public", "private-plugin")
+    ]
+    python_version = release_file.content["python"]
+    # For pypi we need to change '3.8.6-builtin' -> '3.8.6'
+    python_version = python_version[: python_version.rindex("-")]
+    dependencies = PypiDependencies(release_file.content, python_version=python_version)
+    for name, version in release_file.content.items():
+        metadata = repository.content.get(name, {}).get(version, {})
+        if metadata.get("source") != "pypi":
+            dependencies.add_user_specified(name, metadata.get("depends", []))
+    unused_private_packages = set(
         pkg
         for pkg in release_file.content
         if package_status[pkg]["visibility"] == "private"
-    ]
-    public_and_plugin_packages = [
-        pkg
-        for pkg in release_file.content
-        if package_status[pkg]["visibility"] in ("public", "private-plugin")
-    ]
-    public_and_plugin_dependencies = full_dfs(
-        release_file.content,
-        repository.content,
-        public_and_plugin_packages,
-    )
-    diff_packages = set(private_packages).difference(
-        set(public_and_plugin_dependencies)
-    )
-    if diff_packages:
+    ).difference(dependencies.used_packages(public_and_plugin_packages))
+    if unused_private_packages:
         print(
-            f"The following {len(diff_packages)} private packages are not dependencies of any public or private-plugin packages:"
+            f"The following {len(unused_private_packages)} private packages are not dependencies of any public or private-plugin packages:"
         )
-        print(", ".join(sorted(list(diff_packages))))
+        print(", ".join(sorted(list(unused_private_packages))))
         print(
             "If you have added or removed any packages check that the dependencies in repository.yml are correct."
         )

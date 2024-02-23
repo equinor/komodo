@@ -3,16 +3,10 @@ numpy:
     source: pypi
     make: pip
     maintainer: ci
-    depends:
-      - setuptools
-      - python
   1.23.5:
     source: pypi
     make: pip
     maintainer: ci
-    depends:
-      - setuptools
-      - python
 
 python:
   3-builtin:
@@ -26,14 +20,9 @@ setuptools:
     source: pypi
     make: pip
     maintainer: ci
-    depends:
-      - wheel
-      - python
 
 wheel:
   0.42.0:
     source: pypi
     make: pip
     maintainer: ci
-    depends:
-      - python
