@@ -53,13 +53,6 @@ komodo.deployed module
    :undoc-members:
    :show-inheritance:
 
-komodo.extract\_dep\_graph module
----------------------------------
-
-.. automodule:: komodo.extract_dep_graph
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 komodo.fetch module
 -------------------
