@@ -38,6 +38,7 @@ jobs:
     - name: Unit tests
       run: |
         pytest tests
+        pytest --doctest-modules komodo
 
     - name: Lint examples
       run: |
