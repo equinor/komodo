@@ -16,10 +16,6 @@ while test $# -gt 0; do
             shift
             export PREFIX=$1
             ;;
-        --python)
-            shift
-            export PYTHON=$1
-            ;;
         --fakeroot)
             shift
             export FAKEROOT=$1
@@ -31,10 +27,6 @@ while test $# -gt 0; do
         --pip)
             shift
             export PIP=$1
-            ;;
-        --pythonpath)
-            shift
-            export PYTHONPATH=$1
             ;;
         --ld-library-path)
             shift
