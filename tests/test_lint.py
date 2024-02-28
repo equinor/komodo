@@ -7,8 +7,6 @@ import yaml
 from komodo import lint
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
-lint_release_name = ReleaseFile.lint_release_name
-
 REPO = {
     "python": {
         "v3.14": {
