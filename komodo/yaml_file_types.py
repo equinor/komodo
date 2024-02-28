@@ -99,28 +99,6 @@ class ReleaseFile(YamlFile):
             errors.extend(error)
         handle_validation_errors(errors, message)
 
-    @staticmethod
-    def lint_release_name(packagefile_path: str) -> List[KomodoError]:
-        relname = os.path.basename(packagefile_path)
-        found = False
-        for py_suffix in "-py27", "-py36", "-py38", "-py311":
-            for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
-                if relname.endswith(py_suffix + rh_suffix + ".yml"):
-                    found = True
-                    break
-        if not found:
-            return [
-                _komodo_error(
-                    package=packagefile_path,
-                    err=(
-                        "Invalid release name suffix. "
-                        "Must be of the form -pyXX[X] or -pyXX[X]-rhelY"
-                    ),
-                ),
-            ]
-
-        return []
-
 
 class ReleaseMatrixFile(YamlFile):
     """Return the data from 'release' YAML file, but validate it first."""
@@ -156,28 +134,6 @@ class ReleaseMatrixFile(YamlFile):
         for package_name, package_version in release_matrix_file_content.items():
             _recursive_validate_version_matrix(package_version, package_name, errors)
         handle_validation_errors(errors, message)
-
-    @staticmethod
-    def lint_release_name(packagefile_path: str) -> List[KomodoError]:
-        relname = os.path.basename(packagefile_path)
-        found = False
-        for py_suffix in "-py27", "-py36", "-py38", "-py311":
-            for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
-                if relname.endswith(py_suffix + rh_suffix + ".yml"):
-                    found = True
-                    break
-        if not found:
-            return [
-                _komodo_error(
-                    package=packagefile_path,
-                    err=(
-                        "Invalid release name suffix. "
-                        "Must be of the form -pyXX[X] or -pyXX[X]-rhelY"
-                    ),
-                ),
-            ]
-
-        return []
 
 
 class ReleaseDir:
