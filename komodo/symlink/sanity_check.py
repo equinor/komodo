@@ -91,10 +91,21 @@ def assert_root_nodes(link_dict):
         )
 
 
-def _compare_dicts(dict_1, dict_2):
+def _sort_lists_in_dicts(_dict: dict) -> dict:
+    result = {}
+    for key, value in _dict.items():
+        if isinstance(value, list):
+            result[key] = sorted(value)
+        else:
+            result[key] = value
+    return result
+
+
+def _compare_dicts(dict_1: dict, dict_2: dict) -> str:
     return "\n" + "\n".join(
         difflib.ndiff(
-            pprint.pformat(dict_1).splitlines(), pprint.pformat(dict_2).splitlines()
+            pprint.pformat(_sort_lists_in_dicts(dict_1)).splitlines(),
+            pprint.pformat(_sort_lists_in_dicts(dict_2)).splitlines(),
         ),
     )
 
