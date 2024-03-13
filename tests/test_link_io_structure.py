@@ -7,6 +7,8 @@ import pytest
 
 from komodo.symlink.create_links import create_symlinks, symlink_main
 from komodo.symlink.sanity_check import (
+    _compare_dicts,
+    _sort_lists_in_dicts,
     assert_root_nodes,
     equal_links,
     read_link_structure,
@@ -282,3 +284,11 @@ def test_executables(tmpdir):
             sanity_main()
     finally:
         sys.argv = old_argv
+
+
+def test_sort_lists_in_dicts():
+    assert _sort_lists_in_dicts({1: [2, 1]}) == {1: [1, 2]}
+
+
+def test_compare_dicts_handles_non_sorted_lists():
+    assert _compare_dicts({1: [2, 1]}, {1: [1, 2]}).strip() == "{1: [1, 2]}"
