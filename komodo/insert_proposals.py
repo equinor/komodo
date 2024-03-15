@@ -92,6 +92,7 @@ def main():
         args.git_ref,
         args.jobname,
         args.joburl,
+        args.rhel8,
     )
 
 
@@ -202,7 +203,9 @@ def create_pr_with_changes(
     tmp_target: str,
     tmp_ref: GitRef,
     pr_msg: str,
+    rhel8: Optional[bool] = False,
 ):
+    commit_title = f"Add release {target}+rhel8" if rhel8 else f"Add release {target}"
     repo.create_git_ref(ref="refs/heads/" + target, sha=from_sha)
     # making a temporary PR in order to squash the commits into one
     tmp_pr = repo.create_pull(
@@ -213,7 +216,7 @@ def create_pr_with_changes(
     )
     tmp_pr.merge(
         commit_message=pr_msg,
-        commit_title=f"Add release {target}",
+        commit_title=commit_title,
         merge_method="squash",
     )
     with contextlib.suppress(github.GithubException):
@@ -243,7 +246,13 @@ def create_new_release_file(
 
 
 def insert_proposals(
-    repo: Repository, base: str, target: str, git_ref: str, jobname: str, joburl: str
+    repo: Repository,
+    base: str,
+    target: str,
+    git_ref: str,
+    jobname: str,
+    joburl: str,
+    rhel8: Optional[bool] = False,
 ) -> None:
     tmp_target = target + ".tmp"
 
@@ -293,7 +302,9 @@ def insert_proposals(
         jobname=jobname,
         joburl=joburl,
     )
-    create_pr_with_changes(repo, git_ref, target, from_sha, tmp_target, tmp_ref, pr_msg)
+    create_pr_with_changes(
+        repo, git_ref, target, from_sha, tmp_target, tmp_ref, pr_msg, rhel8
+    )
 
 
 class InsertProposalsNamespace(argparse.Namespace):
@@ -308,6 +319,7 @@ class InsertProposalsNamespace(argparse.Namespace):
     git_fork: str
     git_repo: str
     git_ref: str
+    rhel8: bool
 
 
 def parse_args() -> InsertProposalsNamespace:
@@ -333,6 +345,12 @@ def parse_args() -> InsertProposalsNamespace:
     parser.add_argument("--git-fork", help="git fork", default="equinor")
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
+    parser.add_argument(
+        "--rhel8",
+        action="store_true",
+        help="Flag to indicate if one should add release for RHEL8.",
+        default=False,
+    )
     return parser.parse_args(namespace=InsertProposalsNamespace())
 
 
