@@ -30,7 +30,8 @@ dependencies = [
     "pysnyk",
     "PyYAML",
     "requests",
-    "urllib3<2", #Pinned under v2 due to RHEL7 incompability
+    "urllib3<2; '.el7.' in platform_release", #Pinned under v2 due to RHEL7 incompability
+    "urllib3; '.el7.' not in platform_release",
     "ruamel.yaml",
     "shell",
 ]
