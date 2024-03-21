@@ -29,12 +29,13 @@ jobs:
       run: |
         pip install ".[dev]"
 
-    - name: Run black
-      uses: psf/black@stable
-
     - name: Lint with ruff
       run: |
         ruff check komodo tests
+    
+    - name: Format with ruff
+      run: |
+        ruff format komodo tests --check
 
     - name: pylint
       run: |
