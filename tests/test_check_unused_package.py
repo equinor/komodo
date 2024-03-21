@@ -87,7 +87,6 @@ test_case = [
 
 @pytest.mark.parametrize("repo, release, package_status", test_case)
 def test_check_unused_package(repo, release, package_status, capsys, tmpdir):
-
     # Use tmpdir to create a temporary file for package status
     package_status_file = tmpdir.join("package_status.yml")
 
