@@ -38,7 +38,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "black",
     "furo",
     "myst_parser",
     "pylint",

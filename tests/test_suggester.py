@@ -46,7 +46,7 @@ def test_path_is_release(test_input, expected):
     ("release_id", "expected"),
     [
         ("2019.12.00-py3", "py3"),
-        ("2019.12.00-py2.7", "py2.7"),
+        ("2019.12.00-py27", "py27"),
     ],
 )
 def test_py_ver(release_id, expected):

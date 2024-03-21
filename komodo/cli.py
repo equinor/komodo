@@ -249,7 +249,6 @@ def move_new_release_to_release_path(args: KomodoNamespace, release_path: Path) 
 
 @profile_time("Deleting previous release")
 def delete_old_previously_moved_releases(prefix_path: Path, release_name: Path) -> None:
-
     release_dir_glob = [
         str(p.absolute()) for p in list(prefix_path.glob(f"{release_name}.delete-*"))
     ]
