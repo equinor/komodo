@@ -40,7 +40,7 @@ class Release:
 
     def py_ver(self) -> str:
         try:
-            return re.search("-(py\\d\\.?\\d?)", self.release_id).group(1)
+            return re.search(r"-(py\d{1,3})", self.release_id).group(1)
         except TypeError as exc:
             msg = f"{self.release_id} has no python version"
             raise ValueError(msg) from exc
