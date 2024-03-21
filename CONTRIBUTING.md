@@ -4,7 +4,7 @@ The following is a set of guidelines for contributing to Komodo.
 
 ## Ground Rules
 
-1. We use Black code and ruff for formatting
+1. We use ruff for linting and formatting
 1. All code must be testable and unit tested.
 
 ## Commits
