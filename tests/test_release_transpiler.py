@@ -90,10 +90,11 @@ def test_transpile_add_argument(tmpdir, matrix):
     ],
     ids=["Pass for all packages", "Fail", "Fail"],
 )
-def test_check_version_exists_for_coordinates(matrix, error_message_content):
+def test_check_version_exists_for_coordinates(matrix, error_message_content, tmpdir):
     release_file = os.path.join(_get_test_root(), "data", "test_release_matrix.yml")
     try:
-        transpile_releases(release_file, os.getcwd(), matrix)
+        with tmpdir.as_cwd():
+            transpile_releases(release_file, os.getcwd(), matrix)
     except KeyError as exception_info:
         assert all(word in str(exception_info) for word in error_message_content)
 
