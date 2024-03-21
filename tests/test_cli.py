@@ -220,7 +220,7 @@ def test_pyver_is_deprecated():
 
 
 def test_bleeding_builds_marked_for_deletion_are_removed(tmpdir):
-    prefix_path = Path(tmpdir).absolute()
+    prefix_path = Path(tmpdir / "prefix").absolute()
     prefix_path_str = str(prefix_path)
 
     sys.argv = [
