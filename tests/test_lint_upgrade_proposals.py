@@ -112,6 +112,38 @@ VALID_UPGRADE_PROPOSALS_MULTIPLE_RELEASES = """
 1111-12:
   python: 3.8.6
 """
+
+VALID_UPGRADE_PROPOSALS_NESTED_ONE_LEVEL = """
+1111-12:
+  wheel:
+    py38: 0.40.0
+    py311: 0.40.0
+"""
+
+VALID_UPGRADE_PROPOSALS_NESTED_TWO_LEVEL = """
+1111-12:
+  wheel:
+    rhel7:
+      py38: 0.40.0
+    rhel8:
+      py38: 0.40.0
+      py311: 0.40.0
+"""
+
+VALID_UPGRADE_PROPOSALS_MULTI_NESTED = """
+1111-12:
+  python: 3.8.6
+  setuptools:
+    py38: 68.0.0
+    py311: 68.0.0
+  wheel:
+    rhel7:
+      py38: 0.40.0
+    rhel8:
+      py38: 0.40.0
+      py311: 0.40.0
+"""
+
 INVALID_UPGRADE_PROPOSALS_DUPLICATE_PACKAGES = """
 1111-11:
 1111-12:
@@ -216,6 +248,24 @@ yaml
                 match=r"Version '3.8.6' of package 'python' not found in repository",
             ),
             id="repository_file_missing_package_version",
+        ),
+        pytest.param(
+            VALID_UPGRADE_PROPOSALS_NESTED_ONE_LEVEL,
+            VALID_REPOSITORY,
+            does_not_raise(),
+            id="one_level_nested_package_versions_in_upgrade_proposals",
+        ),
+        pytest.param(
+            VALID_UPGRADE_PROPOSALS_NESTED_TWO_LEVEL,
+            VALID_REPOSITORY,
+            does_not_raise(),
+            id="two_level_nested_package_versions_in_upgrade_proposals",
+        ),
+        pytest.param(
+            VALID_UPGRADE_PROPOSALS_MULTI_NESTED,
+            VALID_REPOSITORY,
+            does_not_raise(),
+            id="combined_level_nested_package_versions_in_upgrade_proposals",
         ),
         pytest.param(
             INVALID_UPGRADE_PROPOSALS_DUPLICATE_PACKAGES,
