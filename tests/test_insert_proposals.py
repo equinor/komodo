@@ -168,21 +168,29 @@ class MockRepo:
                     "testlib2": "1.1.1",
                 },
                 "upgrade_proposals.yml": {
-                    "1111-11": {"testlib2": {"rhel7": "1.1.2", "rhel8": "1.1.1"}},
+                    "1111-11": {
+                        "testlib2": {
+                            "rhel7": {"py38": "1.1.2"},
+                            "rhel8": {"py38": "1.1.1", "py311": "1.1.2"},
+                        },
+                    },
                 },
                 "repository.yml": VALID_REPOSITORY_CONTENT,
             },
             {
                 "releases/matrices/1111.11.rc2.yml": {
                     "testlib1": "1.1.1",
-                    "testlib2": {"rhel7": "1.1.2", "rhel8": "1.1.1"},
+                    "testlib2": {
+                        "rhel7": {"py38": "1.1.2"},
+                        "rhel8": {"py38": "1.1.1", "py311": "1.1.2"},
+                    },
                 },
                 "upgrade_proposals.yml": {"1111-11": None},
             },
             ["Temporary PR 1111.11.rc2", "Add release 1111.11.rc2"],
             type(None),
             "",
-            id="update_from_version_to_matrix",
+            id="update_from_version_to_full_matrix",
         ),
         pytest.param(
             "1111.11.rc1",
@@ -190,7 +198,35 @@ class MockRepo:
             {
                 "releases/matrices/1111.11.rc1.yml": {
                     "testlib1": "1.1.1",
-                    "testlib2": {"rhel7": "1.1.2", "rhel8": "1.1.1"},
+                    "testlib2": "1.1.1",
+                },
+                "upgrade_proposals.yml": {
+                    "1111-11": {"testlib2": {"py38": "1.1.2", "py311": "1.1.1"}},
+                },
+                "repository.yml": VALID_REPOSITORY_CONTENT,
+            },
+            {
+                "releases/matrices/1111.11.rc2.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": {"py38": "1.1.2", "py311": "1.1.1"},
+                },
+                "upgrade_proposals.yml": {"1111-11": None},
+            },
+            ["Temporary PR 1111.11.rc2", "Add release 1111.11.rc2"],
+            type(None),
+            "",
+            id="update_from_version_to_py_matrix",
+        ),
+        pytest.param(
+            "1111.11.rc1",
+            "1111.11.rc2",
+            {
+                "releases/matrices/1111.11.rc1.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": {
+                        "rhel7": {"py38": "1.1.2"},
+                        "rhel8": {"py38": "1.1.1", "py311": "1.1.2"},
+                    },
                 },
                 "upgrade_proposals.yml": {
                     "1111-11": {"testlib2": "1.1.2"},
@@ -208,6 +244,33 @@ class MockRepo:
             type(None),
             "",
             id="update_from_matrix_to_version",
+        ),
+        pytest.param(
+            "1111.11.rc1",
+            "1111.11.rc2",
+            {
+                "releases/matrices/1111.11.rc1.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": "1.1.1",
+                },
+                "upgrade_proposals.yml": {
+                    "1111-11": {
+                        "testlib2": {"py38": None, "py311": "1.1.2"},
+                    },
+                },
+                "repository.yml": VALID_REPOSITORY_CONTENT,
+            },
+            {
+                "releases/matrices/1111.11.rc2.yml": {
+                    "testlib1": "1.1.1",
+                    "testlib2": {"py38": None, "py311": "1.1.2"},
+                },
+                "upgrade_proposals.yml": {"1111-11": None},
+            },
+            ["Temporary PR 1111.11.rc2", "Add release 1111.11.rc2"],
+            type(None),
+            "",
+            id="remove_package_from_one_py_version",
         ),
         pytest.param(
             "1111.11.rc1",

@@ -103,7 +103,7 @@ class ReleaseFile(YamlFile):
     def lint_release_name(packagefile_path: str) -> List[KomodoError]:
         relname = os.path.basename(packagefile_path)
         found = False
-        for py_suffix in "-py27", "-py36", "-py38", "-py310":
+        for py_suffix in "-py27", "-py36", "-py38", "-py311":
             for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
                 if relname.endswith(py_suffix + rh_suffix + ".yml"):
                     found = True
@@ -161,7 +161,7 @@ class ReleaseMatrixFile(YamlFile):
     def lint_release_name(packagefile_path: str) -> List[KomodoError]:
         relname = os.path.basename(packagefile_path)
         found = False
-        for py_suffix in "-py27", "-py36", "-py38", "-py310":
+        for py_suffix in "-py27", "-py36", "-py38", "-py311":
             for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
                 if relname.endswith(py_suffix + rh_suffix + ".yml"):
                     found = True
@@ -527,28 +527,42 @@ class Package:
         raise TypeError(msg)
 
     @staticmethod
-    def validate_package_version(package_name: str, package_version: str) -> None:
-        if isinstance(package_version, str):
+    def validate_package_version(
+        package_name: Union[str, None],
+        package_version: str,
+        is_matrix_file: bool = False,
+    ) -> None:
+        if isinstance(package_version, str) or (
+            is_matrix_file and package_version is None
+        ):
             return
-        msg = f"Package '{package_name}' has invalid version type ({package_version})"
-        raise TypeError(
-            msg,
-        )
+        else:
+            msg = (
+                f"Package '{package_name}' has invalid version type ({package_version})"
+            )
+            raise TypeError(
+                msg,
+            )
 
     @staticmethod
-    def validate_package_entry(package_name: str, package_version) -> None:
+    def validate_package_entry(
+        package_name: str, package_version, is_matrix_file=False
+    ) -> None:
         Package.validate_package_name(package_name)
-        Package.validate_package_version(package_name, package_version)
+        Package.validate_package_version(package_name, package_version, is_matrix_file)
 
     @staticmethod
     def validate_package_entry_with_errors(
         package_name: str,
         package_version: str,
+        is_matrix_file: bool = False,
     ) -> List[str]:
         """Validates package name and version, and returns a list of error messages."""
         errors = []
         try:
-            Package.validate_package_entry(package_name, package_version)
+            Package.validate_package_entry(
+                package_name, package_version, is_matrix_file
+            )
         except (ValueError, TypeError) as value_or_type_error:
             errors.append(str(value_or_type_error))
         return errors
@@ -757,7 +771,9 @@ def _recursive_validate_version_matrix(
             )
     else:
         new_errors = Package.validate_package_entry_with_errors(
-            package_name, version_or_matrix
+            package_name,
+            version_or_matrix,
+            is_matrix_file=True,
         )
         for new_error in new_errors:
             errors.add(new_error)

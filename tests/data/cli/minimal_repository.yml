@@ -3,7 +3,7 @@ python:
     make: sh
     makefile: test_python_builtin.sh
     maintainer: foo@example.com
-    makeopts: --python-version 3.10
+    makeopts: --python-version 3.11
 
 treelib:
   1.7.0:

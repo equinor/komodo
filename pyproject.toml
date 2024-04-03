@@ -106,6 +106,7 @@ disable = [
     "use-implicit-booleaness-not-comparison",
     "use-symbolic-message-instead",
     "useless-object-inheritance",
+    "too-many-lines",
 ]
 
 [tool.pylint.MASTER]
