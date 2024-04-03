@@ -30,13 +30,15 @@ def recursive_update(
         package_name1: version_x
 
         package_name2:
-                py38: version_y
-                py312: version_z
+          py38: version_y
+          py312: version_z
 
         package_name3:
-                py38:
-                    rhel7: version_x
-                    rhel8: version_y
+          rhel7:
+            py38: version_x
+          rhel8:
+            py38: version_x
+            py311: version_y
     Args:
         to_be_upgraded (Mapping[str, Union[str, Mapping[str, str]]]):
 
@@ -125,7 +127,7 @@ def validate_upgrades(
 
 def recursive_validate_package_entries(
     package_name,
-    package_version_or_matrix: Union[str, Mapping],
+    package_version_or_matrix: Union[str, Mapping, None],
     repository_file: RepositoryFile,
     errors: MutableSet,
 ) -> None:
@@ -136,6 +138,8 @@ def recursive_validate_package_entries(
             )
         except KomodoException as komodo_exception:
             errors.add(komodo_exception.error)
+    elif package_version_or_matrix is None:
+        return
     else:
         for nested_version_or_matrix in package_version_or_matrix.values():
             recursive_validate_package_entries(

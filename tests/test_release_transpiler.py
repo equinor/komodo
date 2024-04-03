@@ -59,7 +59,7 @@ def test_build_release_matrix_py_coords(
 
 @pytest.mark.parametrize(
     "matrix",
-    [({"py": ["3.8"], "rhel": ["7"]}), ({"py": ["3.8", "3.10"], "rhel": ["7", "8"]})],
+    [({"py": ["3.8"], "rhel": ["7"]}), ({"py": ["3.8", "3.11"], "rhel": ["7", "8"]})],
 )
 def test_transpile_add_argument(tmpdir, matrix):
     release_file = os.path.join(_get_test_root(), "data", "test_release_matrix.yml")
