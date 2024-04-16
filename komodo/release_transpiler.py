@@ -1,51 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
-import itertools
 import os
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Dict, Sequence, Union
 
 import yaml
-from packaging import version as version_parser
 
 from komodo.matrix import format_release, get_matrix
 from komodo.prettier import load_yaml, write_to_file
-
-
-def build_matrix_file(
-    release_base: str,
-    release_folder: str,
-    builtins: dict,
-    py_coords: Optional[Sequence[str]],
-) -> None:
-    """Combine release files from the release_folder into one single matrix_file."""
-    files: Dict[str, Dict] = {}
-    if py_coords is None:
-        py_keys = get_py_coords(release_base, release_folder)
-    else:
-        py_keys = [f"py{py_version.replace('.', '')}" for py_version in py_coords]
-
-    for key in py_keys:
-        files[key] = load_yaml(f"{release_folder}/{release_base}-{key}.yml")
-
-    all_packages = set(
-        itertools.chain.from_iterable(
-            release_file_content.keys() for release_file_content in files.values()
-        ),
-    )
-    compiled = {}
-
-    for package in all_packages:
-        if package in builtins:
-            compiled[package] = builtins[package]
-            continue
-
-        if len({release_file.get(package) for release_file in files.values()}) == 1:
-            compiled[package] = next(iter(files.values()))[package]
-        else:
-            compiled[package] = {key: files[key].get(package) for key in py_keys}
-
-    write_to_file(compiled, f"{release_base}.yml", False)
 
 
 def get_py_coords(release_base: str, release_folder: str) -> Sequence[str]:
@@ -201,15 +163,6 @@ def transpile_releases_for_pip(
             filehandler.write("\n".join(pip_packages))
 
 
-def combine(args):
-    build_matrix_file(
-        args.release_base,
-        args.release_folder,
-        load_yaml(args.override_mapping),
-        args.py_coords,
-    )
-
-
 def transpile(args):
     transpile_releases(args.matrix_file, args.output_folder, args.matrix_coordinates)
 
@@ -231,64 +184,11 @@ def main():
 
     subparsers = parser.add_subparsers(
         title="Commands",
-        description="Combine - build matrix file\nTranspile - generate release files",
+        description="Transpile - generate release files",
         help="Available sub commands",
         dest="mode",
     )
     subparsers.required = True
-
-    matrix_parser = subparsers.add_parser(
-        "combine",
-        description="""
-Combine release files into a matrix file. Output format:
-
-  example-package:
-    rhel7:
-      py36 : # package not included in release
-      py38 : 5.11.13
-    rhel8:
-      py36 : # package not included in release
-      py38 : 5.11.13+builtin""",
-        formatter_class=argparse.RawTextHelpFormatter,
-    )
-    matrix_parser.set_defaults(func=combine)
-    matrix_parser.add_argument(
-        "--release-base",
-        required=True,
-        help="Name of the release to handle (default: None)",
-    )
-    matrix_parser.add_argument(
-        "--release-folder",
-        required=True,
-        type=dir_path,
-        help="Folder with existing release file (default: None)",
-    )
-    matrix_parser.add_argument(
-        "--override-mapping",
-        required=True,
-        type=valid_file,
-        help="File containing explicit matrix packages (default: None)",
-    )
-
-    def comma_delimited_python_versions(python_versions: str) -> List[str]:
-        output_list: List[str] = []
-        for python_version in python_versions.split(","):
-            parsed_python_version = version_parser.parse(python_version).base_version
-            if parsed_python_version >= "4.0.0":
-                raise version_parser.InvalidVersion(python_version)
-            output_list.append(parsed_python_version)
-        return output_list
-
-    matrix_parser.add_argument(
-        "--py_coords",
-        help="""Comma delimited list of python versions to be combined,
-        for example, "3.6,3.8" (without spaces).
-        If None, the release files in release-folder will be used to imply
-        the versions to combine.""",
-        type=comma_delimited_python_versions,
-        required=False,
-        default=None,
-    )
 
     transpile_parser = subparsers.add_parser(
         "transpile",
