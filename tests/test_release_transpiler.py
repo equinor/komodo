@@ -1,10 +1,8 @@
 import os
 
 import pytest
-import yaml
 
 from komodo.release_transpiler import (
-    build_matrix_file,
     get_py_coords,
     transpile_releases,
     transpile_releases_for_pip,
@@ -21,40 +19,6 @@ builtins = {
         },
     },
 }
-
-
-@pytest.mark.parametrize(
-    ("py_coords_input", "packages_lib2", "py_coords_not_in_lib3"),
-    [
-        (["3.6", "3.8"], "2.3.4", "py27"),
-        (None, {"py27": "1.2.3", "py36": "2.3.4", "py38": "2.3.4"}, [""]),
-    ],
-)
-def test_build_release_matrix_py_coords(
-    tmpdir,
-    py_coords_input,
-    packages_lib2,
-    py_coords_not_in_lib3,
-):
-    """lib1 tests packages with builtins,
-    lib2 tests packages with same version for two py coordinates,
-    lib3 tests packages with different versions for each py coordinate.
-    """
-    release_base = "2020.01.a1"
-    release_folder = os.path.join(_get_test_root(), "data/test_releases/")
-    with tmpdir.as_cwd():
-        build_matrix_file(release_base, release_folder, builtins, py_coords_input)
-        new_release_file = f"{release_base}.yml"
-        assert os.path.isfile(new_release_file)
-        with open(new_release_file, encoding="utf-8") as new_release_file_stream:
-            release_matrix = yaml.safe_load(new_release_file_stream)
-
-        assert release_matrix["lib1"] == builtins["lib1"]
-        assert release_matrix["lib2"] == packages_lib2
-        assert all(
-            py_coordinate not in list(release_matrix["lib3"].keys())
-            for py_coordinate in py_coords_not_in_lib3
-        )
 
 
 @pytest.mark.parametrize(
