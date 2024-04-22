@@ -3,7 +3,7 @@ import os
 
 class Data:
     def __init__(self, extra_data_dirs=None) -> None:
-        """Create a Data object responsible for giving you the filez you need.
+        """Create a Data object responsible for giving you the files you need.
         Takes a list of extra_data_dirs to search.
         """
         self._dirs = [os.path.dirname(__file__)]

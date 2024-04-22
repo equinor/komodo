@@ -192,7 +192,7 @@ def is_build_only(args: KomodoNamespace) -> bool:
     return args.build and not args.install
 
 
-def generate_general_release_packages(release_path: Path) -> Path:
+def generate_release_root(release_path: Path) -> Path:
     """Append root to the temporary build dir, as we want a named root/
     directory as the distribution root, organised under the distribution name
 
@@ -206,7 +206,7 @@ def generate_general_release_packages(release_path: Path) -> Path:
     return abs_prefix / "root"
 
 
-def generate_release_packages(
+def generate_release_manifest(
     release_name: Path,
     release_file_content: Mapping[str, str],
     repository_file_content: Mapping[str, Mapping[str, Union[str, Sequence[str]]]],
@@ -356,7 +356,7 @@ def _main(args: KomodoNamespace) -> None:
         release_path=release_path, overwrite_enabled=args.overwrite
     )
 
-    release_root = generate_general_release_packages(release_path)
+    release_root = generate_release_root(release_path)
 
     if args.build or not args.install:
         build_non_pypi_packages_and_move_to_release_path(args, data, release_root)
@@ -365,7 +365,7 @@ def _main(args: KomodoNamespace) -> None:
 
     create_enable_scripts(komodo_prefix=release_root, komodo_release=args.release)
 
-    generate_release_packages(
+    generate_release_manifest(
         args.release, args.pkgs.content, args.repo.content, git_hashes
     )
 
