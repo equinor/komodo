@@ -209,7 +209,9 @@ def create_pr_with_changes(
     pr_msg: str,
     rhel8: Optional[bool] = False,
 ):
-    commit_title = f"Add release {target}+rhel8" if rhel8 else f"Add release {target}"
+    commit_title = (
+        f"Add release {target} (+rhel8)" if rhel8 else f"Add release {target}"
+    )
     repo.create_git_ref(ref="refs/heads/" + target, sha=from_sha)
     # making a temporary PR in order to squash the commits into one
     tmp_pr = repo.create_pull(
