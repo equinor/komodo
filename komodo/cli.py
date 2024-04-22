@@ -4,7 +4,6 @@ import datetime
 import os
 import sys
 import uuid
-import warnings
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
@@ -44,7 +43,6 @@ class KomodoNamespace(argparse.Namespace):
     overwrite: bool
     cmake: str
     pip: str
-    pyver: Optional[str]
     workspace: str
     extra_data_dirs: List[str]
     postinst: str
@@ -570,11 +568,6 @@ def parse_args(args: List[str]) -> KomodoNamespace:
         help="The command to use for pip builds.",
     )
     optional_args.add_argument(
-        "--pyver",
-        type=str,
-        help="[DEPRECATED] This argument is not used.",  # Message to stderr below.
-    )
-    optional_args.add_argument(
         "--workspace",
         type=str,
         default=None,
@@ -604,13 +597,6 @@ def parse_args(args: List[str]) -> KomodoNamespace:
     )
 
     args: KomodoNamespace = parser.parse_args(args, namespace=KomodoNamespace())
-
-    if args.pyver is not None:
-        message = (
-            "\n\n⚠️  The --pyver option is deprecated and will be removed in a "
-            "future version of komodo. It is not used by komodo.\n"
-        )
-        warnings.warn(message, FutureWarning, stacklevel=2)
 
     return args
 
