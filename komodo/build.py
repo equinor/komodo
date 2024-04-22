@@ -10,11 +10,6 @@ from typing import Dict, List, Optional, Set
 
 import requests
 
-from komodo.package_version import (
-    LATEST_PACKAGE_ALIAS,
-    latest_pypi_version,
-    strip_version,
-)
 from komodo.shell import pushd, shell
 
 
@@ -204,27 +199,6 @@ def download(package_name, ver, prefix, url, hash_str, fakeroot, destination):
         )
 
 
-def pip_install(package_name, ver, prefix, dlprefix, fakeroot, pip="pip", makeopts=""):
-    ver = strip_version(ver)
-    if ver == LATEST_PACKAGE_ALIAS:
-        ver = latest_pypi_version(package_name)
-    cmd = [
-        pip,
-        f"install {package_name}=={strip_version(ver)}",
-        f"--root {fakeroot}",
-        f"--prefix {prefix}",
-        "--no-index",
-        "--no-deps",
-        "--ignore-installed",
-        f"--cache-dir {dlprefix}",
-        f"--find-links {dlprefix}",
-        makeopts,
-    ]
-
-    print(f"Installing {package_name} ({ver}) from pip")
-    shell(cmd)
-
-
 def noop(package_name, ver):
     print(f"Doing nothing for noop package {package_name} ({ver})")
 
@@ -332,15 +306,7 @@ def make(
                 cmake=cmk,
             )
         elif make == "pip":
-            pip_install(
-                package_name=package_name,
-                ver=ver,
-                prefix=prefix,
-                dlprefix=dlprefix,
-                fakeroot=fakeroot,
-                pip=pip,
-                makeopts=makeopts,
-            )
+            continue
         elif make == "sh":
             sh(
                 package_name=package_name,
