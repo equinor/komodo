@@ -168,7 +168,7 @@ def _make(*args, **kwargs) -> None:
     make(*args, **kwargs)
 
 
-def build_packages_and_move_to_release_path(
+def build_non_pypi_packages_and_move_to_release_path(
     args: KomodoNamespace, data: Data, tmp_prefix: Path
 ):
     fakeroot = Path(args.release).resolve()
@@ -361,7 +361,7 @@ def _main(args: KomodoNamespace) -> None:
     release_root = generate_general_release_packages(release_path)
 
     if args.build or not args.install:
-        build_packages_and_move_to_release_path(args, data, release_root)
+        build_non_pypi_packages_and_move_to_release_path(args, data, release_root)
         if is_build_only(args):
             sys.exit(0)
 
