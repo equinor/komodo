@@ -292,6 +292,7 @@ def install_previously_downloaded_pip_packages(
             "--no-index",
             "--no-deps",
             "--ignore-installed",
+            "--no-compile",
             # assuming fetch.py has done "pip download" to this directory:
             f"--cache-dir {downloads_directory}",
             f"--find-links {downloads_directory}",
@@ -309,10 +310,17 @@ def run_post_installation_scripts_if_set(
         timing_func(shell([postinst, release_path]))
 
 
-@profile_time("find and delete python bytecode files")
-def find_and_delete_python_bytecode_files(release_root: Path) -> None:
-    print("running", f"find {release_root} -name '*.pyc' -delete")
-    shell(f"find {release_root} -name '*.pyc' -delete")
+@profile_time("Compile python bytecode files")
+def compile_python_bytecode_files(release_root: Path) -> None:
+    _python_exe = release_root / "bin" / "python"
+    if not _python_exe.exists():
+        return
+    print(
+        "running",
+        f"{str(_python_exe)} -m compileall -f -j 0 {str(release_root)}",
+    )
+    # The default optimize setting is 0, any higher would remove all assert statements
+    shell(f"{str(_python_exe)} -m compileall -f -j 0 {str(release_root)}")
 
 
 @profile_time("set permissions")
@@ -321,11 +329,11 @@ def set_permissions(set_permissions_script: Path, release_path: Path) -> None:
     shell([str(set_permissions_script), str(release_path)])
 
 
-def cleanup_python_bytecode_files_and_fix_permissions(
+def compile_python_bytecode_files_and_fix_permissions(
     release_root: Path, set_permissions_script_path, release_path: Path
 ):
-    find_and_delete_python_bytecode_files(release_root)
     set_permissions(set_permissions_script_path, release_path)
+    compile_python_bytecode_files(release_root)
 
 
 timings: List[Tuple[str, datetime.timedelta]] = []
@@ -394,7 +402,7 @@ def _main(args: KomodoNamespace) -> None:
     komodo.switch.create_activator_switch(data, args.prefix, args.release)
 
     run_post_installation_scripts_if_set(args.postinst, release_path)
-    cleanup_python_bytecode_files_and_fix_permissions(
+    compile_python_bytecode_files_and_fix_permissions(
         release_root,
         set_permissions_script_path=data.get("set_permissions.sh"),
         release_path=release_path,
