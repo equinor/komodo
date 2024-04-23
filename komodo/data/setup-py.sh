@@ -57,4 +57,5 @@ $PIP install $OPTS .           \
     --root $FAKEROOT     \
     --no-deps            \
     --no-cache-dir       \
+    --no-compile         \
     --prefix $PREFIX 1>&2
