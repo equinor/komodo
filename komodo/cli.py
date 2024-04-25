@@ -320,7 +320,7 @@ def compile_python_bytecode_files(release_root: Path) -> None:
         f"{str(_python_exe)} -m compileall -f -j 0 {str(release_root)}",
     )
     # The default optimize setting is 0, any higher would remove all assert statements
-    shell(f"{str(_python_exe)} -m compileall -f -j 0 {str(release_root)}")
+    #shell(f"{str(_python_exe)} -m compileall -f -j 0 {str(release_root)}")
 
 
 @profile_time("set permissions")
