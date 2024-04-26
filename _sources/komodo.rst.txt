@@ -61,14 +61,6 @@ komodo.deployed module
    :undoc-members:
    :show-inheritance:
 
-komodo.extract\_dep\_graph module
----------------------------------
-
-.. automodule:: komodo.extract_dep_graph
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 komodo.fetch module
 -------------------
 
@@ -161,6 +153,14 @@ komodo.prettier module
 ----------------------
 
 .. automodule:: komodo.prettier
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+komodo.pypi\_dependencies module
+--------------------------------
+
+.. automodule:: komodo.pypi_dependencies
    :members:
    :undoc-members:
    :show-inheritance:

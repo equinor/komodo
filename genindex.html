@@ -231,6 +231,8 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.pypi_dependencies.PypiDependencies.add_user_specified">add_user_specified() (komodo.pypi_dependencies.PypiDependencies method)</a>
+</li>
         <li><a href="komodo.html#komodo.cli.apply_fallback_tmpdir_for_pip_if_set">apply_fallback_tmpdir_for_pip_if_set() (in module komodo.cli)</a>
 </li>
         <li><a href="komodo.symlink.html#komodo.symlink.sanity_check.assert_root_nodes">assert_root_nodes() (in module komodo.symlink.sanity_check)</a>
@@ -347,6 +349,8 @@
 </li>
         <li><a href="komodo.html#komodo.cli.KomodoNamespace.dry_run">dry_run (komodo.cli.KomodoNamespace attribute)</a>
 </li>
+        <li><a href="komodo.html#komodo.pypi_dependencies.PypiDependencies.dump_cache">dump_cache() (komodo.pypi_dependencies.PypiDependencies method)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -377,6 +381,8 @@
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.pypi_dependencies.PypiDependencies.failed_requirements">failed_requirements() (komodo.pypi_dependencies.PypiDependencies method)</a>
+</li>
         <li><a href="komodo.html#komodo.fetch.fetch">fetch() (in module komodo.fetch)</a>
 </li>
         <li><a href="komodo.html#komodo.deployed.fetch_non_deployed">fetch_non_deployed() (in module komodo.deployed)</a>
@@ -393,6 +399,8 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.pypi_dependencies.format_full_version">format_full_version() (in module komodo.pypi_dependencies)</a>
+</li>
         <li><a href="komodo.html#komodo.matrix.format_release">format_release() (in module komodo.matrix)</a>
 </li>
         <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.configuration.Configuration.from_json">from_json() (komodo.symlink.suggester.configuration.Configuration static method)</a>
@@ -409,8 +417,6 @@
           <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string">(komodo.yaml_file_types.UpgradeProposalsFile method)</a>
 </li>
         </ul></li>
-        <li><a href="komodo.html#komodo.build.full_dfs">full_dfs() (in module komodo.build)</a>
-</li>
     </ul></td>
   </tr></table>
 </section>
@@ -616,13 +622,6 @@
 </li>
         </ul></li>
         <li>
-    komodo.extract_dep_graph
-
-        <ul>
-          <li><a href="komodo.html#module-komodo.extract_dep_graph">module</a>
-</li>
-        </ul></li>
-        <li>
     komodo.fetch
 
         <ul>
@@ -699,13 +698,20 @@
           <li><a href="komodo.html#module-komodo.post_messages">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     komodo.prettier
 
         <ul>
           <li><a href="komodo.html#module-komodo.prettier">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    komodo.pypi_dependencies
+
+        <ul>
+          <li><a href="komodo.html#module-komodo.pypi_dependencies">module</a>
 </li>
         </ul></li>
         <li>
@@ -846,18 +852,12 @@
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.lint_maintainer">lint_maintainer() (komodo.yaml_file_types.RepositoryFile method)</a>
 </li>
-        <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.lint_release_name">lint_release_name() (komodo.yaml_file_types.ReleaseFile static method)</a>
-
-        <ul>
-          <li><a href="komodo.html#komodo.yaml_file_types.ReleaseMatrixFile.lint_release_name">(komodo.yaml_file_types.ReleaseMatrixFile static method)</a>
-</li>
-        </ul></li>
         <li><a href="komodo.html#komodo.lint_symlink_config.lint_symlink_config">lint_symlink_config() (in module komodo.lint_symlink_config)</a>
+</li>
+        <li><a href="komodo.html#komodo.lint.lint_version_numbers">lint_version_numbers() (in module komodo.lint)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="komodo.html#komodo.lint.lint_version_numbers">lint_version_numbers() (in module komodo.lint)</a>
-</li>
         <li><a href="komodo.html#komodo.release_cleanup.load_all_releases">load_all_releases() (in module komodo.release_cleanup)</a>
 </li>
         <li><a href="komodo.html#komodo.check_up_to_date_pypi.load_from_file">load_from_file() (in module komodo.check_up_to_date_pypi)</a>
@@ -886,8 +886,6 @@
           <li><a href="komodo.html#komodo.check_up_to_date_pypi.main">(in module komodo.check_up_to_date_pypi)</a>
 </li>
           <li><a href="komodo.html#komodo.cleanup.main">(in module komodo.cleanup)</a>
-</li>
-          <li><a href="komodo.html#komodo.extract_dep_graph.main">(in module komodo.extract_dep_graph)</a>
 </li>
           <li><a href="komodo.html#komodo.insert_proposals.main">(in module komodo.insert_proposals)</a>
 </li>
@@ -946,8 +944,6 @@
 </li>
           <li><a href="komodo.html#module-komodo.deployed">komodo.deployed</a>
 </li>
-          <li><a href="komodo.html#module-komodo.extract_dep_graph">komodo.extract_dep_graph</a>
-</li>
           <li><a href="komodo.html#module-komodo.fetch">komodo.fetch</a>
 </li>
           <li><a href="komodo.html#module-komodo.insert_proposals">komodo.insert_proposals</a>
@@ -971,6 +967,8 @@
           <li><a href="komodo.html#module-komodo.post_messages">komodo.post_messages</a>
 </li>
           <li><a href="komodo.html#module-komodo.prettier">komodo.prettier</a>
+</li>
+          <li><a href="komodo.html#module-komodo.pypi_dependencies">komodo.pypi_dependencies</a>
 </li>
           <li><a href="komodo.html#module-komodo.release_cleanup">komodo.release_cleanup</a>
 </li>
@@ -1081,10 +1079,10 @@
 </li>
         <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.release.path_leaf">path_leaf() (in module komodo.symlink.suggester.release)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.cli.KomodoNamespace.pip">pip (komodo.cli.KomodoNamespace attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.cli.KomodoNamespace.pkgs">pkgs (komodo.cli.KomodoNamespace attribute)</a>
 </li>
         <li><a href="komodo.html#komodo.cli.KomodoNamespace.postinst">postinst (komodo.cli.KomodoNamespace attribute)</a>
@@ -1106,6 +1104,8 @@
         <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.release.Release.py_ver">py_ver() (komodo.symlink.suggester.release.Release method)</a>
 </li>
         <li><a href="komodo.html#komodo.build.pypaths">pypaths() (in module komodo.build)</a>
+</li>
+        <li><a href="komodo.html#komodo.pypi_dependencies.PypiDependencies">PypiDependencies (class in komodo.pypi_dependencies)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -1161,11 +1161,9 @@
 </li>
         <li><a href="komodo.html#komodo.cli.rsync_komodo_to_destination">rsync_komodo_to_destination() (in module komodo.cli)</a>
 </li>
-        <li><a href="komodo.html#komodo.extract_dep_graph.run">run() (in module komodo.extract_dep_graph)</a>
+        <li><a href="komodo.html#komodo.lint_maturity.run">run() (in module komodo.lint_maturity)</a>
 
         <ul>
-          <li><a href="komodo.html#komodo.lint_maturity.run">(in module komodo.lint_maturity)</a>
-</li>
           <li><a href="komodo.html#komodo.lint_package_status.run">(in module komodo.lint_package_status)</a>
 </li>
           <li><a href="komodo.html#komodo.reverse_dep_graph.run">(in module komodo.reverse_dep_graph)</a>
@@ -1189,14 +1187,16 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.symlink.html#komodo.symlink.sanity_check.sanity_main">sanity_main() (in module komodo.symlink.sanity_check)</a>
 </li>
+        <li><a href="komodo.html#komodo.pypi_dependencies.PypiDependencies.satisfied">satisfied() (komodo.pypi_dependencies.PypiDependencies method)</a>
+</li>
         <li><a href="komodo.html#komodo.cli.set_permissions">set_permissions() (in module komodo.cli)</a>
 </li>
         <li><a href="komodo.html#komodo.build.sh">sh() (in module komodo.build)</a>
 </li>
-        <li><a href="komodo.html#komodo.shell.shell">shell() (in module komodo.shell)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.shell.shell">shell() (in module komodo.shell)</a>
+</li>
         <li><a href="komodo.html#komodo.snyk_reporting.snyk_main">snyk_main() (in module komodo.snyk_reporting)</a>
 </li>
         <li><a href="komodo.html#komodo.package_version.strip_version">strip_version() (in module komodo.package_version)</a>
@@ -1246,6 +1246,8 @@
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile">UpgradeProposalsFile (class in komodo.yaml_file_types)</a>
+</li>
+        <li><a href="komodo.html#komodo.pypi_dependencies.PypiDependencies.used_packages">used_packages() (komodo.pypi_dependencies.PypiDependencies method)</a>
 </li>
     </ul></td>
   </tr></table>
