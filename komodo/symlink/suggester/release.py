@@ -1,12 +1,6 @@
 import datetime
-import ntpath
-import os
 import re
-
-
-def path_leaf(path):
-    head, tail = ntpath.split(path)
-    return tail or ntpath.basename(head)
+from pathlib import Path
 
 
 def diff_month(date_1: datetime.date, date_2: datetime.date) -> int:
@@ -53,9 +47,8 @@ class Release:
 
     @staticmethod
     def id_from_file_name(file_name: str):
-        no_ext = os.path.splitext(file_name)[0]
-        return path_leaf(no_ext)
+        return Path(file_name).stem
 
     @staticmethod
     def path_is_release(path: str) -> bool:
-        return ntpath.split(path)[0] == "releases"
+        return Path(path).parent.name == "releases"
