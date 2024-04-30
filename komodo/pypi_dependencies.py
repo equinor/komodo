@@ -48,7 +48,7 @@ class PypiDependencies:
     ) -> None:
         self.python_version = python_version
         environment["python_full_version"] = python_version
-        environment["python_version"] = python_version[: python_version.rindex(".")]
+        environment["python_version"] = ".".join(python_version.split(".")[0:2])
         self._satisfied_requirements = set()
         self._failed_requirements = set()
         self._used_packages = set()
