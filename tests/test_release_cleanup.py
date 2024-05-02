@@ -5,6 +5,7 @@ import pytest
 
 from komodo.prettier import prettier
 from komodo.release_cleanup import (
+    check_missing_versions,
     find_unused_versions,
     load_all_releases,
     main,
@@ -81,6 +82,21 @@ def test_unused_versions():
     assert "master" in unused_versions["lib3"]
     assert "lib4" not in unused_versions
     assert "1.2.3" in unused_versions["lib5"]
+
+
+def test_missing_versions():
+    files = [
+        os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py27.yml"),
+        os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py36.yml"),
+        os.path.join(_get_test_root(), "data/test_releases/2020.01.a1-py38.yml"),
+    ]
+    used_versions = load_all_releases(files)
+
+    repository = _load_yaml(
+        os.path.join(_get_test_root(), "data/test_repository_missing.yml")
+    )
+    with pytest.raises(ValueError, match="Missing used version"):
+        check_missing_versions(used_versions, repository)
 
 
 def test_remove_unused_versions():

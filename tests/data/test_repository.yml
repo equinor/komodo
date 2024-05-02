@@ -8,6 +8,9 @@ lib1:
   1.2.3:
     source: pypi
     make: pip
+  1.2.4:
+    source: pypi
+    make: pip
   0.1.2:
     source: pypi
     make: pip
