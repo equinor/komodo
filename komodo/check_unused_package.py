@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-
 import argparse
 import os
 import sys
+from typing import Dict
+
+import yaml
 
 from komodo.prettier import load_yaml
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
@@ -11,7 +13,10 @@ from .pypi_dependencies import PypiDependencies
 
 
 def check_for_unused_package(
-    release_file: ReleaseFile, package_status_file: str, repository: RepositoryFile
+    release_file: ReleaseFile,
+    package_status_file: str,
+    repository: RepositoryFile,
+    builtin_python_versions: Dict[str, str],
 ):
     package_status = load_yaml(package_status_file)
     public_and_plugin_packages = [
@@ -20,9 +25,11 @@ def check_for_unused_package(
         if package_status[pkg]["visibility"] in ("public", "private-plugin")
     ]
     python_version = release_file.content["python"]
-    # For pypi we need to change '3.8.6-builtin' -> '3.8.6'
-    python_version = python_version[: python_version.rindex("-")]
-    dependencies = PypiDependencies(release_file.content, python_version=python_version)
+    full_python_version = builtin_python_versions[python_version]
+
+    dependencies = PypiDependencies(
+        release_file.content, python_version=full_python_version
+    )
     for name, version in release_file.content.items():
         metadata = repository.content.get(name, {}).get(version, {})
         if metadata.get("source") != "pypi":
@@ -69,7 +76,11 @@ def main():
     )
 
     args = parser.parse_args()
-    check_for_unused_package(args.release_file, args.status_file, args.repo)
+    with open("builtin_python_versions.yml", "r", encoding="utf-8") as f:
+        builtin_python_versions = yaml.safe_load(f)
+    check_for_unused_package(
+        args.release_file, args.status_file, args.repo, builtin_python_versions
+    )
 
 
 if __name__ == "__main__":
