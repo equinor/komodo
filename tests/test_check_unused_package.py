@@ -82,7 +82,7 @@ test_case = [
 @pytest.mark.parametrize("repo, release, package_status", test_case)
 def test_check_unused_package(repo, release, package_status, capsys, tmpdir):
     package_status["python"] = {"visibility": "public"}
-    release["python"] = "3.8.6-builtin"
+    release["python"] = "3.8-builtin"
 
     # Use tmpdir to create a temporary file for package status
     package_status_file = tmpdir.join("package_status.yml")
@@ -97,6 +97,7 @@ def test_check_unused_package(repo, release, package_status, capsys, tmpdir):
             release_file=release,
             package_status_file=str(package_status_file),
             repository=repo,
+            builtin_python_versions={"3.8-builtin": "3.8.6"},
         )
     assert sys_exit_info.value.code == 1
     captured = capsys.readouterr()

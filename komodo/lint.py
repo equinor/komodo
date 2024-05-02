@@ -6,6 +6,7 @@ import sys
 import warnings
 from collections import namedtuple
 
+import yaml
 from packaging.version import parse
 
 from .pypi_dependencies import PypiDependencies
@@ -101,10 +102,11 @@ def lint(
         }
 
         python_version = release_file.content["python"]
-        # For pypi we need to change '3.8.6-builtin' -> '3.8.6'
-        python_version = python_version[: python_version.rindex("-")]
+        with open("builtin_python_versions.yml", "r", encoding="utf-8") as f:
+            full_python_version = yaml.safe_load(f)[python_version]
+
         dependencies = PypiDependencies(
-            pypi_dependencies, python_version=python_version
+            pypi_dependencies, python_version=full_python_version
         )
         for name, version in release_file.content.items():
             if (
