@@ -35,6 +35,16 @@ def find_unused_versions(used_versions, repository):
     return unused_versions
 
 
+def check_missing_versions(used_versions, repository):
+    unused_versions = {}
+    for lib, versions in used_versions.items():
+        for version in versions:
+            if lib not in repository or version not in repository[lib]:
+                raise ValueError(f"Missing used version {lib}=={version}")
+
+    return unused_versions
+
+
 def remove_unused_versions(repository, unused_versions):
     for lib, versions in unused_versions.items():
         for version in versions:
@@ -155,6 +165,7 @@ def run_cleanup(args, parser):
     release_files = [filename for sublist in args.releases for filename in sublist]
     used_versions = load_all_releases(release_files)
     unused_versions = find_unused_versions(used_versions, repository)
+    check_missing_versions(used_versions, repository)
 
     if args.check:
         if not unused_versions:
