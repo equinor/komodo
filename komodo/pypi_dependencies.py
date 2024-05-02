@@ -114,6 +114,14 @@ class PypiDependencies:
     def _get_requirements(
         self, package_name: str, package_version: str
     ) -> List[Requirement]:
+        """
+        >>> from packaging.requirements import Requirement
+        >>> PypiDependencies(to_install={}, python_version="3.8.11")._get_requirements(
+        ...     "rips",
+        ...     "2024.3.0.2"
+        ... )
+        [<Requirement('grpcio')>, <Requirement('protobuf')>, <Requirement('wheel')>]
+        """
         canonical = canonicalize_name(package_name)
         if canonical in self._user_specified:
             return self._user_specified[canonical]
@@ -161,10 +169,22 @@ class PypiDependencies:
                         f"Got: {files}"
                     )
                 file = files[0]
-                if file.endswith(".whl"):
-                    dist = pkginfo.Wheel(os.path.join(tmpdir, file))
-                else:
-                    dist = pkginfo.SDist(os.path.join(tmpdir, file))
+                if not file.endswith(".whl"):
+                    subprocess.check_output(
+                        [
+                            "pip",
+                            "wheel",
+                            "--use-pep517",
+                            "--no-verify",
+                            "--no-deps",
+                            "--disable-pip-version-check",
+                            "--no-python-version-warning",
+                            file,
+                        ],
+                        cwd=tmpdir,
+                    )
+                    file = [f for f in os.listdir(tmpdir) if f.endswith(".whl")][0]
+                dist = pkginfo.Wheel(os.path.join(tmpdir, file))
                 self.requirements[canonical][package_version] = dist.requires_dist
 
         return [Requirement(r) for r in self.requirements[canonical][package_version]]
