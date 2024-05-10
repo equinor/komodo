@@ -10,7 +10,11 @@ from typing import Dict, List, Optional, Union
 
 from ruamel.yaml import YAML
 
-from komodo.yaml_file_types import ManifestFile
+try:
+    from komodo.yaml_file_types import ManifestFile
+except ImportError:
+    # This is to be able to run show_version.py without installing komodo
+    from yaml_file_types import ManifestFile
 
 
 def get_release() -> str:
