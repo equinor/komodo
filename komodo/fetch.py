@@ -157,8 +157,8 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     print(f"Creating symlink {normalised_dir} -> {pkgname}")
                     os.symlink(normalised_dir, pkgname)
 
-        print(f"Downloading {len(pypi_packages)} pypi packages")
-        shell([pip, "download", "--no-deps", "--dest .", " ".join(pypi_packages)])
+        print(f"Downloading and creating wheels for {len(pypi_packages)} pypi packages")
+        shell([pip, "wheel", "--no-deps", "--wheel-dir .", " ".join(pypi_packages)])
 
     return git_hashes
 
