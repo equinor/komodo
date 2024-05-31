@@ -23,11 +23,7 @@ class Configuration:
         link_exists = link in self.links
         linked_release = self._get_concrete_release(link) if link_exists else None
 
-        if mode == "unstable":
-            if not linked_release or release.monthly_diff(linked_release) >= 0:
-                self.links[link] = repr(release)
-
-        elif mode == "testing":
+        if mode == "testing":
             stable_link = f"stable-{release.py_ver()}"
             stable = (
                 self._get_concrete_release(stable_link)

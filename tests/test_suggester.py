@@ -60,16 +60,16 @@ def test_py_ver(release_id, expected):
 @pytest.mark.parametrize(
     ("conf", "link", "concrete"),
     [
-        # unstable happy path
+        # testing happy path
         (
             {
                 "links": {
-                    "unstable-py27": "1349.01-py27",
+                    "testing-py27": "1349.01-py27",
                     "1349.01-py27": "1349.02-py27",
                     "1349.02-py27": "1349.01.a0-py27",
                 },
             },
-            "unstable-py27",
+            "testing-py27",
             "1349.01.a0-py27",
         ),
     ],
@@ -82,33 +82,18 @@ def test_get_concrete_release(conf, link, concrete):
 @pytest.mark.parametrize(
     ("json_in", "release_id", "mode", "changed", "json_out"),
     [
-        # unstable happy path
+        # testing happy path
         (
             """{"links": {
-"unstable-py27": "1994.12.00.rc0-py27",
-"testing-py27" : "1994.11.a0-py27",
+"testing-py27": "1994.12.00.rc0-py27",
 "1994.12-py27" : "1994.12.00.rc0-py27"}}""",
             "1994.12.00.rc1-py27",
-            "unstable",
+            "testing",
             "changed",
             """{
     "links": {
         "1994.12-py27": "1994.12.00.rc0-py27",
-        "testing-py27": "1994.11.a0-py27",
-        "unstable-py27": "1994.12.00.rc1-py27"
-    }
-}
-""",
-        ),
-        # unstable should not be demoted
-        (
-            """{"links": {"unstable-py27": "1998.12.00-py27"}}""",
-            "1997.01.00.rc1-py27",
-            "unstable",
-            "unchanged",
-            """{
-    "links": {
-        "unstable-py27": "1998.12.00-py27"
+        "testing-py27": "1994.12.00.rc1-py27"
     }
 }
 """,

@@ -27,9 +27,9 @@ def test_assert_root_nodes_error_message_incorrectly_added_roots():
         "links": {
             "stable": "2012.01",
             "testing": "2012.03",
-            "unstable": "testing",
+            "deprecated": "testing",
         },
-        "root_links": ["unstable", "stable", "testing"],
+        "root_links": ["deprecated", "stable", "testing"],
     }
 
     with pytest.raises(
