@@ -37,6 +37,7 @@ def _pick_package_versions_for_release(
     """
     release_dict = {}
     for pkg_name, versions in packages.items():
+        version = None
         try:
             _check_version_exists_for_coordinates(versions, rhel_ver, py_ver)
         except KeyError as err:
