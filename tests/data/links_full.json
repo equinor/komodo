@@ -3,8 +3,6 @@
   "root_links" : [
     "bleeding-py2",
     "bleeding",
-    "unstable-py2",
-    "unstable",
     "testing-py2",
     "testing",
     "stable-py2",
@@ -16,13 +14,7 @@
     "bleeding-py3"  : "bleeding-py36",
     "bleeding-py2"  : "bleeding-py27",
     "bleeding"      : "bleeding-py3",
-    
-    "unstable-py36" : "2020.01.a0-py36",
-    "unstable-py3"  : "unstable-py36",
-    "unstable-py27" : "2020.01.a0-py27",
-    "unstable-py2"  : "unstable-py27",
-    "unstable"      : "unstable-py3",
-    
+
     "testing-py36"  : "2020.01.a0-py36",
     "testing-py3"   : "testing-py36",  
     "testing-py27"  : "2020.01.a0-py27",

@@ -27,17 +27,15 @@ def test_read_folder_structure(tmpdir):
 
         os.symlink("2012.01.12", "2012.01")
         os.symlink("2012.01", "stable")
-        os.symlink("2012.01", "testing")
-        os.symlink("2012.01.rc2", "unstable")
+        os.symlink("2012.01.rc2", "testing")
 
         expected_result = {
             "root_folder": tmpdir,
-            "root_links": ["stable", "unstable", "testing"],
+            "root_links": ["stable", "testing"],
             "links": {
                 "2012.01": "2012.01.12",
                 "stable": "2012.01",
-                "testing": "2012.01",
-                "unstable": "2012.01.rc2",
+                "testing": "2012.01.rc2",
             },
         }
 
@@ -53,8 +51,7 @@ def test_create_symlinks(tmpdir):
         "links": {
             "2012.01": "2012.01.12",
             "stable": "2012.01",
-            "testing": "2012.01",
-            "unstable": "2012.01.rc2",
+            "testing": "2012.01.rc2",
         },
     }
 
@@ -67,7 +64,7 @@ def test_create_symlinks(tmpdir):
         assert os.path.islink("stable")
         assert os.readlink("stable") == "2012.01"
         assert os.path.realpath("stable") == os.path.realpath("2012.01.12")
-        assert os.path.realpath("unstable") == os.path.realpath("2012.01.rc2")
+        assert os.path.realpath("testing") == os.path.realpath("2012.01.rc2")
 
 
 def test_create_symlink_stdout(tmpdir, capsys):
@@ -170,12 +167,11 @@ def test_link_integrity(tmpdir):
 
         test_dict = {
             "root_folder": tmpdir,
-            "root_links": ["stable", "unstable", "testing"],
+            "root_links": ["stable", "testing"],
             "links": {
                 "2012.01": "2012.01.12",
                 "stable": "2012.01",
-                "testing": "2012.01",
-                "unstable": "2012.01.rc2",
+                "testing": "2012.01.rc2",
             },
         }
 
@@ -186,10 +182,10 @@ def test_link_integrity(tmpdir):
         errors = verify_integrity(test_dict)
         assert errors == ["bleeding_py3 does not exist"]
 
-        test_dict["links"]["2012.01.rc2"] = "unstable"
+        test_dict["links"]["2012.01.rc2"] = "testing"
         errors = verify_integrity(test_dict)
         assert "2012.01.rc2 is part of a cyclic symlink" in errors
-        assert "unstable is part of a cyclic symlink" in errors
+        assert "testing is part of a cyclic symlink" in errors
 
 
 def test_root_folder_error(tmpdir):
@@ -198,12 +194,11 @@ def test_root_folder_error(tmpdir):
 
         test_dict = {
             "root_folder": os.path.join(str(tmpdir), "non_existing"),
-            "root_links": ["stable", "unstable", "testing"],
+            "root_links": ["stable", "testing"],
             "links": {
                 "2012.01": "2012.01.12",
                 "stable": "2012.01",
-                "testing": "2012.01",
-                "unstable": "2012.01.rc2",
+                "testing": "2012.01.rc2",
             },
         }
 
@@ -223,12 +218,11 @@ def test_link_error(tmpdir):
 
         test_dict = {
             "root_folder": tmpdir,
-            "root_links": ["stable", "unstable", "testing"],
+            "root_links": ["stable", "testing"],
             "links": {
                 "2012.01": "2012.01.12",
                 "stable": "2012.01",
-                "testing": "2012.01",
-                "unstable": "2012.01.rc2",
+                "testing": "2012.01.rc2",
             },
         }
         with pytest.raises(ValueError) as value_error:
@@ -242,11 +236,11 @@ def test_root_link_error(tmpdir):
 
         test_dict = {
             "root_folder": tmpdir,
-            "root_links": ["stable", "unstable", "testing"],
+            "root_links": ["stable", "testing"],
             "links": {
                 "2012.01": "2012.01.12",
                 "stable": "2012.01",
-                "unstable": "2012.01.rc2",
+                "testing": "2012.01.rc2",
             },
         }
         with pytest.raises(ValueError) as value_error:

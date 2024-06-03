@@ -347,7 +347,7 @@ def _main(args: KomodoNamespace) -> None:
         args: KomodoNamespace instance with configuration
     """
     data = Data(extra_data_dirs=args.extra_data_dirs)
-
+    git_hashes = None
     if args.download or (not args.build and not args.install):
         git_hashes = download_packages(
             args.pkgs.content,
