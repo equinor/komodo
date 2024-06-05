@@ -307,7 +307,7 @@ def run_post_installation_scripts_if_set(
 ) -> None:
     if postinst:
         timing_func = profile_time("Running post-install scripts")
-        timing_func(shell([postinst, release_path]))
+        timing_func(shell([postinst, str(release_path)]))
 
 
 @profile_time("Compile python bytecode files")
