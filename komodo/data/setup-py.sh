@@ -52,10 +52,8 @@ while test $# -gt 0; do
 done
 
 unset DESTDIR
-$PIP install $OPTS .           \
-    --ignore-installed   \
-    --root $FAKEROOT     \
-    --no-deps            \
-    --no-cache-dir       \
-    --no-compile         \
-    --prefix $PREFIX 1>&2
+uv pip install  \
+    --python $FAKEROOT/$PREFIX/bin/python  \
+    --no-deps  \
+    --no-cache  \
+    --reinstall .  \
