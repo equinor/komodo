@@ -196,6 +196,11 @@ def make(
     fakeroot=".",
 ):
     pkgorder = list(pkgs.keys())
+    # We only need to ensure that python is 'installed' first
+    pkgorder.remove("python")
+    pkgorder.insert(0, "python")
+    assert pkgorder[0] == "python"
+
     fakeprefix = fakeroot + prefix
     shell(["mkdir -p", fakeprefix])
     prefix = os.path.abspath(prefix)
