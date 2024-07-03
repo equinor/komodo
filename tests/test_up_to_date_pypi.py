@@ -164,7 +164,7 @@ def test_insert_upgrade_proposals(release, repository, suggestions, expected):
     repository = yaml.load(str(repository))
     release = yaml.load(str(release))
     insert_upgrade_proposals(suggestions, repository, release)
-    assert {"release": release, "repo": repository} == expected
+    assert expected == {"release": release, "repo": repository}
 
 
 def test_run(monkeypatch):

@@ -44,8 +44,8 @@ def test_lint():
     repo = RepositoryFile().from_yaml_string(value=yaml.safe_dump(REPO))
     release = ReleaseFile().from_yaml_string(value=yaml.safe_dump(RELEASE))
     lint_report = lint.lint(release, repo)
-    assert [] == lint_report.dependencies
-    assert [] == lint_report.versions
+    assert lint_report.dependencies == []
+    assert lint_report.versions == []
 
 
 def _write_file(file_path: str, file_content: str) -> str:
