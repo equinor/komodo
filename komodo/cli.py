@@ -14,11 +14,7 @@ import komodo.switch
 from komodo.build import make
 from komodo.data import Data
 from komodo.fetch import fetch
-from komodo.package_version import (
-    LATEST_PACKAGE_ALIAS,
-    latest_pypi_version,
-    strip_version,
-)
+from komodo.package_version import strip_version
 from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
@@ -218,9 +214,7 @@ def generate_release_manifest(
         for package, version in release_file_content.items():
             entry: Dict[str, str] = repository_file_content[package][version]
             maintainer = repository_file_content[package][version]["maintainer"]
-            if version == LATEST_PACKAGE_ALIAS:
-                version = latest_pypi_version(entry.get("pypi_package_name", package))
-            elif entry.get("fetch") == "git":
+            if entry.get("fetch") == "git":
                 version = git_hashes[package]
             release[package] = {
                 "version": version,
@@ -282,8 +276,6 @@ def install_previously_downloaded_pip_packages(
             continue
 
         package_name = current.get("pypi_package_name", pkg)
-        if ver == LATEST_PACKAGE_ALIAS:
-            ver = latest_pypi_version(package_name)
         shell_input = [
             pip_executable,
             f"install {package_name}=={strip_version(ver)}",

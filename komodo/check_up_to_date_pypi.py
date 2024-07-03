@@ -10,7 +10,7 @@ import ruamel.yaml
 from packaging import version as get_version
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 
-from komodo.package_version import LATEST_PACKAGE_ALIAS, strip_version
+from komodo.package_version import strip_version
 from komodo.prettier import write_to_file
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
@@ -98,8 +98,6 @@ def compatible_versions(
 def get_pypi_packages(release: dict, repository: dict) -> list:
     pypi_packages = []
     for package, version in release.items():
-        if LATEST_PACKAGE_ALIAS in strip_version(version):
-            continue
         try:
             if repository[package][version].get("source", None) == "pypi":
                 pypi_packages.append(package)

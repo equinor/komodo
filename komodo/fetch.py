@@ -8,9 +8,7 @@ import sys
 import jinja2
 
 from komodo.package_version import (
-    LATEST_PACKAGE_ALIAS,
     get_git_revision_hash,
-    latest_pypi_version,
     strip_version,
 )
 from komodo.shell import pushd, shell
@@ -110,9 +108,6 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
 
             protocol = current.get("fetch")
             pkg_alias = current.get("pypi_package_name", pkg)
-
-            if url == "pypi" and ver == LATEST_PACKAGE_ALIAS:
-                ver = latest_pypi_version(pkg_alias)
 
             name = f"{pkg_alias} ({ver}): {url}"
             pkgname = f"{pkg_alias}-{ver}"
