@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from komodo.cli import cli_main
-from komodo.package_version import LATEST_PACKAGE_ALIAS
 from tests import _get_test_root
 
 
@@ -72,11 +71,6 @@ def test_main(args, tmpdir):
 
     with open(os.path.join(release_path, release_name), encoding="utf-8") as releasedoc:
         releasedoc_content = releasedoc.read()
-
-        # test specifically for the regression introduced by
-        # https://github.com/equinor/komodo/issues/190 where if you provided ert
-        # with version '*', it would then show up in the releasedoc.
-        assert f"version: '{LATEST_PACKAGE_ALIAS}'" not in releasedoc_content
 
         # ensure the alias is used when resolving the version
         assert "version: null" not in releasedoc_content

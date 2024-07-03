@@ -349,46 +349,6 @@ def test_check_up_to_date_file_output(monkeypatch, tmpdir, capsys):
             id="Base line test",
         ),
         pytest.param(
-            {"dummy_package": "1.0.0", "komodo_version_package": "1.*"},
-            {
-                "dummy_package": {
-                    "1.0.0": {"maintainer": "scout", "make": "pip", "source": "pypi"},
-                },
-                "komodo_version_package": {
-                    "1.*": {"maintainer": "scout", "make": "pip", "source": "pypi"},
-                },
-            },
-            {
-                "releases": {
-                    "2.0.0": [{"filename": f"valid_upgrade_for_macos_{sys.platform}"}]
-                },
-            },
-            {
-                "release": {
-                    "dummy_package": "2.0.0",
-                    "komodo_version_package": "1.*",
-                },
-                "repo": {
-                    "dummy_package": {
-                        "2.0.0": {
-                            "maintainer": "scout",
-                            "make": "pip",
-                            "source": "pypi",
-                        },
-                        "1.0.0": {
-                            "maintainer": "scout",
-                            "make": "pip",
-                            "source": "pypi",
-                        },
-                    },
-                    "komodo_version_package": {
-                        "1.*": {"maintainer": "scout", "make": "pip", "source": "pypi"},
-                    },
-                },
-            },
-            id="With komodo package alias not updated",
-        ),
-        pytest.param(
             {"dummy_package": "1.0.0+py27"},
             {
                 "dummy_package": {

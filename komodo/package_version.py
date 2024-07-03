@@ -1,13 +1,6 @@
 import os
-import re
 import subprocess
 import sys
-
-LATEST_PACKAGE_ALIAS = "*"
-_PYPI_LATEST_VERSION_RE = r".+from\ versions\:\ (.+)\)"
-# This command is deprecated. Hopefully it is not removed until a replacement
-# is made. For updates on this, see https://github.com/pypa/pip/issues/9139
-_PYPI_LATEST_VERSION_CMD = "python -m pip install --use-deprecated=legacy-resolver {}=="
 
 
 def strip_version(version):
@@ -19,27 +12,6 @@ def strip_version(version):
     able to install.
     """
     return version.split("+")[0]
-
-
-def latest_pypi_version(package):
-    cmd = _PYPI_LATEST_VERSION_CMD.format(package)
-    try:
-        subprocess.check_output(cmd.split(" "), stderr=subprocess.PIPE)
-    except subprocess.CalledProcessError as called_process_error:
-        stderr = called_process_error.stderr.decode(sys.getfilesystemencoding())
-        matches = re.match(_PYPI_LATEST_VERSION_RE, stderr)
-        if matches.lastindex == 0:
-            msg = f"got unexpected output from {cmd} using {_PYPI_LATEST_VERSION_RE}: {stderr}"
-            raise ValueError(
-                msg,
-            ) from called_process_error
-        versions = matches.group(1).split(",")
-        version = versions[len(versions) - 1].strip()
-        if version == "none":
-            return None
-        return version
-    msg = f"{cmd} did not raise CalledProcessError"
-    raise ValueError(msg)
 
 
 def get_git_revision_hash(path):

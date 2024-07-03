@@ -11,8 +11,6 @@ from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 from packaging.version import InvalidVersion
 
-from .package_version import LATEST_PACKAGE_ALIAS
-
 
 # From Pep 508
 def format_full_version(info) -> str:
@@ -99,7 +97,7 @@ class PypiDependencies:
             Requirement(
                 d
                 if self._to_install.get(canonicalize_name(d))
-                in [None, LATEST_PACKAGE_ALIAS, "main", "master"]
+                in [None, "main", "master"]
                 else f"{d}=={self._to_install.get(canonicalize_name(d))}"
             )
             for d in depends
@@ -132,28 +130,16 @@ class PypiDependencies:
         if package_version not in self.requirements[canonical]:
             with TemporaryDirectory() as tmpdir:
                 try:
-                    if package_version == LATEST_PACKAGE_ALIAS:
-                        subprocess.check_output(
-                            [
-                                "pip",
-                                "download",
-                                package_name,
-                                f"--python-version={self.python_version}",
-                                "--no-deps",
-                            ],
-                            cwd=tmpdir,
-                        )
-                    else:
-                        subprocess.check_output(
-                            [
-                                "pip",
-                                "download",
-                                f"{package_name}=={package_version}",
-                                f"--python-version={self.python_version}",
-                                "--no-deps",
-                            ],
-                            cwd=tmpdir,
-                        )
+                    subprocess.check_output(
+                        [
+                            "pip",
+                            "download",
+                            f"{package_name}=={package_version}",
+                            f"--python-version={self.python_version}",
+                            "--no-deps",
+                        ],
+                        cwd=tmpdir,
+                    )
                 except Exception as err:
                     raise ValueError(
                         f"Could not install {package_name} {package_version} from pypi"
@@ -194,7 +180,7 @@ class PypiDependencies:
         return self._install_names.get(canonical, canonical)
 
     def _version_satisfied(self, version: str, requirement: Requirement) -> bool:
-        if version in ["main", "master", LATEST_PACKAGE_ALIAS]:
+        if version in ["main", "master"]:
             return True
         try:
             specifier = requirement.specifier

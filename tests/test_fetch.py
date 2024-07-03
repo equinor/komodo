@@ -4,7 +4,6 @@ from unittest.mock import patch
 import pytest
 
 from komodo.fetch import fetch
-from komodo.package_version import LATEST_PACKAGE_ALIAS
 
 
 def test_make_one_pip_package(captured_shell_commands, tmpdir):
@@ -114,28 +113,6 @@ def test_fetch_git_does_not_accept_pypi_package_name(tmpdir):
 
     with pytest.raises(ValueError, match=r"pypi_package_name"):
         fetch(packages, repositories, str(tmpdir))
-
-
-def test_fetch_pip_with_latest_version(captured_shell_commands, tmpdir):
-    packages = {"ert": LATEST_PACKAGE_ALIAS}
-    repositories = {
-        "ert": {
-            LATEST_PACKAGE_ALIAS: {
-                "source": "pypi",
-                "pypi_package_name": "ert3",
-                "fetch": "pip",
-                "make": "pip",
-                "maintainer": "someone",
-                "depends": [],
-            },
-        },
-    }
-
-    with patch("komodo.fetch.latest_pypi_version") as mock_latest_ver:
-        mock_latest_ver.return_value = "1.0.0"
-        fetch(packages, repositories, str(tmpdir))
-        mock_latest_ver.assert_called_once_with("ert3")
-        assert "ert3==1.0.0" in captured_shell_commands[0]
 
 
 def test_fetch_git_hash(captured_shell_commands, tmpdir):

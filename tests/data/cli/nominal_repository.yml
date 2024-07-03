@@ -32,7 +32,7 @@ hackgit:
     maintainer: charlie
 
 ert42:
-  '*':
+  10.0.1:
     source: pypi
     pypi_package_name: ert
     fetch: pip
