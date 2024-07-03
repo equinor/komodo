@@ -196,13 +196,15 @@ def make(
     fakeroot=".",
 ):
     pkgorder = list(pkgs.keys())
+    # We only need to ensure that python is 'installed' first
+    if "python" in pkgorder:
+        pkgorder.remove("python")
+        pkgorder.insert(0, "python")
+
     fakeprefix = fakeroot + prefix
     shell(["mkdir -p", fakeprefix])
     prefix = os.path.abspath(prefix)
 
-    # assuming there always is a python *and* that python will be installed
-    # before pip is required. This dependency *must* be explicit in the
-    # repository
     os.environ["DESTDIR"] = fakeroot
     os.environ["BOOST_ROOT"] = fakeprefix
     ld_lib_path = ":".join(
