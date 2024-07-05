@@ -15,10 +15,9 @@ def cleanup(repository_file_path: str, release_files_path: List[str]):
         release_file = ReleaseFile()(file_name)
         releases.append(release_file.content)
 
-    registered_package_version_combinations = []
-    for package in repository:
-        for version in repository[package]:
-            registered_package_version_combinations.append((package, version))
+    registered_package_version_combinations = [
+        (package, version) for package in repository for version in repository[package]
+    ]
 
     seen_package_version_combinations = set()
     for release in releases:

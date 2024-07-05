@@ -102,7 +102,7 @@ def lint(
         }
 
         python_version = release_file.content["python"]
-        with open("builtin_python_versions.yml", "r", encoding="utf-8") as f:
+        with open("builtin_python_versions.yml", encoding="utf-8") as f:
             full_python_version = yaml.safe_load(f)[python_version]
 
         dependencies = PypiDependencies(

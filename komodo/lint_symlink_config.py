@@ -42,7 +42,7 @@ def main():
     args = parse_args()
     if not os.path.isfile(args.config):
         sys.exit(f"The file {args.config} cannot be found")
-    with open(args.config, mode="r", encoding="utf-8") as config_file_handler:
+    with open(args.config, encoding="utf-8") as config_file_handler:
         symlink_config = json.load(config_file_handler)
     lint_symlink_config(symlink_config)
 
