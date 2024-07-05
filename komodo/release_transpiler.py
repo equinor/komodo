@@ -83,17 +83,13 @@ def _check_version_exists_for_coordinates(
     """
     if isinstance(pkg_versions, str):
         return None
-    first_level_versions = []
-    for version in pkg_versions:
-        first_level_versions.append(version)
+    first_level_versions = list(pkg_versions)
     if "rhel" in first_level_versions[0]:
         # Both rhel and python versions can have different versions
         if rhel_coordinate not in first_level_versions:
             msg = f"Rhel version {rhel_coordinate} not found."
             raise KeyError(msg)
-        second_level_versions = []
-        for version_py in pkg_versions[rhel_coordinate]:
-            second_level_versions.append(version_py)
+        second_level_versions = list(pkg_versions[rhel_coordinate])
         if py_coordinate not in second_level_versions:
             msg = f"Python version {py_coordinate} not found for rhel version {rhel_coordinate}."
             raise KeyError(

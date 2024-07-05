@@ -34,16 +34,16 @@ def check_for_unused_package(
         metadata = repository.content.get(name, {}).get(version, {})
         if metadata.get("source") != "pypi":
             dependencies.add_user_specified(name, metadata.get("depends", []))
-    unused_private_packages = set(
+    unused_private_packages = {
         pkg
         for pkg in release_file.content
         if package_status[pkg]["visibility"] == "private"
-    ).difference(dependencies.used_packages(public_and_plugin_packages))
+    }.difference(dependencies.used_packages(public_and_plugin_packages))
     if unused_private_packages:
         print(
             f"The following {len(unused_private_packages)} private packages are not dependencies of any public or private-plugin packages:"
         )
-        print(", ".join(sorted(list(unused_private_packages))))
+        print(", ".join(sorted(unused_private_packages)))
         print(
             "If you have added or removed any packages check that the dependencies in repository.yml are correct."
         )
@@ -76,7 +76,7 @@ def main():
     )
 
     args = parser.parse_args()
-    with open("builtin_python_versions.yml", "r", encoding="utf-8") as f:
+    with open("builtin_python_versions.yml", encoding="utf-8") as f:
         builtin_python_versions = yaml.safe_load(f)
     check_for_unused_package(
         args.release_file, args.status_file, args.repo, builtin_python_versions

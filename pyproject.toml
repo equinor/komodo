@@ -124,7 +124,12 @@ select = [
   "B",   # flake-8-bugbear
   "SIM", # flake-8-simplify
   "F",   # pyflakes
+  "UP",  # pyupgrade
+  "PERF",  # perflint
+  "C4",  # flake8-comprehensions
 ]
+
+ignore = ["PERF203"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["komodo"]

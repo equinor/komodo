@@ -59,7 +59,7 @@ class PypiDependencies:
         }
         self._cachefile = cachefile
         if os.path.exists(self._cachefile):
-            with open(self._cachefile, "r", encoding="utf-8") as f:
+            with open(self._cachefile, encoding="utf-8") as f:
                 self.requirements = yaml.safe_load(f)
                 self.requirements = {
                     canonicalize_name(name): r for name, r in self.requirements.items()
@@ -249,9 +249,7 @@ class PypiDependencies:
         else:
             self._failed_requirements.add(requirement)
         return satisfied and all(
-            [
-                self.satisfied(transient, extra)
-                for (transients, extra) in transient_requirements
-                for transient in transients
-            ]
+            self.satisfied(transient, extra)
+            for (transients, extra) in transient_requirements
+            for transient in transients
         )
