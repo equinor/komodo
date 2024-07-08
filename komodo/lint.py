@@ -201,7 +201,7 @@ def lint_main():
         if err.err:
             print(f"{err.err}")
             if err.depends:
-                print("\n  ".join(err.depends))
+                print("  " + "\n  ".join(err.depends))
 
     if not any(err.err for err in maintainers + deps):
         sys.exit(0)  # currently we allow erronous version numbers
