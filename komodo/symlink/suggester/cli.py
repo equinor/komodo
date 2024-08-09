@@ -98,6 +98,7 @@ def suggest_symlink_configuration(
         repo.create_git_ref(ref=f"refs/heads/{target_branch}", sha=from_sha)
 
     for symlink_config_file in config_files:
+        symlink_config_file = symlink_config_file.strip()
         try:
             sym_conf_content = repo.get_contents(symlink_config_file, ref=args.git_ref)
         except UnknownObjectException:
