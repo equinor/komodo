@@ -251,13 +251,13 @@ def _mock_repo(sym_config):
 
 
 @pytest.mark.parametrize(
-    ("symlink_file", "branch_name"),
+    ("symlink_file", "mode"),
     [
-        ("foo.json", "onprem-stable"),
-        ("foo_azure.json", "azure-stable"),
+        ("foo.json", "stable"),
+        ("foo_azure.json", "stable"),
     ],
 )
-def test_suggest_symlink_configuration(symlink_file, branch_name):
+def test_suggest_symlink_configuration(symlink_file, mode):
     """Testing whether when updating symlink file the branch gets a corresponding name."""
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
@@ -268,22 +268,24 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
     args = Namespace(
         git_ref="master",
         release="2050.02.01-py58",
-        mode="stable",
+        mode=mode,
         symlink_conf_path=symlink_file,
         joburl="http://job",
         jobname="job",
+        config_files=None,
+        python_versions=None,
     )
     suggest_symlink_configuration(args, repo)
 
     repo.get_contents.assert_called_once_with(symlink_file, ref="master")
     repo.get_branch.assert_called_once_with("master")
     repo.create_git_ref.assert_called_once_with(
-        ref=f"refs/heads/2050.02.01-py58/{branch_name}",
+        ref=f"refs/heads/2050.02.01-py58/{mode}",
         sha=ANY,
     )
     repo.update_file.assert_called_once_with(
         symlink_file,
-        f"Update {branch_name.split('-')[0]} stable symlinks for 2050.02.01-py58",
+        f"Update {mode} symlinks for 2050.02.01-py58",
         """{
     "links": {
         "2050.02-py58": "2050.02.01-py58",
@@ -292,12 +294,12 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
 }
 """,
         ANY,
-        branch=f"2050.02.01-py58/{branch_name}",
+        branch=f"2050.02.01-py58/{mode}",
     )
     repo.create_pull.assert_called_once_with(
         title=ANY,
         body=ANY,
-        head=f"2050.02.01-py58/{branch_name}",
+        head=f"2050.02.01-py58/{mode}",
         base="master",
     )
 
@@ -316,6 +318,8 @@ def test_noop_suggestion():
         symlink_conf_path="foo.json",
         joburl="http://job",
         jobname="job",
+        config_files=None,
+        python_versions=None,
     )
 
     repo.create_pull.assert_not_called()
