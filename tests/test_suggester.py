@@ -325,3 +325,78 @@ def test_noop_suggestion():
     repo.create_pull.assert_not_called()
 
     assert suggest_symlink_configuration(args, repo) is None
+
+
+def test_suggest_symlink_multi_configuration():
+    config = """{"links": {
+"2050.02-py58": "2050.02.00-py58",
+"stable-py58": "2050.02-py58"
+}}"""
+    repo = _mock_repo(config)
+    mode = "stable"
+    args = Namespace(
+        git_ref="master",
+        release="2050.02.01-py58",
+        mode=mode,
+        symlink_conf_path="foo.json",
+        joburl="http://job",
+        jobname="job",
+        config_files="foo.json, foo_azure.json",
+        python_versions="py38, py311",
+    )
+    suggest_symlink_configuration(args, repo)
+
+
+@pytest.mark.parametrize(
+    ("json_in", "release_id", "mode", "changed", "json_out"),
+    [  # testing happy path
+        (
+            """{"links": {
+            "testing-py38": "1994.12.00.rc0-py38",
+            "1994.12-py38": "1994.12.00.rc0-py38",
+            "testing-py311": "1994.12.00.rc0-py311",
+            "1994.12-py311": "1994.12.00.rc0-py311"}}""",
+            "1994.12.00.rc1-py38",
+            "testing",
+            "changed",
+            """{
+    "links": {
+        "1994.12-py311": "1994.12.00.rc0-py311",
+        "1994.12-py38": "1994.12.00.rc0-py38",
+        "testing-py311": "1994.12.00.rc1-py311",
+        "testing-py38": "1994.12.00.rc1-py38"
+    }
+}
+""",
+        ),
+        # testing promotion from previous release
+        (
+            """{"links": {
+        "2001.11-py38": "2001.11.00-py38",
+        "2001.11-py311": "2001.11.00-py311",
+        "stable-py38" : "2001.11-py38",
+        "testing-py38": "2001.11.rc0-py38",
+        "stable-py311" : "2001.11-py311",
+        "testing-py311": "2001.11.rc0-py311"}}""",
+            "2001.12.rc0-py38",
+            "testing",
+            "changed",
+            """{
+    "links": {
+        "2001.11-py311": "2001.11.00-py311",
+        "2001.11-py38": "2001.11.00-py38",
+        "stable-py311": "2001.11-py311",
+        "stable-py38": "2001.11-py38",
+        "testing-py311": "2001.12.rc0-py311",
+        "testing-py38": "2001.12.rc0-py38"
+    }
+}
+""",
+        ),
+    ],
+)
+def test_multi_update(json_in, release_id, mode, changed, json_out):
+    assert update(json_in, release_id, mode, ["py38", "py311"]) == (
+        json_out,
+        changed == "changed",
+    )

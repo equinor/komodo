@@ -23,6 +23,9 @@ class Configuration:
             python_versions = [release.py_ver()]
 
         for python_version in python_versions:
+            python_version = python_version.strip(" ")
+            release.set_python_version(python_version)
+
             link = f"{mode}-{python_version}"
             link_exists = link in self.links
             linked_release = self._get_concrete_release(link) if link_exists else None
