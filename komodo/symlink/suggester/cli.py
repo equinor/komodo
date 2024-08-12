@@ -38,11 +38,6 @@ def _parse_args():
     parser.add_argument("mode", help="stable,testing")
     parser.add_argument("joburl", help="link to the job that triggered this")
     parser.add_argument("jobname", help="name of the job")
-    parser.add_argument(
-        "--symlink-conf-path",
-        help="",
-        default="symlink_configuration/symlink_config.json",
-    )
     parser.add_argument("--git-fork", help="git fork", default="equinor")
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
@@ -57,9 +52,11 @@ def _parse_args():
         help="Set dry-run, will do everything except making the PR",
         action="store_true",
     )
-    parser.add_argument("--python-versions", help="e.g. py38, py311")
+    parser.add_argument("--python-versions", help="e.g. py38, py311", default="py311")
     parser.add_argument(
-        "--config-files", help="e.g. symlink_config.json, symlink_config_azure.json"
+        "--config-files",
+        help="e.g. symlink_config.json, symlink_config_azure.json",
+        default="symlink_configuration/symlink_config.json",
     )
     return parser.parse_args()
 
@@ -81,10 +78,8 @@ def suggest_symlink_configuration(
     """Returns a pull request if the symlink configuration could be updated,
     or None if no update was possible.
     """
-    config_files = (
-        args.config_files.split(",") if args.config_files else [args.symlink_conf_path]
-    )
-    python_versions = args.python_versions.split(",") if args.python_versions else None
+    config_files = args.config_files.split(",")
+    python_versions = args.python_versions.split(",")
 
     if args.release.startswith("bleeding"):
         logger.warning("Symlink to bleeding is not allowed")

@@ -269,11 +269,10 @@ def test_suggest_symlink_configuration(symlink_file, mode):
         git_ref="master",
         release="2050.02.01-py58",
         mode=mode,
-        symlink_conf_path=symlink_file,
         joburl="http://job",
         jobname="job",
-        config_files=None,
-        python_versions=None,
+        config_files=symlink_file,
+        python_versions="py58",
     )
     suggest_symlink_configuration(args, repo)
 
@@ -315,11 +314,10 @@ def test_noop_suggestion():
         git_ref="master",
         release="2050.02.00-py58",
         mode="stable",
-        symlink_conf_path="foo.json",
         joburl="http://job",
         jobname="job",
-        config_files=None,
-        python_versions=None,
+        config_files="foo.json",
+        python_versions="py58",
     )
 
     repo.create_pull.assert_not_called()
@@ -338,7 +336,6 @@ def test_suggest_symlink_multi_configuration():
         git_ref="master",
         release="2050.02.01-py58",
         mode=mode,
-        symlink_conf_path="foo.json",
         joburl="http://job",
         jobname="job",
         config_files="foo.json, foo_azure.json",
