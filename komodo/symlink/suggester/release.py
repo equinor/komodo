@@ -14,6 +14,9 @@ class Release:
     def __repr__(self) -> str:
         return self.release_id
 
+    def set_python_version(self, python_version: str) -> None:
+        self.release_id = self.release_id.split("-")[0] + "-" + python_version
+
     def month(self) -> str:
         return self.release_id[0:7]
 

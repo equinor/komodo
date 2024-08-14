@@ -16,11 +16,10 @@ from komodo.symlink.suggester import configuration
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
-PR_TEMPLATE = """:robot: Suggesting updating {platform} {mode} to {release} in {sym_file}
+PR_TEMPLATE = """:robot: Suggesting updating {mode} to {release}
 ---
 ### Description
 - Release: `{release}`
-- Platform: `{platform}`
 - Link type: `{mode}`
 - When: `{now}`
 
@@ -39,11 +38,6 @@ def _parse_args():
     parser.add_argument("mode", help="stable,testing")
     parser.add_argument("joburl", help="link to the job that triggered this")
     parser.add_argument("jobname", help="name of the job")
-    parser.add_argument(
-        "--symlink-conf-path",
-        help="",
-        default="symlink_configuration/symlink_config.json",
-    )
     parser.add_argument("--git-fork", help="git fork", default="equinor")
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
@@ -57,6 +51,12 @@ def _parse_args():
         "--dry-run",
         help="Set dry-run, will do everything except making the PR",
         action="store_true",
+    )
+    parser.add_argument("--python-versions", help="e.g. py38, py311", default="py311")
+    parser.add_argument(
+        "--config-files",
+        help="e.g. symlink_config.json, symlink_config_azure.json",
+        default="symlink_configuration/symlink_config.json",
     )
     return parser.parse_args()
 
@@ -78,55 +78,58 @@ def suggest_symlink_configuration(
     """Returns a pull request if the symlink configuration could be updated,
     or None if no update was possible.
     """
-    try:
-        sym_conf_content = repo.get_contents(args.symlink_conf_path, ref=args.git_ref)
-    except UnknownObjectException:
-        sys.exit(f"Filename {args.symlink_conf_path} is not in repo {repo.full_name}")
+    config_files = args.config_files.split(",")
+    python_versions = args.python_versions.split(",")
 
     if args.release.startswith("bleeding"):
         logger.warning("Symlink to bleeding is not allowed")
         return None
 
-    try:
-        new_symlink_content, updated = configuration.update(
-            b64decode(sym_conf_content.content),
-            args.release,
-            args.mode,
-        )
-    except ValueError as exc:
-        logger.critical(exc)
-        sys.exit(1)
-
-    if not updated:
-        logger.info("Nothing to update")
-        return None
-
-    platform = "azure" if "azure" in args.symlink_conf_path else "onprem"
-
-    target_branch = f"{args.release}/{platform}-{args.mode}"
-
+    target_branch = f"{args.release}/{args.mode}"
     from_sha = repo.get_branch(args.git_ref).commit.sha
+    msg = f"Update {args.mode} symlinks for {args.release}"
 
-    msg = f"Update {platform} {args.mode} symlinks for {args.release}"
     if not dry_run:
         repo.create_git_ref(ref=f"refs/heads/{target_branch}", sha=from_sha)
-        repo.update_file(
-            args.symlink_conf_path,
-            msg,
-            new_symlink_content,
-            sym_conf_content.sha,
-            branch=target_branch,
-        )
+
+    for symlink_config_file in config_files:
+        symlink_config_file = symlink_config_file.strip()
+        try:
+            sym_conf_content = repo.get_contents(symlink_config_file, ref=args.git_ref)
+        except UnknownObjectException:
+            sys.exit(f"Filename {symlink_config_file} is not in repo {repo.full_name}")
+
+        try:
+            new_symlink_content, updated = configuration.update(
+                b64decode(sym_conf_content.content),
+                args.release,
+                args.mode,
+                python_versions,
+            )
+        except ValueError as exc:
+            logger.critical(exc)
+            sys.exit(1)
+
+        if not updated:
+            logger.info("Nothing to update")
+            return None
+
+        if not dry_run:
+            repo.update_file(
+                symlink_config_file,
+                msg,
+                new_symlink_content,
+                sym_conf_content.sha,
+                branch=target_branch,
+            )
 
     body = PR_TEMPLATE.format(
-        sym_file=args.symlink_conf_path,
         change=target_branch,
         release=args.release,
         mode=args.mode,
         now=datetime.now(),
         job_url=args.joburl,
         job_name=args.jobname,
-        platform=platform,
     )
 
     if dry_run:

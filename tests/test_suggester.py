@@ -251,13 +251,13 @@ def _mock_repo(sym_config):
 
 
 @pytest.mark.parametrize(
-    ("symlink_file", "branch_name"),
+    ("symlink_file", "mode"),
     [
-        ("foo.json", "onprem-stable"),
-        ("foo_azure.json", "azure-stable"),
+        ("foo.json", "stable"),
+        ("foo_azure.json", "stable"),
     ],
 )
-def test_suggest_symlink_configuration(symlink_file, branch_name):
+def test_suggest_symlink_configuration(symlink_file, mode):
     """Testing whether when updating symlink file the branch gets a corresponding name."""
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
@@ -268,22 +268,23 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
     args = Namespace(
         git_ref="master",
         release="2050.02.01-py58",
-        mode="stable",
-        symlink_conf_path=symlink_file,
+        mode=mode,
         joburl="http://job",
         jobname="job",
+        config_files=symlink_file,
+        python_versions="py58",
     )
     suggest_symlink_configuration(args, repo)
 
     repo.get_contents.assert_called_once_with(symlink_file, ref="master")
     repo.get_branch.assert_called_once_with("master")
     repo.create_git_ref.assert_called_once_with(
-        ref=f"refs/heads/2050.02.01-py58/{branch_name}",
+        ref=f"refs/heads/2050.02.01-py58/{mode}",
         sha=ANY,
     )
     repo.update_file.assert_called_once_with(
         symlink_file,
-        f"Update {branch_name.split('-')[0]} stable symlinks for 2050.02.01-py58",
+        f"Update {mode} symlinks for 2050.02.01-py58",
         """{
     "links": {
         "2050.02-py58": "2050.02.01-py58",
@@ -292,12 +293,12 @@ def test_suggest_symlink_configuration(symlink_file, branch_name):
 }
 """,
         ANY,
-        branch=f"2050.02.01-py58/{branch_name}",
+        branch=f"2050.02.01-py58/{mode}",
     )
     repo.create_pull.assert_called_once_with(
         title=ANY,
         body=ANY,
-        head=f"2050.02.01-py58/{branch_name}",
+        head=f"2050.02.01-py58/{mode}",
         base="master",
     )
 
@@ -313,11 +314,86 @@ def test_noop_suggestion():
         git_ref="master",
         release="2050.02.00-py58",
         mode="stable",
-        symlink_conf_path="foo.json",
         joburl="http://job",
         jobname="job",
+        config_files="foo.json",
+        python_versions="py58",
     )
 
     repo.create_pull.assert_not_called()
 
     assert suggest_symlink_configuration(args, repo) is None
+
+
+def test_suggest_symlink_multi_configuration():
+    config = """{"links": {
+"2050.02-py58": "2050.02.00-py58",
+"stable-py58": "2050.02-py58"
+}}"""
+    repo = _mock_repo(config)
+    mode = "stable"
+    args = Namespace(
+        git_ref="master",
+        release="2050.02.01-py58",
+        mode=mode,
+        joburl="http://job",
+        jobname="job",
+        config_files="foo.json, foo_azure.json",
+        python_versions="py38, py311",
+    )
+    suggest_symlink_configuration(args, repo)
+
+
+@pytest.mark.parametrize(
+    ("json_in", "release_id", "mode", "changed", "json_out"),
+    [  # testing happy path
+        (
+            """{"links": {
+            "testing-py38": "1994.12.00.rc0-py38",
+            "1994.12-py38": "1994.12.00.rc0-py38",
+            "testing-py311": "1994.12.00.rc0-py311",
+            "1994.12-py311": "1994.12.00.rc0-py311"}}""",
+            "1994.12.00.rc1",
+            "testing",
+            "changed",
+            """{
+    "links": {
+        "1994.12-py311": "1994.12.00.rc0-py311",
+        "1994.12-py38": "1994.12.00.rc0-py38",
+        "testing-py311": "1994.12.00.rc1-py311",
+        "testing-py38": "1994.12.00.rc1-py38"
+    }
+}
+""",
+        ),
+        # testing promotion from previous release
+        (
+            """{"links": {
+        "2001.11-py38": "2001.11.00-py38",
+        "2001.11-py311": "2001.11.00-py311",
+        "stable-py38" : "2001.11-py38",
+        "testing-py38": "2001.11.rc0-py38",
+        "stable-py311" : "2001.11-py311",
+        "testing-py311": "2001.11.rc0-py311"}}""",
+            "2001.12.rc0",
+            "testing",
+            "changed",
+            """{
+    "links": {
+        "2001.11-py311": "2001.11.00-py311",
+        "2001.11-py38": "2001.11.00-py38",
+        "stable-py311": "2001.11-py311",
+        "stable-py38": "2001.11-py38",
+        "testing-py311": "2001.12.rc0-py311",
+        "testing-py38": "2001.12.rc0-py38"
+    }
+}
+""",
+        ),
+    ],
+)
+def test_multi_update(json_in, release_id, mode, changed, json_out):
+    assert update(json_in, release_id, mode, ["py38", "py311"]) == (
+        json_out,
+        changed == "changed",
+    )
