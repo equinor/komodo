@@ -18,10 +18,7 @@ class Configuration:
             release = Release(self.links[repr(release)])
         return release
 
-    def update(self, release, mode, python_versions: List[str] = None):
-        if not python_versions:
-            python_versions = [release.py_ver()]
-
+    def update(self, release, mode, python_versions: List[str]):
         for python_version in python_versions:
             python_version = python_version.strip()
             release.set_python_version(python_version)
@@ -70,12 +67,17 @@ def update(
     symlink_configuration, release_id, mode, python_versions: List[str] = None
 ) -> Tuple[str, bool]:
     """Return a tuple of a string representing the new symlink config json,
-    and whether or not an update was made. This function assumes the release_id
-    is in the yyyy.mm.[part ...]-py[\\d+] format and that symlink_configuration
-    is a string representing the current symlink config json.
+    and whether an update was made. This function assumes the release_id
+    is in the yyyy.mm.[part ...] format and will look for python suffix (-py38, -py311)
+    if no python_versions are passed. Symlink_configuration shall be a string
+    representing the current symlink config json.
     """
     json_kwargs = {"sort_keys": True, "indent": 4, "separators": (",", ": ")}
-    release = Release(release_id)
+
+    id_parts = release_id.split("-")
+    release = Release(id_parts[0])
+    if not python_versions:
+        python_versions = [part for part in id_parts[1:] if "py" in part][:1]
 
     configuration = Configuration.from_json(symlink_configuration)
     configuration.update(release, mode, python_versions)

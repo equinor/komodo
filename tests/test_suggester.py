@@ -353,7 +353,7 @@ def test_suggest_symlink_multi_configuration():
             "1994.12-py38": "1994.12.00.rc0-py38",
             "testing-py311": "1994.12.00.rc0-py311",
             "1994.12-py311": "1994.12.00.rc0-py311"}}""",
-            "1994.12.00.rc1-py38",
+            "1994.12.00.rc1",
             "testing",
             "changed",
             """{
@@ -375,7 +375,7 @@ def test_suggest_symlink_multi_configuration():
         "testing-py38": "2001.11.rc0-py38",
         "stable-py311" : "2001.11-py311",
         "testing-py311": "2001.11.rc0-py311"}}""",
-            "2001.12.rc0-py38",
+            "2001.12.rc0",
             "testing",
             "changed",
             """{
