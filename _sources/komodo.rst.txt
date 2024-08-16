@@ -181,14 +181,6 @@ komodo.release\_transpiler module
    :undoc-members:
    :show-inheritance:
 
-komodo.reverse\_dep\_graph module
----------------------------------
-
-.. automodule:: komodo.reverse_dep_graph
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 komodo.shebang module
 ---------------------
 
