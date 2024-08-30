@@ -229,7 +229,6 @@ def rsync_komodo_to_destination(release_name: str, destination: str) -> None:
     shell(f"mv {release_name} .{release_name}")
     shell(f"rsync -a .{release_name} {destination}")
 
-
 def move_old_release_from_release_path_if_exists(release_path: Path) -> None:
     if release_path.exists():
         shell(f"mv {str(release_path)} " f"{str(release_path)}.delete-{uuid.uuid4()}")
@@ -248,6 +247,7 @@ def delete_old_previously_moved_releases(prefix_path: Path, release_name: Path) 
         "rm -rf -- " + " ".join(release_dir_glob),
         allow_failure=True,
     )
+    shell(f"rm -rf .{release_name}")
 
 
 def apply_fallback_tmpdir_for_pip_if_set(tmp_dir: Optional[str] = None):

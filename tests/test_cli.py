@@ -145,7 +145,6 @@ def test_no_overwrite_by_default(tmpdir):
     # Try another rerun after we have removed the downloads and remainder from
     # failed build above:
     shutil.rmtree(tmpdir / "downloads")
-    shutil.rmtree(tmpdir / ".existing_release")
     with pytest.raises(RuntimeError, match="Only bleeding builds can be overwritten"):
         cli_main()
 
@@ -167,7 +166,6 @@ def test_bleeding_overwrite_by_default(tmpdir):
     cli_main()
     # Remove non-interesting leftovers from first build:
     shutil.rmtree(tmpdir / "downloads")
-    shutil.rmtree(tmpdir / ".some_bleeding_release")
 
     # Assert that we can overwrite the build inside "some_bleeding_release"
     cli_main()
@@ -191,7 +189,6 @@ def test_overwrite_if_option_is_set(tmpdir):
     cli_main()
     # Remove non-interesting leftovers from first build:
     shutil.rmtree(tmpdir / "downloads")
-    shutil.rmtree(tmpdir / ".some_release")
 
     # Assert that we can overwrite the build inside "some_release"
     cli_main()
@@ -234,3 +231,27 @@ def test_bleeding_builds_marked_for_deletion_are_removed(tmpdir):
     assert count_release_folders_to_be_deleted() == len(test_dirs)
     cli_main()
     assert count_release_folders_to_be_deleted() == 0
+
+
+
+def test_build_removes_hidden_directory_after_rsync(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "some_bleeding_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    # Remove non-interesting leftovers from first build:
+    assert not (tmpdir / ".some_bleeding_release").isdir()
+    shutil.rmtree(tmpdir / "downloads")
+
+    # Assert that we can overwrite the build inside "some_bleeding_release"
+    cli_main()
