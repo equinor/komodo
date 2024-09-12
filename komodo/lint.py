@@ -22,7 +22,6 @@ Report = namedtuple(
     ["release_name", "maintainers", "dependencies", "versions"],
 )
 
-
 MISSING_PACKAGE = "missing package"
 MISSING_VERSION = "missing version"
 MISSING_DEPENDENCY = "missing dependency"
@@ -128,10 +127,12 @@ def lint(
 
         failed_requirements = dependencies.failed_requirements()
         if failed_requirements:
+            package_set = sorted(set(failed_requirements.values()))
             deps = [
                 _komodo_error(
-                    err="Failed requirements ",
+                    err="Failed requirements:",
                     depends=[str(r) for r in failed_requirements],
+                    package=", ".join(package_set),
                 )
             ]
         else:
@@ -200,6 +201,8 @@ def lint_main():
     for err in maintainers + deps + versions:
         if err.err:
             print(f"{err.err}")
+            if err.package:
+                print(f"{err.package}")
             if err.depends:
                 print("  " + "\n  ".join(err.depends))
 

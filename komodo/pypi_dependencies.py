@@ -48,7 +48,7 @@ class PypiDependencies:
         environment["python_full_version"] = python_version
         environment["python_version"] = ".".join(python_version.split(".")[0:2])
         self._satisfied_requirements = set()
-        self._failed_requirements = set()
+        self._failed_requirements: Dict[Requirement, str] = {}
         self._used_packages = set()
 
         self._to_install = to_install
@@ -74,7 +74,7 @@ class PypiDependencies:
             requirements = self._get_requirements(package_name, version)
             self._used_packages.add(package_name)
             for r in requirements:
-                _ = self.satisfied(r)
+                _ = self.satisfied(r, package_name)
 
     def failed_requirements(self, packages=None):
         self._update_package_sets(packages)
@@ -221,6 +221,7 @@ class PypiDependencies:
     def satisfied(
         self,
         requirement: Requirement,
+        package_name: str = "",
         extra=None,
     ) -> bool:
         """
@@ -247,9 +248,12 @@ class PypiDependencies:
         if satisfied:
             self._satisfied_requirements.add(requirement)
         else:
-            self._failed_requirements.add(requirement)
+            if requirement in self._failed_requirements:
+                self._failed_requirements[requirement] += f", {package_name}"
+            else:
+                self._failed_requirements[requirement] = package_name
         return satisfied and all(
-            self.satisfied(transient, extra)
+            self.satisfied(transient, package_name, extra)
             for (transients, extra) in transient_requirements
             for transient in transients
         )
