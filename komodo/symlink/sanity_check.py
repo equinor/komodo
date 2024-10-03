@@ -3,6 +3,7 @@ import difflib
 import json
 import os
 import pprint
+import re
 import sys
 
 
@@ -32,9 +33,26 @@ def read_link_structure(path):
     }
 
     list_of_files = [os.path.join(path, file_name) for file_name in os.listdir(path)]
+
+    bleeding_timestamp_pattern = r"bleeding-\d{8}-\d{4}-"
+    bleeding_deleteme_pattern = r"bleeding-.*\.deleteme"
+    dangling_root_folders = [
+        "bleeding-py311-rhel8",
+        "bleeding-py38-rhel7",
+        "bleeding-py38-rhel8",
+    ]
+
     for file_path in list_of_files:
         file_name = os.path.basename(file_path)
-        if os.path.islink(file_path):
+
+        if not any(
+            [
+                re.match(bleeding_timestamp_pattern, file_name),
+                re.match(bleeding_deleteme_pattern, file_name),
+                file_name in dangling_root_folders,
+                not os.path.islink(file_path),
+            ]
+        ):
             link_structure["links"][file_name] = os.path.basename(
                 os.readlink(file_path),
             )

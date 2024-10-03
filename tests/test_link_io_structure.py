@@ -24,10 +24,17 @@ def test_read_folder_structure(tmpdir):
         os.mkdir("2012.01.rc2")
         os.mkdir("bleeding")
         os.mkdir("2012.01.12")
+        os.mkdir("nowhere")
 
         os.symlink("2012.01.12", "2012.01")
         os.symlink("2012.01", "stable")
         os.symlink("2012.01.rc2", "testing")
+        os.symlink("nowhere", "bleeding-20242012-2313-py311")
+        os.symlink("nowhere", "bleeding-20242012-2245-py38")
+        os.symlink("nowhere", "bleeding-something.deleteme")
+        os.symlink("bleeding-20242012-2313-py38", "bleeding-py38-rhel7")
+        os.symlink("bleeding-20242012-2313-py38", "bleeding-py38-rhel8")
+        os.symlink("bleeding-20242012-2313-py311", "bleeding-py311-rhel8")
 
         expected_result = {
             "root_folder": tmpdir,
