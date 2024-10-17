@@ -153,9 +153,9 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                     os.symlink(normalised_dir, pkgname)
 
         print(f"Downloading {len(pypi_packages)} pypi packages")
-        shell([pip, "download", "--no-deps", "--dest .", " ".join(pypi_packages)])
+        # shell([pip, "download", "--no-deps", "--dest .", " ".join(pypi_packages)])
 
-    return git_hashes
+    return git_hashes, pypi_packages
 
 
 if __name__ == "__main__":
