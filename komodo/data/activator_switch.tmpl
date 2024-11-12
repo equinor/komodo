@@ -1,11 +1,17 @@
 {% if py_version == "py38" -%}
 if [[ $(uname -r) == *el7* ]] ; then
-    export KOMODO_ROOT={{ prefix }}
-    KOMODO_RELEASE_REAL={{ release }}
+    # Get the full path of the sourced script
+    script_path="${BASH_SOURCE[0]}"
+    if [[ $script_path == *deprecated-rhel7* ]] ; then
+        export KOMODO_ROOT={{ prefix }}
+        KOMODO_RELEASE_REAL={{ release }}
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
-    export PS1="(${KOMODO_RELEASE_REAL}) ${_PRE_KOMODO_PS1}"
-    export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
+        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
+        export PS1="(${KOMODO_RELEASE_REAL}) ${_PRE_KOMODO_PS1}"
+        export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
+    else
+        echo -e "{{ migration_warning }}"
+    fi
 elif [[ $(uname -r) == *el8* ]] ; then
     export KOMODO_ROOT={{ prefix }}
     KOMODO_RELEASE_REAL={{ release }}
@@ -24,8 +30,6 @@ elif [[ $(uname -r) == *el8* ]] ; then
     export PS1="(${KOMODO_RELEASE_REAL}) ${_PRE_KOMODO_PS1}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 {%- endif %}
-elif [[ $(uname -r) == *el6* ]]; then
-    echo -e "{{ migration_warning }}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 fi

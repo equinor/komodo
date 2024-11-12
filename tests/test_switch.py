@@ -12,16 +12,24 @@ def test_write_activator_switches(tmpdir):
     switch.create_activator_switch(Data(), prefix, release)
 
     actual_bash_activator = prefix / f"{expected_release}/enable"
+    bash_source_script_path = 'script_path="${BASH_SOURCE[0]}"'
+
     assert (
         actual_bash_activator.read_text(encoding="utf-8").strip()
         == f"""
 if [[ $(uname -r) == *el7* ]] ; then
-    export KOMODO_ROOT={prefix}
-    KOMODO_RELEASE_REAL={expected_release}
+    # Get the full path of the sourced script
+    { bash_source_script_path }
+    if [[ $script_path == *deprecated-rhel7* ]] ; then
+        export KOMODO_ROOT={ prefix }
+        KOMODO_RELEASE_REAL={ expected_release }
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
-    export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
-    export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
+        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
+        export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
+        export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
+    else
+        echo -e "{MIGRATION_WARNING}"
+    fi
 elif [[ $(uname -r) == *el8* ]] ; then
     export KOMODO_ROOT={prefix}
     KOMODO_RELEASE_REAL={expected_release}
@@ -29,8 +37,6 @@ elif [[ $(uname -r) == *el8* ]] ; then
     source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel8/enable
     export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
-elif [[ $(uname -r) == *el6* ]]; then
-    echo -e "{MIGRATION_WARNING}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 fi
@@ -42,14 +48,20 @@ fi
         actual_csh_activator.read_text(encoding="utf-8").strip()
         == f"""
 if ( `uname -r` =~ *el7* ) then
-    setenv KOMODO_ROOT {prefix}
-    set KOMODO_RELEASE_REAL = "{expected_release}"
+    # Get the last command executed wich contains the full path of the sourced script
+    set lastCommandExecuted = ($_)
+    if ( "$lastCommandExecuted" =~ "*deprecated-rhel7*" ) then
+        setenv KOMODO_ROOT {prefix}
+        set KOMODO_RELEASE_REAL = "{expected_release}"
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
-    if ( $?_KOMODO_OLD_PROMPT ) then
-        set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
+        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
+        if ( $?_KOMODO_OLD_PROMPT ) then
+            set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
+        endif
+        setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
+    else
+        echo "{MIGRATION_WARNING}"
     endif
-    setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else if ( `uname -r` =~ *el8* ) then
     setenv KOMODO_ROOT {prefix}
     set KOMODO_RELEASE_REAL = "{expected_release}"
@@ -59,10 +71,6 @@ else if ( `uname -r` =~ *el8* ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-else if ( `uname -r` =~ *el6* ) then
-    echo "Attention! Your machine is running on an environment that is not supported. RHEL6 has been phased out."
-    echo "From October 2020, komodo versions only support RHEL7."
-    echo "Please migrate as soon as possible. If you have any questions or issues - contact us on #ert-users on Slack or Equinor's Yammer."
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 endif
