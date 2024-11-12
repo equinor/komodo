@@ -1,6 +1,6 @@
 {% if py_version == "py38" -%}
 if ( `uname -r` =~ *el7* ) then
-   # Get the last command executed wich contains the full path of the sourced script
+    # Get the last command executed wich contains the full path of the sourced script
     set lastCommandExecuted = ($_)
     if ( "$lastCommandExecuted" =~ "*deprecated-rhel7*" ) then
         setenv KOMODO_ROOT {{ prefix }}
