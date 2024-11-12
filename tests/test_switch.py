@@ -50,14 +50,20 @@ fi
         actual_csh_activator.read_text(encoding="utf-8").strip()
         == f"""
 if ( `uname -r` =~ *el7* ) then
-    setenv KOMODO_ROOT {prefix}
-    set KOMODO_RELEASE_REAL = "{expected_release}"
+    # Get the last command executed wich contains the full path of the sourced script
+    set lastCommandExecuted = ($_)
+    if ( "$lastCommandExecuted" =~ "*deprecated-rhel7*" ) then
+        setenv KOMODO_ROOT {prefix}
+        set KOMODO_RELEASE_REAL = "{expected_release}"
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
-    if ( $?_KOMODO_OLD_PROMPT ) then
-        set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
+        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
+        if ( $?_KOMODO_OLD_PROMPT ) then
+            set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
+        endif
+        setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
+    else
+        echo "{MIGRATION_WARNING}"
     endif
-    setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else if ( `uname -r` =~ *el8* ) then
     setenv KOMODO_ROOT {prefix}
     set KOMODO_RELEASE_REAL = "{expected_release}"
