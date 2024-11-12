@@ -68,7 +68,7 @@ else if ( `uname -r` =~ *el8* ) then
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else if ( `uname -r` =~ *el6* ) then
-    echo -e "{MIGRATION_WARNING}"
+    echo "{MIGRATION_WARNING}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 endif
