@@ -28,17 +28,7 @@ if [[ $(uname -r) == *el7* ]] ; then
         export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
         export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
     else
-        echo "Attention! Your machine is running on an environment
- that is not supported. RHEL7 has been phased out.
-From October 2024, komodo versions only support RHEL8.
-Please migrate as soon as possible.
-
-To use the latest stable RHEL7 build use
- source /prog/res/komodo/deprecated-rhel7/enable
-
-If you have any questions or issues -
- contact us on #ert-users on Slack or Equinor's Yammer.
-"
+        echo -e "{MIGRATION_WARNING}"
     fi
 elif [[ $(uname -r) == *el8* ]] ; then
     export KOMODO_ROOT={prefix}
@@ -78,9 +68,7 @@ else if ( `uname -r` =~ *el8* ) then
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 else if ( `uname -r` =~ *el6* ) then
-    echo "Attention! Your machine is running on an environment that is not supported. RHEL6 has been phased out."
-    echo "From October 2020, komodo versions only support RHEL7."
-    echo "Please migrate as soon as possible. If you have any questions or issues - contact us on #ert-users on Slack or Equinor's Yammer."
+    echo -e "{MIGRATION_WARNING}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 endif

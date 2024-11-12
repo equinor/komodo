@@ -5,9 +5,14 @@ from jinja2 import Template
 
 MIGRATION_WARNING = (
     "Attention! Your machine is running on an environment "
-    "that is not supported. RHEL6 has been phased out.\n"
-    "From October 2020, komodo versions only support RHEL7.\n"
-    "Please migrate as soon as possible. If you have any questions or issues - "
+    "that is not supported. RHEL7 has been phased out.\n"
+    "From November 2024, komodo versions only support RHEL8.\n"
+    "Please migrate as soon as possible.\n"
+    "To use the latest stable RHEL7 build use either: "
+    "source /prog/res/komodo/deprecated-rhel7/enable\n"
+    "source /prog/res/komodo/deprecated-rhel7/enable.csh\n"
+    "\n"
+    "If you have any questions or issues - "
     "contact us on #ert-users on Slack or Equinor's Yammer."
 )
 

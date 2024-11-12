@@ -31,11 +31,7 @@ else if ( `uname -r` =~ *el8* ) then
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
 {%- endif %}
 else if ( `uname -r` =~ *el6* ) then
-{% filter indent(4, True) -%}
-{% for line in migration_warning.split('\n') -%}
-    echo "{{ line }}"
-{% endfor -%}
-{% endfilter -%}
+    echo -e "{{ migration_warning }}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 endif
