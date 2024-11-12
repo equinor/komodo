@@ -30,8 +30,6 @@ elif [[ $(uname -r) == *el8* ]] ; then
     export PS1="(${KOMODO_RELEASE_REAL}) ${_PRE_KOMODO_PS1}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 {%- endif %}
-elif [[ $(uname -r) == *el6* ]]; then
-    echo -e "{{ migration_warning }}"
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 fi
