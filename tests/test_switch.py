@@ -60,7 +60,14 @@ if ( `uname -r` =~ *el7* ) then
         endif
         setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
     else
-        echo "{MIGRATION_WARNING}"
+        echo "Attention! Your machine is running on an environment that is not supported. RHEL7 has been phased out."
+        echo "From November 2024, komodo versions only support RHEL8."
+        echo "Please migrate as soon as possible."
+        echo "To use the latest stable RHEL7 build use either:"
+        echo "source /prog/res/komodo/deprecated-rhel7/enable"
+        echo "source /prog/res/komodo/deprecated-rhel7/enable.csh"
+        echo ""
+        echo "If you have any questions or issues - contact us on #ert-users on Slack or Equinor's Yammer."
     endif
 else if ( `uname -r` =~ *el8* ) then
     setenv KOMODO_ROOT {prefix}

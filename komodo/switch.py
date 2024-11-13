@@ -8,7 +8,7 @@ MIGRATION_WARNING = (
     "that is not supported. RHEL7 has been phased out.\n"
     "From November 2024, komodo versions only support RHEL8.\n"
     "Please migrate as soon as possible.\n"
-    "To use the latest stable RHEL7 build use either: "
+    "To use the latest stable RHEL7 build use either:\n"
     "source /prog/res/komodo/deprecated-rhel7/enable\n"
     "source /prog/res/komodo/deprecated-rhel7/enable.csh\n"
     "\n"
