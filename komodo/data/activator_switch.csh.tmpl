@@ -12,7 +12,9 @@ if ( `uname -r` =~ *el7* ) then
         endif
         setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
     else
-        echo "{{ migration_warning }}"
+        {%- for line in migration_warning.split('\n') %}
+        echo "{{ line }}"
+        {%- endfor %}
     endif
 else if ( `uname -r` =~ *el8* ) then
     setenv KOMODO_ROOT {{ prefix }}
