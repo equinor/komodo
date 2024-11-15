@@ -40,6 +40,7 @@ environment = {
 class PypiDependencies:
     def __init__(
         self,
+        pypi_dependencies: Dict[str, str],
         to_install: Dict[str, str],
         python_version: str,
         cachefile: str = "./pypi_dependencies.yml",
@@ -51,9 +52,11 @@ class PypiDependencies:
         self._failed_requirements: Dict[Requirement, str] = {}
         self._used_packages = set()
 
-        self._to_install = to_install
-
         self._install_names = {canonicalize_name(name): name for name in to_install}
+        self._pypi_dependencies = {
+            canonicalize_name(name): version
+            for name, version in pypi_dependencies.items()
+        }
         self._to_install = {
             canonicalize_name(name): version for name, version in to_install.items()
         }
@@ -70,13 +73,34 @@ class PypiDependencies:
         self._user_specified = {}
 
     def _update_package_sets(self, packages=None):
-        for package_name, version in packages or self._to_install.items():
+        for package_name, version in packages or self._pypi_dependencies.items():
             requirements = self._get_requirements(package_name, version)
             self._used_packages.add(package_name)
             for r in requirements:
                 _ = self.satisfied(r, package_name)
 
     def failed_requirements(self, packages=None):
+        """
+        >>>
+        >>> pypi_packages = {
+        ...    "ert": "11.1.0",
+        ...    "aiohttp": "3.10.10",
+        ...    "deprecation": "2.1.0",
+        ...    "filelock": "3.16.1",
+        ...    "jinja2": "3.1.4",
+        ...    "aiohappyeyeballs": "2.4.3",
+        ...    "cryptography": "43.0.1",
+        ...    "PyJWT": "2.3.0"}
+        >>> all_packages = {
+        ...    **pypi_packages,
+        ...    "xtgeo": "main",
+        ...    "iterative_ensemble_smoother": "main"}
+        >>> dependencies = PypiDependencies(pypi_packages, all_packages, python_version="3.8")
+        >>> dependencies.add_user_specified("xtgeo", [])
+        >>> dependencies.add_user_specified("iterative_ensemble_smoother", [])
+        >>> dependencies.failed_requirements() # doctest: +ELLIPSIS
+        Not installed: aiosignal...
+        """
         self._update_package_sets(packages)
         return self._failed_requirements
 
@@ -114,7 +138,7 @@ class PypiDependencies:
     ) -> List[Requirement]:
         """
         >>> from packaging.requirements import Requirement
-        >>> PypiDependencies(to_install={}, python_version="3.8.11")._get_requirements(
+        >>> PypiDependencies({}, {}, python_version="3.8.11")._get_requirements(
         ...     "rips",
         ...     "2024.3.0.2"
         ... )
@@ -226,12 +250,13 @@ class PypiDependencies:
     ) -> bool:
         """
         >>> from packaging.requirements import Requirement
-        >>> PypiDependencies(to_install={}, python_version="3.8").satisfied(
+        >>> PypiDependencies({}, {}, python_version="3.8").satisfied(
         ... Requirement("PyJWT[crypto] (<3, >=1.0.0)")
         ... )
         Not installed: pyjwt
         False
-        >>> PypiDependencies(to_install={"PyJWT": "2.3.0"}, python_version="3.8").satisfied(
+        >>> packages = {"PyJWT": "2.3.0"}
+        >>> PypiDependencies(packages, packages, python_version="3.8").satisfied(
         ...     Requirement("PyJWT (<3, >=1.0.0)")
         ... )
         True

@@ -93,9 +93,10 @@ def lint(
             maintainers.append(komodo_exception.error)
 
     if check_dependencies:
+        all_dependencies = dict(release_file.content.items())
         pypi_dependencies = {
             name: version
-            for name, version in release_file.content.items()
+            for name, version in all_dependencies.items()
             if repository_file.content.get(name, {}).get(version, {}).get("source")
             == "pypi"
         }
@@ -105,7 +106,7 @@ def lint(
             full_python_version = yaml.safe_load(f)[python_version]
 
         dependencies = PypiDependencies(
-            pypi_dependencies, python_version=full_python_version
+            pypi_dependencies, all_dependencies, python_version=full_python_version
         )
         for name, version in release_file.content.items():
             if (

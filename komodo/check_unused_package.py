@@ -28,7 +28,7 @@ def check_for_unused_package(
     full_python_version = builtin_python_versions[python_version]
 
     dependencies = PypiDependencies(
-        release_file.content, python_version=full_python_version
+        release_file.content, release_file.content, python_version=full_python_version
     )
     for name, version in release_file.content.items():
         metadata = repository.content.get(name, {}).get(version, {})
