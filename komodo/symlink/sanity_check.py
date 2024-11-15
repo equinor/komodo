@@ -36,6 +36,7 @@ def read_link_structure(path):
 
     bleeding_timestamp_pattern = r"bleeding-\d{8}-\d{4}-"
     bleeding_deleteme_pattern = r"bleeding-.*\.deleteme"
+    bleeding_py_version_pattern = r"bleeding-py\d{2}"
     dangling_root_folders = [
         "bleeding-py311-rhel8",
         "bleeding-py38-rhel7",
@@ -49,6 +50,7 @@ def read_link_structure(path):
             [
                 re.match(bleeding_timestamp_pattern, file_name),
                 re.match(bleeding_deleteme_pattern, file_name),
+                re.match(bleeding_py_version_pattern, file_name),
                 file_name in dangling_root_folders,
                 not os.path.islink(file_path),
             ]
