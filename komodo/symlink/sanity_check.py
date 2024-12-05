@@ -97,6 +97,14 @@ def _get_root_nodes(link_dict):
     return keys.difference(values)
 
 
+def suggest_missing_roots(link_dict):
+    input_roots = link_dict.get("root_links", [])
+    inferred_roots = _get_root_nodes(link_dict)
+    if set(input_roots) != inferred_roots:
+        return sorted(set(inferred_roots).difference(input_roots))
+    return []
+
+
 def assert_root_nodes(link_dict):
     input_roots = link_dict["root_links"]
     inferred_roots = _get_root_nodes(link_dict)

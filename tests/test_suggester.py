@@ -1,3 +1,4 @@
+import json
 from argparse import Namespace
 from base64 import b64encode
 from unittest.mock import ANY, MagicMock
@@ -235,6 +236,33 @@ def test_get_concrete_release(conf, link, concrete):
 }
 """,
         ),
+        # suggest deprecated update to 2020.11-py37
+        (
+            """{"links": {
+        "2020.10-py37": "2020.10.02-py37",
+        "2020.11-py37": "2020.11.04-py37",
+        "2020.12-py37": "2020.12.rc2-py37",
+        "stable-py3": "stable-py37",
+        "stable-py37": "2020.11-py37",
+        "deprecated-py3": "deprecated-py37",
+        "deprecated-py37": "2020.10-py37"
+    }}""",
+            "2020.11.04-py37",
+            "deprecated",
+            "changed",
+            """{
+    "links": {
+        "2020.10-py37": "2020.10.02-py37",
+        "2020.11-py37": "2020.11.04-py37",
+        "2020.12-py37": "2020.12.rc2-py37",
+        "deprecated-py3": "deprecated-py37",
+        "deprecated-py37": "2020.11-py37",
+        "stable-py3": "stable-py37",
+        "stable-py37": "2020.11-py37"
+    }
+}
+""",
+        ),
     ],
 )
 def test_update(json_in, release_id, mode, changed, json_out):
@@ -255,14 +283,17 @@ def _mock_repo(sym_config):
     [
         ("foo.json", "stable"),
         ("foo_azure.json", "stable"),
+        ("foo.json", "deprecated"),
+        ("foo.json", "testing"),
     ],
 )
 def test_suggest_symlink_configuration(symlink_file, mode):
     """Testing whether when updating symlink file the branch gets a corresponding name."""
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
-"stable-py58": "2050.02-py58"
-}}"""
+"deprecated-py58": "2050.02-py58",
+"stable-py58": "2050.02-py58",
+"testing-py58": "2050.02-py58"}}"""
     repo = _mock_repo(config)
 
     args = Namespace(
@@ -288,7 +319,9 @@ def test_suggest_symlink_configuration(symlink_file, mode):
         """{
     "links": {
         "2050.02-py58": "2050.02.01-py58",
-        "stable-py58": "2050.02-py58"
+        "deprecated-py58": "2050.02-py58",
+        "stable-py58": "2050.02-py58",
+        "testing-py58": "2050.02-py58"
     }
 }
 """,
@@ -306,8 +339,7 @@ def test_suggest_symlink_configuration(symlink_file, mode):
 def test_noop_suggestion():
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
-"stable-py58": "2050.02-py58"
-}}"""
+"stable-py58": "2050.02-py58"}}"""
     repo = _mock_repo(config)
 
     args = Namespace(
@@ -321,15 +353,13 @@ def test_noop_suggestion():
     )
 
     repo.create_pull.assert_not_called()
-
     assert suggest_symlink_configuration(args, repo) is None
 
 
 def test_suggest_symlink_multi_configuration():
     config = """{"links": {
 "2050.02-py58": "2050.02.00-py58",
-"stable-py58": "2050.02-py58"
-}}"""
+"stable-py58": "2050.02-py58"}}"""
     repo = _mock_repo(config)
     mode = "stable"
     args = Namespace(
@@ -390,6 +420,36 @@ def test_suggest_symlink_multi_configuration():
 }
 """,
         ),
+        # testing deprecated promotion from previous release
+        (
+            """{"links": {
+        "2001.11-py38": "2001.11.00-py38",
+        "2001.11-py311": "2001.11.00-py311",
+        "deprecated-py38": "2001.11.rc0-py38",
+        "deprecated-py311": "2001.11.rc0-py311",
+        "stable-py38" : "2001.11-py38",
+        "testing-py38": "2001.11.rc0-py38",
+        "stable-py311" : "2001.11-py311",
+        "testing-py311": "2001.11.rc0-py311"}}""",
+            "2001.12.rc0",
+            "deprecated",
+            "changed",
+            """{
+    "links": {
+        "2001.11-py311": "2001.11.00-py311",
+        "2001.11-py38": "2001.11.00-py38",
+        "2001.12-py311": "2001.12.rc0-py311",
+        "2001.12-py38": "2001.12.rc0-py38",
+        "deprecated-py311": "2001.12-py311",
+        "deprecated-py38": "2001.12-py38",
+        "stable-py311": "2001.11-py311",
+        "stable-py38": "2001.11-py38",
+        "testing-py311": "2001.11.rc0-py311",
+        "testing-py38": "2001.11.rc0-py38"
+    }
+}
+""",
+        ),
     ],
 )
 def test_multi_update(json_in, release_id, mode, changed, json_out):
@@ -397,3 +457,78 @@ def test_multi_update(json_in, release_id, mode, changed, json_out):
         json_out,
         changed == "changed",
     )
+
+
+@pytest.mark.parametrize(
+    ("json_in", "release_id", "mode", "changed", "suggested_root_links"),
+    # move deprecated, expect 2001.10-py27 added as root_link
+    [
+        (
+            """{"links": {
+                "2001.10-py27": "2001.10.03-py27",
+                "2001.11-py27": "2001.11.00-py27",
+                "2001.12-py27": "2001.12.rc0-py27",
+                "deprecated": "deprecated-py27",
+                "deprecated-py27": "2001.10.03-py27",
+                "stable": "stable-py27",
+                "stable-py27" : "2001.11-py27",
+                "testing": "testing-py27",
+                "testing-py27": "2001.12.rc0-py27"
+            },
+            "root_links": []
+        }""",
+            "2001.11.00-py27",
+            "deprecated",
+            "changed",
+            ["testing", "deprecated", "stable", "2001.10-py27", "2001.12-py27"],
+        ),
+        # move testing, expect 2001.12.rc0 but not 2002.01-py27 added as root_link
+        (
+            """{"links": {
+                "2001.10-py27": "2001.10.03-py27",
+                "2001.11-py27": "2001.11.00-py27",
+                "2001.12-py27": "2001.12.rc0-py27",
+                "2002.01-py27": "2002.01.rc0-py27",
+                "deprecated": "deprecated-py27",
+                "deprecated-py27": "2001.10.03-py27",
+                "stable": "stable-py27",
+                "stable-py27" : "2001.11-py27",
+                "testing": "testing-py27",
+                "testing-py27": "2001.12.rc0-py27"
+            },
+            "root_links": []
+                }""",
+            "2002.01-py27",
+            "testing",
+            "changed",
+            ["testing", "deprecated", "stable", "2001.10-py27", "2001.12-py27"],
+        ),
+        # move stable, expect 2001.11-py27, but not 2001.12-py27 added as root_link
+        (
+            """{"links": {
+                "2001.10-py27": "2001.10.03-py27",
+                "2001.11-py27": "2001.11.00-py27",
+                "2001.12-py27": "2001.12.rc0-py27",
+                "deprecated": "deprecated-py27",
+                "deprecated-py27": "2001.10.03-py27",
+                "stable": "stable-py27",
+                "stable-py27" : "2001.11-py27",
+                "testing": "testing-py27",
+                "testing-py27": "2001.12.rc0-py27"
+            },
+            "root_links": []
+                }""",
+            "2001.12-py27",
+            "stable",
+            "changed",
+            ["testing", "deprecated", "stable", "2001.10-py27", "2001.11-py27"],
+        ),
+    ],
+)
+def test_suggesting_dangling_root_links_update(
+    json_in, release_id, mode, changed, suggested_root_links
+):
+    json_out, changed = update(json_in, release_id, mode)
+    assert changed
+    json_obj = json.loads(json_out)
+    assert json_obj["root_links"] == sorted(suggested_root_links)

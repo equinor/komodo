@@ -35,7 +35,7 @@ def _parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("release", help="e.g. 2019.12.rc0-py38")
-    parser.add_argument("mode", help="stable,testing")
+    parser.add_argument("mode", help="stable,testing,deprecated")
     parser.add_argument("joburl", help="link to the job that triggered this")
     parser.add_argument("jobname", help="name of the job")
     parser.add_argument("--git-fork", help="git fork", default="equinor")

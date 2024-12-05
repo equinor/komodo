@@ -1,7 +1,23 @@
 import pytest
 
 from komodo.lint_symlink_config import lint_symlink_config
-from komodo.symlink.sanity_check import assert_root_nodes
+from komodo.symlink.sanity_check import assert_root_nodes, suggest_missing_roots
+
+
+def test_suggest_missing_root_links():
+    link_dict = {
+        "links": {
+            "stable": "2012.01",
+            "testing": "2012.03",
+            "deprecated-py38": "2011.11",
+            "deprecated-py311": "2011.12",
+        },
+        "root_links": ["stable", "testing"],
+    }
+
+    assert suggest_missing_roots(link_dict) == sorted(
+        ["deprecated-py311", "deprecated-py38"]
+    )
 
 
 def test_assert_root_nodes_error_message_missing_roots():

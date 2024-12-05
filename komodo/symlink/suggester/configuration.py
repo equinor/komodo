@@ -1,6 +1,7 @@
 import json
 from typing import List, Tuple
 
+from komodo.symlink.sanity_check import suggest_missing_roots
 from komodo.symlink.suggester.release import Release
 
 
@@ -8,6 +9,7 @@ class Configuration:
     def __init__(self, conf) -> None:
         self.conf = conf
         self.links = conf["links"]
+        self.root_links = conf.get("root_links", [])
 
     def _month_alias_update_only(self, link, release):
         return self.links.get(link, None) == release.month_alias()
@@ -48,7 +50,7 @@ class Configuration:
                         self.links[link] = release.month_alias()
                     else:
                         self.links[link] = repr(release)
-            elif mode == "stable":
+            elif mode in {"stable", "deprecated"}:
                 self.links[release.month_alias()] = repr(release)
                 self.links[link] = release.month_alias()
             else:
@@ -81,10 +83,19 @@ def update(
 
     configuration = Configuration.from_json(symlink_configuration)
     configuration.update(release, mode, python_versions)
-
     new_json_str = configuration.to_json(json_kwargs)
-    old_json_str = json.dumps(json.loads(symlink_configuration), **json_kwargs)
 
+    missing_roots = suggest_missing_roots(json.loads(new_json_str))
+    if missing_roots:
+        appended_roots = json.loads(new_json_str)
+
+        for missing_root in missing_roots:
+            if "root_links" in appended_roots:
+                appended_roots["root_links"].append(missing_root)
+
+        new_json_str = json.dumps(appended_roots, **json_kwargs)
+
+    old_json_str = json.dumps(json.loads(symlink_configuration), **json_kwargs)
     configuration_changed = new_json_str != old_json_str
 
     return f"{new_json_str}\n", configuration_changed
