@@ -210,7 +210,7 @@ def main():
         help="Matrix to be transpiled, expected yaml format string.",
         type=yaml.safe_load,
         required=False,
-        default="{rhel: ['7'], py: ['3.8']}",
+        default="{rhel: ['8'], py: ['3.11']}",
     )
     transpile_for_pip_parser = subparsers.add_parser(
         "transpile-for-pip",
@@ -237,7 +237,7 @@ def main():
         help="Matrix to be transpiled, expected yaml format string.",
         type=yaml.safe_load,
         required=False,
-        default="{rhel: ['7'], py: ['3.8']}",
+        default="{rhel: ['8'], py: ['3.11']}",
     )
     args = parser.parse_args()
     args.func(args)
