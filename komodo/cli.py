@@ -4,8 +4,9 @@ import datetime
 import os
 import sys
 import uuid
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any
 
 import jinja2
 from ruamel.yaml import YAML
@@ -40,7 +41,7 @@ class KomodoNamespace(argparse.Namespace):
     cmake: str
     pip: str
     workspace: str
-    extra_data_dirs: List[str]
+    extra_data_dirs: list[str]
     postinst: str
 
 
@@ -88,7 +89,7 @@ def create_enable_scripts(komodo_prefix: str, komodo_release: str) -> None:
 
 
 def _print_timing(
-    timing_element: Tuple[str, datetime.timedelta],
+    timing_element: tuple[str, datetime.timedelta],
     adjust: bool = False,
 ) -> None:
     if adjust:
@@ -125,10 +126,10 @@ def is_download_only(args: KomodoNamespace) -> bool:
 @profile_time("Fetching all packages")
 def download_packages(
     release_file_content: Mapping[str, str],
-    repository_file_content: Mapping[str, Mapping[str, Union[str, Sequence[str]]]],
+    repository_file_content: Mapping[str, Mapping[str, str | Sequence[str]]],
     download_destination: str,
     pip_executable: str = "pip",
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Downloads all PyPI packages to destination. Tries to download other
         packages to destination too.
     Git packages are collected, and a dict of all git hashes is returned.
@@ -205,14 +206,14 @@ def generate_release_root(release_path: Path) -> Path:
 def generate_release_manifest(
     release_name: Path,
     release_file_content: Mapping[str, str],
-    repository_file_content: Mapping[str, Mapping[str, Union[str, Sequence[str]]]],
-    git_hashes: Optional[Mapping[str, str]] = None,
+    repository_file_content: Mapping[str, Mapping[str, str | Sequence[str]]],
+    git_hashes: Mapping[str, str] | None = None,
 ) -> None:
     releasedoc = Path(release_name) / Path(release_name)
     with open(releasedoc, mode="w", encoding="utf-8") as filehandle:
-        release: Dict[str, Dict[str, str]] = {}
+        release: dict[str, dict[str, str]] = {}
         for package, version in release_file_content.items():
-            entry: Dict[str, str] = repository_file_content[package][version]
+            entry: dict[str, str] = repository_file_content[package][version]
             maintainer = repository_file_content[package][version]["maintainer"]
             if entry.get("fetch") == "git":
                 version = git_hashes[package]
@@ -250,7 +251,7 @@ def delete_old_previously_moved_releases(prefix_path: Path, release_name: Path) 
     )
 
 
-def apply_fallback_tmpdir_for_pip_if_set(tmp_dir: Optional[str] = None):
+def apply_fallback_tmpdir_for_pip_if_set(tmp_dir: str | None = None):
     """Allows e.g. pip to use this folder as a destination for "pip
     download", instead of in some cases falling back to /tmp, which is
     undesired when building on nfs.
@@ -265,7 +266,7 @@ def apply_fallback_tmpdir_for_pip_if_set(tmp_dir: Optional[str] = None):
 @profile_time("pip install to final destination")
 def install_previously_downloaded_pip_packages(
     release_file_content: Mapping[str, str],
-    repository_file_content: Mapping[str, Mapping[str, Union[str, Sequence[str]]]],
+    repository_file_content: Mapping[str, Mapping[str, str | Sequence[str]]],
     downloads_directory: str,
     pip_executable: str,
     release_root: Path,
@@ -295,7 +296,7 @@ def install_previously_downloaded_pip_packages(
 
 
 def run_post_installation_scripts_if_set(
-    postinst: Optional[str], release_path: Path
+    postinst: str | None, release_path: Path
 ) -> None:
     if postinst:
         timing_func = profile_time("Running post-install scripts")
@@ -328,7 +329,7 @@ def compile_python_bytecode_files_and_fix_permissions(
     compile_python_bytecode_files(release_root)
 
 
-timings: List[Tuple[str, datetime.timedelta]] = []
+timings: list[tuple[str, datetime.timedelta]] = []
 
 
 def _main(args: KomodoNamespace) -> None:
@@ -416,7 +417,7 @@ def cli_main():
         _main(args)
 
 
-def parse_args(args: List[str]) -> KomodoNamespace:
+def parse_args(args: list[str]) -> KomodoNamespace:
     """Parse the arguments from the command line into an `argparse.Namespace`.
     Having a separated function makes it easier to test the CLI.
 

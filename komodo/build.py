@@ -5,7 +5,6 @@ import os
 import re
 import stat
 from pathlib import Path
-from typing import Dict
 
 import requests
 
@@ -184,7 +183,7 @@ def pypaths(prefix, version):
 
 
 def make(
-    pkgs: Dict[str, str],
+    pkgs: dict[str, str],
     repo,
     data,
     prefix,
@@ -228,7 +227,7 @@ def make(
     def resolve(input_str):
         return input_str.replace("$(prefix)", prefix)
 
-    for package_name, path in zip(pkgorder, pkgpaths):
+    for package_name, path in zip(pkgorder, pkgpaths, strict=False):
         ver = pkgs[package_name]
         current = repo[package_name][ver]
         make = current["make"]

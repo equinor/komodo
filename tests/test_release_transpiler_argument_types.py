@@ -1,7 +1,6 @@
 import sys
 from contextlib import contextmanager
 from os.path import abspath, dirname
-from typing import List
 
 import pytest
 
@@ -72,7 +71,7 @@ def does_not_raise():
         ),
     ],
 )
-def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch):
+def test_transpile_py_matrix_file_type(args: list[str], expectation, monkeypatch):
     monkeypatch.setattr(
         sys,
         "argv",
@@ -131,7 +130,7 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
     ],
 )
-def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypatch):
+def test_transpile_py_output_folder_type(args: list[str], expectation, monkeypatch):
     monkeypatch.setattr(
         sys,
         "argv",
@@ -179,7 +178,7 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
     ],
 )
 def test_transpile_py_matrix_coordinates_type(
-    args: List[str],
+    args: list[str],
     expectation,
     monkeypatch,
 ):

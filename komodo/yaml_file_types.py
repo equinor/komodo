@@ -1,8 +1,8 @@
 import argparse
 import os
 from collections import namedtuple
+from collections.abc import Mapping, MutableSet, Sequence
 from pathlib import Path
-from typing import Dict, List, Mapping, MutableSet, Sequence, Union
 
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
@@ -137,7 +137,7 @@ class ReleaseMatrixFile(YamlFile):
 
 
 class ReleaseDir:
-    def __call__(self, value: str) -> Dict[str, YamlFile]:
+    def __call__(self, value: str) -> dict[str, YamlFile]:
         if not os.path.isdir(value):
             raise NotADirectoryError(value)
         result = {}
@@ -155,7 +155,7 @@ class ManifestFile(YamlFile):
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
-    def __call__(self, value: str) -> Dict[str, Dict[str, str]]:
+    def __call__(self, value: str) -> dict[str, dict[str, str]]:
         yml = super().__call__(value)
         self.validate_manifest_file(yml)
         return yml
@@ -272,7 +272,7 @@ class RepositoryFile(YamlFile):
 
         handle_validation_errors(errors, message)
 
-    def validate_versions(self, package_name: str, versions: dict) -> List[str]:
+    def validate_versions(self, package_name: str, versions: dict) -> list[str]:
         """Validates versions-dictionary of a package and returns a list of error messages."""
         errors = []
         for version, version_metadata in versions.items():
@@ -308,7 +308,7 @@ class RepositoryFile(YamlFile):
         package_version: str,
         package_property: str,
         package_property_value: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates package properties of the specified package
         and returns a list of error messages.
         """
@@ -355,7 +355,7 @@ class UpgradeProposalsFile(YamlFile):
         super().__init__(*args, **kwargs)
         self.content: dict = None
 
-    def __call__(self, value: str) -> Dict[str, Dict[str, str]]:
+    def __call__(self, value: str) -> dict[str, dict[str, str]]:
         yml = super().__call__(value)
         self.validate_upgrade_proposals_file(yml)
         self.content: dict = yml
@@ -484,7 +484,7 @@ class Package:
 
     @staticmethod
     def validate_package_version(
-        package_name: Union[str, None],
+        package_name: str | None,
         package_version: str,
         is_matrix_file: bool = False,
     ) -> None:
@@ -512,7 +512,7 @@ class Package:
         package_name: str,
         package_version: str,
         is_matrix_file: bool = False,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates package name and version, and returns a list of error messages."""
         errors = []
         try:
@@ -541,7 +541,7 @@ class Package:
     def validate_package_importance_with_errors(
         package_name,
         package_importance: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates package importance of a package and returns a list of error messages."""
         errors = []
         try:
@@ -582,7 +582,7 @@ class Package:
     def validate_package_maturity_with_errors(
         package_name: str,
         package_maturity: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates package maturity of a package and returns a list of error messages."""
         errors = []
         try:
@@ -614,7 +614,7 @@ class Package:
         package_name: str,
         package_version: str,
         package_make: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates make of a package and returns a list of error messages."""
         errors = []
         try:
@@ -641,7 +641,7 @@ class Package:
         package_name: str,
         package_version: str,
         package_maintainer: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates maintainer of a package and returns a list of error messages."""
         errors = []
         try:
@@ -660,7 +660,7 @@ class Package:
         package_version: str,
         package_source: str,
     ) -> None:
-        if isinstance(package_source, (str, type(None))):
+        if isinstance(package_source, (str | type(None))):
             return
         msg = f"Package '{package_name}' version {package_version} has invalid source type ({package_source})"
         raise TypeError(
@@ -672,7 +672,7 @@ class Package:
         package_name: str,
         package_version: str,
         package_source: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Validates source of a package and returns a list of error messages."""
         errors = []
         try:
@@ -718,7 +718,7 @@ def load_repository_file(repository_file_string):
 
 
 def _recursive_validate_version_matrix(
-    version_or_matrix: Union[dict, str], package_name: str, errors: MutableSet
+    version_or_matrix: dict | str, package_name: str, errors: MutableSet
 ) -> None:
     if isinstance(version_or_matrix, Mapping):
         for nested_version_or_matrix in version_or_matrix.values():

@@ -43,11 +43,10 @@ def create_activator_switch(data, prefix, release):
 
     os.makedirs(release_path)
 
-    with open(
-        os.path.join(release_path, "enable"), "w", encoding="utf-8"
-    ) as activator, open(
-        data.get("activator_switch.tmpl"), encoding="utf-8"
-    ) as activator_tmpl:
+    with (
+        open(os.path.join(release_path, "enable"), "w", encoding="utf-8") as activator,
+        open(data.get("activator_switch.tmpl"), encoding="utf-8") as activator_tmpl,
+    ):
         activator.write(
             Template(activator_tmpl.read(), keep_trailing_newline=True).render(
                 py_version=py_version,
@@ -57,11 +56,12 @@ def create_activator_switch(data, prefix, release):
             ),
         )
 
-    with open(
-        os.path.join(release_path, "enable.csh"), "w", encoding="utf-8"
-    ) as activator, open(
-        data.get("activator_switch.csh.tmpl"), encoding="utf-8"
-    ) as activator_tmpl:
+    with (
+        open(
+            os.path.join(release_path, "enable.csh"), "w", encoding="utf-8"
+        ) as activator,
+        open(data.get("activator_switch.csh.tmpl"), encoding="utf-8") as activator_tmpl,
+    ):
         activator.write(
             Template(activator_tmpl.read(), keep_trailing_newline=True).render(
                 py_version=py_version,

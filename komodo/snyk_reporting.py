@@ -2,7 +2,7 @@ import argparse
 import html
 import os
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from snyk import SnykClient
 from snyk.models import Organization, Vulnerability
@@ -41,7 +41,7 @@ def main() -> None:
         print(_format_console(vulnerabilities=vulnerabilities))
 
 
-def parse_args(args: List[str]) -> argparse.Namespace:
+def parse_args(args: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Test a release for security and license issues.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -81,9 +81,9 @@ def parse_args(args: List[str]) -> argparse.Namespace:
 
 
 def filter_pip_packages(
-    packages: Dict[str, str],
-    repository: Dict[str, Any],
-) -> Dict[str, str]:
+    packages: dict[str, str],
+    repository: dict[str, Any],
+) -> dict[str, str]:
     return {
         package_name: version
         for (package_name, version) in packages.items()
@@ -91,13 +91,13 @@ def filter_pip_packages(
     }
 
 
-def create_snyk_search_string(packages: Dict[str, str]) -> str:
+def create_snyk_search_string(packages: dict[str, str]) -> str:
     return "\n".join(
         [f"{package_name}=={version}" for package_name, version in packages.items()],
     )
 
 
-def get_unique_issues(issues: List[Vulnerability]) -> List[Vulnerability]:
+def get_unique_issues(issues: list[Vulnerability]) -> list[Vulnerability]:
     ids = set()
     result = []
     for issue in issues:
@@ -109,7 +109,7 @@ def get_unique_issues(issues: List[Vulnerability]) -> List[Vulnerability]:
 
 
 def filter_vulnerability_issues(
-    snyk_issues: List[Vulnerability], release_packages: Dict[str, str]
+    snyk_issues: list[Vulnerability], release_packages: dict[str, str]
 ):
     filtered_vulnerability_issues = []
     for snyk_issue in snyk_issues:
@@ -121,10 +121,10 @@ def filter_vulnerability_issues(
 
 
 def find_vulnerabilities(
-    releases: Dict[str, Dict[str, str]],
-    repository: Dict[str, Any],
+    releases: dict[str, dict[str, str]],
+    repository: dict[str, Any],
     org: Organization,
-) -> Dict[str, List[Vulnerability]]:
+) -> dict[str, list[Vulnerability]]:
     result = {}
 
     for release_name, packages in releases.items():
@@ -139,7 +139,7 @@ def find_vulnerabilities(
     return result
 
 
-def _format_console(vulnerabilities: Dict[str, List[Vulnerability]]) -> str:
+def _format_console(vulnerabilities: dict[str, list[Vulnerability]]) -> str:
     result = "Security Vulnerabilities:\n"
     for release, vulns in vulnerabilities.items():
         result += release + "\n"
@@ -160,7 +160,7 @@ def _format_console(vulnerabilities: Dict[str, List[Vulnerability]]) -> str:
     return result
 
 
-def _format_github(vulnerabilities: Dict[str, List[Vulnerability]]) -> str:
+def _format_github(vulnerabilities: dict[str, list[Vulnerability]]) -> str:
     result = "Snyk Security Report\n==\n\n"
     for release, vulns in vulnerabilities.items():
         result += f"{release}\n--\n"
@@ -191,11 +191,11 @@ def _get_org(api_token: str, org_id: str) -> Organization:
 
 
 def snyk_main(
-    releases: Dict[str, Dict[str, str]],
-    repository: Dict[str, Any],
-    api_token: Optional[str],
+    releases: dict[str, dict[str, str]],
+    repository: dict[str, Any],
+    api_token: str | None,
     org_id: str,
-) -> Dict[str, List[Vulnerability]]:
+) -> dict[str, list[Vulnerability]]:
     if api_token is None:
         msg = "No api token given, please set the environment variable SNYK_API_TOKEN."
         raise ValueError(
