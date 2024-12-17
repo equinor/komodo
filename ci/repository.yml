@@ -1,4 +1,8 @@
 numpy:
+  2.2.0:
+    source: pypi
+    make: pip
+    maintainer: ci
   1.26.4:
     source: pypi
     make: pip
@@ -16,13 +20,13 @@ python:
     makeopts: --virtualenv-interpreter python3
 
 setuptools:
-  69.0.3:
+  75.6.0:
     source: pypi
     make: pip
     maintainer: ci
 
 wheel:
-  0.42.0:
+  0.45.1:
     source: pypi
     make: pip
     maintainer: ci

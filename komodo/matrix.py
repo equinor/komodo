@@ -6,13 +6,13 @@ repeat itself.
 
 import itertools
 import re
-from typing import Iterator, Sequence, Tuple
+from collections.abc import Iterator, Sequence
 
 
 def get_matrix(
     rhel_versions: Sequence[str],
     py_versions: Sequence[str],
-) -> Iterator[Tuple[str, str]]:
+) -> Iterator[tuple[str, str]]:
     """Return tuples of rhel version and Python version, representing the
     current release matrix.
     """

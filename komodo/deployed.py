@@ -1,7 +1,6 @@
 import argparse
 import json
 import os
-from typing import List, Optional
 
 from komodo.matrix import get_matrix_base
 from komodo.yaml_file_types import ReleaseDir
@@ -35,13 +34,13 @@ def _fetch_non_deployed_releases(install_root, release_folder):
 def fetch_non_deployed(
     install_root: str,
     releases_folder: str,
-    limit: Optional[int] = None,
-) -> List[str]:
+    limit: int | None = None,
+) -> list[str]:
     non_deployed = _fetch_non_deployed_releases(install_root, releases_folder)
     return non_deployed[:limit]
 
 
-def output_formatter(release_list: List[str], do_json: bool = False) -> str:
+def output_formatter(release_list: list[str], do_json: bool = False) -> str:
     if do_json:
         return json.dumps(release_list, separators=(",", ":"))
     return "\n".join(release_list)
