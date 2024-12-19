@@ -2,6 +2,7 @@
 _version.py
 
 # Standard Python project ignores.
+venv
 *.pyc
 .vscode
 .idea
