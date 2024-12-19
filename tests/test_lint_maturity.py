@@ -294,12 +294,9 @@ bleeding has 4 packages with invalid maturity tag.
 """  # noqa
 
     for list_file in list_files:
-        with (
-            pytest.raises(SystemExit) as exit_info,
-            warnings.catch_warnings(
-                record=True,
-            ) as warning_info,
-        ):
+        with pytest.raises(SystemExit) as exit_info, warnings.catch_warnings(
+            record=True,
+        ) as warning_info:
             lint_maturity.run(
                 files_to_lint=[list_file],
                 tag_exceptions={

@@ -3,6 +3,7 @@ import json
 import os
 import sys
 from contextlib import contextmanager
+from typing import List
 
 from .sanity_check import verify_integrity
 
@@ -17,7 +18,7 @@ def working_dir(path):
         os.chdir(prev_dir)
 
 
-def get_implicitly_moved_symlinks(key: str, link_dict: dict) -> list[str]:
+def get_implicitly_moved_symlinks(key: str, link_dict: dict) -> List[str]:
     sources = [src for src, dst in link_dict.items() if dst == key]
     implicitly_moved_symlinks = []
     for source in sources:

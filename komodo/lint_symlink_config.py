@@ -3,8 +3,8 @@ import json
 import os
 import re
 import sys
-from collections.abc import Mapping
 from pathlib import Path
+from typing import Mapping, Union
 
 from komodo.symlink.sanity_check import assert_root_nodes
 
@@ -21,7 +21,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def lint_symlink_config(link_dict: Mapping[str, Mapping | str]):
+def lint_symlink_config(link_dict: Mapping[str, Union[Mapping, str]]):
     assert_root_nodes(link_dict)
 
     links = link_dict["links"]

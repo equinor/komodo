@@ -1,6 +1,7 @@
 import os
 import sys
 from contextlib import contextmanager
+from typing import List
 
 import pytest
 
@@ -71,8 +72,8 @@ def _write_file(file_path: str, file_content: str) -> str:
 
 def _create_tmp_test_files(
     repository_file_content: str,
-    release_files_contents: list[str],
-) -> (str, list[str]):
+    release_files_contents: List[str],
+) -> (str, List[str]):
     folder_name = os.path.join(os.getcwd(), "test_cleanup/")
     os.mkdir(folder_name)
     repository_file_path = _write_file(
@@ -108,7 +109,7 @@ def _create_tmp_test_files(
 )
 def test_cleanup_main(
     repository_file_content: str,
-    release_files_content: list[str],
+    release_files_content: List[str],
     expected_print,
     monkeypatch,
     tmpdir,
@@ -145,7 +146,7 @@ def test_cleanup_main(
 )
 def test_cleanup_main_invalid_input_files(
     repository_file_content: str,
-    release_files_content: list[str],
+    release_files_content: List[str],
     expectation,
     monkeypatch,
     tmpdir,

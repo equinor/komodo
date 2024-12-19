@@ -1,4 +1,4 @@
-from collections.abc import Mapping, Sequence
+from typing import Mapping, Sequence
 from unittest.mock import Mock, patch
 
 import pytest

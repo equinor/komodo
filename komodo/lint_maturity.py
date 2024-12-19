@@ -3,6 +3,7 @@
 import argparse
 import os
 import warnings
+from typing import List
 
 import yaml
 from packaging.version import InvalidVersion, Version
@@ -125,7 +126,7 @@ def get_release_version(release_basename, tag_exceptions_release):
     return release_version
 
 
-def run(files_to_lint: list[str], tag_exceptions):
+def run(files_to_lint: List[str], tag_exceptions):
     system_exit_msg = ""
     system_warning_msg = ""
 
@@ -180,7 +181,7 @@ def read_yaml_file_and_convert_to_release_file(release_file_path: str) -> Releas
     return ReleaseFile().from_yaml_string(value=release_file_yaml_string)
 
 
-def get_files_to_lint(release_folder: str, release_file: str) -> list[str]:
+def get_files_to_lint(release_folder: str, release_file: str) -> List[str]:
     if release_folder is None:
         files_to_lint = [release_file]
     else:

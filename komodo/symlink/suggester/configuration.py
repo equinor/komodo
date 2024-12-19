@@ -1,4 +1,5 @@
 import json
+from typing import List, Tuple
 
 from komodo.symlink.sanity_check import suggest_missing_roots
 from komodo.symlink.suggester.release import Release
@@ -19,7 +20,7 @@ class Configuration:
             release = Release(self.links[repr(release)])
         return release
 
-    def update(self, release, mode, python_versions: list[str]):
+    def update(self, release, mode, python_versions: List[str]):
         for python_version in python_versions:
             python_version = python_version.strip()
             release.set_python_version(python_version)
@@ -65,8 +66,8 @@ class Configuration:
 
 
 def update(
-    symlink_configuration, release_id, mode, python_versions: list[str] = None
-) -> tuple[str, bool]:
+    symlink_configuration, release_id, mode, python_versions: List[str] = None
+) -> Tuple[str, bool]:
     """Return a tuple of a string representing the new symlink config json,
     and whether an update was made. This function assumes the release_id
     is in the yyyy.mm.[part ...] format and will look for python suffix (-py38, -py311)
