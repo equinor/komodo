@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 import sys
+from typing import List
 
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
-def cleanup(repository_file_path: str, release_files_path: list[str]):
+def cleanup(repository_file_path: str, release_files_path: List[str]):
     repository_file = RepositoryFile()(repository_file_path)
     repository = repository_file.content
 

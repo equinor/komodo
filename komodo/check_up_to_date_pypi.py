@@ -3,6 +3,7 @@ import copy
 import pathlib
 import re
 import sys
+from typing import Dict, List
 
 import requests
 import ruamel.yaml
@@ -56,7 +57,7 @@ def get_python_requirement(sources: list):
     return ""
 
 
-def is_platform_compatible(build_info: list[dict], platform: str) -> bool:
+def is_platform_compatible(build_info: List[Dict], platform: str) -> bool:
     if platform == "darwin":
         platform = "macos"
     if platform == "linux2":
@@ -72,7 +73,7 @@ def is_platform_compatible(build_info: list[dict], platform: str) -> bool:
 
 def compatible_versions(
     releases: dict, python_version, platform: str
-) -> list[get_version.Version]:
+) -> List[get_version.Version]:
     compatible_versions = []
     for version_str, build_info in releases.items():
         try:

@@ -3,8 +3,8 @@ import contextlib
 import difflib
 import os
 from base64 import b64decode
-from collections.abc import Mapping, MutableSet
 from datetime import datetime
+from typing import Dict, Mapping, MutableSet, Optional, Union
 
 import github
 from github import Github, UnknownObjectException
@@ -21,8 +21,8 @@ from komodo.yaml_file_types import (
 
 
 def recursive_update(
-    to_be_upgraded: Mapping[str, str | Mapping[str, str]],
-    upgrades: Mapping[str, str | Mapping[str, str]] | None,
+    to_be_upgraded: Mapping[str, Union[str, Mapping[str, str]]],
+    upgrades: Optional[Mapping[str, Union[str, Mapping[str, str]]]],
 ) -> None:
     """Updates release in place with upgrades/additions of packages from upgrades.
 
@@ -115,7 +115,7 @@ def get_upgrade_key(target: str) -> str:
 
 
 def validate_upgrades(
-    upgrade_section: dict[str, str], repofile: RepositoryFile
+    upgrade_section: Dict[str, str], repofile: RepositoryFile
 ) -> None:
     errors = set()
     for package_name, package_version in upgrade_section.items():
@@ -128,7 +128,7 @@ def validate_upgrades(
 
 def recursive_validate_package_entries(
     package_name,
-    package_version_or_matrix: str | Mapping | None,
+    package_version_or_matrix: Union[str, Mapping, None],
     repository_file: RepositoryFile,
     errors: MutableSet,
 ) -> None:
@@ -151,7 +151,7 @@ def recursive_validate_package_entries(
 def generate_contents_of_new_release_matrix(
     base_release_matrix_content: Mapping,
     repofile: RepositoryFile,
-    upgrade: dict | None,
+    upgrade: Optional[Dict],
 ) -> str:
     if upgrade:
         validate_upgrades(upgrade, repofile)
@@ -207,7 +207,7 @@ def create_pr_with_changes(
     tmp_target: str,
     tmp_ref: GitRef,
     pr_msg: str,
-    rhel8: bool | None = False,
+    rhel8: Optional[bool] = False,
 ):
     commit_title = (
         f"Add release {target} (+rhel8)" if rhel8 else f"Add release {target}"
@@ -258,7 +258,7 @@ def insert_proposals(
     git_ref: str,
     jobname: str,
     joburl: str,
-    rhel8: bool | None = False,
+    rhel8: Optional[bool] = False,
 ) -> None:
     tmp_target = target + ".tmp"
 
@@ -274,7 +274,7 @@ def insert_proposals(
     base_file = f"releases/matrices/{base}.yml"
     release_file_yaml_string = load_yaml_from_repo(base_file, repo, git_ref)
     release_matrix_file = ReleaseMatrixFile.from_yaml_string(release_file_yaml_string)
-    upgrade: dict[str, str] = proposal_file.content.get(upgrade_key)
+    upgrade: Dict[str, str] = proposal_file.content.get(upgrade_key)
 
     repofile_yaml_string = load_yaml_from_repo("repository.yml", repo, git_ref)
     repofile = RepositoryFile().from_yaml_string(repofile_yaml_string)

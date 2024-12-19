@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+from typing import Dict
 
 import yaml
 
@@ -15,7 +16,7 @@ def check_for_unused_package(
     release_file: ReleaseFile,
     package_status_file: str,
     repository: RepositoryFile,
-    builtin_python_versions: dict[str, str],
+    builtin_python_versions: Dict[str, str],
 ):
     package_status = load_yaml(package_status_file)
     public_and_plugin_packages = [

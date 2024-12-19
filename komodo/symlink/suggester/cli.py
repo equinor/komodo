@@ -5,6 +5,7 @@ import os
 import sys
 from base64 import b64decode
 from datetime import datetime
+from typing import Optional
 
 from github import Github
 from github.GithubException import UnknownObjectException
@@ -60,7 +61,7 @@ def _parse_args():
     return parser.parse_args()
 
 
-def _get_repo(token: str | None, fork: str, repo: str) -> Repository:
+def _get_repo(token: Optional[str], fork: str, repo: str) -> Repository:
     client = Github(token)
     try:
         return client.get_repo(f"{fork}/{repo}")
@@ -73,7 +74,7 @@ def suggest_symlink_configuration(
     args: argparse.Namespace,
     repo: Repository,
     dry_run: bool = False,
-) -> Repository | None:
+) -> Optional[Repository]:
     """Returns a pull request if the symlink configuration could be updated,
     or None if no update was possible.
     """

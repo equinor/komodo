@@ -1,8 +1,9 @@
 numpy:
+  py38: 1.23.5
+  py39: 1.23.5
   py310: 1.23.5
   py311: 1.23.5
   py312: 1.26.4
-  py313: 2.2.0
 python: 3-builtin
-setuptools: 75.6.0
-wheel: 0.45.1
+setuptools: 69.0.3
+wheel: 0.42.0

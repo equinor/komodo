@@ -2,7 +2,7 @@
 
 import argparse
 import os
-from collections.abc import Sequence
+from typing import Dict, Sequence, Union
 
 import yaml
 
@@ -56,7 +56,7 @@ def _pick_package_versions_for_release(
 
 
 def _check_version_exists_for_coordinates(
-    pkg_versions: dict | str,
+    pkg_versions: Union[dict, str],
     rhel_coordinate: str,
     py_coordinate: str,
 ) -> None:
@@ -164,7 +164,7 @@ def transpile(args):
     transpile_releases(args.matrix_file, args.output_folder, args.matrix_coordinates)
 
 
-def transpile_for_pip(args: dict):
+def transpile_for_pip(args: Dict):
     transpile_releases_for_pip(
         args.matrix_file,
         args.output_folder,

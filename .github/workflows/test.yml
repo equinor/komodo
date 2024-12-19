@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.8', '3.10', '3.11', '3.12']
 
     runs-on: ubuntu-latest
 
@@ -32,7 +32,7 @@ jobs:
 
     - name: Setup Komodo
       run: |
-        pip install -U pip
+        pip install -U pip wheel setuptools
         pip install ".[dev]"
 
     - name: Unit tests
@@ -48,13 +48,13 @@ jobs:
       run: |
         komodo-transpiler transpile \
             --matrix-file="ci/${{env.RELEASE_NAME}}.yml" \
-            --output ci --matrix-coordinates "{rhel: ['8'], py: ['${{matrix.python-version}}']}"
+            --output ci --matrix-coordinates "{rhel: ['7'], py: ['${{matrix.python-version}}']}"
             
     - name: Full integration test
       run: |
         py_version_number=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
         kmd \
-            ci/${{env.RELEASE_NAME}}-py$py_version_number-rhel8.yml \
+            ci/${{env.RELEASE_NAME}}-py$py_version_number-rhel7.yml \
             ci/${{env.REPOSITORY}} \
             --workspace ${{ runner.temp }}/kmd-ws \
             --prefix ${{ runner.temp }}/prefix \
