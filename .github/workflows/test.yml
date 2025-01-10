@@ -6,6 +6,7 @@ jobs:
   build:
     env:
       RELEASE_NAME: release-matrix
+      RELEASE_FULL_NAME: release-matrix.yml
       REPOSITORY: repository.yml
 
     strategy:
@@ -42,19 +43,19 @@ jobs:
 
     - name: Lint examples
       run: |
-        komodo-lint examples/stable.yml examples/repository.yml
+        komodo-lint examples/stable.yml examples/${{env.REPOSITORY}}
 
     - name: Transpile file
       run: |
         komodo-transpiler transpile \
-            --matrix-file="ci/${{env.RELEASE_NAME}}.yml" \
+            --matrix-file=ci/"${{ env.RELEASE_FULL_NAME }}" \
             --output ci --matrix-coordinates "{rhel: ['7'], py: ['${{matrix.python-version}}']}"
-            
+
     - name: Full integration test
       run: |
         py_version_number=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
         kmd \
-            ci/${{env.RELEASE_NAME}}-py$py_version_number-rhel7.yml \
+            ci/${{ env.RELEASE_NAME }}-py$py_version_number-rhel7.yml \
             ci/${{env.REPOSITORY}} \
             --workspace ${{ runner.temp }}/kmd-ws \
             --prefix ${{ runner.temp }}/prefix \

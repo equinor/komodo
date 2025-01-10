@@ -2,7 +2,8 @@
 
 import argparse
 import os
-from typing import Dict, Sequence, Union
+import re
+from typing import Dict, Optional, Sequence, Union
 
 import yaml
 
@@ -10,27 +11,11 @@ from komodo.matrix import format_release, get_matrix
 from komodo.prettier import load_yaml, write_to_file
 
 
-def get_py_coords(release_base: str, release_folder: str) -> Sequence[str]:
-    """Get python versions of release files inside a given release_folder."""
-    filenames_with_prefix = sorted(
-        [
-            filename
-            for filename in os.listdir(release_folder)
-            if filename.startswith(release_base)
-        ],
-    )
-    len_release_base = len(release_base + "-")
-    irrelevant_suffix_length = len(".yml")
-    return [
-        filename[len_release_base:-irrelevant_suffix_length]
-        for filename in filenames_with_prefix
-    ]
-
-
 def _pick_package_versions_for_release(
     packages: dict,
     rhel_ver: str,
     py_ver: str,
+    other_ver: Optional[str] = None,
 ) -> dict:
     """Consolidate the packages for a given combination of rhel and python version
     into a dictionary.
@@ -39,7 +24,7 @@ def _pick_package_versions_for_release(
     for pkg_name, versions in packages.items():
         version = None
         try:
-            _check_version_exists_for_coordinates(versions, rhel_ver, py_ver)
+            _check_version_exists_for_coordinates(versions, rhel_ver, py_ver, other_ver)
         except KeyError as err:
             error_msg = f"{err!s}. Failed for {pkg_name}."
             raise KeyError(error_msg) from None
@@ -48,6 +33,12 @@ def _pick_package_versions_for_release(
                 version = versions[rhel_ver][py_ver]
             elif py_ver in versions:
                 version = versions[py_ver]
+
+            if other_ver:
+                if other_ver in versions:
+                    version = versions[other_ver]
+                elif other_ver and other_ver in version:
+                    version = version[other_ver]
         else:
             version = versions
         if version:
@@ -59,6 +50,7 @@ def _check_version_exists_for_coordinates(
     pkg_versions: Union[dict, str],
     rhel_coordinate: str,
     py_coordinate: str,
+    other_coordinate: Optional[str],
 ) -> None:
     """Check the coordinates `rhel_ver` and `py_ver` input as arguments to
     build a release against the release matrix file. Raise exceptions if
@@ -79,27 +71,58 @@ def _check_version_exists_for_coordinates(
         }
         or:
         {1.1.1}.
-
+        or:
+        {
+            py36: 1.1.1, # first level
+                numpy1: 1.2.6
+                numpy2: 2.2.1
+            py38: 2.1.1,
+                numpy1: 1.2.6
+                numpy2: 2.2.1
+        }
+        or:
+        {
+            numpy2: 2.2.1
+            numpy1: 1.2.6
+        }
     """
     if isinstance(pkg_versions, str):
         return None
     first_level_versions = list(pkg_versions)
-    if "rhel" in first_level_versions[0]:
-        # Both rhel and python versions can have different versions
-        if rhel_coordinate not in first_level_versions:
-            msg = f"Rhel version {rhel_coordinate} not found."
-            raise KeyError(msg)
-        second_level_versions = list(pkg_versions[rhel_coordinate])
-        if py_coordinate not in second_level_versions:
-            msg = f"Python version {py_coordinate} not found for rhel version {rhel_coordinate}."
+
+    def verify_coordinate_in_list(
+        coordinate: str, all_coordinates: Sequence[str], seq: Sequence[str]
+    ) -> None:
+        if not coordinate in seq:
             raise KeyError(
-                msg,
+                f"Matrix coordinate {coordinate}, part of {all_coordinates}, not found in {seq}"
             )
-    elif "py" in first_level_versions[0]:
-        if py_coordinate not in first_level_versions:
-            # Only python has different versions
-            msg = f"Python version {py_coordinate} not found."
-            raise KeyError(msg)
+
+    all_coords = [rhel_coordinate, py_coordinate, other_coordinate]
+
+    if "rhel" in first_level_versions[0]:
+        verify_coordinate_in_list(rhel_coordinate, all_coords, first_level_versions)
+        second_level_versions = list(pkg_versions[rhel_coordinate])
+        verify_coordinate_in_list(py_coordinate, all_coords, second_level_versions)
+
+        if other_coordinate:
+            third_level_versions = list(pkg_versions[rhel_coordinate][py_coordinate])
+            verify_coordinate_in_list(
+                other_coordinate, all_coords, third_level_versions
+            )
+
+    elif re.match(r"py\d{2,3}", first_level_versions[0]):
+        verify_coordinate_in_list(py_coordinate, all_coords, first_level_versions)
+
+        if other_coordinate:
+            second_level_versions = list(pkg_versions[py_coordinate])
+            verify_coordinate_in_list(
+                other_coordinate, all_coords, second_level_versions
+            )
+
+    elif other_coordinate:
+        verify_coordinate_in_list(other_coordinate, all_coords, first_level_versions)
+
     else:
         msg = """Invalid package versioning structure."""
         raise KeyError(msg)
@@ -112,19 +135,35 @@ def transpile_releases(matrix_file: str, output_folder: str, matrix: dict) -> No
     Write one dimension file for each element in the matrix
     (e.g. rhel7 and py3.8, rhel6 and py3.6).
     """
-    rhel_versions = matrix["rhel"]
-    python_versions = matrix["py"]
+    if not isinstance(matrix, dict):
+        raise TypeError("Matrix coordinates must be a dictionary")
+
+    rhel_versions = matrix.get("rhel", "8")
+    python_versions = matrix.get("py", "311")
+    other_versions = None
+
+    for k, v in matrix.items():  # find first item not rhel or py
+        if k not in ["rhel", "py"]:
+            other_versions = {k: v}
+            break
 
     release_base = os.path.splitext(os.path.basename(matrix_file))[0]
     release_folder = os.path.dirname(matrix_file)
     release_matrix = load_yaml(f"{os.path.join(release_folder, release_base)}.yml")
-    for rhel_ver, py_ver in get_matrix(rhel_versions, python_versions):
+
+    for rhel_ver, py_ver, other_ver in get_matrix(
+        rhel_versions, python_versions, other_versions
+    ):
         release_dict = _pick_package_versions_for_release(
             release_matrix,
             rhel_ver,
             py_ver,
+            other_ver,
         )
-        filename = f"{format_release(release_base, rhel_ver, py_ver)}.yml"
+        filename = f"{format_release(release_base, rhel_ver, py_ver)}"
+        if other_versions:
+            filename = filename + f"-{other_ver}"
+        filename = filename + ".yml"
         write_to_file(release_dict, os.path.join(output_folder, filename))
 
 
@@ -134,24 +173,37 @@ def transpile_releases_for_pip(
     repository_file: str,
     matrix: dict,
 ) -> None:
-    rhel_versions = matrix["rhel"]
-    python_versions = matrix["py"]
+    if not isinstance(matrix, dict):
+        raise TypeError("Matrix coordinates must be a dictionary")
+
+    rhel_versions = matrix.get("rhel", "8")
+    python_versions = matrix.get("py", "311")
+    other_versions = None
+
+    for k, v in matrix.items():  # find first item not rhel or py
+        if k not in ["rhel", "py"]:
+            other_versions = {k: v}
+            break
+
     release_base = os.path.splitext(os.path.basename(matrix_file))[0]
     release_folder = os.path.dirname(matrix_file)
     release_matrix = load_yaml(f"{os.path.join(release_folder, release_base)}.yml")
     repository = load_yaml(repository_file)
-    for rhel_ver, py_ver in get_matrix(rhel_versions, python_versions):
+    for rhel_ver, py_ver, other_ver in get_matrix(
+        rhel_versions, python_versions, other_versions
+    ):
         release_dict = _pick_package_versions_for_release(
             release_matrix,
             rhel_ver,
             py_ver,
+            other_ver,
         )
         pip_packages = [
             f"{pkg}=={version}"
             for pkg, version in release_dict.items()
             if repository[pkg][version].get("make") == "pip"
         ]
-        filename = f"{format_release(release_base, rhel_ver, py_ver)}.req"
+        filename = f"{format_release(release_base, rhel_ver, py_ver, other_ver)}.req"
         with open(
             os.path.join(output_folder, filename),
             mode="w",

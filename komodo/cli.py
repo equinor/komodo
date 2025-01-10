@@ -232,7 +232,7 @@ def rsync_komodo_to_destination(release_name: str, destination: str) -> None:
 
 def move_old_release_from_release_path_if_exists(release_path: Path) -> None:
     if release_path.exists():
-        shell(f"mv {str(release_path)} " f"{str(release_path)}.delete-{uuid.uuid4()}")
+        shell(f"mv {str(release_path)} {str(release_path)}.delete-{uuid.uuid4()}")
 
 
 def move_new_release_to_release_path(args: KomodoNamespace, release_path: Path) -> None:

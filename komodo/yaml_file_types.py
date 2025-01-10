@@ -368,9 +368,9 @@ class UpgradeProposalsFile(YamlFile):
         return self
 
     def validate_upgrade_key(self, upgrade_key: str) -> None:
-        assert (
-            upgrade_key in self.content
-        ), f"No section for this release ({upgrade_key}) in upgrade_proposals.yml"
+        assert upgrade_key in self.content, (
+            f"No section for this release ({upgrade_key}) in upgrade_proposals.yml"
+        )
 
     @staticmethod
     def validate_upgrade_proposals_file(upgrade_proposals_file_content: dict) -> None:
