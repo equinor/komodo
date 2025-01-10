@@ -182,9 +182,7 @@ def run_check_up_to_date(
     release_file,
     repository_file,
     python_version=(
-        f"{sys.version_info.major}."
-        f"{sys.version_info.minor}."
-        f"{sys.version_info.micro}"
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     ),
     propose_upgrade=False,
     ignore=None,

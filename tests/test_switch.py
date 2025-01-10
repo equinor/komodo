@@ -19,10 +19,10 @@ def test_write_activator_switches(tmpdir):
         == f"""
 if [[ $(uname -r) == *el7* ]] ; then
     # Get the full path of the sourced script
-    { bash_source_script_path }
+    {bash_source_script_path}
     if [[ $script_path == *deprecated-rhel7* ]] ; then
-        export KOMODO_ROOT={ prefix }
-        KOMODO_RELEASE_REAL={ expected_release }
+        export KOMODO_ROOT={prefix}
+        KOMODO_RELEASE_REAL={expected_release}
 
         source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
         export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
