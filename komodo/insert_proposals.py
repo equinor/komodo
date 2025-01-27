@@ -94,7 +94,7 @@ def main():
         args.git_ref,
         args.jobname,
         args.joburl,
-        args.rhel8,
+        args.rhel9,
     )
 
 
@@ -207,10 +207,10 @@ def create_pr_with_changes(
     tmp_target: str,
     tmp_ref: GitRef,
     pr_msg: str,
-    rhel8: Optional[bool] = False,
+    rhel9: Optional[bool] = False,
 ):
     commit_title = (
-        f"Add release {target} (+rhel8)" if rhel8 else f"Add release {target}"
+        f"Add release {target} (+rhel9)" if rhel9 else f"Add release {target}"
     )
     repo.create_git_ref(ref="refs/heads/" + target, sha=from_sha)
     # making a temporary PR in order to squash the commits into one
@@ -258,7 +258,7 @@ def insert_proposals(
     git_ref: str,
     jobname: str,
     joburl: str,
-    rhel8: Optional[bool] = False,
+    rhel9: Optional[bool] = False,
 ) -> None:
     tmp_target = target + ".tmp"
 
@@ -309,7 +309,7 @@ def insert_proposals(
         joburl=joburl,
     )
     create_pr_with_changes(
-        repo, git_ref, target, from_sha, tmp_target, tmp_ref, pr_msg, rhel8
+        repo, git_ref, target, from_sha, tmp_target, tmp_ref, pr_msg, rhel9
     )
 
 
@@ -325,7 +325,7 @@ class InsertProposalsNamespace(argparse.Namespace):
     git_fork: str
     git_repo: str
     git_ref: str
-    rhel8: bool
+    rhel9: bool
 
 
 def parse_args() -> InsertProposalsNamespace:
@@ -352,9 +352,9 @@ def parse_args() -> InsertProposalsNamespace:
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
     parser.add_argument(
-        "--rhel8",
+        "--rhel9",
         action="store_true",
-        help="Flag to indicate if one should add release for RHEL8.",
+        help="Flag to indicate if one should add release for RHEL9.",
         default=False,
     )
     return parser.parse_args(namespace=InsertProposalsNamespace())
