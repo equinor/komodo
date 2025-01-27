@@ -188,7 +188,6 @@ class PypiDependencies:
                             "--no-verify",
                             "--no-deps",
                             "--disable-pip-version-check",
-                            "--no-python-version-warning",
                             file,
                         ],
                         cwd=tmpdir,
