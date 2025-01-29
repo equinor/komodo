@@ -5,6 +5,7 @@ import pytest
 import yaml
 
 from komodo.release_transpiler import (
+    detect_custom_coordinates,
     transpile_releases,
     transpile_releases_for_pip,
 )
@@ -81,6 +82,15 @@ def test_transpile_custom_coordinate_releases(tmpdir, matrix, expectation):
                             assert p in content
                         for k in keywords:
                             assert k not in content
+
+
+def test_automatic_custom_coordinate_detection():
+    release_file = os.path.join(
+        _get_test_root(), "input", "test_custom_coordinate_release.yml"
+    )
+
+    coords = detect_custom_coordinates(release_file)
+    assert coords == {"numpy": ["1", "2"]}
 
 
 @pytest.mark.parametrize(
