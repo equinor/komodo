@@ -3,7 +3,7 @@
 import argparse
 import os
 import re
-from typing import Dict, Optional, Sequence, Union
+from typing import Dict, List, Optional, Sequence, Union
 
 import yaml
 
@@ -212,11 +212,51 @@ def transpile_releases_for_pip(
             filehandler.write("\n".join(pip_packages))
 
 
+def detect_custom_coordinates(matrix_file: str) -> Dict[str, List[str]]:
+    release_base = os.path.splitext(os.path.basename(matrix_file))[0]
+    release_folder = os.path.dirname(matrix_file)
+    release_matrix = load_yaml(f"{os.path.join(release_folder, release_base)}.yml")
+
+    def traverse_for_custom_coordinates(coords: Dict[str, List[str]]):
+        def split_text_and_number(s):
+            parts = re.findall(r"(\D+)(\d+)", s)
+            return parts[0] if parts else (s, "")
+
+        detected_coordinates = {}
+
+        for val in coords.values():
+            if isinstance(val, dict):
+                for k, v in val.items():
+                    if not re.search(r"rhel", k) and not re.match(r"^py", k):
+                        package, version = split_text_and_number(k)
+
+                        if (
+                            package in detected_coordinates
+                            and version not in detected_coordinates[package]
+                        ):
+                            detected_coordinates[package].append(version)
+                        else:
+                            detected_coordinates = {package: [version]}
+
+                    if isinstance(v, dict):
+                        detected_coordinates.update(traverse_for_custom_coordinates(v))
+
+        return detected_coordinates
+
+    return traverse_for_custom_coordinates(release_matrix)
+
+
 def transpile(args):
+    if args.auto_custom_coordinates:
+        args.matrix_coordinates.update(detect_custom_coordinates(args.matrix_file))
+
     transpile_releases(args.matrix_file, args.output_folder, args.matrix_coordinates)
 
 
 def transpile_for_pip(args: Dict):
+    if args.auto_custom_coordinates:
+        args.matrix_coordinates.update(detect_custom_coordinates(args.matrix_file))
+
     transpile_releases_for_pip(
         args.matrix_file,
         args.output_folder,
@@ -264,6 +304,13 @@ def main():
         required=False,
         default="{rhel: ['8'], py: ['3.11']}",
     )
+    transpile_parser.add_argument(
+        "--auto-custom-coordinates",
+        help="Deduce custom coordinates from yaml input file",
+        action="store_true",
+        required=False,
+    )
+
     transpile_for_pip_parser = subparsers.add_parser(
         "transpile-for-pip",
         description="transpile a matrix file into separate pip requirement files.",
@@ -290,6 +337,12 @@ def main():
         type=yaml.safe_load,
         required=False,
         default="{rhel: ['8'], py: ['3.11']}",
+    )
+    transpile_for_pip_parser.add_argument(
+        "--auto-custom-coordinates",
+        help="Deduce custom coordinates from yaml input file",
+        action="store_true",
+        required=False,
     )
     args = parser.parse_args()
     args.func(args)
