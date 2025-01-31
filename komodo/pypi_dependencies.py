@@ -4,6 +4,7 @@ import os
 import platform
 import subprocess
 import sys
+from collections.abc import Iterable
 from tempfile import TemporaryDirectory
 
 import pkginfo
@@ -105,7 +106,9 @@ class PypiDependencies:
         self._update_package_sets(packages)
         return self._failed_requirements
 
-    def used_packages(self, packages=None):
+    def used_packages(
+        self, packages: Iterable[tuple[str, str]] | None = None
+    ) -> set[str]:
         self._update_package_sets(packages)
         return self._used_packages
 
