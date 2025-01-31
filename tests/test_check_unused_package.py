@@ -84,10 +84,8 @@ def test_check_unused_package(repo, release, package_status, capsys, tmpdir):
     package_status["python"] = {"visibility": "public"}
     release["python"] = "3.8-builtin"
 
-    # Use tmpdir to create a temporary file for package status
     package_status_file = tmpdir.join("package_status.yml")
 
-    # Write package_status data to the temporary file
     with open(str(package_status_file), "w", encoding="utf-8") as file:
         yaml.safe_dump(package_status, file)
     repo = RepositoryFile().from_yaml_string(value=yaml.safe_dump(repo))
