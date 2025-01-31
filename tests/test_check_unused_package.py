@@ -80,19 +80,17 @@ test_case = [
 
 
 @pytest.mark.parametrize("repo, release, package_status", test_case)
-def test_check_unused_package(repo, release, package_status, capsys):
+def test_check_unused_package(repo, release, package_status):
     package_status["python"] = {"visibility": "public"}
     release["python"] = "3.8-builtin"
 
     repo = RepositoryFile().from_yaml_string(value=yaml.safe_dump(repo))
     release = ReleaseFile().from_yaml_string(value=yaml.safe_dump(release))
-    with pytest.raises(SystemExit) as sys_exit_info:
-        check_for_unused_package(
-            release_file=release,
-            package_status=package_status,
-            repository=repo,
-            builtin_python_versions={"3.8-builtin": "3.8.6"},
-        )
-    assert sys_exit_info.value.code == 1
-    captured = capsys.readouterr()
-    assert "The following 1" in captured.out and "package_f" in captured.out
+    result = check_for_unused_package(
+        release_file=release,
+        package_status=package_status,
+        repository=repo,
+        builtin_python_versions={"3.8-builtin": "3.8.6"},
+    )
+    assert result.exitcode == 1
+    assert "The following 1" in result.message and "package_f" in result.message
