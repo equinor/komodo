@@ -161,3 +161,76 @@ def test_public_packages_are_used(public_type):
         ).exitcode
         == 0
     )
+
+
+def test_dependencies_of_public_packages_are_used():
+    assert (
+        has_unused_packages(
+            {
+                "public_package": {
+                    "1.0": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["private_package"],
+                    }
+                },
+                "private_package": {
+                    "0.1": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                    }
+                },
+            },
+            {"public_package": "1.0", "private_package": "0.1"},
+            {
+                "public_package": {"visibility": "public"},
+                "private_package": {"visibility": "private"},
+            },
+        ).exitcode
+        == 0
+    )
+
+
+def test_transient_dependencies_of_public_packages_are_used():
+    assert (
+        has_unused_packages(
+            {
+                "public_package": {
+                    "1.0": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["private_package"],
+                    }
+                },
+                "private_package": {
+                    "0.1": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["transient_package"],
+                    }
+                },
+                "transient_package": {
+                    "2.0": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                    }
+                },
+            },
+            {
+                "public_package": "1.0",
+                "private_package": "0.1",
+                "transient_package": "2.0",
+            },
+            {
+                "public_package": {"visibility": "public"},
+                "private_package": {"visibility": "private"},
+                "transient_package": {"visibility": "private"},
+            },
+        ).exitcode
+        == 0
+    )
