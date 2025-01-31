@@ -4,6 +4,7 @@ import os
 import sys
 
 import yaml
+from typing import Any
 
 from komodo.prettier import load_yaml
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
@@ -13,11 +14,10 @@ from .pypi_dependencies import PypiDependencies
 
 def check_for_unused_package(
     release_file: ReleaseFile,
-    package_status_file: str,
+    package_status: dict[str, Any],
     repository: RepositoryFile,
     builtin_python_versions: dict[str, str],
 ):
-    package_status = load_yaml(package_status_file)
     public_and_plugin_packages = [
         (pkg, version)
         for pkg, version in release_file.content.items()
@@ -77,8 +77,9 @@ def main():
     args = parser.parse_args()
     with open("builtin_python_versions.yml", encoding="utf-8") as f:
         builtin_python_versions = yaml.safe_load(f)
+    package_status = load_yaml(package_status_file)
     check_for_unused_package(
-        args.release_file, args.status_file, args.repo, builtin_python_versions
+        args.release_file, package_status, args.repo, builtin_python_versions
     )
 
 
