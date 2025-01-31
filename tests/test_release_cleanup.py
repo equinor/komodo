@@ -164,7 +164,7 @@ def test_return_values_of_prettier(tmpdir):
         assert exit_info.value.code == 0
 
 
-def test_cleanup_argparse(tmpdir):
+def test_cleanup_argparse_raises_on_non_existing_repository():
     with pytest.raises(SystemExit):
         main(
             [
@@ -176,6 +176,8 @@ def test_cleanup_argparse(tmpdir):
             ],
         )
 
+
+def test_cleanup_argparse_raises_on_non_existing_releases():
     with pytest.raises(SystemExit):
         main(
             [
@@ -188,6 +190,8 @@ def test_cleanup_argparse(tmpdir):
             ],
         )
 
+
+def test_cleanup_succeeds_on_valid_setup():
     main(
         [
             "cleanup",
@@ -201,6 +205,8 @@ def test_cleanup_argparse(tmpdir):
         ],
     )
 
+
+def test_cleanup_argparse_raises_on_invalid_commandline_options():
     with pytest.raises(SystemExit):
         main(
             [
@@ -216,6 +222,8 @@ def test_cleanup_argparse(tmpdir):
             ],
         )
 
+
+def test_cleanup_can_output_to_file(tmpdir):
     with tmpdir.as_cwd():
         main(
             [
