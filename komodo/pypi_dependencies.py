@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import os
 import platform
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
-from typing import Dict, List, Set, Tuple
 
 import pkginfo
 import yaml
@@ -40,8 +41,8 @@ environment = {
 class PypiDependencies:
     def __init__(
         self,
-        pypi_dependencies: Dict[str, str],
-        to_install: Dict[str, str],
+        pypi_dependencies: dict[str, str],
+        to_install: dict[str, str],
         python_version: str,
         cachefile: str = "./pypi_dependencies.yml",
     ) -> None:
@@ -49,7 +50,7 @@ class PypiDependencies:
         environment["python_full_version"] = python_version
         environment["python_version"] = ".".join(python_version.split(".")[0:2])
         self._satisfied_requirements = set()
-        self._failed_requirements: Dict[Requirement, str] = {}
+        self._failed_requirements: dict[Requirement, str] = {}
         self._used_packages = set()
 
         self._install_names = {canonicalize_name(name): name for name in to_install}
@@ -111,7 +112,7 @@ class PypiDependencies:
     def add_user_specified(
         self,
         package_name: str,
-        depends: List[str],
+        depends: list[str],
     ) -> None:
         canonical = canonicalize_name(package_name)
         # It is necessary to set the version to the installed
@@ -135,7 +136,7 @@ class PypiDependencies:
 
     def _get_requirements(
         self, package_name: str, package_version: str
-    ) -> List[Requirement]:
+    ) -> list[Requirement]:
         """
         >>> from packaging.requirements import Requirement
         >>> PypiDependencies({}, {}, python_version="3.8.11")._get_requirements(
@@ -218,8 +219,8 @@ class PypiDependencies:
 
     def _satisfied(
         self,
-        requirements: List[Requirement],
-    ) -> Tuple[bool, List[Tuple[List[Requirement], Set[str]]]]:
+        requirements: list[Requirement],
+    ) -> tuple[bool, list[tuple[list[Requirement], set[str]]]]:
         installed = self._to_install
         transient_requirements = []
         for requirement in requirements:
