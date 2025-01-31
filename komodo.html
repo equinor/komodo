@@ -379,6 +379,12 @@
 
 </dd></dl>
 
+<dl class="py exception">
+<dt class="sig sig-object py" id="komodo.check_unused_package.NoSuchPackageStatus">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">NoSuchPackageStatus</span></span><a class="headerlink" href="#komodo.check_unused_package.NoSuchPackageStatus" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.check_unused_package.check_for_unused_package">
 <span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">check_for_unused_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile" title="komodo.yaml_file_types.ReleaseFile"><span class="pre">ReleaseFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile" title="komodo.yaml_file_types.RepositoryFile"><span class="pre">RepositoryFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtin_python_versions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#komodo.check_unused_package.CheckResult" title="komodo.check_unused_package.CheckResult"><span class="pre">CheckResult</span></a></span></span><a class="headerlink" href="#komodo.check_unused_package.check_for_unused_package" title="Link to this definition">¶</a></dt>
@@ -2081,6 +2087,7 @@ and returns a list of error messages.</p>
 <li><a class="reference internal" href="#komodo.check_unused_package.CheckResult.message"><code class="docutils literal notranslate"><span class="pre">CheckResult.message</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#komodo.check_unused_package.NoSuchPackageStatus"><code class="docutils literal notranslate"><span class="pre">NoSuchPackageStatus</span></code></a></li>
 <li><a class="reference internal" href="#komodo.check_unused_package.check_for_unused_package"><code class="docutils literal notranslate"><span class="pre">check_for_unused_package()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.check_unused_package.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
