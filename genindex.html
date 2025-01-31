@@ -312,6 +312,8 @@
 </li>
         <li><a href="komodo.html#komodo.release_cleanup.check_missing_versions">check_missing_versions() (in module komodo.release_cleanup)</a>
 </li>
+        <li><a href="komodo.html#komodo.check_unused_package.CheckResult">CheckResult (class in komodo.check_unused_package)</a>
+</li>
         <li><a href="komodo.html#komodo.insert_proposals.clean_proposals_file">clean_proposals_file() (in module komodo.insert_proposals)</a>
 </li>
         <li><a href="komodo.html#komodo.cleanup.cleanup">cleanup() (in module komodo.cleanup)</a>
@@ -326,10 +328,10 @@
 </li>
         <li><a href="komodo.html#komodo.check_up_to_date_pypi.compatible_versions">compatible_versions() (in module komodo.check_up_to_date_pypi)</a>
 </li>
-        <li><a href="komodo.html#komodo.cli.compile_python_bytecode_files">compile_python_bytecode_files() (in module komodo.cli)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.cli.compile_python_bytecode_files">compile_python_bytecode_files() (in module komodo.cli)</a>
+</li>
         <li><a href="komodo.html#komodo.cli.compile_python_bytecode_files_and_fix_permissions">compile_python_bytecode_files_and_fix_permissions() (in module komodo.cli)</a>
 </li>
         <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.configuration.Configuration">Configuration (class in komodo.symlink.suggester.configuration)</a>
@@ -408,14 +410,16 @@
 </li>
         <li><a href="komodo.symlink.html#komodo.symlink.sanity_check.equal_links">equal_links() (in module komodo.symlink.sanity_check)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.lint.KomodoError.err">err (komodo.lint.KomodoError attribute)</a>
 
         <ul>
           <li><a href="komodo.html#komodo.yaml_file_types.KomodoError.err">(komodo.yaml_file_types.KomodoError attribute)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.check_unused_package.CheckResult.exitcode">exitcode (komodo.check_unused_package.CheckResult attribute)</a>
+</li>
         <li><a href="komodo.html#komodo.cli.KomodoNamespace.extra_data_dirs">extra_data_dirs (komodo.cli.KomodoNamespace attribute)</a>
 </li>
     </ul></td>
@@ -442,24 +446,34 @@
 </li>
         <li><a href="komodo.html#komodo.shebang.fixup_python_shebangs">fixup_python_shebangs() (in module komodo.shebang)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="komodo.html#komodo.pypi_dependencies.format_full_version">format_full_version() (in module komodo.pypi_dependencies)</a>
 </li>
         <li><a href="komodo.html#komodo.matrix.format_release">format_release() (in module komodo.matrix)</a>
 </li>
-        <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.configuration.Configuration.from_json">from_json() (komodo.symlink.suggester.configuration.Configuration static method)</a>
-</li>
-        <li><a href="komodo.html#komodo.yaml_file_types.PackageStatusFile.from_yaml_string">from_yaml_string() (komodo.yaml_file_types.PackageStatusFile method)</a>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="komodo.html#komodo.yaml_file_types.PackageStatusFile.from_dictionary">from_dictionary() (komodo.yaml_file_types.PackageStatusFile class method)</a>
 
         <ul>
-          <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.from_yaml_string">(komodo.yaml_file_types.ReleaseFile method)</a>
+          <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.from_dictionary">(komodo.yaml_file_types.ReleaseFile class method)</a>
+</li>
+          <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.from_dictionary">(komodo.yaml_file_types.RepositoryFile class method)</a>
+</li>
+          <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile.from_dictionary">(komodo.yaml_file_types.UpgradeProposalsFile class method)</a>
+</li>
+        </ul></li>
+        <li><a href="komodo.symlink.suggester.html#komodo.symlink.suggester.configuration.Configuration.from_json">from_json() (komodo.symlink.suggester.configuration.Configuration static method)</a>
+</li>
+        <li><a href="komodo.html#komodo.yaml_file_types.PackageStatusFile.from_yaml_string">from_yaml_string() (komodo.yaml_file_types.PackageStatusFile class method)</a>
+
+        <ul>
+          <li><a href="komodo.html#komodo.yaml_file_types.ReleaseFile.from_yaml_string">(komodo.yaml_file_types.ReleaseFile class method)</a>
 </li>
           <li><a href="komodo.html#komodo.yaml_file_types.ReleaseMatrixFile.from_yaml_string">(komodo.yaml_file_types.ReleaseMatrixFile class method)</a>
 </li>
-          <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.from_yaml_string">(komodo.yaml_file_types.RepositoryFile method)</a>
+          <li><a href="komodo.html#komodo.yaml_file_types.RepositoryFile.from_yaml_string">(komodo.yaml_file_types.RepositoryFile class method)</a>
 </li>
-          <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string">(komodo.yaml_file_types.UpgradeProposalsFile method)</a>
+          <li><a href="komodo.html#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string">(komodo.yaml_file_types.UpgradeProposalsFile class method)</a>
 </li>
         </ul></li>
     </ul></td>
@@ -955,6 +969,8 @@
         <li><a href="komodo.html#komodo.build.make">make() (in module komodo.build)</a>
 </li>
         <li><a href="komodo.html#komodo.yaml_file_types.ManifestFile">ManifestFile (class in komodo.yaml_file_types)</a>
+</li>
+        <li><a href="komodo.html#komodo.check_unused_package.CheckResult.message">message (komodo.check_unused_package.CheckResult attribute)</a>
 </li>
         <li>
     module

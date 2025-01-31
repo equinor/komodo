@@ -363,9 +363,25 @@
 </section>
 <section id="module-komodo.check_unused_package">
 <span id="komodo-check-unused-package-module"></span><h2>komodo.check_unused_package module<a class="headerlink" href="#module-komodo.check_unused_package" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="komodo.check_unused_package.CheckResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">CheckResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exitcode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.check_unused_package.CheckResult" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.check_unused_package.CheckResult.exitcode">
+<span class="sig-name descname"><span class="pre">exitcode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#komodo.check_unused_package.CheckResult.exitcode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="komodo.check_unused_package.CheckResult.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#komodo.check_unused_package.CheckResult.message" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="komodo.check_unused_package.check_for_unused_package">
-<span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">check_for_unused_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile" title="komodo.yaml_file_types.ReleaseFile"><span class="pre">ReleaseFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_status_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile" title="komodo.yaml_file_types.RepositoryFile"><span class="pre">RepositoryFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtin_python_versions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.check_unused_package.check_for_unused_package" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">check_for_unused_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile" title="komodo.yaml_file_types.ReleaseFile"><span class="pre">ReleaseFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile" title="komodo.yaml_file_types.RepositoryFile"><span class="pre">RepositoryFile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">builtin_python_versions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#komodo.check_unused_package.CheckResult" title="komodo.check_unused_package.CheckResult"><span class="pre">CheckResult</span></a></span></span><a class="headerlink" href="#komodo.check_unused_package.check_for_unused_package" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1820,8 +1836,13 @@ argument is expected to be a komodo.data.Data instance.</p>
 <dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
 <p>Return the data from ‘package_status’ YAML, but validate it first.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.PackageStatusFile.from_dictionary">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.PackageStatusFile.from_dictionary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.PackageStatusFile.from_yaml_string">
-<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.PackageStatusFile.from_yaml_string" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.PackageStatusFile.from_yaml_string" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1843,8 +1864,13 @@ argument is expected to be a komodo.data.Data instance.</p>
 <dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
 <p>Return the data from ‘release’ YAML file, but validate it first.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile.from_dictionary">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.from_dictionary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.ReleaseFile.from_yaml_string">
-<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.from_yaml_string" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.ReleaseFile.from_yaml_string" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1883,8 +1909,13 @@ argument is expected to be a komodo.data.Data instance.</p>
 <dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
 <p>Return the data from ‘repository’ YAML, but validate it first.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.from_dictionary">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.from_dictionary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.RepositoryFile.from_yaml_string">
-<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.from_yaml_string" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.RepositoryFile.from_yaml_string" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1923,8 +1954,13 @@ and returns a list of error messages.</p>
 <dd><p>Bases: <a class="reference internal" href="#komodo.yaml_file_types.YamlFile" title="komodo.yaml_file_types.YamlFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YamlFile</span></code></a></p>
 <p>Return the data from ‘upgrade_proposals’ YAML, but validate it first.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="komodo.yaml_file_types.UpgradeProposalsFile.from_dictionary">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yml</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_dictionary" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string">
-<span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_yaml_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2040,6 +2076,11 @@ and returns a list of error messages.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-komodo.check_unused_package">komodo.check_unused_package module</a><ul>
+<li><a class="reference internal" href="#komodo.check_unused_package.CheckResult"><code class="docutils literal notranslate"><span class="pre">CheckResult</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.check_unused_package.CheckResult.exitcode"><code class="docutils literal notranslate"><span class="pre">CheckResult.exitcode</span></code></a></li>
+<li><a class="reference internal" href="#komodo.check_unused_package.CheckResult.message"><code class="docutils literal notranslate"><span class="pre">CheckResult.message</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#komodo.check_unused_package.check_for_unused_package"><code class="docutils literal notranslate"><span class="pre">check_for_unused_package()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.check_unused_package.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
@@ -2345,12 +2386,14 @@ and returns a list of error messages.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile.from_dictionary"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile.from_dictionary()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile.from_yaml_string()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.PackageStatusFile.validate_package_status_file"><code class="docutils literal notranslate"><span class="pre">PackageStatusFile.validate_package_status_file()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseDir"><code class="docutils literal notranslate"><span class="pre">ReleaseDir</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile"><code class="docutils literal notranslate"><span class="pre">ReleaseFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.from_dictionary"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.from_dictionary()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.from_yaml_string()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.ReleaseFile.validate_release_file"><code class="docutils literal notranslate"><span class="pre">ReleaseFile.validate_release_file()</span></code></a></li>
 </ul>
@@ -2362,6 +2405,7 @@ and returns a list of error messages.</p>
 </li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.Report"><code class="docutils literal notranslate"><span class="pre">Report</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile"><code class="docutils literal notranslate"><span class="pre">RepositoryFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.from_dictionary"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.from_dictionary()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.from_yaml_string()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.lint_maintainer"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.lint_maintainer()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.RepositoryFile.validate_package_entry"><code class="docutils literal notranslate"><span class="pre">RepositoryFile.validate_package_entry()</span></code></a></li>
@@ -2371,6 +2415,7 @@ and returns a list of error messages.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile</span></code></a><ul>
+<li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_dictionary"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.from_dictionary()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.from_yaml_string"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.from_yaml_string()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_key"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.validate_upgrade_key()</span></code></a></li>
 <li><a class="reference internal" href="#komodo.yaml_file_types.UpgradeProposalsFile.validate_upgrade_proposals_file"><code class="docutils literal notranslate"><span class="pre">UpgradeProposalsFile.validate_upgrade_proposals_file()</span></code></a></li>
