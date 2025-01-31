@@ -41,7 +41,7 @@ test_case = [
                 },
             },
             "package_f": {
-                "1.0": {
+                "1.0.0": {
                     "make": "pip",
                     "maintainer": "scout",
                     "depends": ["package_c"],
@@ -82,6 +82,7 @@ test_case = [
 def test_check_unused_package(repo, release, package_status):
     package_status["python"] = {"visibility": "public"}
     release["python"] = "3.8-builtin"
+    repo["python"] = {"3.8-builtin": {"maintainer": "me", "make": "sh"}}
 
     repo = RepositoryFile.from_dictionary(value=repo)
     release = ReleaseFile.from_dictionary(value=release)
@@ -93,3 +94,70 @@ def test_check_unused_package(repo, release, package_status):
     )
     assert result.exitcode == 1
     assert "The following 1" in result.message and "package_f" in result.message
+
+
+def has_unused_packages(repo, release, package_status):
+    package_status["python"] = {"visibility": "public"}
+    release["python"] = "3.8-builtin"
+    repo["python"] = {"3.8-builtin": {"maintainer": "me", "make": "sh"}}
+
+    return check_for_unused_package(
+        release_file=ReleaseFile.from_dictionary(release),
+        package_status=package_status,
+        repository=RepositoryFile.from_dictionary(repo),
+        builtin_python_versions={"3.8-builtin": "3.8.6"},
+    )
+
+
+def test_empty_release_has_no_unused_packages():
+    assert has_unused_packages({}, {}, {}).exitcode == 0
+
+
+def test_missing_package_status_gives_error_code_2():
+    assert has_unused_packages({}, {"package": "version"}, {}).exitcode == 2
+
+
+def test_missing_visibility_gives_error_code_2():
+    assert (
+        has_unused_packages({}, {"package": "version"}, {"package": {}}).exitcode == 2
+    )
+
+
+def test_missing_repo_gives_error_code_3():
+    assert (
+        has_unused_packages(
+            {}, {"package": "version"}, {"package": {"visibility": "public"}}
+        ).exitcode
+        == 3
+    )
+
+
+def test_private_unused_package_gives_error_code_1():
+    assert (
+        has_unused_packages(
+            {
+                "package": {
+                    "1.0": {"source": "github", "make": "pip", "maintainer": "me"}
+                }
+            },
+            {"package": "1.0"},
+            {"package": {"visibility": "private"}},
+        ).exitcode
+        == 1
+    )
+
+
+@pytest.mark.parametrize("public_type", ("public", "private-plugin"))
+def test_public_packages_are_used(public_type):
+    assert (
+        has_unused_packages(
+            {
+                "package": {
+                    "1.0": {"source": "github", "make": "pip", "maintainer": "me"}
+                }
+            },
+            {"package": "1.0"},
+            {"package": {"visibility": public_type}},
+        ).exitcode
+        == 0
+    )
