@@ -149,7 +149,7 @@ def test_get_release_type(version_string, expected_release_type):
 
 def test_get_packages_info():
     dict_tag_maturity = lint_maturity.get_packages_info(
-        release_file=ReleaseFile().from_yaml_string(
+        release_file=ReleaseFile.from_yaml_string(
             value=yaml.dump(
                 {
                     "package_a1": "v3.1.a1",

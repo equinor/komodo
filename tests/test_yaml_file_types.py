@@ -64,7 +64,7 @@ def does_not_raise():
 )
 def test_release_file_yaml_type(content, expectations):
     with expectations:
-        ReleaseFile().from_yaml_string(content)
+        ReleaseFile.from_yaml_string(content)
 
 
 VALID_REPOSITORY = """
@@ -712,7 +712,7 @@ INVALID_YAML = "zopfli"
 )
 def test_repository_file_yaml_type(content, expectations):
     with expectations:
-        RepositoryFile().from_yaml_string(content)
+        RepositoryFile.from_yaml_string(content)
 
 
 LINT_MAINTAINER_TEST_REPO = """
@@ -780,7 +780,7 @@ def test_repository_file_lint_maintainer(
     expectation,
     return_object,
 ):
-    repo_file = RepositoryFile().from_yaml_string(LINT_MAINTAINER_TEST_REPO)
+    repo_file = RepositoryFile.from_yaml_string(LINT_MAINTAINER_TEST_REPO)
     with expectation:
         result = repo_file.lint_maintainer(package_name, package_version)
     if return_object:
@@ -851,7 +851,7 @@ def test_repository_file_lint_maintainer(
 )
 def test_package_status_file_type(package_status_file_content: str, expectation):
     with expectation:
-        PackageStatusFile().from_yaml_string(package_status_file_content)
+        PackageStatusFile.from_yaml_string(package_status_file_content)
 
 
 def test_release_dir_with_one_release(tmpdir):

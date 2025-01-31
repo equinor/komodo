@@ -1,5 +1,4 @@
 import pytest
-import yaml
 
 from komodo.check_unused_package import check_for_unused_package
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
@@ -84,8 +83,8 @@ def test_check_unused_package(repo, release, package_status):
     package_status["python"] = {"visibility": "public"}
     release["python"] = "3.8-builtin"
 
-    repo = RepositoryFile().from_yaml_string(value=yaml.safe_dump(repo))
-    release = ReleaseFile().from_yaml_string(value=yaml.safe_dump(release))
+    repo = RepositoryFile.from_dictionary(value=repo)
+    release = ReleaseFile.from_dictionary(value=release)
     result = check_for_unused_package(
         release_file=release,
         package_status=package_status,
