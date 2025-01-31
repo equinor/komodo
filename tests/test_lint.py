@@ -2,7 +2,6 @@ import os
 import sys
 
 import pytest
-import yaml
 
 from komodo import lint
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
@@ -41,8 +40,8 @@ RELEASE = {
 
 
 def test_lint():
-    repo = RepositoryFile().from_yaml_string(value=yaml.safe_dump(REPO))
-    release = ReleaseFile().from_yaml_string(value=yaml.safe_dump(RELEASE))
+    repo = RepositoryFile.from_dictionary(value=REPO)
+    release = ReleaseFile.from_dictionary(value=RELEASE)
     lint_report = lint.lint(release, repo)
     assert lint_report.dependencies == []
     assert lint_report.versions == []

@@ -75,11 +75,17 @@ class ReleaseFile(YamlFile):
         self.content: dict = yml
         return self
 
-    def from_yaml_string(self, value: bytes):
+    @classmethod
+    def from_yaml_string(cls, value: str):
         yml = load_yaml_from_string(value)
-        self.validate_release_file(yml)
-        self.content: dict = yml
-        return self
+        return cls.from_dictionary(yml)
+
+    @classmethod
+    def from_dictionary(cls, value: dict):
+        s = cls()
+        s.validate_release_file(value)
+        s.content = value
+        return s
 
     @staticmethod
     def validate_release_file(release_file_content: Mapping) -> None:
@@ -194,11 +200,17 @@ class RepositoryFile(YamlFile):
         self.validate_repository_file()
         return self
 
-    def from_yaml_string(self, value: bytes):
+    @classmethod
+    def from_yaml_string(cls, value: str):
         yml = load_yaml_from_string(value)
-        self.content: dict = yml
-        self.validate_repository_file()
-        return self
+        return cls.from_dictionary(yml)
+
+    @classmethod
+    def from_dictionary(cls, value: dict):
+        s = cls()
+        s.content = value
+        s.validate_repository_file()
+        return s
 
     def validate_package_entry(
         self,
@@ -361,11 +373,17 @@ class UpgradeProposalsFile(YamlFile):
         self.content: dict = yml
         return self
 
-    def from_yaml_string(self, value):
+    @classmethod
+    def from_yaml_string(cls, value):
         yml = load_yaml_from_string(value)
-        self.validate_upgrade_proposals_file(yml)
-        self.content: dict = yml
-        return self
+        return cls.from_dictionary(yml)
+
+    @classmethod
+    def from_dictionary(cls, yml):
+        s = cls()
+        s.validate_upgrade_proposals_file(yml)
+        s.content = yml
+        return s
 
     def validate_upgrade_key(self, upgrade_key: str) -> None:
         assert upgrade_key in self.content, (
@@ -420,11 +438,17 @@ class PackageStatusFile(YamlFile):
         self.validate_package_status_file()
         return self
 
-    def from_yaml_string(self, value: str):
+    @classmethod
+    def from_yaml_string(cls, value: str):
         yml = load_yaml_from_string(value)
-        self.content: dict = yml
-        self.validate_package_status_file()
-        return self
+        return cls.from_dictionary(yml)
+
+    @classmethod
+    def from_dictionary(cls, value: dict):
+        s = cls()
+        s.content = value
+        s.validate_package_status_file()
+        return s
 
     def validate_package_status_file(self) -> None:
         package_status = self.content
@@ -710,11 +734,11 @@ def handle_validation_errors(errors: Sequence[str], message: str):
 
 
 def load_package_status_file(package_status_string: str):
-    return PackageStatusFile().from_yaml_string(package_status_string)
+    return PackageStatusFile.from_yaml_string(package_status_string)
 
 
 def load_repository_file(repository_file_string):
-    return RepositoryFile().from_yaml_string(repository_file_string)
+    return RepositoryFile.from_yaml_string(repository_file_string)
 
 
 def _recursive_validate_version_matrix(

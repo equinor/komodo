@@ -268,7 +268,7 @@ def insert_proposals(
     upgrade_key = get_upgrade_key(target)
 
     proposals_yaml_string = load_yaml_from_repo("upgrade_proposals.yml", repo, git_ref)
-    proposal_file = UpgradeProposalsFile().from_yaml_string(proposals_yaml_string)
+    proposal_file = UpgradeProposalsFile.from_yaml_string(proposals_yaml_string)
     proposal_file.validate_upgrade_key(upgrade_key)
 
     base_file = f"releases/matrices/{base}.yml"
@@ -277,7 +277,7 @@ def insert_proposals(
     upgrade: Dict[str, str] = proposal_file.content.get(upgrade_key)
 
     repofile_yaml_string = load_yaml_from_repo("repository.yml", repo, git_ref)
-    repofile = RepositoryFile().from_yaml_string(repofile_yaml_string)
+    repofile = RepositoryFile.from_yaml_string(repofile_yaml_string)
 
     new_release_contents = generate_contents_of_new_release_matrix(
         release_matrix_file.content, repofile, upgrade
