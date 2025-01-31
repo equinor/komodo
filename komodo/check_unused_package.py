@@ -21,7 +21,11 @@ class CheckResult:
 
 
 class NoSuchPackageStatus(ValueError):
-    pass
+    exit_code = 2
+
+
+class NoSuchRepository(ValueError):
+    exit_code = 3
 
 
 def check_for_unused_package(
@@ -45,44 +49,53 @@ def check_for_unused_package(
             ) from err
 
     try:
-        public_and_plugin_packages = [
+        private_packages = {
+            pkg for pkg in release_file.content if get_visibility(pkg) == "private"
+        }
+        public_packages = (
             (pkg, version)
             for pkg, version in release_file.content.items()
             if get_visibility(pkg) in ("public", "private-plugin")
-        ]
-
-        python_version = release_file.content["python"]
-        full_python_version = builtin_python_versions[python_version]
-
-        dependencies = PypiDependencies(
-            release_file.content,
-            release_file.content,
-            python_version=full_python_version,
         )
-        for name, version in release_file.content.items():
-            try:
-                metadata = repository.content[name][version]
-            except KeyError:
-                return CheckResult(
-                    message=f"Could not find package-version: {name}:{version} in the repository file",
-                    exitcode=3,
-                )
-            if metadata.get("source") != "pypi":
-                dependencies.add_user_specified(name, metadata.get("depends", []))
-        unused_private_packages = {
-            pkg for pkg in release_file.content if get_visibility(pkg) == "private"
-        }.difference(dependencies.used_packages(public_and_plugin_packages))
-        if unused_private_packages:
-            return CheckResult(
-                message=f"The following {len(unused_private_packages)} private packages are not dependencies of any public or private-plugin packages:"
-                + ", ".join(sorted(unused_private_packages))
-                + "If you have added or removed any packages check that the dependencies in repository.yml are correct.",
-                exitcode=1,
-            )
-        else:
-            return CheckResult(message="Everything seems fine.", exitcode=0)
-    except NoSuchPackageStatus as err:
-        return CheckResult(message=str(err), exitcode=2)
+        dependencies = _extract_dependencies(
+            release_file,
+            repository,
+            builtin_python_versions[release_file.content["python"]],
+        )
+    except (NoSuchPackageStatus, NoSuchRepository) as err:
+        return CheckResult(message=str(err), exitcode=err.exit_code)
+
+    used_packages = dependencies.used_packages(public_packages)
+
+    if unused_private_packages := private_packages.difference(used_packages):
+        return CheckResult(
+            message=f"The following {len(unused_private_packages)} private packages are"
+            " not dependencies of any public or private-plugin packages:"
+            + ", ".join(sorted(unused_private_packages))
+            + "If you have added or removed any packages check that the dependencies"
+            " in repository.yml are correct.",
+            exitcode=1,
+        )
+    else:
+        return CheckResult(message="Everything seems fine.", exitcode=0)
+
+
+def _extract_dependencies(release_file, repository, full_python_version):
+    dependencies = PypiDependencies(
+        release_file.content,
+        release_file.content,
+        python_version=full_python_version,
+    )
+    for name, version in release_file.content.items():
+        try:
+            metadata = repository.content[name][version]
+        except KeyError as err:
+            raise NoSuchRepository(
+                f"Could not find package-version: {name}:{version} in the repository file"
+            ) from err
+        if metadata.get("source") != "pypi":
+            dependencies.add_user_specified(name, metadata.get("depends", []))
+    return dependencies
 
 
 def main():
