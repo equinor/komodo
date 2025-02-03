@@ -167,6 +167,10 @@ class PypiDependencies:
         self, package_name: str, package_version: str
     ) -> list[Requirement]:
         """
+
+        Returns:
+            List of requirements for given package.
+
         >>> from packaging.requirements import Requirement
         >>> PypiDependencies({}, {}, python_version="3.8.11")._get_requirements(
         ...     "rips",
