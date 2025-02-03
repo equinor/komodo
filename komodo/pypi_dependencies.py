@@ -185,6 +185,12 @@ class PypiDependencies:
         if canonical not in self.requirements:
             self.requirements[canonical] = {}
 
+        return self._get_requirements_from_pypi(package_name, package_version)
+
+    def _get_requirements_from_pypi(
+        self, package_name: str, package_version: str
+    ) -> list[Requirement]:
+        canonical = canonicalize_name(package_name)
         if package_version not in self.requirements[canonical]:
             with TemporaryDirectory() as tmpdir:
                 try:

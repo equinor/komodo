@@ -3,6 +3,7 @@
 Checks that for a given release, all private packages (as defined in the visibility
 field of the package status file) is the dependency of some public package.
 """
+
 from __future__ import annotations
 
 import argparse

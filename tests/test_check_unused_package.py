@@ -1,7 +1,19 @@
 import pytest
+from unittest.mock import patch
 
 from komodo.check_unused_package import check_for_unused_package
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
+from komodo.pypi_dependencies import PypiDependencies
+
+
+@pytest.fixture(autouse=True, scope="module")
+def mock_get_requirements():
+    with patch.object(
+        PypiDependencies, "_get_requirements_from_pypi"
+    ) as mock_get_requirements:
+        yield
+        mock_get_requirements.assert_not_called()
+
 
 test_case = [
     (
