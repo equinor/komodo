@@ -147,6 +147,32 @@ def test_private_unused_package_gives_error_code_1():
     )
 
 
+def test_private_unused_dependency_gives_error_code_1():
+    assert (
+        has_unused_packages(
+            {
+                "private_pkg": {
+                    "1.0": {"source": "github", "make": "pip", "maintainer": "me"}
+                },
+                "public_pkg": {
+                    "0.1": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["private_pkg"],
+                    }
+                },
+            },
+            {"private_pkg": "1.0"},
+            {
+                "private_pkg": {"visibility": "private"},
+                "public_pkg": {"visibility": "public"},
+            },
+        ).exitcode
+        == 1
+    )
+
+
 @pytest.mark.parametrize("public_type", ("public", "private-plugin"))
 def test_public_packages_are_used(public_type):
     assert (
