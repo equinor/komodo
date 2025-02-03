@@ -392,3 +392,47 @@ def test_private_package_used_by_another_private_package_reported_as_unused():
     assert "private_pkg1" in result.message
     assert "private_pkg2" in result.message
     assert "private_pkg3" in result.message
+
+
+def test_circular_dependencies_handled_gracefully():
+    repo = {
+        "circular_pkg1": {
+            "1.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+                "depends": ["circular_pkg2"],
+            }
+        },
+        "circular_pkg2": {
+            "2.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+                "depends": ["circular_pkg1"],
+            }
+        },
+        "public_pkg": {
+            "3.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+                "depends": ["circular_pkg1"],
+            }
+        },
+    }
+    release = {
+        "circular_pkg1": "1.0",
+        "circular_pkg2": "2.0",
+        "public_pkg": "3.0",
+    }
+    package_status = {
+        "circular_pkg1": {"visibility": "private"},
+        "circular_pkg2": {"visibility": "private"},
+        "public_pkg": {"visibility": "public"},
+    }
+
+    result = has_unused_packages(repo, release, package_status)
+
+    assert result.exitcode == 0  # No unused packages should be reported
+    assert "Everything seems fine." in result.message
