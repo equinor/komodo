@@ -125,9 +125,17 @@ class PypiDependencies:
         return self._failed_requirements
 
     def used_packages(
-        self, packages: Iterable[tuple[str, str]] | None = None
+        self, top_level_packages: Iterable[tuple[str, str]] | None = None
     ) -> set[str]:
-        self._update_package_sets(packages)
+        """Given you want to install top_level_packages, returns list of
+        all packages that must be installed to satisfy dependencies.
+
+        Args:
+            packages:
+                which packages to consider, by default: all.
+        """
+        self._used_packages = set()  # clear packages used
+        self._update_package_sets(top_level_packages)
         return self._used_packages
 
     def add_user_specified(
