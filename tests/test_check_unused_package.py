@@ -234,3 +234,24 @@ def test_transient_dependencies_of_public_packages_are_used():
         ).exitcode
         == 0
     )
+
+
+@pytest.mark.parametrize("public_type", ("public", "private-plugin"))
+def test_public_packages_are_used_redundant_package_status_has_no_effect(public_type):
+    assert (
+        has_unused_packages(
+            {
+                "package": {
+                    "1.0": {"source": "github", "make": "pip", "maintainer": "me"}
+                }
+            },
+            {"package": "1.0"},
+            {
+                "package": {"visibility": public_type},
+                "package1": {"visibility": public_type},
+                "package2": {"visibility": "private"},
+                "package3": {"visibility": "private"},
+            },
+        ).exitcode
+        == 0
+    )
