@@ -1,9 +1,10 @@
-import pytest
 from unittest.mock import patch
 
+import pytest
+
 from komodo.check_unused_package import check_for_unused_package
-from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 from komodo.pypi_dependencies import PypiDependencies
+from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 @pytest.fixture(autouse=True, scope="module")
