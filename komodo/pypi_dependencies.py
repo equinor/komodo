@@ -238,10 +238,6 @@ class PypiDependencies:
 
         return [Requirement(r) for r in self.requirements[canonical][package_version]]
 
-    def _make_install_name(self, name: str) -> str:
-        canonical = canonicalize_name(name)
-        return self._install_names.get(canonical, canonical)
-
     def _version_satisfied(self, version: str, requirement: Requirement) -> bool:
         if version in ["main", "master"]:
             return True
