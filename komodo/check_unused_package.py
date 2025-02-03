@@ -25,12 +25,14 @@ class CheckResult:
 
 
 class NoSuchPackageStatus(ValueError):
-    """ Raised when a package is not present in the package status file """
+    """Raised when a package is not present in the package status file"""
+
     exit_code = 2
 
 
 class NoSuchRepository(ValueError):
-    """ Raised when a package is not present in the repository file """
+    """Raised when a package is not present in the repository file"""
+
     exit_code = 3
 
 

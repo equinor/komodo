@@ -47,6 +47,20 @@ class PypiDependencies:
         python_version: str,
         cachefile: str = "./pypi_dependencies.yml",
     ) -> None:
+        """A dependency checker for pypi packages.
+
+        Args:
+            pypi_depedencies:
+                mapping from pypi package name to version of all pypi packages
+                under consideration.
+            to_install:
+                All packages that are to be installed
+            python_version:
+                the python version string, e.g. 3.8.11
+            cachefile:
+                filename to use for package metadata fetched from pypi.
+
+        """
         self.python_version = python_version
         environment["python_full_version"] = python_version
         environment["python_version"] = ".".join(python_version.split(".")[0:2])
@@ -82,8 +96,12 @@ class PypiDependencies:
                 _ = self.satisfied(r, package_name)
 
     def failed_requirements(self, packages=None):
-        """
-        >>>
+        """lists which requirements were not met.
+
+        Args:
+            packages:
+                which packages to consider, by default: all.
+
         >>> pypi_packages = {
         ...    "ert": "11.1.0",
         ...    "aiohttp": "3.10.10",
