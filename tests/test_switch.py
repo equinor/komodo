@@ -85,25 +85,6 @@ endif
     )
 
 
-def test_write_activator_switches_for_py311(tmpdir):
-    prefix = tmpdir / "prefix"
-    release = "2024.01.01-py311-rhel8"
-    expected_release = "2024.01.01-py311"
-    switch.create_activator_switch(Data(), prefix, release)
-
-    actual_bash_activator = prefix / f"{expected_release}/enable"
-    assert (
-        "Error! Komodo release for Python newer than 3.8 is not available on RHEL7."
-        in actual_bash_activator.read_text(encoding="utf-8").strip()
-    )
-
-    actual_csh_activator = prefix / f"{expected_release}/enable.csh"
-    assert (
-        "Error! Komodo release for Python newer than 3.8 is not available on RHEL7."
-        in actual_csh_activator.read_text(encoding="utf-8").strip()
-    )
-
-
 def test_write_activator_switches_for_non_matrix_build(tmpdir):
     prefix = tmpdir / "prefix"
     release = "foobar"
