@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+Checks that for a given release, all private packages (as defined in the visibility
+field of the package status file) is the dependency of some public package.
+"""
 from __future__ import annotations
 
 import argparse
@@ -21,10 +25,12 @@ class CheckResult:
 
 
 class NoSuchPackageStatus(ValueError):
+    """ Raised when a package is not present in the package status file """
     exit_code = 2
 
 
 class NoSuchRepository(ValueError):
+    """ Raised when a package is not present in the repository file """
     exit_code = 3
 
 
@@ -118,7 +124,7 @@ def main():
     parser.add_argument(
         "repo",
         type=RepositoryFile(),
-        help="Repository file with all packages listed with dependencies.",
+        help="Repository file wich lists where to get the package from.",
     )
 
     args = parser.parse_args()
