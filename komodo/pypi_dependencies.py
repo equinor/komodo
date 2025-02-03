@@ -238,7 +238,11 @@ class PypiDependencies:
 
         return [Requirement(r) for r in self.requirements[canonical][package_version]]
 
-    def _version_satisfied(self, version: str, requirement: Requirement) -> bool:
+    def _version_satisfies_requirement(
+        self, version: str, requirement: Requirement
+    ) -> bool:
+        """Whether the requirement is satisfied by the version"""
+
         if version in ["main", "master"]:
             return True
         try:
@@ -248,7 +252,10 @@ class PypiDependencies:
         except InvalidVersion:
             return True
 
-    def _is_necessary(self, requirement, extras):
+    def _is_required_by_environment(
+        self, requirement: Requirement, extras: Iterable[str]
+    ) -> bool:
+        """Is the requirement necessary for the environment"""
         environment["extra"] = ",".join(extras)
         return requirement.marker is None or requirement.marker.evaluate(environment)
 
@@ -266,7 +273,7 @@ class PypiDependencies:
             self._used_packages.add(self._install_names[name])
             installed_version = installed[name]
 
-            if not self._version_satisfied(installed_version, requirement):
+            if not self._version_satisfies_requirement(installed_version, requirement):
                 return False, []
 
             transient_requirements.append(
@@ -281,9 +288,16 @@ class PypiDependencies:
         self,
         requirement: Requirement,
         package_name: str = "",
-        extra=None,
+        extra: set[str] | None = None,
     ) -> bool:
-        """
+        """Is the given requirement satisfied.
+
+        Args:
+            package_name:
+                The package that has the given requirement.
+            extra:
+                Optional set of extras for package_name.
+
         >>> from packaging.requirements import Requirement
         >>> PypiDependencies({}, {}, python_version="3.8").satisfied(
         ... Requirement("PyJWT[crypto] (<3, >=1.0.0)")
@@ -297,7 +311,7 @@ class PypiDependencies:
         True
         """
         extra = extra or set()
-        if not self._is_necessary(requirement, extra):
+        if not self._is_required_by_environment(requirement, extra):
             return True
         if requirement in self._failed_requirements:
             return False
