@@ -1,43 +1,13 @@
-{% if py_version == "py38" -%}
-if ( `uname -r` =~ *el7* ) then
-    # Get the last command executed wich contains the full path of the sourced script
-    set lastCommandExecuted = ($_)
-    if ( "$lastCommandExecuted" =~ "*deprecated-rhel7*" ) then
-        setenv KOMODO_ROOT {{ prefix }}
-        set KOMODO_RELEASE_REAL = "{{ release }}"
-
-        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
-        if ( $?_KOMODO_OLD_PROMPT ) then
-            set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
-        endif
-        setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-    else
-        {%- for line in migration_warning.split('\n') %}
-        echo "{{ line }}"
-        {%- endfor %}
-    endif
-else if ( `uname -r` =~ *el8* ) then
+if ( `uname -r` =~ *el8* ) || ( `uname -r` =~ *el9* ) then
     setenv KOMODO_ROOT {{ prefix }}
     set KOMODO_RELEASE_REAL = "{{ release }}"
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel8/enable.csh
+    set rhel_version_number=`uname -r | grep -oP 'el\K[0-9]'`
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number/enable.csh
     if ( $?_KOMODO_OLD_PROMPT ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
     setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-{%- else -%}
-if ( `uname -r` =~ *el7* ) then
-    echo "Error! Komodo release for Python newer than 3.8 is not available on RHEL7."
-else if ( `uname -r` =~ *el8* ) then
-    setenv KOMODO_ROOT {{ prefix }}
-    set KOMODO_RELEASE_REAL = "{{ release }}"
-
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel8/enable.csh
-    if ( $?_KOMODO_OLD_PROMPT ) then
-        set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
-    endif
-    setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-{%- endif %}
 else
     echo "Attention! Your machine is running on an environment that is not supported."
 endif

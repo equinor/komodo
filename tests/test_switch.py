@@ -2,39 +2,32 @@ import pytest
 
 from komodo import switch
 from komodo.data import Data
-from komodo.switch import MIGRATION_WARNING
 
 
-def test_write_activator_switches(tmpdir):
+@pytest.mark.parametrize(
+    "release, expected_release",
+    [
+        ("2024.03.03-py311-rhel8", "2024.03.03-py311"),
+        ("2024.04.04-py312-rhel8", "2024.04.04-py312"),
+        ("2025.05.05-py312-rhel9", "2025.05.05-py312"),
+        ("2025.05.05-py312-rhel9-numpy1", "2025.05.05-py312"),
+    ],
+)
+def test_write_activator_switches(tmpdir, release, expected_release):
     prefix = tmpdir / "prefix"
-    release = "2022.01.01-py38-rhel7"
-    expected_release = "2022.01.01-py38"
     switch.create_activator_switch(Data(), prefix, release)
 
     actual_bash_activator = prefix / f"{expected_release}/enable"
-    bash_source_script_path = 'script_path="${BASH_SOURCE[0]}"'
 
     assert (
         actual_bash_activator.read_text(encoding="utf-8").strip()
         == f"""
-if [[ $(uname -r) == *el7* ]] ; then
-    # Get the full path of the sourced script
-    {bash_source_script_path}
-    if [[ $script_path == *deprecated-rhel7* ]] ; then
-        export KOMODO_ROOT={prefix}
-        KOMODO_RELEASE_REAL={expected_release}
-
-        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
-        export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
-        export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
-    else
-        echo -e "{MIGRATION_WARNING}"
-    fi
-elif [[ $(uname -r) == *el8* ]] ; then
+if [[ $(uname -r) == *el8* ]] || [[ $(uname -r) == *el9* ]] ; then
     export KOMODO_ROOT={prefix}
     KOMODO_RELEASE_REAL={expected_release}
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel8/enable
+    rhel_version_number=$(uname -r | grep -oP 'el\\K[0-9]')
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number/enable
     export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 else
@@ -47,33 +40,12 @@ fi
     assert (
         actual_csh_activator.read_text(encoding="utf-8").strip()
         == f"""
-if ( `uname -r` =~ *el7* ) then
-    # Get the last command executed wich contains the full path of the sourced script
-    set lastCommandExecuted = ($_)
-    if ( "$lastCommandExecuted" =~ "*deprecated-rhel7*" ) then
-        setenv KOMODO_ROOT {prefix}
-        set KOMODO_RELEASE_REAL = "{expected_release}"
-
-        source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable.csh
-        if ( $?_KOMODO_OLD_PROMPT ) then
-            set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
-        endif
-        setenv KOMODO_RELEASE $KOMODO_RELEASE_REAL
-    else
-        echo "Attention! Your machine is running on an environment that is not supported. RHEL7 has been phased out."
-        echo "From November 2024, komodo versions only support RHEL8."
-        echo "Please migrate as soon as possible."
-        echo "To use the latest stable RHEL7 build use either:"
-        echo "source /prog/res/komodo/deprecated-rhel7/enable"
-        echo "source /prog/res/komodo/deprecated-rhel7/enable.csh"
-        echo ""
-        echo "If you have any questions or issues - contact us on #ert-users on Slack or Equinor's Yammer."
-    endif
-else if ( `uname -r` =~ *el8* ) then
+if ( `uname -r` =~ *el8* ) || ( `uname -r` =~ *el9* ) then
     setenv KOMODO_ROOT {prefix}
     set KOMODO_RELEASE_REAL = "{expected_release}"
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel8/enable.csh
+    set rhel_version_number=`uname -r | grep -oP 'el\\K[0-9]'`
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number/enable.csh
     if ( $?_KOMODO_OLD_PROMPT ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
