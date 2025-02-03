@@ -207,7 +207,7 @@ class PypiDependencies:
                     )
                 except Exception as err:
                     raise ValueError(
-                        f"Could not install {package_name} {package_version} from pypi"
+                        f"Could not install {package_name} {package_version} from pypi "
                         f"With python version {self.python_version} "
                         "in order to determine dependencies. "
                         "This may be because no wheel exists for this python version."
