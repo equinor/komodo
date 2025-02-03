@@ -45,7 +45,7 @@ class PypiDependencies:
         pypi_dependencies: dict[str, str],
         to_install: dict[str, str],
         python_version: str,
-        cachefile: str = "./pypi_dependencies.yml",
+        cachefile: str | None = "./pypi_dependencies.yml",
     ) -> None:
         """A dependency checker for pypi packages.
 
@@ -58,7 +58,7 @@ class PypiDependencies:
             python_version:
                 the python version string, e.g. 3.8.11
             cachefile:
-                filename to use for package metadata fetched from pypi.
+                filename to use for package metadata fetched from pypi. None means no cache.
 
         """
         self.python_version = python_version
@@ -77,7 +77,7 @@ class PypiDependencies:
             canonicalize_name(name): version for name, version in to_install.items()
         }
         self._cachefile = cachefile
-        if os.path.exists(self._cachefile):
+        if self._cachefile is not None and os.path.exists(self._cachefile):
             with open(self._cachefile, encoding="utf-8") as f:
                 self.requirements = yaml.safe_load(f)
                 self.requirements = {
@@ -160,8 +160,9 @@ class PypiDependencies:
         self._install_names[canonical] = package_name
 
     def dump_cache(self):
-        with open(self._cachefile, "w", encoding="utf-8") as f:
-            yaml.safe_dump(self.requirements, f)
+        if self._cachefile is not None:
+            with open(self._cachefile, "w", encoding="utf-8") as f:
+                yaml.safe_dump(self.requirements, f)
 
     def _get_requirements(
         self, package_name: str, package_version: str
