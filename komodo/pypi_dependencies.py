@@ -47,6 +47,20 @@ class PypiDependencies:
         python_version: str,
         cachefile: str = "./pypi_dependencies.yml",
     ) -> None:
+        """A dependency checker for pypi packages.
+
+        Args:
+            pypi_depedencies:
+                mapping from pypi package name to version of all pypi packages
+                under consideration.
+            to_install:
+                All packages that are to be installed
+            python_version:
+                the python version string, e.g. 3.8.11
+            cachefile:
+                filename to use for package metadata fetched from pypi.
+
+        """
         self.python_version = python_version
         environment["python_full_version"] = python_version
         environment["python_version"] = ".".join(python_version.split(".")[0:2])
@@ -82,8 +96,12 @@ class PypiDependencies:
                 _ = self.satisfied(r, package_name)
 
     def failed_requirements(self, packages=None):
-        """
-        >>>
+        """lists which requirements were not met.
+
+        Args:
+            packages:
+                which packages to consider, by default: all.
+
         >>> pypi_packages = {
         ...    "ert": "11.1.0",
         ...    "aiohttp": "3.10.10",
@@ -107,9 +125,17 @@ class PypiDependencies:
         return self._failed_requirements
 
     def used_packages(
-        self, packages: Iterable[tuple[str, str]] | None = None
+        self, top_level_packages: Iterable[tuple[str, str]] | None = None
     ) -> set[str]:
-        self._update_package_sets(packages)
+        """Given you want to install top_level_packages, returns list of
+        all packages that must be installed to satisfy dependencies.
+
+        Args:
+            packages:
+                which packages to consider, by default: all.
+        """
+        self._used_packages = set()  # clear packages used
+        self._update_package_sets(top_level_packages)
         return self._used_packages
 
     def add_user_specified(
@@ -141,6 +167,10 @@ class PypiDependencies:
         self, package_name: str, package_version: str
     ) -> list[Requirement]:
         """
+
+        Returns:
+            List of requirements for given package.
+
         >>> from packaging.requirements import Requirement
         >>> PypiDependencies({}, {}, python_version="3.8.11")._get_requirements(
         ...     "rips",
@@ -155,6 +185,12 @@ class PypiDependencies:
         if canonical not in self.requirements:
             self.requirements[canonical] = {}
 
+        return self._get_requirements_from_pypi(package_name, package_version)
+
+    def _get_requirements_from_pypi(
+        self, package_name: str, package_version: str
+    ) -> list[Requirement]:
+        canonical = canonicalize_name(package_name)
         if package_version not in self.requirements[canonical]:
             with TemporaryDirectory() as tmpdir:
                 try:
@@ -202,11 +238,11 @@ class PypiDependencies:
 
         return [Requirement(r) for r in self.requirements[canonical][package_version]]
 
-    def _make_install_name(self, name: str) -> str:
-        canonical = canonicalize_name(name)
-        return self._install_names.get(canonical, canonical)
+    def _version_satisfies_requirement(
+        self, version: str, requirement: Requirement
+    ) -> bool:
+        """Whether the requirement is satisfied by the version"""
 
-    def _version_satisfied(self, version: str, requirement: Requirement) -> bool:
         if version in ["main", "master"]:
             return True
         try:
@@ -216,7 +252,10 @@ class PypiDependencies:
         except InvalidVersion:
             return True
 
-    def _is_necessary(self, requirement, extras):
+    def _is_required_by_environment(
+        self, requirement: Requirement, extras: Iterable[str]
+    ) -> bool:
+        """Is the requirement necessary for the environment"""
         environment["extra"] = ",".join(extras)
         return requirement.marker is None or requirement.marker.evaluate(environment)
 
@@ -234,7 +273,7 @@ class PypiDependencies:
             self._used_packages.add(self._install_names[name])
             installed_version = installed[name]
 
-            if not self._version_satisfied(installed_version, requirement):
+            if not self._version_satisfies_requirement(installed_version, requirement):
                 return False, []
 
             transient_requirements.append(
@@ -249,9 +288,16 @@ class PypiDependencies:
         self,
         requirement: Requirement,
         package_name: str = "",
-        extra=None,
+        extra: set[str] | None = None,
     ) -> bool:
-        """
+        """Is the given requirement satisfied.
+
+        Args:
+            package_name:
+                The package that has the given requirement.
+            extra:
+                Optional set of extras for package_name.
+
         >>> from packaging.requirements import Requirement
         >>> PypiDependencies({}, {}, python_version="3.8").satisfied(
         ... Requirement("PyJWT[crypto] (<3, >=1.0.0)")
@@ -265,7 +311,7 @@ class PypiDependencies:
         True
         """
         extra = extra or set()
-        if not self._is_necessary(requirement, extra):
+        if not self._is_required_by_environment(requirement, extra):
             return True
         if requirement in self._failed_requirements:
             return False

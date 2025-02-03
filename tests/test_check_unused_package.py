@@ -1,7 +1,20 @@
+from unittest.mock import patch
+
 import pytest
 
 from komodo.check_unused_package import check_for_unused_package
+from komodo.pypi_dependencies import PypiDependencies
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
+
+
+@pytest.fixture(autouse=True, scope="module")
+def mock_get_requirements():
+    with patch.object(
+        PypiDependencies, "_get_requirements_from_pypi"
+    ) as mock_get_requirements:
+        yield
+        mock_get_requirements.assert_not_called()
+
 
 test_case = [
     (
@@ -147,6 +160,32 @@ def test_private_unused_package_gives_error_code_1():
     )
 
 
+def test_private_unused_dependency_gives_error_code_1():
+    assert (
+        has_unused_packages(
+            {
+                "private_pkg": {
+                    "1.0": {"source": "github", "make": "pip", "maintainer": "me"}
+                },
+                "public_pkg": {
+                    "0.1": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["private_pkg"],
+                    }
+                },
+            },
+            {"private_pkg": "1.0"},
+            {
+                "private_pkg": {"visibility": "private"},
+                "public_pkg": {"visibility": "public"},
+            },
+        ).exitcode
+        == 1
+    )
+
+
 @pytest.mark.parametrize("public_type", ("public", "private-plugin"))
 def test_public_packages_are_used(public_type):
     assert (
@@ -158,6 +197,100 @@ def test_public_packages_are_used(public_type):
             },
             {"package": "1.0"},
             {"package": {"visibility": public_type}},
+        ).exitcode
+        == 0
+    )
+
+
+def test_dependencies_of_public_packages_are_used():
+    assert (
+        has_unused_packages(
+            {
+                "public_package": {
+                    "1.0": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["private_package"],
+                    }
+                },
+                "private_package": {
+                    "0.1": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                    }
+                },
+            },
+            {"public_package": "1.0", "private_package": "0.1"},
+            {
+                "public_package": {"visibility": "public"},
+                "private_package": {"visibility": "private"},
+            },
+        ).exitcode
+        == 0
+    )
+
+
+def test_transient_dependencies_of_public_packages_are_used():
+    assert (
+        has_unused_packages(
+            {
+                "public_package": {
+                    "1.0": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["private_package"],
+                    }
+                },
+                "private_package": {
+                    "0.1": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                        "depends": ["transient_package"],
+                    }
+                },
+                "transient_package": {
+                    "2.0": {
+                        "source": "github",
+                        "make": "pip",
+                        "maintainer": "me",
+                    }
+                },
+            },
+            {
+                "public_package": "1.0",
+                "private_package": "0.1",
+                "transient_package": "2.0",
+            },
+            {
+                "public_package": {"visibility": "public"},
+                "private_package": {"visibility": "private"},
+                "transient_package": {"visibility": "private"},
+            },
+        ).exitcode
+        == 0
+    )
+
+
+@pytest.mark.parametrize("public_type", ("public", "private-plugin"))
+def test_public_packages_are_used_redundant_package_status_has_no_effect(public_type):
+    assert (
+        has_unused_packages(
+            {
+                "package": {
+                    "1.0": {"source": "github", "make": "pip", "maintainer": "me"}
+                }
+            },
+            {"package": "1.0"},
+            {
+                "package": {"visibility": public_type},
+                "package1": {"visibility": public_type},
+                "package2": {"visibility": "private"},
+                "package3": {"visibility": "private"},
+            },
         ).exitcode
         == 0
     )
