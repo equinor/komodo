@@ -363,6 +363,8 @@
 </section>
 <section id="module-komodo.check_unused_package">
 <span id="komodo-check-unused-package-module"></span><h2>komodo.check_unused_package module<a class="headerlink" href="#module-komodo.check_unused_package" title="Link to this heading">¶</a></h2>
+<p>Checks that for a given release, all private packages (as defined in the visibility
+field of the package status file) is the dependency of some public package.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="komodo.check_unused_package.CheckResult">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">CheckResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exitcode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.check_unused_package.CheckResult" title="Link to this definition">¶</a></dt>
@@ -383,6 +385,7 @@
 <dt class="sig sig-object py" id="komodo.check_unused_package.NoSuchPackageStatus">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">NoSuchPackageStatus</span></span><a class="headerlink" href="#komodo.check_unused_package.NoSuchPackageStatus" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a package is not present in the package status file</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="komodo.check_unused_package.NoSuchPackageStatus.exit_code">
 <span class="sig-name descname"><span class="pre">exit_code</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#komodo.check_unused_package.NoSuchPackageStatus.exit_code" title="Link to this definition">¶</a></dt>
@@ -394,6 +397,7 @@
 <dt class="sig sig-object py" id="komodo.check_unused_package.NoSuchRepository">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">komodo.check_unused_package.</span></span><span class="sig-name descname"><span class="pre">NoSuchRepository</span></span><a class="headerlink" href="#komodo.check_unused_package.NoSuchRepository" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a package is not present in the repository file</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="komodo.check_unused_package.NoSuchRepository.exit_code">
 <span class="sig-name descname"><span class="pre">exit_code</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#komodo.check_unused_package.NoSuchRepository.exit_code" title="Link to this definition">¶</a></dt>
@@ -1318,8 +1322,13 @@ is True, otherwise no empty lines).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="komodo.pypi_dependencies.PypiDependencies.failed_requirements">
 <span class="sig-name descname"><span class="pre">failed_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#komodo.pypi_dependencies.PypiDependencies.failed_requirements" title="Link to this definition">¶</a></dt>
-<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pypi_packages</span> <span class="o">=</span> <span class="p">{</span>
+<dd><p>lists which requirements were not met.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>packages</strong> – which packages to consider, by default: all.</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pypi_packages</span> <span class="o">=</span> <span class="p">{</span>
 <span class="gp">... </span>   <span class="s2">&quot;ert&quot;</span><span class="p">:</span> <span class="s2">&quot;11.1.0&quot;</span><span class="p">,</span>
 <span class="gp">... </span>   <span class="s2">&quot;aiohttp&quot;</span><span class="p">:</span> <span class="s2">&quot;3.10.10&quot;</span><span class="p">,</span>
 <span class="gp">... </span>   <span class="s2">&quot;deprecation&quot;</span><span class="p">:</span> <span class="s2">&quot;2.1.0&quot;</span><span class="p">,</span>
@@ -1343,8 +1352,17 @@ is True, otherwise no empty lines).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="komodo.pypi_dependencies.PypiDependencies.satisfied">
-<span class="sig-name descname"><span class="pre">satisfied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requirement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Requirement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#komodo.pypi_dependencies.PypiDependencies.satisfied" title="Link to this definition">¶</a></dt>
-<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">packaging.requirements</span><span class="w"> </span><span class="kn">import</span> <span class="n">Requirement</span>
+<span class="sig-name descname"><span class="pre">satisfied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requirement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Requirement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#komodo.pypi_dependencies.PypiDependencies.satisfied" title="Link to this definition">¶</a></dt>
+<dd><p>Is the given requirement satisfied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>package_name</strong> – The package that has the given requirement.</p></li>
+<li><p><strong>extra</strong> – Optional set of extras for package_name.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">packaging.requirements</span><span class="w"> </span><span class="kn">import</span> <span class="n">Requirement</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">PypiDependencies</span><span class="p">({},</span> <span class="p">{},</span> <span class="n">python_version</span><span class="o">=</span><span class="s2">&quot;3.8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">satisfied</span><span class="p">(</span>
 <span class="gp">... </span><span class="n">Requirement</span><span class="p">(</span><span class="s2">&quot;PyJWT[crypto] (&lt;3, &gt;=1.0.0)&quot;</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
@@ -1361,8 +1379,15 @@ is True, otherwise no empty lines).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="komodo.pypi_dependencies.PypiDependencies.used_packages">
-<span class="sig-name descname"><span class="pre">used_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.pypi_dependencies.PypiDependencies.used_packages" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">used_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_level_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#komodo.pypi_dependencies.PypiDependencies.used_packages" title="Link to this definition">¶</a></dt>
+<dd><p>Given you want to install top_level_packages, returns list of
+all packages that must be installed to satisfy dependencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>packages</strong> – which packages to consider, by default: all.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
