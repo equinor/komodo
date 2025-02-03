@@ -347,3 +347,48 @@ def test_multiple_private_packages_unused():
     assert "The following 2 private packages are" in result.message
     assert "unused_private_pkg1" in result.message
     assert "unused_private_pkg2" in result.message
+
+
+def test_private_package_used_by_another_private_package_reported_as_unused():
+    repo = {
+        "private_pkg1": {
+            "1.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+                "depends": ["private_pkg2"],
+            }
+        },
+        "private_pkg2": {
+            "2.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+            }
+        },
+        "private_pkg3": {
+            "3.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+            }
+        },
+    }
+    release = {
+        "private_pkg1": "1.0",
+        "private_pkg2": "2.0",
+        "private_pkg3": "3.0",
+    }
+    package_status = {
+        "private_pkg1": {"visibility": "private"},
+        "private_pkg2": {"visibility": "private"},
+        "private_pkg3": {"visibility": "private"},
+    }
+
+    result = has_unused_packages(repo, release, package_status)
+
+    assert result.exitcode == 1
+    assert "The following 3 private packages are" in result.message
+    assert "private_pkg1" in result.message
+    assert "private_pkg2" in result.message
+    assert "private_pkg3" in result.message
