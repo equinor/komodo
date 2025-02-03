@@ -294,3 +294,56 @@ def test_public_packages_are_used_redundant_package_status_has_no_effect(public_
         ).exitcode
         == 0
     )
+
+
+def test_multiple_private_packages_unused():
+    repo = {
+        "public_pkg": {
+            "1.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+                "depends": ["used_private_pkg"],
+            }
+        },
+        "used_private_pkg": {
+            "0.1": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+            }
+        },
+        "unused_private_pkg1": {
+            "2.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+            }
+        },
+        "unused_private_pkg2": {
+            "3.0": {
+                "source": "github",
+                "make": "pip",
+                "maintainer": "me",
+            }
+        },
+    }
+    release = {
+        "public_pkg": "1.0",
+        "used_private_pkg": "0.1",
+        "unused_private_pkg1": "2.0",
+        "unused_private_pkg2": "3.0",
+    }
+    package_status = {
+        "public_pkg": {"visibility": "public"},
+        "used_private_pkg": {"visibility": "private"},
+        "unused_private_pkg1": {"visibility": "private"},
+        "unused_private_pkg2": {"visibility": "private"},
+    }
+
+    result = has_unused_packages(repo, release, package_status)
+
+    assert result.exitcode == 1
+    assert "The following 2 private packages are" in result.message
+    assert "unused_private_pkg1" in result.message
+    assert "unused_private_pkg2" in result.message
