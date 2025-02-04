@@ -7,33 +7,38 @@ from jinja2 import Template
 from komodo.data import Data
 
 
+def extract_versions(release_string: str) -> (str, str, str):
+    release_parts = release_string.split("-")
+    release_python = None
+    release_rhel = None
+
+    # Use a single loop to find both RHEL and Python versions
+    for part in release_parts:
+        if not release_rhel and re.match(r"rhel\d+", part.strip()):
+            release_rhel = part.strip()
+        if not release_python and re.match(r"^py\d+", part.strip()):
+            release_python = part.strip()
+        if release_rhel and release_python:
+            break  # Exit the loop early if both versions are found
+
+    if not release_rhel:
+        raise ValueError(f"Missing RHEL version in release name: {release_string}")
+    if not release_python:
+        raise ValueError(f"Missing Python version in release name: {release_string}")
+
+    # Construct the release version string
+    base_version = f"{release_string.split('-py')[0]}-{release_python}"
+    return base_version, release_python, release_rhel
+
+
 def create_activator_switch(data: Data, prefix: str, release: str):
     """Given a prefix and a release, create an activator switch which
     will vary the selected activator based on the RHEL version and python version.
     """
     try:
-        release_parts = release.split("-")
-        release_python = None
-        release_rhel = None
-
-        for rhel_ver in release_parts:
-            if re.match(r"rhel\d+", rhel_ver.strip()):
-                release_rhel = rhel_ver.strip()
-                break
-
-        if not release_rhel:
-            raise ValueError(f"Missing rhel version in release name: {release}")
-
-        for py_ver in release_parts:
-            if re.match(r"^py\d+", py_ver.strip()):
-                release_python = py_ver.strip()
-                break
-
-        if not release_python:
-            raise ValueError(f"Missing python version in release name: {release}")
-
-        release_version = release_parts[0].strip() + "-" + release_python
-
+        release_version, python_version, rhel_version = extract_versions(
+            release_string=release
+        )
     except ValueError:
         # likely a build that does not require an activator switch
         return
@@ -56,8 +61,8 @@ def create_activator_switch(data: Data, prefix: str, release: str):
         ) as activator, open(data.get(template), encoding="utf-8") as activator_tmpl:
             activator.write(
                 Template(activator_tmpl.read(), keep_trailing_newline=True).render(
-                    py_version=release_python,
-                    rhel_version=release_rhel,
+                    py_version=python_version,
+                    rhel_version=rhel_version,
                     prefix=prefix,
                     release=release_version,
                 ),

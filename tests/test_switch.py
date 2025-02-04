@@ -65,3 +65,31 @@ def test_write_activator_switches_for_non_matrix_build(tmpdir):
         switch.create_activator_switch(Data(), prefix, release)
     except ValueError as value_error:
         pytest.fail(f"Unexpected ValueError {value_error}")
+
+
+@pytest.mark.parametrize(
+    "release, base_ver, py_ver, rhel_ver",
+    [
+        ("2024.03.03-py311-rhel8", "2024.03.03-py311", "py311", "rhel8"),
+        ("2024.04.04-py312-rhel8", "2024.04.04-py312", "py312", "rhel8"),
+        ("2025.05.05-py312-rhel9", "2025.05.05-py312", "py312", "rhel9"),
+        ("2025.05.05-py312-rhel9-numpy1", "2025.05.05-py312", "py312", "rhel9"),
+        (
+            "bleeding-20250204-1434-py38-rhel9",
+            "bleeding-20250204-1434-py38",
+            "py38",
+            "rhel9",
+        ),
+        (
+            "bleeding-20250204-1434-py311-rhel8-numpy1",
+            "bleeding-20250204-1434-py311",
+            "py311",
+            "rhel8",
+        ),
+    ],
+)
+def test_extract_version_strings(release, base_ver, py_ver, rhel_ver):
+    base, py, rhel = switch.extract_versions(release)
+    assert base == base_ver
+    assert py == py_ver
+    assert rhel == rhel_ver
