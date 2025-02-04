@@ -7,19 +7,18 @@ from jinja2 import Template
 from komodo.data import Data
 
 
-def extract_versions(release_string: str) -> (str, str, str):
+def extract_versions(release_string: str) -> (str, str, str, str):
     release_parts = release_string.split("-")
-    release_python = None
-    release_rhel = None
+    release_python = release_rhel = release_custom = ""
 
-    # Use a single loop to find both RHEL and Python versions
     for part in release_parts:
+        if release_rhel and release_python:
+            release_custom = part  # optional custom part is always last
+            break
         if not release_rhel and re.match(r"rhel\d+", part.strip()):
             release_rhel = part.strip()
         if not release_python and re.match(r"^py\d+", part.strip()):
             release_python = part.strip()
-        if release_rhel and release_python:
-            break  # Exit the loop early if both versions are found
 
     if not release_rhel:
         raise ValueError(f"Missing RHEL version in release name: {release_string}")
@@ -28,7 +27,7 @@ def extract_versions(release_string: str) -> (str, str, str):
 
     # Construct the release version string
     base_version = f"{release_string.split('-py')[0]}-{release_python}"
-    return base_version, release_python, release_rhel
+    return base_version, release_python, release_rhel, release_custom
 
 
 def create_activator_switch(data: Data, prefix: str, release: str):
@@ -36,8 +35,8 @@ def create_activator_switch(data: Data, prefix: str, release: str):
     will vary the selected activator based on the RHEL version and python version.
     """
     try:
-        release_version, python_version, rhel_version = extract_versions(
-            release_string=release
+        release_version, python_version, rhel_version, custom_version = (
+            extract_versions(release_string=release)
         )
     except ValueError:
         # likely a build that does not require an activator switch
@@ -65,5 +64,6 @@ def create_activator_switch(data: Data, prefix: str, release: str):
                     rhel_version=rhel_version,
                     prefix=prefix,
                     release=release_version,
+                    custom_version=custom_version,
                 ),
             )

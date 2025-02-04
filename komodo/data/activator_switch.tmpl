@@ -1,9 +1,15 @@
+{% if custom_version %}
+    CUSTOM_COORDINATE="-{{ custom_version }}"
+{% else %}
+    CUSTOM_COORDINATE=""
+{% endif %}
+
 if [[ $(uname -r) == *el8* ]] || [[ $(uname -r) == *el9* ]] ; then
     export KOMODO_ROOT={{ prefix }}
     KOMODO_RELEASE_REAL={{ release }}
 
     rhel_version_number=$(uname -r | grep -oP 'el\K[0-9]')
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number/enable
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number$CUSTOM_COORDINATE/enable
     export PS1="(${KOMODO_RELEASE_REAL}) ${_PRE_KOMODO_PS1}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 else
