@@ -1,9 +1,15 @@
+{% if custom_version %}
+    CUSTOM_COORDINATE="-{{ custom_version }}"
+{% else %}
+    CUSTOM_COORDINATE=""
+{% endif %}
+
 if ( `uname -r` =~ *el8* ) || ( `uname -r` =~ *el9* ) then
     setenv KOMODO_ROOT {{ prefix }}
     set KOMODO_RELEASE_REAL = "{{ release }}"
 
     set rhel_version_number=`uname -r | grep -oP 'el\K[0-9]'`
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number/enable.csh
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number$CUSTOM_COORDINATE/enable.csh
     if ( $?_KOMODO_OLD_PROMPT ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
