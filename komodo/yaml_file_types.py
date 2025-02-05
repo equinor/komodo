@@ -1,47 +1,12 @@
 import argparse
 import os
-from collections import namedtuple
 from pathlib import Path
 from typing import Dict, List, Mapping, MutableSet, Sequence, Union
 
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
 
-KomodoError = namedtuple(
-    "KomodoError",
-    ["package", "version", "maintainer", "depends", "err"],
-)
-
-Report = namedtuple(
-    "LintReport",
-    ["release_name", "maintainers", "dependencies", "versions"],
-)
-
-
-class KomodoException(Exception):
-    def __init__(self, error_message: KomodoError) -> None:
-        self.error = error_message
-
-
-MISSING_PACKAGE = "missing package"
-MISSING_VERSION = "missing version"
-MISSING_DEPENDENCY = "missing dependency"
-MISSING_MAINTAINER = "missing maintainer"
-MISSING_MAKE = "missing make information"
-MALFORMED_VERSION = "malformed version"
-MAIN_VERSION = "dangerous version (main branch)"
-MASTER_VERSION = "dangerous version (master branch)"
-FLOAT_VERSION = "dangerous version (float interpretable)"
-
-
-def _komodo_error(package=None, version=None, maintainer=None, depends=None, err=None):
-    return KomodoError(
-        package=package,
-        version=version,
-        maintainer=maintainer,
-        depends=depends,
-        err=err,
-    )
+from .komodo_error import KomodoError, KomodoException
 
 
 def load_yaml_from_string(value: str) -> dict:
@@ -247,9 +212,11 @@ class RepositoryFile(YamlFile):
             self.validate_package_entry(package, version)
         except KomodoException as komodo_exception:
             raise KomodoException(
-                _komodo_error(package=package, version=version, err=komodo_exception),
+                KomodoError(
+                    package=package, version=version, err=str(komodo_exception)
+                ),
             ) from komodo_exception
-        return _komodo_error(
+        return KomodoError(
             package=package,
             version=version,
             maintainer=repository_entries[package][version]["maintainer"],

@@ -3,13 +3,12 @@ from pathlib import Path
 
 import pytest
 
+from komodo.komodo_error import KomodoError, KomodoException
 from komodo.yaml_file_types import (
-    KomodoException,
     PackageStatusFile,
     ReleaseDir,
     ReleaseFile,
     RepositoryFile,
-    _komodo_error,
 )
 
 
@@ -755,7 +754,7 @@ LINT_MAINTAINER_TEST_REPO = """
             "python",
             "3.8.6",
             does_not_raise(),
-            _komodo_error("python", "3.8.6", "scout"),
+            KomodoError("python", "3.8.6", "scout"),
             id="lint_maintainer_returns_valid",
         ),
         pytest.param(
