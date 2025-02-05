@@ -28,10 +28,10 @@ CUSTOM_COORDINATE="{custom_coordinate}"
 
 if [[ $(uname -r) == *el8* ]] || [[ $(uname -r) == *el9* ]] ; then
     export KOMODO_ROOT={prefix}
-    KOMODO_RELEASE_REAL={expected_release}
-
     rhel_version_number=$(uname -r | grep -oP 'el\\K[0-9]')
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number$CUSTOM_COORDINATE/enable
+    KOMODO_RELEASE_REAL={expected_release}-rhel$rhel_version_number$CUSTOM_COORDINATE
+
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL/enable
     export PS1="(${{KOMODO_RELEASE_REAL}}) ${{_PRE_KOMODO_PS1}}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 else
@@ -44,15 +44,15 @@ fi
     assert (
         actual_csh_activator.read_text(encoding="utf-8").strip()
         == f"""
-CUSTOM_COORDINATE="{custom_coordinate}"
+set CUSTOM_COORDINATE="{custom_coordinate}"
 
 
-if ( `uname -r` =~ *el8* ) || ( `uname -r` =~ *el9* ) then
+set rhel_version_number = `uname -r | grep -oP 'el\\K[8-9]'`
+if ( $status == 0 ) then
     setenv KOMODO_ROOT {prefix}
-    set KOMODO_RELEASE_REAL = "{expected_release}"
+    set KOMODO_RELEASE_REAL = "{expected_release}"-rhel$rhel_version_number$CUSTOM_COORDINATE
 
-    set rhel_version_number=`uname -r | grep -oP 'el\\K[0-9]'`
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel$rhel_version_number$CUSTOM_COORDINATE/enable.csh
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL/enable.csh
     if ( $?_KOMODO_OLD_PROMPT ) then
         set prompt = "[$KOMODO_RELEASE_REAL] $_KOMODO_OLD_PROMPT"
     endif
