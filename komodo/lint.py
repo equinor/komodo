@@ -54,9 +54,9 @@ def lint_version_numbers(package, version, repo):
             parsed_version
         ):  # don't know if possible to check otherwise
             return KomodoError(package, version, maintainer)
-    except:  # pylint: disable=bare-except  # noqa
+    except Exception as err:  # pylint: disable=broad-exception-caught
         # Log any exception:
-        return KomodoError(package, version, maintainer)
+        return KomodoError(package, version, maintainer, err=str(err))
     return None
 
 
