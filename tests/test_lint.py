@@ -2,51 +2,85 @@ from __future__ import annotations
 
 import os
 import sys
+from typing import Any
 
 import pytest
 
-from komodo import lint
+from komodo import lint as kmdlint
+from komodo.komodo_error import KomodoError
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
-REPO = {
-    "python": {
-        "v3.14": {
-            "maintainer": "ertomatic@equinor.com",
-            "make": "sh",
-            "makefile": "configure",
-            "source": "git://github.com/python/cpython.git",
-        },
-    },
-    "requests": {
-        "8.18.4": {
-            "depends": ["python"],
-            "maintainer": "maintainer@equinor.com",
-            "make": "pip",
-            "source": "pypi",
-        },
-    },
-    "secrettool": {
-        "10.0": {
-            "source": "https://{{ACCESS_TOKEN}}@github.com/equinor/secrettool.git",
-            "fetch": "git",
-            "make": "pip",
-            "maintainer": "Prop Rietary",
-        },
-    },
-}
 
-RELEASE = {
-    "python": "v3.14",
-    "requests": "8.18.4",
-}
+def lint(
+    release: dict[str, str],
+    repository: dict[str, Any],
+) -> kmdlint.Report:
+    return kmdlint.lint(
+        ReleaseFile.from_dictionary(release),
+        RepositoryFile.from_dictionary(repository),
+    )
 
 
 def test_lint():
-    repo = RepositoryFile.from_dictionary(REPO)
-    release = ReleaseFile.from_dictionary(RELEASE)
-    lint_report = lint.lint(release, repo)
-    assert lint_report.dependency_errors == []
+    lint_report = lint(
+        {
+            "python": "v3.14",
+            "requests": "8.18.4",
+        },
+        {
+            "python": {
+                "v3.14": {
+                    "maintainer": "ertomatic@equinor.com",
+                    "make": "sh",
+                    "makefile": "configure",
+                    "source": "git://github.com/python/cpython.git",
+                },
+            },
+            "requests": {
+                "8.18.4": {
+                    "depends": ["python"],
+                    "maintainer": "maintainer@equinor.com",
+                    "make": "pip",
+                    "source": "pypi",
+                },
+            },
+            "secrettool": {
+                "10.0": {
+                    "source": "https://{{ACCESS_TOKEN}}@github.com/equinor/secrettool.git",
+                    "fetch": "git",
+                    "make": "pip",
+                    "maintainer": "Prop Rietary",
+                },
+            },
+        },
+    )
     assert lint_report.version_errors == []
+
+
+def test_lint_empty_release_has_no_errors():
+    lint_report = lint(
+        {},
+        {
+            "python": {
+                "v3.14": {
+                    "maintainer": "ertomatic@equinor.com",
+                    "make": "sh",
+                    "makefile": "configure",
+                    "source": "git://github.com/python/cpython.git",
+                },
+            },
+        },
+    )
+    assert lint_report.version_errors == []
+    assert lint_report.maintainer_errors == []
+    assert lint_report.release_name_errors == []
+
+
+def test_missing_repo_package_gives_error():
+    lint_report = lint({"python": "3.14.0"}, {})
+    assert lint_report.version_errors == []
+    assert len(lint_report.maintainer_errors) == 1
+    assert lint_report.release_name_errors == []
 
 
 def _write_file(file_path: str, file_content: str) -> str:
@@ -361,4 +395,4 @@ def test_integration_main(
         )
     monkeypatch.setattr(sys, "argv", ["", release_file, repository_file])
     with expectation:
-        lint.lint_main()
+        kmdlint.lint_main()
