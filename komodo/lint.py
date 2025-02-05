@@ -19,7 +19,12 @@ KomodoError = namedtuple(
 
 Report = namedtuple(
     "LintReport",
-    ["release_name", "maintainers", "dependencies", "versions"],
+    [
+        "release_name_errors",
+        "maintainer_errors",
+        "dependency_errors",
+        "version_errors",
+    ],
 )
 
 MISSING_PACKAGE = "missing package"
@@ -143,10 +148,10 @@ def lint(
         deps = []
 
     return Report(
-        release_name=[],
-        maintainers=maintainers,
-        dependencies=deps,
-        versions=versions,
+        release_name_errors=[],
+        maintainer_errors=maintainers,
+        dependency_errors=deps,
+        version_errors=versions,
     )
 
 
@@ -190,9 +195,9 @@ def lint_main():
         args.packagefile, args.repofile, check_dependencies=args.check_pypi_dependencies
     )
     maintainers, deps, versions = (
-        report.maintainers,
-        report.dependencies,
-        report.versions,
+        report.maintainer_errors,
+        report.dependency_errors,
+        report.version_errors,
     )
     print(f"{len(maintainers)} packages")
     if not any(err.err for err in maintainers + deps + versions):
