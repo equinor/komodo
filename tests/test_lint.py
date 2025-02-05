@@ -42,8 +42,8 @@ RELEASE = {
 
 
 def test_lint():
-    repo = RepositoryFile.from_dictionary(value=REPO)
-    release = ReleaseFile.from_dictionary(value=RELEASE)
+    repo = RepositoryFile.from_dictionary(REPO)
+    release = ReleaseFile.from_dictionary(RELEASE)
     lint_report = lint.lint(release, repo)
     assert lint_report.dependency_errors == []
     assert lint_report.version_errors == []
