@@ -20,7 +20,6 @@ Report = namedtuple(
     [
         "release_name_errors",
         "maintainer_errors",
-        "dependency_errors",
         "version_errors",
     ],
 )
@@ -63,7 +62,6 @@ def lint_version_numbers(package, version, repo):
 def lint(
     release_file: ReleaseFile,
     repository_file: RepositoryFile,
-    check_dependencies: bool = False,
 ) -> Report:
     maintainers, versions = [], []
     for package_name, package_version in release_file.content.items():
@@ -84,63 +82,60 @@ def lint(
                 versions.append(lint_version_number)
         except KomodoException as komodo_exception:
             maintainers.append(komodo_exception.error)
-
-    if check_dependencies:
-        all_dependencies = dict(release_file.content.items())
-        pypi_dependencies = {
-            name: version
-            for name, version in all_dependencies.items()
-            if repository_file.content.get(name, {}).get(version, {}).get("source")
-            == "pypi"
-        }
-
-        python_version = release_file.content["python"]
-        with open("builtin_python_versions.yml", encoding="utf-8") as f:
-            full_python_version = yaml.safe_load(f)[python_version]
-
-        dependencies = PypiDependencies(
-            pypi_dependencies, all_dependencies, python_version=full_python_version
-        )
-        for name, version in release_file.content.items():
-            if (
-                repository_file.content.get(name, {}).get(version, {}).get("source")
-                != "pypi"
-            ):
-                if (
-                    name not in repository_file.content
-                    or version not in repository_file.content[name]
-                ):
-                    raise ValueError(
-                        f"Missing package in repository file: {name}=={version}"
-                    )
-                depends = repository_file.content[name][version].get("depends", [])
-                if depends:
-                    dependencies.add_user_specified(
-                        name, repository_file.content[name][version]["depends"]
-                    )
-
-        failed_requirements = dependencies.failed_requirements()
-        if failed_requirements:
-            package_set = sorted(set(failed_requirements.values()))
-            deps = [
-                KomodoError(
-                    err="Failed requirements:",
-                    depends=[str(r) for r in failed_requirements],
-                    package=", ".join(package_set),
-                )
-            ]
-        else:
-            deps = []
-        dependencies.dump_cache()
-    else:
-        deps = []
-
     return Report(
         release_name_errors=[],
         maintainer_errors=maintainers,
-        dependency_errors=deps,
         version_errors=versions,
     )
+
+
+def check_dependencies(
+    release_file: ReleaseFile, repository_file: RepositoryFile, full_python_version: str
+) -> list[KomodoError]:
+    all_dependencies = dict(release_file.content.items())
+    pypi_dependencies = {
+        name: version
+        for name, version in all_dependencies.items()
+        if repository_file.content.get(name, {}).get(version, {}).get("source")
+        == "pypi"
+    }
+
+    dependencies = PypiDependencies(
+        pypi_dependencies, all_dependencies, python_version=full_python_version
+    )
+    for name, version in release_file.content.items():
+        if (
+            repository_file.content.get(name, {}).get(version, {}).get("source")
+            != "pypi"
+        ):
+            if (
+                name not in repository_file.content
+                or version not in repository_file.content[name]
+            ):
+                raise ValueError(
+                    f"Missing package in repository file: {name}=={version}"
+                )
+            depends = repository_file.content[name][version].get("depends", [])
+            if depends:
+                dependencies.add_user_specified(
+                    name, repository_file.content[name][version]["depends"]
+                )
+
+    failed_requirements = dependencies.failed_requirements()
+    if failed_requirements:
+        package_set = sorted(set(failed_requirements.values()))
+        deps = [
+            KomodoError(
+                err="Failed requirements:",
+                depends=[str(r) for r in failed_requirements],
+                package=", ".join(package_set),
+            )
+        ]
+    else:
+        deps = []
+    dependencies.dump_cache()
+
+    return deps
 
 
 def get_args(args=None):
@@ -179,14 +174,17 @@ def lint_main(args=None):
     args = get_args(args)
     logging.basicConfig(format="%(message)s", level=args.loglevel)
 
-    report = lint(
-        args.packagefile, args.repofile, check_dependencies=args.check_pypi_dependencies
-    )
-    maintainers, deps, versions = (
-        report.maintainer_errors,
-        report.dependency_errors,
-        report.version_errors,
-    )
+    if args.check_pypi_dependencies:
+        python_version = args.packagefile.content["python"]
+        with open("builtin_python_versions.yml", encoding="utf-8") as f:
+            full_python_version = yaml.safe_load(f)[python_version]
+        deps = check_dependencies(args.packagefile, args.repofile, full_python_version)
+    else:
+        full_python_version = None
+        deps = []
+
+    report = lint(args.packagefile, args.repofile)
+    maintainers, versions = (report.maintainer_errors, report.version_errors)
     print(f"{len(maintainers)} packages")
     if not any(err.err for err in maintainers + deps + versions):
         print("No errors found")
