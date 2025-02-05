@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import sys
 
@@ -53,7 +55,9 @@ def _write_file(file_path: str, file_content: str) -> str:
     return file_path
 
 
-def _create_tmp_test_files(release_file_content, repository_file_content) -> (str, str):
+def _create_tmp_test_files(
+    release_file_content, repository_file_content
+) -> tuple[str, str]:
     folder_name = os.path.join(os.getcwd(), "test_lint/")
     os.mkdir(folder_name)
     release_file = _write_file(
