@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import argparse
 import logging
 import sys
@@ -9,13 +11,9 @@ from collections import namedtuple
 import yaml
 from packaging.version import parse
 
+from .komodo_error import KomodoError, KomodoException
 from .pypi_dependencies import PypiDependencies
-from .yaml_file_types import KomodoException, ReleaseFile, RepositoryFile
-
-KomodoError = namedtuple(
-    "KomodoError",
-    ["package", "version", "maintainer", "depends", "err"],
-)
+from .yaml_file_types import ReleaseFile, RepositoryFile
 
 Report = namedtuple(
     "LintReport",
@@ -38,16 +36,6 @@ MASTER_VERSION = "dangerous version (master branch)"
 FLOAT_VERSION = "dangerous version (float interpretable)"
 
 
-def _komodo_error(package=None, version=None, maintainer=None, depends=None, err=None):
-    return KomodoError(
-        package=package,
-        version=version,
-        maintainer=maintainer,
-        depends=depends,
-        err=err,
-    )
-
-
 def lint_version_numbers(package, version, repo):
     package_release = repo[package][version]
     maintainer = package_release.get("maintainer", MISSING_MAINTAINER)
@@ -55,9 +43,9 @@ def lint_version_numbers(package, version, repo):
     try:
         logging.info(f"Using {package} {version}")
         if "main" in version:
-            return _komodo_error(package, version, maintainer, err=MAIN_VERSION)
+            return KomodoError(package, version, maintainer, err=MAIN_VERSION)
         if "master" in version:
-            return _komodo_error(package, version, maintainer, err=MASTER_VERSION)
+            return KomodoError(package, version, maintainer, err=MASTER_VERSION)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
             parsed_version = parse(version)
@@ -65,10 +53,10 @@ def lint_version_numbers(package, version, repo):
         if "Legacy" in repr(
             parsed_version
         ):  # don't know if possible to check otherwise
-            return _komodo_error(package, version, maintainer)
+            return KomodoError(package, version, maintainer)
     except:  # pylint: disable=bare-except  # noqa
         # Log any exception:
-        return _komodo_error(package, version, maintainer)
+        return KomodoError(package, version, maintainer)
     return None
 
 
@@ -135,7 +123,7 @@ def lint(
         if failed_requirements:
             package_set = sorted(set(failed_requirements.values()))
             deps = [
-                _komodo_error(
+                KomodoError(
                     err="Failed requirements:",
                     depends=[str(r) for r in failed_requirements],
                     package=", ".join(package_set),

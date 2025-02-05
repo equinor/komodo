@@ -79,7 +79,15 @@ def test_lint_empty_release_has_no_errors():
 def test_missing_repo_package_gives_error():
     lint_report = lint({"python": "3.14.0"}, {})
     assert lint_report.version_errors == []
-    assert len(lint_report.maintainer_errors) == 1
+    assert lint_report.maintainer_errors == [
+        KomodoError(
+            package="python",
+            version="3.14.0",
+            maintainer=None,
+            depends=None,
+            err="Package 'python' not found in repository",
+        )
+    ]
     assert lint_report.release_name_errors == []
 
 
