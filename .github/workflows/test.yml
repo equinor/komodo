@@ -83,6 +83,14 @@ jobs:
         source ${{ runner.temp }}/prefix/ci/enable
         [[ "$(which python)" == "${{ runner.temp }}/prefix/ci/root/bin/python" ]]
 
+    - name: Test enable.csh script
+      run: |
+        cat ${{ runner.temp }}/prefix/ci/enable.csh
+        csh -v -c "source ${{ runner.temp }}/prefix/ci/enable.csh"
+        echo "Current Python path:"
+        csh -v -c "source /home/runner/work/_temp/prefix/ci/enable.csh && which python"
+        csh -v -c "which python | grep -q '${{ runner.temp }}/prefix/ci/root/bin/python'"
+
     - name: Test Python version
       run: |
         source ${{ runner.temp }}/prefix/ci/enable
