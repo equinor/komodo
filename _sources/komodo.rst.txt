@@ -77,6 +77,14 @@ komodo.insert\_proposals module
    :undoc-members:
    :show-inheritance:
 
+komodo.komodo\_error module
+---------------------------
+
+.. automodule:: komodo.komodo_error
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 komodo.lint module
 ------------------
 
