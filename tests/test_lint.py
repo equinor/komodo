@@ -452,3 +452,58 @@ def test_missing_dependency_is_printed(tmp_path, monkeypatch, capsys):
                 [str(release_file), str(repo_file), "--check-pypi-dependencies"]
             )
         assert "Failed requirements:\nert\n  numpy<2" in capsys.readouterr()
+
+
+def check_dependencies(
+    release: dict[str, str],
+    repository: dict[str, Any],
+    full_python_version: str = "3.11.5",
+):
+    return kmdlint.check_dependencies(
+        ReleaseFile.from_dictionary(release),
+        RepositoryFile.from_dictionary(repository),
+        full_python_version,
+    )
+
+
+@patch_fetch_from_pypi()
+def test_empty_depends_field_means_no_dependencies():
+    assert (
+        check_dependencies(
+            {"ert": "13.0.0"},
+            {
+                "ert": {
+                    "13.0.0": {"source": "git", "make": "pip", "maintainer": "scout"}
+                }
+            },
+        )
+        == []
+    )
+
+
+def test_empty_depends_field_means_no_dependencies_in_transient():
+    def pypi_requirements(package, _):
+        # we only expect to fetch
+        # semeio from pypi in the below setup
+        assert package == "semeio"
+        return [Requirement("ert>=13.0.0")]
+
+    with patch_fetch_from_pypi(pypi_requirements):
+        assert (
+            check_dependencies(
+                {"ert": "main", "semeio": "0.1.0"},
+                {
+                    "ert": {
+                        "main": {"source": "git", "make": "pip", "maintainer": "scout"}
+                    },
+                    "semeio": {
+                        "0.1.0": {
+                            "source": "pypi",
+                            "make": "pip",
+                            "maintainer": "scout",
+                        }
+                    },
+                },
+            )
+            == []
+        )
