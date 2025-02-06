@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import Any
+from textwrap import dedent
+from typing import Any, Callable
+from unittest.mock import patch
 
 import pytest
+from packaging.requirements import Requirement
 
 from komodo import lint as kmdlint
 from komodo.komodo_error import KomodoError
+from komodo.pypi_dependencies import PypiDependencies
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
@@ -404,3 +408,47 @@ def test_integration_main(
     monkeypatch.setattr(sys, "argv", ["", release_file, repository_file])
     with expectation:
         kmdlint.lint_main()
+
+
+def fail(*args, **kwargs):
+    raise AssertionError()
+
+
+def patch_fetch_from_pypi(f: Callable[[str, str], list[Requirement]] = fail):
+    return patch.object(
+        PypiDependencies,
+        "_get_requirements_from_pypi",
+        new=lambda *args: f(*args[1:]),  # drop self parameter
+    )
+
+
+def test_missing_dependency_is_printed(tmp_path, monkeypatch, capsys):
+    (tmp_path / "builtin_python_versions.yml").write_text("3.11-builtin: 3.11.5\n")
+    (release_file := tmp_path / "2025.02.00-py311-rhel9.yml").write_text(
+        dedent("""\
+        python: 3.11-builtin\n
+        ert: 13.0.0
+        """)
+    )
+    (repo_file := tmp_path / "repo.yml").write_text(
+        dedent("""\
+        ert:
+          13.0.0:
+            maintainer: scout
+            make: pip
+            source: pypi
+        python:
+          3.11-builtin:
+            maintainer: scout
+            make: sh
+            makefile: build__python-virtualenv.sh
+            makeopts: --virtualenv-interpreter /usr/bin/python3.11
+        """)
+    )
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit, match=SYSTEM_EXIT_KOMODO_ERROR):
+        with patch_fetch_from_pypi(lambda *_: [Requirement("numpy < 2")]):
+            kmdlint.lint_main(
+                [str(release_file), str(repo_file), "--check-pypi-dependencies"]
+            )
+        assert "Failed requirements:\nert\n  numpy<2" in capsys.readouterr()
