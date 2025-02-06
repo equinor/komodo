@@ -143,7 +143,7 @@ def lint(
     )
 
 
-def get_args():
+def get_args(args=None):
     parser = argparse.ArgumentParser(
         description="Lint komodo setup.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -172,11 +172,11 @@ def get_args():
         action="store_true",
         default=False,
     )
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
-def lint_main():
-    args = get_args()
+def lint_main(args=None):
+    args = get_args(args)
     logging.basicConfig(format="%(message)s", level=args.loglevel)
 
     report = lint(
