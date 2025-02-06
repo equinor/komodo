@@ -105,21 +105,13 @@ def check_dependencies(
     )
     for name, version in release_file.content.items():
         if (
-            repository_file.content.get(name, {}).get(version, {}).get("source")
-            != "pypi"
+            name not in repository_file.content
+            or version not in repository_file.content[name]
         ):
-            if (
-                name not in repository_file.content
-                or version not in repository_file.content[name]
-            ):
-                raise ValueError(
-                    f"Missing package in repository file: {name}=={version}"
-                )
-            depends = repository_file.content[name][version].get("depends", [])
-            if depends:
-                dependencies.add_user_specified(
-                    name, repository_file.content[name][version]["depends"]
-                )
+            raise ValueError(f"Missing package in repository file: {name}=={version}")
+        package_repo = repository_file.content[name][version]
+        if package_repo.get("source") != "pypi":
+            dependencies.add_user_specified(name, package_repo.get("depends", []))
 
     failed_requirements = dependencies.failed_requirements()
     if failed_requirements:
