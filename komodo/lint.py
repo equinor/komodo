@@ -93,15 +93,9 @@ def check_dependencies(
     release_file: ReleaseFile, repository_file: RepositoryFile, full_python_version: str
 ) -> list[KomodoError]:
     all_dependencies = dict(release_file.content.items())
-    pypi_dependencies = {
-        name: version
-        for name, version in all_dependencies.items()
-        if repository_file.content.get(name, {}).get(version, {}).get("source")
-        == "pypi"
-    }
 
     dependencies = PypiDependencies(
-        pypi_dependencies, all_dependencies, python_version=full_python_version
+        all_dependencies, python_version=full_python_version
     )
     for name, version in release_file.content.items():
         if (

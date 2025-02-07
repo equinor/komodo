@@ -92,7 +92,6 @@ def check_for_unused_package(
 def _extract_dependencies(release_file, repository, full_python_version):
     dependencies = PypiDependencies(
         release_file.content,
-        release_file.content,
         python_version=full_python_version,
     )
     for name, version in release_file.content.items():
