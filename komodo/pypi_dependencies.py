@@ -42,7 +42,6 @@ environment = {
 class PypiDependencies:
     def __init__(
         self,
-        pypi_dependencies: dict[str, str],
         to_install: dict[str, str],
         python_version: str,
         cachefile: str | None = "./pypi_dependencies.yml",
@@ -50,9 +49,6 @@ class PypiDependencies:
         """A dependency checker for pypi packages.
 
         Args:
-            pypi_depedencies:
-                mapping from pypi package name to version of all pypi packages
-                under consideration.
             to_install:
                 All packages that are to be installed
             python_version:
@@ -69,10 +65,6 @@ class PypiDependencies:
         self._used_packages = set()
 
         self._install_names = {canonicalize_name(name): name for name in to_install}
-        self._pypi_dependencies = {
-            canonicalize_name(name): version
-            for name, version in pypi_dependencies.items()
-        }
         self._to_install = {
             canonicalize_name(name): version for name, version in to_install.items()
         }
@@ -88,14 +80,14 @@ class PypiDependencies:
 
         self._user_specified = {}
 
-    def _update_package_sets(self, packages=None):
-        for package_name, version in packages or self._pypi_dependencies.items():
+    def _update_package_sets(self, packages):
+        for package_name, version in packages:
             requirements = self._get_requirements(package_name, version)
             self._used_packages.add(package_name)
             for r in requirements:
                 _ = self.satisfied(r, package_name)
 
-    def failed_requirements(self, packages=None):
+    def failed_requirements(self):
         """lists which requirements were not met.
 
         Args:
@@ -115,18 +107,16 @@ class PypiDependencies:
         ...    **pypi_packages,
         ...    "xtgeo": "main",
         ...    "iterative_ensemble_smoother": "main"}
-        >>> dependencies = PypiDependencies(pypi_packages, all_packages, python_version="3.8")
+        >>> dependencies = PypiDependencies(all_packages, python_version="3.8")
         >>> dependencies.add_user_specified("xtgeo", [])
         >>> dependencies.add_user_specified("iterative_ensemble_smoother", [])
         >>> dependencies.failed_requirements() # doctest: +ELLIPSIS
         Not installed: aiosignal...
         """
-        self._update_package_sets(packages)
+        self._update_package_sets(self._to_install.items())
         return self._failed_requirements
 
-    def used_packages(
-        self, top_level_packages: Iterable[tuple[str, str]] | None = None
-    ) -> set[str]:
+    def used_packages(self, top_level_packages: Iterable[tuple[str, str]]) -> set[str]:
         """Given you want to install top_level_packages, returns list of
         all packages that must be installed to satisfy dependencies.
 
@@ -173,7 +163,7 @@ class PypiDependencies:
             List of requirements for given package.
 
         >>> from packaging.requirements import Requirement
-        >>> PypiDependencies({}, {}, python_version="3.8.11")._get_requirements(
+        >>> PypiDependencies({}, python_version="3.8.11")._get_requirements(
         ...     "rips",
         ...     "2024.3.0.2"
         ... )
@@ -300,13 +290,13 @@ class PypiDependencies:
                 Optional set of extras for package_name.
 
         >>> from packaging.requirements import Requirement
-        >>> PypiDependencies({}, {}, python_version="3.8").satisfied(
+        >>> PypiDependencies({}, python_version="3.8").satisfied(
         ... Requirement("PyJWT[crypto] (<3, >=1.0.0)")
         ... )
         Not installed: pyjwt
         False
         >>> packages = {"PyJWT": "2.3.0"}
-        >>> PypiDependencies(packages, packages, python_version="3.8").satisfied(
+        >>> PypiDependencies(packages, python_version="3.8").satisfied(
         ...     Requirement("PyJWT (<3, >=1.0.0)")
         ... )
         True
