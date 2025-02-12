@@ -39,11 +39,15 @@ environment = {
 
 
 def version_list_to_requirements(
-    version_list: Iterable[tuple[str, str | None]],
+    version_list: Iterable[tuple[str, str | None, list[str]]],
 ) -> list[Requirement]:
     return [
-        Requirement(d if version in [None, "main", "master"] else f"{d}=={version}")
-        for d, version in version_list
+        Requirement(
+            f"{d}[{','.join(extras)}]"
+            if version in [None, "main", "master"]
+            else f"{d}[{','.join(extras)}]=={version}"
+        )
+        for d, version, extras in version_list
         if d != "python"
     ]
 
@@ -146,7 +150,7 @@ class PypiDependencies:
         # version if present as the version check considers
         # beta versions as failing unless specifically specified
         depends_versions = [
-            (name, self._to_install.get(canonicalize_name(name)))
+            (name, self._to_install.get(canonicalize_name(name)), [])
             for name in depends
             if name != "python"
         ]
