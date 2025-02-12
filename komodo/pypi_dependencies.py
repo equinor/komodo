@@ -118,8 +118,8 @@ class PypiDependencies:
         all packages that must be installed to satisfy dependencies.
 
         Args:
-            packages:
-                which packages to consider, by default: all.
+            top_level_packages:
+                which package, version pairs that must be installed.
         """
         self._used_packages = set()  # clear packages used
         for package_name, version in top_level_packages:
