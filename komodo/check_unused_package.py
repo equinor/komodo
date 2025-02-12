@@ -57,12 +57,21 @@ def check_for_unused_package(
                 f"{pkg} does not have visibility field in package status file"
             ) from err
 
+    def get_extras(pkg: str) -> list[str]:
+        try:
+            status = package_status[pkg]
+        except KeyError as err:
+            raise NoSuchPackageStatus(
+                f"Could not find {pkg} in the package status file"
+            ) from err
+        return status.get("extras", [])
+
     try:
         private_packages = {
             pkg for pkg in release_file.content if get_visibility(pkg) == "private"
         }
         public_packages = version_list_to_requirements(
-            (pkg, version)
+            (pkg, version, get_extras(pkg))
             for pkg, version in release_file.content.items()
             if get_visibility(pkg) in ("public", "private-plugin")
         )

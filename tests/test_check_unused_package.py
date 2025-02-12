@@ -440,3 +440,52 @@ def test_circular_dependencies_handled_gracefully():
 
     assert result.exitcode == 0  # No unused packages should be reported
     assert "Everything seems fine." in result.message
+
+
+def test_specified_extras_are_required():
+    from_pypi = {
+        ("ert", "13.0.0"): [
+            Requirement("numpy==2.0.0"),
+            Requirement("flask ; extra == 'everest'"),
+        ],
+        ("numpy", "2.0.0"): [],
+        ("flask", "0.1.0"): [],
+    }
+    with patch_fetch_from_pypi(lambda *args: from_pypi[tuple(args)]):
+        repo = {
+            "ert": {
+                "13.0.0": {
+                    "source": "pypi",
+                    "make": "pip",
+                    "maintainer": "me",
+                }
+            },
+            "flask": {
+                "0.1.0": {
+                    "source": "pypi",
+                    "make": "pip",
+                    "maintainer": "me",
+                }
+            },
+            "numpy": {
+                "2.0.0": {
+                    "source": "pypi",
+                    "make": "pip",
+                    "maintainer": "me",
+                }
+            },
+        }
+        release = {
+            "ert": "13.0.0",
+            "numpy": "2.0.0",
+            "flask": "0.1.0",
+        }
+        package_status = {
+            "flask": {"visibility": "private"},
+            "numpy": {"visibility": "private"},
+            "ert": {"visibility": "public", "extras": ["everest"]},
+        }
+
+        result = has_unused_packages(repo, release, package_status)
+
+        assert result.exitcode == 0  # No unused packages should be reported
