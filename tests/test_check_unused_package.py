@@ -127,19 +127,17 @@ def test_empty_release_has_no_unused_packages():
 
 
 def test_missing_package_status_gives_error_code_2():
-    assert has_unused_packages({}, {"package": "version"}, {}).exitcode == 2
+    assert has_unused_packages({}, {"package": "1.0.0"}, {}).exitcode == 2
 
 
 def test_missing_visibility_gives_error_code_2():
-    assert (
-        has_unused_packages({}, {"package": "version"}, {"package": {}}).exitcode == 2
-    )
+    assert has_unused_packages({}, {"package": "1.0.0"}, {"package": {}}).exitcode == 2
 
 
 def test_missing_repo_gives_error_code_3():
     assert (
         has_unused_packages(
-            {}, {"package": "version"}, {"package": {"visibility": "public"}}
+            {}, {"package": "1.0.0"}, {"package": {"visibility": "public"}}
         ).exitcode
         == 3
     )
@@ -202,12 +200,13 @@ def test_public_packages_are_used(public_type):
     )
 
 
-def test_dependencies_of_public_packages_are_used():
+@pytest.mark.parametrize("public_version", ["1.0", "main", "master"])
+def test_dependencies_of_public_packages_are_used(public_version):
     assert (
         has_unused_packages(
             {
                 "public_package": {
-                    "1.0": {
+                    public_version: {
                         "source": "github",
                         "make": "pip",
                         "maintainer": "me",
@@ -222,7 +221,7 @@ def test_dependencies_of_public_packages_are_used():
                     }
                 },
             },
-            {"public_package": "1.0", "private_package": "0.1"},
+            {"public_package": public_version, "private_package": "0.1"},
             {
                 "public_package": {"visibility": "public"},
                 "private_package": {"visibility": "private"},

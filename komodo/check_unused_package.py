@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import yaml
+from packaging.requirements import Requirement
 
 from komodo.prettier import load_yaml
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
@@ -62,9 +63,11 @@ def check_for_unused_package(
             pkg for pkg in release_file.content if get_visibility(pkg) == "private"
         }
         public_packages = (
-            (pkg, version)
+            Requirement(pkg)
+            if version in {"master", "main"}
+            else Requirement(f"{pkg}=={version}")
             for pkg, version in release_file.content.items()
-            if get_visibility(pkg) in ("public", "private-plugin")
+            if get_visibility(pkg) in ("public", "private-plugin") and pkg != "python"
         )
         dependencies = _extract_dependencies(
             release_file,
