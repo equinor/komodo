@@ -80,13 +80,6 @@ class PypiDependencies:
 
         self._user_specified = {}
 
-    def _update_package_sets(self, packages):
-        for package_name, version in packages:
-            requirements = self._get_requirements(package_name, version)
-            self._used_packages.add(package_name)
-            for r in requirements:
-                _ = self.satisfied(r, package_name)
-
     def failed_requirements(self):
         """lists which requirements were not met.
 
@@ -113,7 +106,11 @@ class PypiDependencies:
         >>> dependencies.failed_requirements() # doctest: +ELLIPSIS
         Not installed: aiosignal...
         """
-        self._update_package_sets(self._to_install.items())
+        for package_name, version in self._to_install.items():
+            requirements = self._get_requirements(package_name, version)
+            self._used_packages.add(package_name)
+            for r in requirements:
+                _ = self.satisfied(r, package_name)
         return self._failed_requirements
 
     def used_packages(self, top_level_packages: Iterable[tuple[str, str]]) -> set[str]:
@@ -125,7 +122,11 @@ class PypiDependencies:
                 which packages to consider, by default: all.
         """
         self._used_packages = set()  # clear packages used
-        self._update_package_sets(top_level_packages)
+        for package_name, version in top_level_packages:
+            requirements = self._get_requirements(package_name, version)
+            self._used_packages.add(package_name)
+            for r in requirements:
+                _ = self.satisfied(r, package_name)
         return self._used_packages
 
     def add_user_specified(
