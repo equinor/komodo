@@ -108,7 +108,6 @@ class PypiDependencies:
         """
         for package_name, version in self._to_install.items():
             requirements = self._get_requirements(package_name, version)
-            self._used_packages.add(package_name)
             for r in requirements:
                 _ = self.satisfied(r, package_name)
         return self._failed_requirements
