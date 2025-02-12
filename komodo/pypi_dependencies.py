@@ -135,7 +135,7 @@ class PypiDependencies:
         # It is necessary to set the version to the installed
         # version if present as the version check considers
         # beta versions as failing unless specifically specified
-        self._user_specified[canonicalize_name(package_name)] = [
+        self._user_specified[canonical] = [
             Requirement(
                 d
                 if self._to_install.get(canonicalize_name(d))
