@@ -1,20 +1,10 @@
-from unittest.mock import patch
-
 import pytest
+from packaging.requirements import Requirement
 
 from komodo.check_unused_package import check_for_unused_package
-from komodo.pypi_dependencies import PypiDependencies
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
-
-@pytest.fixture(autouse=True, scope="module")
-def mock_get_requirements():
-    with patch.object(
-        PypiDependencies, "_get_requirements_from_pypi"
-    ) as mock_get_requirements:
-        yield
-        mock_get_requirements.assert_not_called()
-
+from ._mock_get_pypi_requirements import patch_fetch_from_pypi
 
 test_case = [
     (
@@ -92,6 +82,7 @@ test_case = [
 
 
 @pytest.mark.parametrize("repo, release, package_status", test_case)
+@patch_fetch_from_pypi()
 def test_check_unused_package(repo, release, package_status):
     package_status["python"] = {"visibility": "public"}
     release["python"] = "3.8-builtin"
@@ -122,18 +113,22 @@ def has_unused_packages(repo, release, package_status):
     )
 
 
+@patch_fetch_from_pypi()
 def test_empty_release_has_no_unused_packages():
     assert has_unused_packages({}, {}, {}).exitcode == 0
 
 
+@patch_fetch_from_pypi()
 def test_missing_package_status_gives_error_code_2():
     assert has_unused_packages({}, {"package": "1.0.0"}, {}).exitcode == 2
 
 
+@patch_fetch_from_pypi()
 def test_missing_visibility_gives_error_code_2():
     assert has_unused_packages({}, {"package": "1.0.0"}, {"package": {}}).exitcode == 2
 
 
+@patch_fetch_from_pypi()
 def test_missing_repo_gives_error_code_3():
     assert (
         has_unused_packages(
@@ -143,6 +138,7 @@ def test_missing_repo_gives_error_code_3():
     )
 
 
+@patch_fetch_from_pypi()
 def test_private_unused_package_gives_error_code_1():
     assert (
         has_unused_packages(
@@ -158,6 +154,7 @@ def test_private_unused_package_gives_error_code_1():
     )
 
 
+@patch_fetch_from_pypi()
 def test_private_unused_dependency_gives_error_code_1():
     assert (
         has_unused_packages(
@@ -186,6 +183,7 @@ def test_private_unused_dependency_gives_error_code_1():
 
 @pytest.mark.parametrize("public_type", ("public", "private-plugin"))
 @pytest.mark.parametrize("version", ("1.0.0", "v1.0"))
+@patch_fetch_from_pypi()
 def test_public_packages_are_used(public_type, version):
     assert (
         has_unused_packages(
@@ -202,6 +200,7 @@ def test_public_packages_are_used(public_type, version):
 
 
 @pytest.mark.parametrize("public_version", ["1.0", "main", "master"])
+@patch_fetch_from_pypi()
 def test_dependencies_of_public_packages_are_used(public_version):
     assert (
         has_unused_packages(
@@ -232,6 +231,7 @@ def test_dependencies_of_public_packages_are_used(public_version):
     )
 
 
+@patch_fetch_from_pypi()
 def test_transient_dependencies_of_public_packages_are_used():
     assert (
         has_unused_packages(
@@ -276,6 +276,7 @@ def test_transient_dependencies_of_public_packages_are_used():
 
 
 @pytest.mark.parametrize("public_type", ("public", "private-plugin"))
+@patch_fetch_from_pypi()
 def test_public_packages_are_used_redundant_package_status_has_no_effect(public_type):
     assert (
         has_unused_packages(
@@ -296,6 +297,7 @@ def test_public_packages_are_used_redundant_package_status_has_no_effect(public_
     )
 
 
+@patch_fetch_from_pypi()
 def test_multiple_private_packages_unused():
     repo = {
         "public_pkg": {
@@ -349,6 +351,7 @@ def test_multiple_private_packages_unused():
     assert "unused_private_pkg2" in result.message
 
 
+@patch_fetch_from_pypi()
 def test_private_package_used_by_another_private_package_reported_as_unused():
     repo = {
         "private_pkg1": {
@@ -394,6 +397,7 @@ def test_private_package_used_by_another_private_package_reported_as_unused():
     assert "private_pkg3" in result.message
 
 
+@patch_fetch_from_pypi()
 def test_circular_dependencies_handled_gracefully():
     repo = {
         "circular_pkg1": {
