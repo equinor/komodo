@@ -112,20 +112,18 @@ class PypiDependencies:
                 _ = self.satisfied(r, package_name)
         return self._failed_requirements
 
-    def used_packages(self, top_level_packages: Iterable[tuple[str, str]]) -> set[str]:
-        """Given you want to install top_level_packages, returns list of
+    def used_packages(self, top_level_requirements: Iterable[Requirement]) -> set[str]:
+        """Given you want to install top_level_requirements, returns list of
         all packages that must be installed to satisfy dependencies.
 
         Args:
-            top_level_packages:
-                which package, version pairs that must be installed.
+            top_level_requirements:
+                Requirements that must be satisified
         """
         self._used_packages = set()  # clear packages used
-        for package_name, version in top_level_packages:
-            requirements = self._get_requirements(package_name, version)
-            self._used_packages.add(package_name)
-            for r in requirements:
-                _ = self.satisfied(r, package_name)
+        for requirement in top_level_requirements:
+            self._used_packages.add(requirement.name)
+            _ = self.satisfied(requirement, requirement.name)
         return self._used_packages
 
     def add_user_specified(
