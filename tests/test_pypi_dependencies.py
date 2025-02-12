@@ -1,24 +1,11 @@
 from __future__ import annotations
 
-from typing import Callable
-from unittest.mock import patch
-
 import pytest
 from packaging.requirements import Requirement
 
 from komodo.pypi_dependencies import PypiDependencies
 
-
-def fail(*args, **kwargs):
-    raise AssertionError()
-
-
-def patch_fetch_from_pypi(f: Callable[[str, str], list[Requirement]] = fail):
-    return patch.object(
-        PypiDependencies,
-        "_get_requirements_from_pypi",
-        new=lambda *args: f(*args[1:]),  # drop self parameter
-    )
+from ._mock_get_pypi_requirements import patch_fetch_from_pypi
 
 
 def test_empty_package_lists_have_no_failed_requirements():
