@@ -38,6 +38,16 @@ environment = {
 }
 
 
+def version_list_to_requirements(
+    version_list: Iterable[tuple[str, str | None]],
+) -> list[Requirement]:
+    return [
+        Requirement(d if version in [None, "main", "master"] else f"{d}=={version}")
+        for d, version in version_list
+        if d != "python"
+    ]
+
+
 # pylint: disable=too-many-instance-attributes
 class PypiDependencies:
     def __init__(
@@ -140,11 +150,7 @@ class PypiDependencies:
             for name in depends
             if name != "python"
         ]
-        self._user_specified[canonical] = [
-            Requirement(d if version in [None, "main", "master"] else f"{d}=={version}")
-            for d, version in depends_versions
-            if d != "python"
-        ]
+        self._user_specified[canonical] = version_list_to_requirements(depends_versions)
         self._install_names[canonical] = package_name
 
     def dump_cache(self):
