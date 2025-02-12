@@ -41,7 +41,5 @@ def test_user_specified_dependencies_are_checked_before_pypi():
         dependencies = PypiDependencies(
             {"ert": "13.0.0"}, python_version="3.8", cachefile=None
         )
-        dependencies.add_user_specified("ert", ["numpy==2.0.0"])
-        assert dependencies.failed_requirements() == {
-            Requirement("numpy==2.0.0"): "ert"
-        }
+        dependencies.add_user_specified("ert", ["numpy"])
+        assert dependencies.failed_requirements() == {Requirement("numpy"): "ert"}
