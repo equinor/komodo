@@ -35,6 +35,16 @@ def find_unused_versions(used_versions, repository):
     return unused_versions
 
 
+def check_missing_versions(used_versions, repository):
+    unused_versions = {}
+    for lib, versions in used_versions.items():
+        for version in versions:
+            if lib not in repository or version not in repository[lib]:
+                raise ValueError(f"Missing used version {lib}=={version}")
+
+    return unused_versions
+
+
 def remove_unused_versions(repository, unused_versions):
     for lib, versions in unused_versions.items():
         for version in versions:
@@ -70,15 +80,17 @@ def _valid_path_or_files(path):
     elif os.path.isfile(full_path) and _is_yml(full_path):
         yml_files.append(full_path)
     else:
-        raise argparse.ArgumentTypeError(f"{path} is not a valid yml-file or folder")
+        msg = f"{path} is not a valid yml-file or folder"
+        raise argparse.ArgumentTypeError(msg)
     return yml_files
 
 
 def add_cleanup_parser(subparsers):
     cleanup_parser = subparsers.add_parser(
         "cleanup",
-        description="Clean up unused versions the repository file "
-        "based on a set of releases",
+        description=(
+            "Clean up unused versions the repository file based on a set of releases"
+        ),
     )
     cleanup_parser.set_defaults(func=run_cleanup)
     cleanup_parser.add_argument(
@@ -105,7 +117,9 @@ def add_cleanup_parser(subparsers):
         nargs="+",
     )
     cleanup_parser.add_argument(
-        "--output", type=str, help="name of file to write new repository"
+        "--output",
+        type=str,
+        help="name of file to write new repository",
     )
 
 
@@ -127,6 +141,7 @@ def add_prettier_parser(subparsers):
         nargs="+",
     )
     prettier_parser.add_argument(
+        "--check-only",
         "--check",
         action="store_true",
         help=(
@@ -144,12 +159,13 @@ def run_cleanup(args, parser):
             argparse.ArgumentError(
                 message="Only check, stdout can not be used together!",
                 argument=args.check,
-            )
+            ),
         )
     repository = load_yaml(args.repository)
     release_files = [filename for sublist in args.releases for filename in sublist]
     used_versions = load_all_releases(release_files)
     unused_versions = find_unused_versions(used_versions, repository)
+    check_missing_versions(used_versions, repository)
 
     if args.check:
         if not unused_versions:
@@ -180,9 +196,14 @@ def run_cleanup(args, parser):
 def run_prettier(args, _):
     release_files = [filename for sublist in args.files for filename in sublist]
 
-    if not args.check or all(
-        [prettified_yaml(filename, args.check) for filename in release_files]
+    if all(
+        prettified_yaml(filename, check_only=args.check_only)
+        for filename in release_files
     ):
+        sys.exit(0)
+
+    if args.check_only is False:
+        # The prettifier has successfully reformatted all files
         sys.exit(0)
 
     sys.exit(1)

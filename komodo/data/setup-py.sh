@@ -36,10 +36,6 @@ while test $# -gt 0; do
             shift
             export PYTHONPATH=$1
             ;;
-        --virtualenv)
-            shift
-            export VIRTUALENV=$1
-            ;;
         --ld-library-path)
             shift
             ;;
@@ -61,4 +57,5 @@ $PIP install $OPTS .           \
     --root $FAKEROOT     \
     --no-deps            \
     --no-cache-dir       \
+    --no-compile         \
     --prefix $PREFIX 1>&2

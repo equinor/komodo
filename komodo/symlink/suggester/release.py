@@ -1,12 +1,6 @@
 import datetime
-import ntpath
-import os
 import re
-
-
-def path_leaf(path):
-    head, tail = ntpath.split(path)
-    return tail or ntpath.basename(head)
+from pathlib import Path
 
 
 def diff_month(date_1: datetime.date, date_2: datetime.date) -> int:
@@ -14,11 +8,14 @@ def diff_month(date_1: datetime.date, date_2: datetime.date) -> int:
 
 
 class Release:
-    def __init__(self, release_id: str):
+    def __init__(self, release_id: str) -> None:
         self.release_id = release_id
 
     def __repr__(self) -> str:
         return self.release_id
+
+    def set_python_version(self, python_version: str) -> None:
+        self.release_id = self.release_id.split("-")[0] + "-" + python_version
 
     def month(self) -> str:
         return self.release_id[0:7]
@@ -34,26 +31,27 @@ class Release:
 
     def is_concrete(self) -> bool:
         """Return whether or not this is a concrete build. 2019.01-py is not a
-        concrete build: all komodo builds follow the format 2019.01.???-pyN."""
+        concrete build: all komodo builds follow the format 2019.01.???-pyN.
+        """
         return len(repr(self)) > len(self.month_alias())
 
     def py_ver(self) -> str:
         try:
-            return re.search("-(py\\d\\.?\\d?)", self.release_id).group(1)
+            return re.search(r"-(py\d{1,3})", self.release_id).group(1)
         except TypeError as exc:
-            raise ValueError(f"{self.release_id} has no python version") from exc
-        except AttributeError as attr_error:
+            msg = f"{self.release_id} has no python version"
+            raise ValueError(msg) from exc
+        except AttributeError:
             # In the case that this is a monthly alias without postfix, assume 3.8
             if len(repr(self)) == 7:
                 return "py38"
 
-            raise attr_error
+            raise
 
     @staticmethod
     def id_from_file_name(file_name: str):
-        no_ext = os.path.splitext(file_name)[0]
-        return path_leaf(no_ext)
+        return Path(file_name).stem
 
     @staticmethod
     def path_is_release(path: str) -> bool:
-        return ntpath.split(path)[0] == "releases"
+        return Path(path).parent.name == "releases"

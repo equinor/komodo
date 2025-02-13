@@ -3,9 +3,12 @@
 import argparse
 import os
 import warnings
+from typing import List
 
 import yaml
 from packaging.version import InvalidVersion, Version
+
+from komodo.yaml_file_types import ReleaseFile
 
 _INVALID_TAGS = {
     "a": ["invalid"],
@@ -23,11 +26,14 @@ def print_system_exit_message(system_exit_msg):
 
 def print_warning_message(system_warning_msg):
     if system_warning_msg != "":
-        warnings.warn(system_warning_msg, UserWarning)
+        warnings.warn(system_warning_msg, UserWarning, stacklevel=2)
 
 
 def msg_packages_invalid(
-    release_basename, release_version, count_tag_invalid, dict_tag_maturity
+    release_basename,
+    release_version,
+    count_tag_invalid,
+    dict_tag_maturity,
 ):
     exit_msg = ""
     exit_msg += (
@@ -58,14 +64,12 @@ def msg_packages_exception(release_basename, dict_tag_maturity):
 
 def count_invalid_tags(dict_tag_maturity, invalid_tags):
     count_tag_maturity = {tag: len(dict_tag_maturity[tag]) for tag in dict_tag_maturity}
-    invalid_tags_count = sum(count_tag_maturity[tag] for tag in invalid_tags)
-
-    return invalid_tags_count
+    return sum(count_tag_maturity[tag] for tag in invalid_tags)
 
 
-def get_release_type(version_string):
+def get_release_type(version: str):
     try:
-        version = Version(version_string)
+        version = Version(version)
         release_type = "stable" if version.pre is None else version.pre[0]
     except InvalidVersion:
         release_type = "invalid"
@@ -73,7 +77,7 @@ def get_release_type(version_string):
     return release_type
 
 
-def get_packages_info(packages_dict, tag_exceptions_package):
+def get_packages_info(release_file: ReleaseFile, tag_exceptions_package):
     dict_tag_maturity = {
         "a": [],
         "b": [],
@@ -83,23 +87,21 @@ def get_packages_info(packages_dict, tag_exceptions_package):
         "invalid": [],
     }
 
-    for package_name, package_version in packages_dict.items():
+    for package_name, package_version in release_file.content.items():
         if package_name not in tag_exceptions_package:
             release_version_package = get_release_type(package_version)
         else:
             release_version_package = "exception"
         dict_tag_maturity[release_version_package].append(
-            (package_name, package_version)
+            (package_name, package_version),
         )
 
     return dict_tag_maturity
 
 
 def read_yaml_file(file_path):
-    with open(file_path) as yml_file:
-        loaded_yaml_file = yaml.safe_load(yml_file)
-
-    return loaded_yaml_file
+    with open(file_path, encoding="utf-8") as yml_file:
+        return yaml.safe_load(yml_file)
 
 
 def msg_release_exception(release_basename, release_version):
@@ -124,14 +126,15 @@ def get_release_version(release_basename, tag_exceptions_release):
     return release_version
 
 
-def run(files_to_lint, tag_exceptions):
+def run(files_to_lint: List[str], tag_exceptions):
     system_exit_msg = ""
     system_warning_msg = ""
 
     for file_to_lint in files_to_lint:
         release_basename = os.path.basename(file_to_lint)
         release_version = get_release_version(
-            release_basename, tag_exceptions["release"]
+            release_basename,
+            tag_exceptions["release"],
         )
         system_warning_msg += msg_release_exception(release_basename, release_version)
 
@@ -140,16 +143,19 @@ def run(files_to_lint, tag_exceptions):
                 release_basename + " is incompatible with version name.\n"
             )
         else:
-            packages_dict = read_yaml_file(file_path=file_to_lint)
+            release_file = read_yaml_file_and_convert_to_release_file(file_to_lint)
             dict_tag_maturity = get_packages_info(
-                packages_dict, tag_exceptions["package"]
+                release_file,
+                tag_exceptions["package"],
             )
             count_tag_invalid = count_invalid_tags(
-                dict_tag_maturity, _INVALID_TAGS[release_version]
+                dict_tag_maturity,
+                _INVALID_TAGS[release_version],
             )
 
             system_warning_msg += msg_packages_exception(
-                release_basename, dict_tag_maturity
+                release_basename,
+                dict_tag_maturity,
             )
 
             if count_tag_invalid > 0:
@@ -169,16 +175,24 @@ def run(files_to_lint, tag_exceptions):
     print_system_exit_message(system_exit_msg)
 
 
-def get_files_to_lint(release_folder, release_file):
+def read_yaml_file_and_convert_to_release_file(release_file_path: str) -> ReleaseFile:
+    with open(release_file_path, mode="r+", encoding="utf-8") as release_file_stream:
+        release_file_yaml_string = release_file_stream.read()
+    return ReleaseFile.from_yaml_string(value=release_file_yaml_string)
+
+
+def get_files_to_lint(release_folder: str, release_file: str) -> List[str]:
     if release_folder is None:
         files_to_lint = [release_file]
     else:
-        files_to_lint = filter(
-            lambda file: os.path.isfile(file),
-            map(
-                lambda file: os.path.join(release_folder, file),
-                os.listdir(release_folder),
-            ),
+        files_to_lint = list(
+            filter(
+                os.path.isfile,
+                (
+                    os.path.join(release_folder, file_path)
+                    for file_path in os.listdir(release_folder)
+                ),
+            )
         )
     return files_to_lint
 
@@ -195,7 +209,7 @@ def define_tag_exceptions(tag_exception_arg):
     return tag_exceptions
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Lint the maturity of packages.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -210,16 +224,18 @@ def get_parser():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "--release_file",
-        type=lambda arg: arg
-        if os.path.isfile(arg)
-        else parser.error(f"{arg} is not a valid file"),
+        type=lambda arg: (
+            arg if os.path.isfile(arg) else parser.error(f"{arg} is not a valid file")
+        ),
         help="Komodo release file in YAML format.",
     )
     group.add_argument(
         "--release_folder",
-        type=lambda arg: arg
-        if os.path.isdir(arg)
-        else parser.error(f"{arg} is not a valid directory"),
+        type=lambda arg: (
+            arg
+            if os.path.isdir(arg)
+            else parser.error(f"{arg} is not a valid directory")
+        ),
         help="File with all package tags named as release version.",
     )
 
@@ -233,7 +249,8 @@ def main():
     tag_exceptions = define_tag_exceptions(tag_exception_arg=args.tag_exceptions)
 
     files_to_lint = get_files_to_lint(
-        release_folder=args.release_folder, release_file=args.release_file
+        release_folder=args.release_folder,
+        release_file=args.release_file,
     )
 
     run(files_to_lint, tag_exceptions)

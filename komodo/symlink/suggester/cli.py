@@ -1,23 +1,4 @@
 #!/usr/bin/env python
-"""suggest changes to a symlink configuration
-
-usage: cli.py [-h] [--symlink-conf-path SYMLINK_CONF_PATH]
-              [--git-fork GIT_FORK] [--git-repo GIT_REPO] [--git-ref GIT_REF]
-              release mode joburl jobname
-
-positional arguments:
-  release               e.g. 2019.12.rc0-py38
-  mode                  stable,testing,unstable
-  joburl                link to the job that triggered this
-  jobname               name of the job
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --symlink-conf-path SYMLINK_CONF_PATH
-  --git-fork GIT_FORK   git fork
-  --git-repo GIT_REPO   git repo
-  --git-ref GIT_REF     git ref
-"""
 import argparse
 import logging
 import os
@@ -35,7 +16,7 @@ from komodo.symlink.suggester import configuration
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
-PR_TEMPLATE = """:robot: Suggesting updating {mode} to {release} in {sym_file}
+PR_TEMPLATE = """:robot: Suggesting updating {mode} to {release}
 ---
 ### Description
 - Release: `{release}`
@@ -51,27 +32,31 @@ Source code for this script can be found [here](https://github.com/equinor/komod
 
 def _parse_args():
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("release", help="e.g. 2019.12.rc0-py38")
-    parser.add_argument("mode", help="stable,testing,unstable")
+    parser.add_argument("mode", help="stable,testing,deprecated")
     parser.add_argument("joburl", help="link to the job that triggered this")
     parser.add_argument("jobname", help="name of the job")
-    parser.add_argument(
-        "--symlink-conf-path",
-        help="",
-        default="symlink_configuration/symlink_config.json",
-    )
     parser.add_argument("--git-fork", help="git fork", default="equinor")
     parser.add_argument("--git-repo", help="git repo", default="komodo-releases")
     parser.add_argument("--git-ref", help="git ref", default="main")
     parser.add_argument(
-        "--verbose", "-v", help="Set loglevel to INFO", action="store_true"
+        "--verbose",
+        "-v",
+        help="Set loglevel to INFO",
+        action="store_true",
     )
     parser.add_argument(
         "--dry-run",
         help="Set dry-run, will do everything except making the PR",
         action="store_true",
+    )
+    parser.add_argument("--python-versions", help="e.g. py38, py311", default="py311")
+    parser.add_argument(
+        "--config-files",
+        help="e.g. symlink_config.json, symlink_config_azure.json",
+        default="symlink_configuration/symlink_config.json",
     )
     return parser.parse_args()
 
@@ -86,50 +71,59 @@ def _get_repo(token: Optional[str], fork: str, repo: str) -> Repository:
 
 
 def suggest_symlink_configuration(
-    args: argparse.Namespace, repo: Repository, dry_run: bool = False
+    args: argparse.Namespace,
+    repo: Repository,
+    dry_run: bool = False,
 ) -> Optional[Repository]:
     """Returns a pull request if the symlink configuration could be updated,
-    or None if no update was possible."""
-    try:
-        sym_conf_content = repo.get_contents(args.symlink_conf_path, ref=args.git_ref)
-    except UnknownObjectException:
-        sys.exit(f"Filename {args.symlink_conf_path} is not in repo {repo.full_name}")
+    or None if no update was possible.
+    """
+    config_files = args.config_files.split(",")
+    python_versions = args.python_versions.split(",")
 
     if args.release.startswith("bleeding"):
         logger.warning("Symlink to bleeding is not allowed")
         return None
 
-    try:
-        new_symlink_content, updated = configuration.update(
-            b64decode(sym_conf_content.content), args.release, args.mode
-        )
-    except ValueError as exc:
-        logger.critical(exc)
-        sys.exit(1)
-
-    if not updated:
-        logger.info("Nothing to update")
-        return None
-
     target_branch = f"{args.release}/{args.mode}"
-    if "azure" in args.symlink_conf_path:
-        target_branch += "/azure"
-
     from_sha = repo.get_branch(args.git_ref).commit.sha
-
     msg = f"Update {args.mode} symlinks for {args.release}"
+
     if not dry_run:
         repo.create_git_ref(ref=f"refs/heads/{target_branch}", sha=from_sha)
-        repo.update_file(
-            args.symlink_conf_path,
-            msg,
-            new_symlink_content,
-            sym_conf_content.sha,
-            branch=target_branch,
-        )
+
+    for symlink_config_file in config_files:
+        symlink_config_file = symlink_config_file.strip()
+        try:
+            sym_conf_content = repo.get_contents(symlink_config_file, ref=args.git_ref)
+        except UnknownObjectException:
+            sys.exit(f"Filename {symlink_config_file} is not in repo {repo.full_name}")
+
+        try:
+            new_symlink_content, updated = configuration.update(
+                b64decode(sym_conf_content.content),
+                args.release,
+                args.mode,
+                python_versions,
+            )
+        except ValueError as exc:
+            logger.critical(exc)
+            sys.exit(1)
+
+        if not updated:
+            logger.info("Nothing to update")
+            return None
+
+        if not dry_run:
+            repo.update_file(
+                symlink_config_file,
+                msg,
+                new_symlink_content,
+                sym_conf_content.sha,
+                branch=target_branch,
+            )
 
     body = PR_TEMPLATE.format(
-        sym_file=args.symlink_conf_path,
         change=target_branch,
         release=args.release,
         mode=args.mode,

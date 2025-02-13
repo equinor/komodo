@@ -18,6 +18,11 @@ GitHub:
 pip install git+https://github.com/equinor/komodo.git
 ```
 
+## Documentation
+
+[The documentation](https://equinor.github.io/komodo) is online. 
+Developers can build it by installing with dev-dependencies by running `pip install ".[dev]"` and running `make html` in the `docs` directory.
+
 
 ## Basic usage
 
@@ -33,7 +38,7 @@ versions. Each version contains:
 
 For example, we may have a `repository.yml` like this:
 
-```yml
+```yaml
 python:
   3-builtin:
     make: sh
@@ -56,7 +61,7 @@ Note that `build__python-virtualenv.sh` is a script that comes with `komodo`
 Now a 'release', e.g. _stable_, is defined in another YAML file, e.g.
 `stable.yml`, containing some or all of the packages in the repository file:
 
-```yml
+```yaml
 python: 3-builtin
 treelib: 1.6.1
 ```
@@ -79,60 +84,39 @@ commands, each with its own options:
 - `komodo-ask-for-tags` &mdash; Checks if there are any internal dependencies
   with changes since last release and composes a message to ask for new tags
   from the respective maintainers
-- `komodo-check-pypi` &mdash; Checks if pypi packages are up to date
-- `komodo-insert-proposals` &mdash; Copy proposals into release and create PR
-- `komodo-post-messages` &mdash; Post messages to a release
 - `komodo-check-symlinks` &mdash; Verify symlinks for komodo versions are
 according to a given config
-- `komodo-lint` &mdash; Lint komodo setup
-- `komodo-reverse-deps` &mdash; Extracts dependencies from a given set of
-packages
+- `komodo-check-pypi` &mdash; Checks if pypi packages are up to date
 - `komodo-clean-repository` &mdash; Clean up unused versions in the repository
 file based on a set of releases
-- `komodo-lint-maturity` &mdash; Lint the maturity of packages
-- `komodo-snyk-test` &mdash; Test a release for security and license issues
 - `komodo-create-symlinks` &mdash; Create symlinks for komodo versions
-- `komodo-lint-package-status` &mdash; Lint the package status file
-- `komodo-suggest-symlinks` &mdash; Returns a pull request if the symlink
-configuration could be updated
 - `komodo-extract-dep-graph` &mdash; Extracts dependencies from a given set of
 packages
+- `komodo-insert-proposals` &mdash; Copy proposals into release and create PR
+- `komodo-lint` &mdash; Lint komodo setup
+- `komodo-lint-maturity` &mdash; Lint the maturity of packages
+- `komodo-lint-package-status` &mdash; Lint the package status file
+- `komodo-lint-upgrade-proposals` &mdash; Lint the upgrade proposals file against
+the repository file
 - `komodo-non-deployed` &mdash; Outputs the name of undeployed matrices given
 an installation root and a release folder
-- `komodo-transpiler` &mdash; Build release files
+- `komodo-post-messages` &mdash; Post messages to a release
+- `komodo-reverse-deps` &mdash; Extracts dependencies from a given set of
+packages
 - `komodo-show-version` &mdash; Return the version of a specified package in the active release
-
-### Auto-formatting configuration files
-
-You can auto-format repository and/or releases by running something like
-
-```bash
-komodo-clean-repository prettier --files repository.yml releases/*
-```
-
-If you are in e.g. CI and only want to check style compliance, add `--check`.
-
-### Finding reverse dependecies
-
-You can show reverse dependencies of a package by running the tool
-`komodo-reverse-deps`:
-
-```bash
-komodo-reverse-deps releases/matrices/2022.09.02.yml repository.yml --pkg websockets
-```
-
-If `--pkg` is not specified, the program will prompt for it.
-
-The `--dot` option outputs the reverse dependency graph in `.dot` format.
-Alternatively, if `GraphViz` and `ImageMagick` are available, the
-`--display_dot` option will try to render the graph directly.
+- `komodo-snyk-test` &mdash; Test a release for security and license issues
+- `komodo-suggest-symlinks` &mdash; Returns a pull request if the symlink
+configuration could be updated
+- `komodo-transpiler` &mdash; Build release files
 
 
 ## Run tests
 
+In a virtual environment:
+
 ```bash
 git clone https://github.com/equinor/komodo.git
 cd komodo
-pip install -r dev-requirements.txt
+pip install ".[dev]"
 pytest tests
 ```

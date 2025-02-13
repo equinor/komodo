@@ -4,5 +4,5 @@ hackres: 0.0.5289
 hackgit: test-hash
 python: 2.7.5-builtin
 qt5: 5.13.6-builtin
-ert42: '*'
+ert42: 10.0.1
 some_github_binary_artifact: 0.0.1a1

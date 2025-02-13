@@ -17,18 +17,35 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: License :: OSI Approved :: GNU Affero General Public License v3",
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "importlib_metadata",
     "jinja2",
     "packaging",
     "PyGithub >= 1.55",
     "pysnyk",
     "PyYAML",
     "requests",
+    "urllib3<2; '.el7.' in platform_release", #Pinned under v2 due to RHEL7 incompability
+    "urllib3; '.el7.' not in platform_release",
     "ruamel.yaml",
-    "shell",
+    "pkginfo",
+]
+
+[project.optional-dependencies]
+dev = [
+    "furo",
+    "myst_parser",
+    "pylint",
+    "pytest",
+    "ruff",
+    "sphinx",
+    "sphinxcontrib-apidoc",
+    "types-pyyaml"
 ]
 
 [tool.setuptools.packages.find]
@@ -44,37 +61,32 @@ komodo-check-pypi = "komodo.check_up_to_date_pypi:main"
 komodo-check-symlinks = "komodo.symlink.sanity_check:sanity_main"
 komodo-clean-repository = "komodo.release_cleanup:main"
 komodo-create-symlinks = "komodo.symlink.create_links:symlink_main"
-komodo-extract-dep-graph = "komodo.extract_dep_graph:main"
 komodo-insert-proposals = "komodo.insert_proposals:main"
 komodo-lint = "komodo.lint:lint_main"
 komodo-lint-maturity = "komodo.lint_maturity:main"
 komodo-lint-package-status = "komodo.lint_package_status:main"
+komodo-lint-symlink-config = "komodo.lint_symlink_config:main"
+komodo-lint-upgrade-proposals = "komodo.lint_upgrade_proposals:main"
 komodo-non-deployed = "komodo.deployed:deployed_main"
 komodo-post-messages = "komodo.post_messages:main"
-komodo-reverse-deps = "komodo.reverse_dep_graph:main"
 komodo-show-version = "komodo.show_version:main"
 komodo-snyk-test = "komodo.snyk_reporting:main"
 komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
 komodo-transpiler = "komodo.release_transpiler:main"
-
-[tool.isort]
-profile = "black"
+komodo-check-unused = "komodo.check_unused_package:main"
 
 [tool.pylint.messages_control]
 disable = [
     "bad-inline-option",
-    "consider-using-dict-items",
-    "consider-using-f-string",
     "consider-using-sys-exit",
-    "consider-using-with",
     "deprecated-pragma",
     "duplicate-code",
     "file-ignored",
     "fixme",
-    "invalid-name",
     "line-too-long",
     "locally-disabled",
     "logging-not-lazy",
+    "logging-fstring-interpolation", # Do not remove; it greatly decreases readability
     "missing-class-docstring",
     "missing-function-docstring",
     "missing-module-docstring",
@@ -89,11 +101,35 @@ disable = [
     "too-many-branches",
     "too-many-locals",
     "too-many-statements",
-    "unnecessary-lambda",
-    "unspecified-encoding",
-    "unused-argument",
     "use-a-generator",
     "use-implicit-booleaness-not-comparison",
     "use-symbolic-message-instead",
     "useless-object-inheritance",
+    "too-many-lines",
+    "too-many-positional-arguments",
 ]
+
+[tool.pylint.MASTER]
+ignore-paths = [
+    '^.*\\_version.py'
+]
+
+[tool.ruff]
+src = ["src"]
+line-length = 88
+[tool.ruff.lint]
+select = [
+  "W",   # pycodestyle
+  "I",   # isort
+  "B",   # flake-8-bugbear
+  "SIM", # flake-8-simplify
+  "F",   # pyflakes
+  "UP",  # pyupgrade
+  "PERF",  # perflint
+  "C4",  # flake8-comprehensions
+]
+
+ignore = ["PERF203"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["komodo"]

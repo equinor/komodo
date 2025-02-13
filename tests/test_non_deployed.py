@@ -47,8 +47,14 @@ def test_non_deployed(tmpdir):
         os.makedirs(os.path.join(install_root, "2019.11.05-py38-rhel7/root"))
 
         # Create matrix files
-        open(os.path.join(release_folder, "2019.11.05.yml"), "a").close()
-        open(os.path.join(release_folder, "2019.12.02.yml"), "a").close()
+        with open(
+            os.path.join(release_folder, "2019.11.05.yml"), "a", encoding="utf-8"
+        ):
+            pass
+        with open(
+            os.path.join(release_folder, "2019.12.02.yml"), "a", encoding="utf-8"
+        ):
+            pass
 
         expected = ("2019.12.02",)
         actual = fetch_non_deployed(install_root, release_folder)
@@ -72,15 +78,21 @@ def test_links_ignored(tmpdir):
             ),
             root=install_root,
         )
-        open(os.path.join(release_folder, "2019.12.01.yml"), "a").close()
-        open(os.path.join(release_folder, "2022.02.02.yml"), "a").close()
+        with open(
+            os.path.join(release_folder, "2019.12.01.yml"), "a", encoding="utf-8"
+        ):
+            pass
+        with open(
+            os.path.join(release_folder, "2022.02.02.yml"), "a", encoding="utf-8"
+        ):
+            pass
 
         non_deployed = fetch_non_deployed(install_root, release_folder)
         assert len(non_deployed) == 0, non_deployed
 
 
 @pytest.mark.parametrize(
-    "release_list, do_json, expected",
+    ("release_list", "do_json", "expected"),
     [
         (["a"], False, "a"),
         (["a"], True, '["a"]'),

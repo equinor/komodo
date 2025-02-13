@@ -17,7 +17,7 @@ setuptools:
 
 hackres:
   0.0.5289:
-    source: ../hackres # we assume here hackres is copied into cache/..
+    source: ../hackres # we assume here hackres is copied into _work/..
     fetch: fs-cp
     make: sh
     makefile: test_build_script.sh
@@ -32,7 +32,7 @@ hackgit:
     maintainer: charlie
 
 ert42:
-  '*':
+  10.0.1:
     source: pypi
     pypi_package_name: ert
     fetch: pip

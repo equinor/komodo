@@ -1,0 +1,4 @@
+lib1:
+  1.2.4+builtin:
+    source: pypi
+    make: sh

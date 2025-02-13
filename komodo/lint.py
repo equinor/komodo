@@ -1,18 +1,27 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import argparse
 import logging
-import os
+import sys
 import warnings
 from collections import namedtuple
 
-import yaml as yml
-from pkg_resources import PkgResourcesDeprecationWarning, parse_version
+import yaml
+from packaging.version import parse
 
-kerr = namedtuple("KomodoError", ["pkg", "version", "maintainer", "depends", "err"])
+from .komodo_error import KomodoError, KomodoException
+from .pypi_dependencies import PypiDependencies
+from .yaml_file_types import ReleaseFile, RepositoryFile
 
-report = namedtuple(
-    "LintReport", ["release_name", "maintainers", "dependencies", "versions"]
+Report = namedtuple(
+    "LintReport",
+    [
+        "release_name_errors",
+        "maintainer_errors",
+        "version_errors",
+    ],
 )
 
 MISSING_PACKAGE = "missing package"
@@ -21,147 +30,113 @@ MISSING_DEPENDENCY = "missing dependency"
 MISSING_MAINTAINER = "missing maintainer"
 MISSING_MAKE = "missing make information"
 MALFORMED_VERSION = "malformed version"
+MAIN_VERSION = "dangerous version (main branch)"
 MASTER_VERSION = "dangerous version (master branch)"
 FLOAT_VERSION = "dangerous version (float interpretable)"
 
 
-def _kerr(pkg=None, version=None, maintainer=None, depends=None, err=None):
-    return kerr(
-        pkg=pkg, version=version, maintainer=maintainer, depends=depends, err=err
+def lint_version_numbers(package, version, repo):
+    package_release = repo[package][version]
+    maintainer = package_release.get("maintainer", MISSING_MAINTAINER)
+
+    try:
+        logging.info(f"Using {package} {version}")
+        if "main" in version:
+            return KomodoError(package, version, maintainer, err=MAIN_VERSION)
+        if "master" in version:
+            return KomodoError(package, version, maintainer, err=MASTER_VERSION)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            parsed_version = parse(version)
+            # A warning coincides with finding "Legacy" in repr(v)
+        if "Legacy" in repr(
+            parsed_version
+        ):  # don't know if possible to check otherwise
+            return KomodoError(package, version, maintainer)
+    except Exception as err:  # pylint: disable=broad-exception-caught
+        # Log any exception:
+        return KomodoError(package, version, maintainer, err=str(err))
+    return None
+
+
+def lint(
+    release_file: ReleaseFile,
+    repository_file: RepositoryFile,
+) -> Report:
+    maintainers, versions = [], []
+    for package_name, package_version in release_file.content.items():
+        try:
+            lint_maintainer = repository_file.lint_maintainer(
+                package_name,
+                package_version,
+            )  # throws komodoexception on missing package or version in repository
+            if lint_maintainer:
+                maintainers.append(lint_maintainer)
+
+            lint_version_number = lint_version_numbers(
+                package_name,
+                package_version,
+                repository_file.content,
+            )
+            if lint_version_number:
+                versions.append(lint_version_number)
+        except KomodoException as komodo_exception:
+            maintainers.append(komodo_exception.error)
+    return Report(
+        release_name_errors=[],
+        maintainer_errors=maintainers,
+        version_errors=versions,
     )
 
 
-def _validate(pkg, ver, repo):
-    if pkg not in repo:
-        return _kerr(pkg=pkg, err=MISSING_PACKAGE)
-    if ver not in repo[pkg]:
-        return _kerr(pkg=pkg, version=ver, err=MISSING_VERSION)
-    if "maintainer" not in repo[pkg][ver]:
-        return _kerr(pkg=pkg, version=ver, err=MISSING_MAINTAINER)
-    if "make" not in repo[pkg][ver]:
-        return _kerr(pkg=pkg, version=ver, err=MISSING_MAKE)
-    return _kerr(pkg=pkg, version=ver, maintainer=repo[pkg][ver]["maintainer"])
+def check_dependencies(
+    release_file: ReleaseFile, repository_file: RepositoryFile, full_python_version: str
+) -> list[KomodoError]:
+    all_dependencies = dict(release_file.content.items())
 
+    dependencies = PypiDependencies(
+        all_dependencies, python_version=full_python_version
+    )
+    for name, version in release_file.content.items():
+        if (
+            name not in repository_file.content
+            or version not in repository_file.content[name]
+        ):
+            raise ValueError(f"Missing package in repository file: {name}=={version}")
+        package_repo = repository_file.content[name][version]
+        if package_repo.get("source") != "pypi":
+            dependencies.add_user_specified(name, package_repo.get("depends", []))
 
-def lint_release_name(pkgfile):
-    relname = os.path.basename(pkgfile)
-    found = False
-    for py_suffix in "-py27", "-py36", "-py38", "-py310":
-        for rh_suffix in "", "-rhel6", "-rhel7", "-rhel8":
-            if relname.endswith(py_suffix + rh_suffix + ".yml"):
-                found = True
-                break
-    if not found:
-        return [
-            _kerr(
-                pkg=pkgfile,
-                err="Invalid release name suffix. "
-                "Must be of the form -pyXX[X] or -pyXX[X]-rhelY",
+    failed_requirements = dependencies.failed_requirements()
+    if failed_requirements:
+        package_set = sorted(set(failed_requirements.values()))
+        deps = [
+            KomodoError(
+                err="Failed requirements:",
+                depends=[str(r) for r in failed_requirements],
+                package=", ".join(package_set),
             )
         ]
-
-    return []
-
-
-def lint_maintainers(pkgs, repo):
-    return [_validate(pkg, ver, repo) for pkg, ver in pkgs.items()]
-
-
-def __reg_version_err(errs, pkg, ver, maintainer, err=MALFORMED_VERSION):
-    errs.append(_kerr(pkg=pkg, version=ver, maintainer=maintainer, err=err))
-
-
-def lint_version_numbers(pkgs, repo):
-    errs = []
-    for pkg, ver in pkgs.items():
-        if pkg not in repo or ver not in repo[pkg]:
-            continue  # error caught previously
-
-        pv = repo[pkg][ver]
-        maintainer = pv.get("maintainer", MISSING_MAINTAINER)
-        if isinstance(ver, float):
-            __reg_version_err(errs, pkg, ver, maintainer, FLOAT_VERSION)
-            continue
-
-        try:
-            logging.info("Using %s %s" % (pkg, ver))
-            if "master" in ver:
-                __reg_version_err(errs, pkg, ver, maintainer, err=MASTER_VERSION)
-                continue
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", PkgResourcesDeprecationWarning)
-                v = parse_version(ver)
-                # A warning coincides with finding "Legacy" in repr(v)
-            if "Legacy" in repr(v):  # don't know if possible to check otherwise
-                __reg_version_err(errs, pkg, ver, maintainer)
-        except:  # pylint: disable=bare-except  # noqa
-            # Log any exception:
-            __reg_version_err(errs, pkg, ver, maintainer)
-    return errs
-
-
-def lint_dependencies(pkgs, repo):
-    errs = []
-    for pkg, ver in pkgs.items():
-        if pkg not in repo or ver not in repo[pkg]:
-            continue  # error caught previously
-        pv = repo[pkg][ver]
-        maintainer = pv.get("maintainer", MISSING_MAINTAINER)
-        if "depends" not in pv:
-            continue
-        missing = [d for d in pv["depends"] if d not in pkgs]
-        if missing:
-            errs.append(
-                _kerr(
-                    pkg=pkg,
-                    version=ver,
-                    maintainer=maintainer,
-                    depends=missing,
-                    err=MISSING_DEPENDENCY,
-                )
-            )
-    return errs
-
-
-def lint(pkgfile, repofile):
-    if isinstance(pkgfile, dict) and isinstance(repofile, dict):
-        release_name = []
-        pkgs, repo = pkgfile, repofile
     else:
-        release_name = lint_release_name(pkgfile)
-        try:
-            with open(pkgfile, "r") as p, open(repofile, "r") as r:
-                pkgs, repo = yml.safe_load(p), yml.safe_load(r)
-        except yml.scanner.ScannerError as err:
-            raise ValueError("Malformed YAML: %s" % str(err))
+        deps = []
+    dependencies.dump_cache()
 
-    if not isinstance(pkgs, dict):
-        raise ValueError("Malformed package file: %s " % str(type(pkgs)))
-    if not isinstance(repo, dict):
-        raise ValueError("Malformed repository file: %s" % str(type(repo)))
-
-    mns = lint_maintainers(pkgs, repo)
-    deps = lint_dependencies(pkgs, repo)
-    vers = lint_version_numbers(pkgs, repo)
-    return report(
-        release_name=release_name, maintainers=mns, dependencies=deps, versions=vers
-    )
+    return deps
 
 
-def get_args():
+def get_args(args=None):
     parser = argparse.ArgumentParser(
         description="Lint komodo setup.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "pkgfile",
-        type=str,
-        help="A Komodo release file mapping package name to version, "
-        "in YAML format.",
+        "packagefile",
+        type=ReleaseFile(),
+        help="A Komodo release file mapping package name to version, in YAML format.",
     )
     parser.add_argument(
         "repofile",
-        type=str,
+        type=RepositoryFile(),
         help="A Komodo repository file, in YAML format.",
     )
     parser.add_argument(
@@ -171,34 +146,48 @@ def get_args():
         dest="loglevel",
         const=logging.INFO,
     )
-    args = parser.parse_args()
-    return args
+    parser.add_argument(
+        "--check-pypi-dependencies",
+        dest="check_pypi_dependencies",
+        help="Checks package metadata",
+        action="store_true",
+        default=False,
+    )
+    return parser.parse_args(args)
 
 
-def lint_main():
-    args = get_args()
+def lint_main(args=None):
+    args = get_args(args)
     logging.basicConfig(format="%(message)s", level=args.loglevel)
 
-    try:
-        report = lint(args.pkgfile, args.repofile)
-        mns, deps, vers = report.maintainers, report.dependencies, report.versions
-    except ValueError as err:
-        exit(str(err))
-    print("%d packages" % len(mns))
-    if not any([err.err for err in mns + deps + vers]):
+    if args.check_pypi_dependencies:
+        python_version = args.packagefile.content["python"]
+        with open("builtin_python_versions.yml", encoding="utf-8") as f:
+            full_python_version = yaml.safe_load(f)[python_version]
+        deps = check_dependencies(args.packagefile, args.repofile, full_python_version)
+    else:
+        full_python_version = None
+        deps = []
+
+    report = lint(args.packagefile, args.repofile)
+    maintainers, versions = (report.maintainer_errors, report.version_errors)
+    print(f"{len(maintainers)} packages")
+    if not any(err.err for err in maintainers + deps + versions):
         print("No errors found")
-        exit(0)
+        sys.exit(0)
 
-    for err in mns + deps + vers:
+    for err in maintainers + deps + versions:
         if err.err:
-            ver = err.version if err.version else ""
-            dep = ": %s" % ", ".join(err.depends) if err.depends else ""
-            print("%s for %s %s%s" % (err.err, err.pkg, ver, dep))
+            print(f"{err.err}")
+            if err.package:
+                print(f"{err.package}")
+            if err.depends:
+                print("  " + "\n  ".join(err.depends))
 
-    if not any([err.err for err in mns + deps]):
-        exit(0)  # currently we allow erronous version numbers
+    if not any(err.err for err in maintainers + deps):
+        sys.exit(0)  # currently we allow erronous version numbers
 
-    exit("Error in komodo configuration.")
+    sys.exit("Error in komodo configuration.")
 
 
 if __name__ == "__main__":

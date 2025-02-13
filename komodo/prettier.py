@@ -2,12 +2,9 @@ import argparse
 import functools
 import os
 import re
-import sys
 
 import ruamel.yaml
-
-# On Python3, StringIO can come from standard library io:
-from ruamel.yaml.compat import StringIO, ordereddict
+from ruamel.yaml.compat import StringIO
 
 
 def repository_specific_formatting(empty_line_top_level, yaml_string):
@@ -15,12 +12,13 @@ def repository_specific_formatting(empty_line_top_level, yaml_string):
     only empty lines inbetween different top level keys (if empty_line_top_level
     is True, otherwise no empty lines).
     """
-
     yaml_string = re.sub(r"\n+", r"\n", yaml_string)  # Remove all empty lines
 
     if empty_line_top_level:
         yaml_string = re.sub(  # Add one empty line between each package
-            r"(\n[^\#][^\n]*)\n([^\s])", r"\1\n\n\2", yaml_string
+            r"(\n[^\#][^\n]*)\n([^\s])",
+            r"\1\n\n\2",
+            yaml_string,
         )
 
     return yaml_string
@@ -35,14 +33,11 @@ def is_repository(config):
 
     Raises ValueError if inconsistent throughout the config.
     """
-
-    if all([isinstance(package, str) for package in config.values()]):
+    if all(isinstance(package, str) for package in config.values()):
         return False
     elif all(
-        [
-            isinstance(package, ruamel.yaml.comments.CommentedMap)
-            for package in config.values()
-        ]
+        isinstance(package, ruamel.yaml.comments.CommentedMap)
+        for package in config.values()
     ):
         return True
 
@@ -52,18 +47,18 @@ def is_repository(config):
 
 def prettier(yaml_input_dict, check_type=True):
     """Takes in a string corresponding to a YAML Komodo configuration, and returns
-    the corresponding prettified YAML string."""
-
+    the corresponding prettified YAML string.
+    """
     ruamel_instance = ruamel.yaml.YAML()
     ruamel_instance.indent(  # Komodo prefers two space indendation
-        mapping=2, sequence=4, offset=2
+        mapping=2,
+        sequence=4,
+        offset=2,
     )
     ruamel_instance.width = 1000  # Avoid ruamel wrapping long
 
     komodo_repository = check_type and is_repository(yaml_input_dict)
 
-    # On Python3.6+, sorted_config can just be an
-    # ordinary dict as insertion order is then preserved.
     sorted_config = ruamel.yaml.comments.CommentedMap()
     for package in sorted(yaml_input_dict, key=str.lower):
         sorted_config[package] = yaml_input_dict[package]
@@ -77,10 +72,6 @@ def prettier(yaml_input_dict, check_type=True):
         transform=functools.partial(repository_specific_formatting, komodo_repository),
     )
 
-    if sys.version_info < (3, 0):
-        # Need to encode the byte-string on Python2
-        return yaml_output.getvalue().encode("utf-8")
-
     return yaml_output.getvalue()
 
 
@@ -88,9 +79,8 @@ def prettified_yaml(filepath, check_only=True):
     """Returns `True` if the file is already "prettified", `False` otherwise.
     If `check_only` is False, the input file will be "prettified" in place if necessary.
     """
-
     print(f"Checking {filepath}... ", end="")
-    with open(file=filepath, mode="r") as input_file:
+    with open(file=filepath, encoding="utf-8") as input_file:
         yaml_original = input_file.read()
 
     yaml_input = load_yaml(filepath)
@@ -100,8 +90,8 @@ def prettified_yaml(filepath, check_only=True):
     if yaml_prettified_string != yaml_original:
         print(f"{'would be' if check_only else ''} reformatted!")
         if not check_only:
-            with open(filepath, "w") as fh:
-                fh.write(yaml_prettified_string)
+            with open(filepath, "w", encoding="utf-8") as yaml_file_stream:
+                yaml_file_stream.write(yaml_prettified_string)
         return False
 
     print("looking good!")
@@ -110,34 +100,37 @@ def prettified_yaml(filepath, check_only=True):
 
 def write_to_string(repository, check_type=True):
     if isinstance(repository, dict):
-        repository = ordereddict(sorted(repository.items(), key=lambda t: t[0]))
+        repository = dict(sorted(repository.items(), key=lambda t: t[0]))
         repository = ruamel.yaml.comments.CommentedMap(repository)
     return prettier(repository, check_type)
 
 
 def write_to_file(repository, filename, check_type=True):
     output_str = write_to_string(repository, check_type)
-    with open(filename, mode="w") as output_file:
+    with open(filename, mode="w", encoding="utf-8") as output_file:
         output_file.write(output_str)
 
 
 def load_yaml(filename):
     if not os.path.isfile(os.path.realpath(filename)):
-        raise argparse.ArgumentTypeError(f"{filename} is not a valid file")
+        msg = f"{filename} is not a valid file"
+        raise argparse.ArgumentTypeError(msg)
 
     ruamel_instance = ruamel.yaml.YAML()
     ruamel_instance.indent(  # Komodo prefers two space indendation
-        mapping=2, sequence=4, offset=2
+        mapping=2,
+        sequence=4,
+        offset=2,
     )
     ruamel_instance.width = 1000  # Avoid ruamel wrapping long
 
     try:
-        with open(filename) as repo_handle:
-            input_dict = ruamel_instance.load(repo_handle)
-        return input_dict
+        with open(filename, encoding="utf-8") as repo_handle:
+            return ruamel_instance.load(repo_handle)
 
     except (
         ruamel.yaml.scanner.ScannerError,
         ruamel.yaml.constructor.DuplicateKeyError,
-    ) as e:
-        raise SystemExit(f"The file: <{filename}> contains invalid YAML syntax:\n {e}")
+    ) as yaml_error:
+        msg = f"The file: <{filename}> contains invalid YAML syntax"
+        raise SystemExit(msg) from yaml_error

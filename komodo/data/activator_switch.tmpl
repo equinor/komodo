@@ -1,10 +1,17 @@
-if [[ $(uname -r) == *el7* ]] ; then
-    export KOMODO_ROOT={{ prefix }}
-    KOMODO_RELEASE_REAL={{ release }}
+{% if custom_version %}
+    CUSTOM_COORDINATE="-{{ custom_version }}"
+{% else %}
+    CUSTOM_COORDINATE=""
+{% endif %}
 
-    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL-rhel7/enable
+if [[ $(uname -r) == *el8* ]] || [[ $(uname -r) == *el9* ]] ; then
+    export KOMODO_ROOT={{ prefix }}
+    rhel_version_number=$(uname -r | grep -oP 'el\K[0-9]')
+    KOMODO_RELEASE_REAL={{ release }}-rhel$rhel_version_number$CUSTOM_COORDINATE
+
+    source $KOMODO_ROOT/$KOMODO_RELEASE_REAL/enable
     export PS1="(${KOMODO_RELEASE_REAL}) ${_PRE_KOMODO_PS1}"
     export KOMODO_RELEASE=$KOMODO_RELEASE_REAL
 else
-    echo -e "{{ migration_warning }}"
+    echo "Attention! Your machine is running on an environment that is not supported."
 fi

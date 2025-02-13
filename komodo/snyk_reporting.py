@@ -2,13 +2,12 @@ import argparse
 import html
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from snyk import SnykClient
-from snyk.managers import OrganizationManager
-from snyk.models import Vulnerability
+from snyk.models import Organization, Vulnerability
 
-from komodo.yaml_file_type import ReleaseDir, ReleaseFile, YamlFile
+from komodo.yaml_file_types import ReleaseDir, ReleaseFile, RepositoryFile
 
 _CONSOLE_VULNERABILITY_FORMAT = """\t{id}
 \t\tPackage: {package}
@@ -30,7 +29,10 @@ def main() -> None:
     releases = args.release_folder if args.release_folder else args.release
 
     vulnerabilities = snyk_main(
-        releases=releases, repository=args.repo, api_token=api_token, org_id=args.orgid
+        releases=releases,
+        repository=args.repo.content,
+        api_token=api_token,
+        org_id=args.orgid,
     )
 
     if args.format_github:
@@ -39,17 +41,20 @@ def main() -> None:
         print(_format_console(vulnerabilities=vulnerabilities))
 
 
-def parse_args(args: Dict[str, str]) -> argparse.Namespace:
+def parse_args(args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Test a release for security and license issues.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "--orgid", type=str, required=True, help="The Snyk organization ID."
+        "--orgid",
+        type=str,
+        required=True,
+        help="The Snyk organization ID.",
     )
     parser.add_argument(
         "--repo",
-        type=YamlFile(),
+        type=RepositoryFile(),
         required=True,
         help="A Komodo repository file, in YAML format.",
     )
@@ -57,8 +62,7 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
     group.add_argument(
         "--release",
         type=ReleaseFile(),
-        help="A Komodo release file mapping package name to version, "
-        "in YAML format.",
+        help="A Komodo release file mapping package name to version, in YAML format.",
     )
     group.add_argument(
         "--release-folder",
@@ -68,15 +72,17 @@ def parse_args(args: Dict[str, str]) -> argparse.Namespace:
     parser.add_argument(
         "--format-github",
         action="store_true",
-        help="Flag to print vulnerabilities in GitHub-friendly format vs "
-        "console format.",
+        help=(
+            "Flag to print vulnerabilities in GitHub-friendly format vs console format."
+        ),
     )
 
     return parser.parse_args(args)
 
 
 def filter_pip_packages(
-    packages: Dict[str, str], repository: Dict[str, Any]
+    packages: Dict[str, str],
+    repository: Dict[str, Any],
 ) -> Dict[str, str]:
     return {
         package_name: version
@@ -87,7 +93,7 @@ def filter_pip_packages(
 
 def create_snyk_search_string(packages: Dict[str, str]) -> str:
     return "\n".join(
-        [f"{package_name}=={version}" for package_name, version in packages.items()]
+        [f"{package_name}=={version}" for package_name, version in packages.items()],
     )
 
 
@@ -102,10 +108,22 @@ def get_unique_issues(issues: List[Vulnerability]) -> List[Vulnerability]:
     return result
 
 
+def filter_vulnerability_issues(
+    snyk_issues: List[Vulnerability], release_packages: Dict[str, str]
+):
+    filtered_vulnerability_issues = []
+    for snyk_issue in snyk_issues:
+        vulnerable_package_name = snyk_issue.package
+        vulnerable_package_version = snyk_issue.version
+        if release_packages.get(vulnerable_package_name) == vulnerable_package_version:
+            filtered_vulnerability_issues.append(snyk_issue)
+    return filtered_vulnerability_issues
+
+
 def find_vulnerabilities(
     releases: Dict[str, Dict[str, str]],
     repository: Dict[str, Any],
-    org: OrganizationManager,
+    org: Organization,
 ) -> Dict[str, List[Vulnerability]]:
     result = {}
 
@@ -114,8 +132,10 @@ def find_vulnerabilities(
         snyk_search_string = create_snyk_search_string(pip_packages)
         snyk_result = org.test_pipfile(snyk_search_string)
         vulnerability_issues = get_unique_issues(snyk_result.issues.vulnerabilities)
-        result[release_name] = vulnerability_issues
-
+        filtered_vulnerabity_issues = filter_vulnerability_issues(
+            vulnerability_issues, packages
+        )
+        result[release_name] = filtered_vulnerabity_issues
     return result
 
 
@@ -165,7 +185,7 @@ def _format_github(vulnerabilities: Dict[str, List[Vulnerability]]) -> str:
     return html.escape(result)
 
 
-def _get_org(api_token: str, org_id: str) -> OrganizationManager:
+def _get_org(api_token: str, org_id: str) -> Organization:
     client = SnykClient(api_token)
     return client.organizations.get(org_id)
 
@@ -173,23 +193,22 @@ def _get_org(api_token: str, org_id: str) -> OrganizationManager:
 def snyk_main(
     releases: Dict[str, Dict[str, str]],
     repository: Dict[str, Any],
-    api_token: str,
+    api_token: Optional[str],
     org_id: str,
-) -> None:
-    if sys.version_info < (3, 7):
-        raise RuntimeError("Snyk security reporting requires Python >= 3.7")
+) -> Dict[str, List[Vulnerability]]:
     if api_token is None:
+        msg = "No api token given, please set the environment variable SNYK_API_TOKEN."
         raise ValueError(
-            "No api token given, please set the environment variable SNYK_API_TOKEN."
+            msg,
         )
 
     org = _get_org(api_token, org_id)
 
-    vulnerabilities = find_vulnerabilities(
-        releases=releases, repository=repository, org=org
+    return find_vulnerabilities(
+        releases=releases,
+        repository=repository,
+        org=org,
     )
-
-    return vulnerabilities
 
 
 if __name__ == "__main__":

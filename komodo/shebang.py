@@ -3,9 +3,9 @@ import os
 from komodo.shell import shell
 
 
-def _is_shebang(s):
+def _is_shebang(input_str):
     """Checks if the string potentially is a Python shebang."""
-    return s.startswith("#!/") and "python" in s
+    return input_str.startswith("#!/") and "python" in input_str
 
 
 def fixup_python_shebangs(prefix, release):
@@ -32,12 +32,16 @@ def fixup_python_shebangs(prefix, release):
     # executables with wrong shebang
     for bin_ in os.listdir(binpath):
         try:
-            with open(os.path.join(binpath, bin_), "r") as f:
-                shebang = f.readline().strip()
+            with open(
+                os.path.join(binpath, bin_), encoding="utf-8"
+            ) as binary_file_stream:
+                shebang = binary_file_stream.readline().strip()
             if _is_shebang(shebang):
                 bins_.append(bin_)
         except UnicodeDecodeError:
             # Whenever the executables are compiled binaries, we end here.
+            pass
+        except IsADirectoryError:
             pass
 
     for bin_ in bins_:

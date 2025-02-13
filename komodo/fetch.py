@@ -8,20 +8,18 @@ import sys
 import jinja2
 
 from komodo.package_version import (
-    LATEST_PACKAGE_ALIAS,
     get_git_revision_hash,
-    latest_pypi_version,
     strip_version,
 )
 from komodo.shell import pushd, shell
-from komodo.yaml_file_type import YamlFile
+from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 
 def eprint(*args, **kwargs):
     return print(*args, file=sys.stderr, **kwargs)
 
 
-def grab(path, filename=None, version=None, protocol=None, pip="pip"):
+def grab(path, filename=None, version=None, protocol=None):
     # guess protocol if it's obvious from the url (usually is)
     if protocol is None:
         protocol = path.split(":")[0]
@@ -34,19 +32,26 @@ def grab(path, filename=None, version=None, protocol=None, pip="pip"):
             f"-b {strip_version(version)} "
             "--quiet "
             "--recurse-submodules "
-            f"-- {path} {filename}"
+            f"-- {path} {filename}",
         )
 
     elif protocol in ("nfs", "fs-ln"):
-        shell(f"cp --recursive --symbolic-link {path} {filename}")
+        if sys.platform == "darwin":
+            shell(f"cp -Rs {path} {filename}")
+        else:
+            shell(f"cp --recursive --symbolic-link {path} {filename}")
 
     elif protocol in ("fs-cp"):
-        shell(f"cp --recursive {path} {filename}")
+        if sys.platform == "darwin":
+            shell(f"cp -R {path} {filename}")
+        else:
+            shell(f"cp --recursive {path} {filename}")
 
     elif protocol in ("rsync"):
         shell(f"rsync -a {path}/ {filename}")
     else:
-        raise NotImplementedError(f"Unknown protocol {protocol}")
+        msg = f"Unknown protocol {protocol}"
+        raise NotImplementedError(msg)
 
 
 def fetch(pkgs, repo, outdir, pip="pip") -> dict:
@@ -62,16 +67,21 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
     for pkg in missingver:
         eprint(
             f"missingver: missing version for {pkg}: {pkgs[pkg]} requested, "
-            f'found: {",".join(repo[pkg].keys())}'
+            f"found: {','.join(repo[pkg].keys())}",
         )
 
     if missingpkg or missingver:
         return {}
 
     if not outdir:
+        msg = "The value of `outdir`, the download destination location cannot be None or the empty string."
         raise ValueError(
-            "The value of `outdir`, the cache location for pip and other "
-            "tools, cannot be None or the empty string."
+            msg,
+        )
+    if os.path.exists(outdir) and os.listdir(outdir):
+        msg = f"Downloading to non-empty directory {outdir} is not supported."
+        raise RuntimeError(
+            msg,
         )
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -83,13 +93,14 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
         for pkg, ver in pkgs.items():
             current = repo[pkg][ver]
             if "pypi_package_name" in current and current["make"] != "pip":
+                msg = "pypi_package_name is only valid when building with pip"
                 raise ValueError(
-                    "pypi_package_name is only valid when building with pip"
+                    msg,
                 )
 
             if "source" in current:
                 templater = jinja2.Environment(loader=jinja2.BaseLoader).from_string(
-                    current.get("source")
+                    current.get("source"),
                 )
                 url = templater.render(os.environ)
             else:
@@ -98,9 +109,6 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
             protocol = current.get("fetch")
             pkg_alias = current.get("pypi_package_name", pkg)
 
-            if url == "pypi" and ver == LATEST_PACKAGE_ALIAS:
-                ver = latest_pypi_version(pkg_alias)
-
             name = f"{pkg_alias} ({ver}): {url}"
             pkgname = f"{pkg_alias}-{ver}"
 
@@ -108,7 +116,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                 package_folder = os.path.abspath(pkgname)
                 print(
                     f"Nothing to fetch for {pkgname}, "
-                    f"but created folder {package_folder}"
+                    f"but created folder {package_folder}",
                 )
                 os.mkdir(pkgname)
                 continue
@@ -121,7 +129,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
             if len(spliturl) > 1 and spliturl[-2] == "tar":
                 ext = f"tar.{spliturl[-1]}"
 
-            if ext in ["rpm", "tar", "gz", "tgz", "tar.gz", "tar.bz2", "tar.xz"]:
+            if ext in ["tar", "gz", "tgz", "tar.gz", "tar.bz2", "tar.xz"]:
                 dst = f"{dst}.{ext}"
 
             if url == "pypi":
@@ -130,7 +138,7 @@ def fetch(pkgs, repo, outdir, pip="pip") -> dict:
                 continue
 
             print(f"Downloading {name}")
-            grab(url, filename=dst, version=ver, protocol=protocol, pip=pip)
+            grab(url, filename=dst, version=ver, protocol=protocol)
 
             if protocol == "git":
                 git_hashes[pkg] = get_git_revision_hash(path=dst)
@@ -157,13 +165,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "pkgfile",
-        type=YamlFile(),
-        help="A Komodo release file mapping package name to version, "
-        "in YAML format.",
+        type=ReleaseFile(),
+        help="A Komodo release file mapping package name to version, in YAML format.",
     )
     parser.add_argument(
         "repofile",
-        type=YamlFile(),
+        type=RepositoryFile(),
         help="A Komodo repository file, in YAML format.",
     )
     parser.add_argument(
@@ -171,13 +178,21 @@ if __name__ == "__main__":
         "-o",
         type=str,
         required=True,
-        help="The cache location for pip and other tools; will be created.",
+        help=(
+            "The download destination for pip, cp, rsync and git. "
+            "Must be non-existing or empty."
+        ),
     )
     parser.add_argument(
         "--pip",
         type=str,
         default="pip",
-        help="The command to use for downloading.",
+        help="The command to use for downloading pip packages.",
     )
     args = parser.parse_args()
-    fetch(args.pkgfile, args.repofile, outdir=args.output, pip=args.pip)
+    fetch(
+        args.content.pkgfile,
+        args.content.repofile,
+        outdir=args.content.output,
+        pip=args.pip,
+    )

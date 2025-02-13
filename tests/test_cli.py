@@ -1,11 +1,11 @@
 import os
 import shutil
 import sys
+from pathlib import Path
 
 import pytest
 
-from komodo.cli import cli_main, parse_args
-from komodo.package_version import LATEST_PACKAGE_ALIAS
+from komodo.cli import cli_main
 from tests import _get_test_root
 
 
@@ -25,15 +25,13 @@ from tests import _get_test_root
             "--release",
             "nominal_release",
             "--pip",
-            "/bin/true",
+            "/usr/bin/true",
+            os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
+            os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
             "--extra-data-dirs",
             os.path.join(_get_test_root(), "data/cli"),
             os.path.join(_get_test_root(), "data/cli/hackres"),
             os.path.join(_get_test_root(), "data/cli/hackgit"),
-            "--locations-config",
-            os.path.join(_get_test_root(), "data/cli/locations.yml"),
-            os.path.join(_get_test_root(), "data/cli/nominal_release.yml"),
-            os.path.join(_get_test_root(), "data/cli/nominal_repository.yml"),
         ),
     ],
 )
@@ -53,7 +51,6 @@ def test_main(args, tmpdir):
         "--workspace",
         tmpdir,
     ]
-
     sys.argv.extend(list(args))
 
     cli_main()
@@ -66,21 +63,14 @@ def test_main(args, tmpdir):
     assert os.path.exists(os.path.join(release_path, "root/bin/python4.2"))
     assert os.path.exists(os.path.join(release_path, "enable"))
     assert os.path.exists(os.path.join(release_path, "enable.csh"))
-    assert os.path.exists(os.path.join(release_path, "local"))
-    assert os.path.exists(os.path.join(release_path, "local.csh"))
 
     fname = "root/bin/some-github-binary-artifact"
     downloaded_file = os.path.join(release_path, fname)
     assert os.path.exists(downloaded_file)
     assert os.access(downloaded_file, os.X_OK)
 
-    with open(os.path.join(release_path, release_name)) as releasedoc:
+    with open(os.path.join(release_path, release_name), encoding="utf-8") as releasedoc:
         releasedoc_content = releasedoc.read()
-
-        # test specifically for the regression introduced by
-        # https://github.com/equinor/komodo/issues/190 where if you provided ert
-        # with version '*', it would then show up in the releasedoc.
-        assert f"version: '{LATEST_PACKAGE_ALIAS}'" not in releasedoc_content
 
         # ensure the alias is used when resolving the version
         assert "version: null" not in releasedoc_content
@@ -107,8 +97,7 @@ def test_main(args, tmpdir):
     ],
 )
 def test_minimal_main(args, tmpdir):
-    """
-    Check that a minimal example, more like that from the README, also works.
+    """Check that a minimal example, more like that from the README, also works.
 
     Without --locations-config, this should not produce the scripts local & local.csh.
     """
@@ -133,23 +122,115 @@ def test_minimal_main(args, tmpdir):
     assert not os.path.exists(os.path.join(release_path, "local.csh"))
 
 
-def test_pyver_is_deprecated(capsys):
-    """
-    pyver is not being used anywhere in the code and has been deprecated.
-    This test ensures that its use prints a message in stderr.
+def test_no_overwrite_by_default(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "existing_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    with pytest.raises(
+        RuntimeError, match="Downloading to non-empty directory downloads"
+    ):
+        cli_main()
 
-    Note that one can raise a DeprecationWarning instead, and test for it,
-    but it does not show up in the CLI.
-    """
-    pkgs = os.path.join(_get_test_root(), "data/cli/nominal_release.yml")
-    repo = os.path.join(_get_test_root(), "data/cli/nominal_repository.yml")
-    locs = os.path.join(_get_test_root(), "data/cli/locations.yml")
-    cmd = (
-        f"{pkgs} {repo} --prefix pfx --release rel "
-        f"--locations-config {locs} "
-        f"--pyver 3.8"
-    )
-    with pytest.warns(FutureWarning) as record:
-        _ = parse_args(cmd.split())
+    # Try another rerun after we have removed the downloads and remainder from
+    # failed build above:
+    shutil.rmtree(tmpdir / "downloads")
+    shutil.rmtree(tmpdir / ".existing_release")
+    with pytest.raises(RuntimeError, match="Only bleeding builds can be overwritten"):
+        cli_main()
 
-    assert "The --pyver option is deprecated" in record[0].message.args[0]
+
+def test_bleeding_overwrite_by_default(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "some_bleeding_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    # Remove non-interesting leftovers from first build:
+    shutil.rmtree(tmpdir / "downloads")
+    shutil.rmtree(tmpdir / ".some_bleeding_release")
+
+    # Assert that we can overwrite the build inside "some_bleeding_release"
+    cli_main()
+
+
+def test_overwrite_if_option_is_set(tmpdir):
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        "--overwrite",
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        "prefix",
+        "--release",
+        "some_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+    cli_main()
+    # Remove non-interesting leftovers from first build:
+    shutil.rmtree(tmpdir / "downloads")
+    shutil.rmtree(tmpdir / ".some_release")
+
+    # Assert that we can overwrite the build inside "some_release"
+    cli_main()
+
+
+def test_bleeding_builds_marked_for_deletion_are_removed(tmpdir):
+    prefix_path = Path(tmpdir).absolute()
+    prefix_path_str = str(prefix_path)
+
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        os.path.join(_get_test_root(), "data/cli/minimal_release.yml"),
+        os.path.join(_get_test_root(), "data/cli/minimal_repository.yml"),
+        "--prefix",
+        prefix_path_str,
+        "--release",
+        "some_bleeding_release",
+        "--extra-data-dirs",  # Required to find test_python_builtin.sh.
+        os.path.join(_get_test_root(), "data/cli"),
+    ]
+
+    test_dirs = [
+        prefix_path_str + "/some_bleeding_release.delete-7632",
+        prefix_path_str + "/some_bleeding_release.delete-4342",
+        prefix_path_str + "/some_bleeding_release.delete-1234",
+    ]
+
+    def count_release_folders_to_be_deleted() -> int:
+        release_dir_glob = [
+            str(p.absolute())
+            for p in list(Path(prefix_path).glob("some_bleeding_release.delete-*"))
+        ]
+        return len(release_dir_glob) if release_dir_glob else 0
+
+    for test_dir in test_dirs:
+        os.makedirs(test_dir)
+
+    assert count_release_folders_to_be_deleted() == len(test_dirs)
+    cli_main()
+    assert count_release_folders_to_be_deleted() == 0

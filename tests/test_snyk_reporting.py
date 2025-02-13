@@ -1,3 +1,4 @@
+from typing import Mapping, Sequence
 from unittest.mock import Mock, patch
 
 import pytest
@@ -6,17 +7,17 @@ from snyk.models import Vulnerability
 from komodo.snyk_reporting import snyk_main
 
 
-def _create_result_mock(issue_ids):
+def _create_result_mock(issues: Sequence[Mapping[str, str]]):
     result_mock = Mock()
     result_mock.issues.vulnerabilities = [
         Vulnerability(
-            id=issue_id,
+            id=issue["id"],
             url="some_url",
             title="some_title",
             description="some_description",
             upgradePath="some_upgradePath",
-            package="some_package",
-            version="some_version",
+            package=issue["package"],
+            version=issue["version"],
             severity="some_severity",
             exploitMaturity="some_exploitMaturity",
             isUpgradable="some_isUpgradable",
@@ -25,7 +26,7 @@ def _create_result_mock(issue_ids):
             identifiers="some_identifiers",
             semver="some_semver",
         )
-        for issue_id in issue_ids
+        for issue in issues
     ]
     return result_mock
 
@@ -40,30 +41,43 @@ def test_no_api_token():
 
 
 @pytest.mark.parametrize(
-    "packages,expected_search_string,input_issue_ids,expected_issue_ids",
+    ("packages", "expected_search_string", "input_issues", "expected_issue_ids"),
     [
         (
             {"pyaml": "20.4.0"},
             "pyaml==20.4.0",
-            ("some_issue1", "some_issue2"),
+            (
+                {"id": "some_issue1", "package": "pyaml", "version": "20.4.0"},
+                {"id": "some_issue2", "package": "pyaml", "version": "20.4.0"},
+            ),
             ("some_issue1", "some_issue2"),
         ),
         (
             {"pyaml": "20.4.0"},
             "pyaml==20.4.0",
-            ("some_issue1", "some_issue2", "some_issue2"),
+            (
+                {"id": "some_issue1", "package": "pyaml", "version": "20.4.0"},
+                {"id": "some_issue2", "package": "pyaml", "version": "20.4.0"},
+                {"id": "some_issue2", "package": "pyaml", "version": "20.4.0"},
+            ),
             ("some_issue1", "some_issue2"),
         ),
         (
             {"pyaml": "20.4.0", "flask": "1.2.0"},
             "pyaml==20.4.0\nflask==1.2.0",
-            ("some_issue1", "some_issue1"),
+            (
+                {"id": "some_issue1", "package": "pyaml", "version": "20.4.0"},
+                {"id": "some_issue1", "package": "flask", "version": "1.2.0"},
+            ),
             ("some_issue1",),
         ),
     ],
 )
 def test_snyk_reporting(
-    packages, expected_search_string, input_issue_ids, expected_issue_ids
+    packages,
+    expected_search_string,
+    input_issues: Sequence[Mapping[str, str]],
+    expected_issue_ids,
 ):
     releases = {"2025.05.00": packages}
     repositories = {
@@ -73,7 +87,7 @@ def test_snyk_reporting(
                 "make": "pip",
                 "maintainer": "someone",
                 "depends": [],
-            }
+            },
         }
         for k, v in packages.items()
     }
@@ -85,14 +99,15 @@ def test_snyk_reporting(
                     "make": "pip",
                     "maintainer": "someone",
                     "depends": [],
-                }
-            }
-        }
+                },
+            },
+        },
     )
     org_mock = Mock()
-    org_mock.test_pipfile.return_value = _create_result_mock(input_issue_ids)
+    org_mock.test_pipfile.return_value = _create_result_mock(input_issues)
     with patch(
-        "komodo.snyk_reporting._get_org", return_value=org_mock
+        "komodo.snyk_reporting._get_org",
+        return_value=org_mock,
     ) as org_func_mock:
         vulnerabilities = snyk_main(
             releases=releases,

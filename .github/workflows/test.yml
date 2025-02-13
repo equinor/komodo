@@ -5,59 +5,74 @@ on: [pull_request]
 jobs:
   build:
     env:
-      RELEASE: release-py3x.yml
-
+      RELEASE_NAME: release-matrix
+      RELEASE_FULL_NAME: release-matrix.yml
+      REPOSITORY: repository.yml
 
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.10']
+        python-version: ['3.8', '3.11', '3.12']
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install csh
+        sudo apt-get update
+        sudo apt-get install csh
 
     - name: Setup Komodo
       run: |
-        ./bootstrap.sh $(which python)
+        pip install -U pip wheel setuptools
+        pip install ".[dev]"
 
     - name: Unit tests
-      run: boot/kmd-env/bin/python -m pytest tests
-
-    - name: Lint tests
       run: |
-        boot/kmd-env/bin/python -m komodo.lint examples/releases/unstable.yml examples/repository.yml
-        boot/kmd-env/bin/python -m komodo.lint examples/releases/ecl.yml examples/repository.yml
+        pytest tests
+        pytest --doctest-modules komodo
+
+    - name: Lint examples
+      run: |
+        komodo-lint examples/stable.yml examples/${{env.REPOSITORY}}
+
+    - name: Transpile file
+      run: |
+        komodo-transpiler transpile \
+            --matrix-file=ci/"${{ env.RELEASE_FULL_NAME }}" \
+            --output ci --matrix-coordinates "{rhel: ['7'], py: ['${{matrix.python-version}}']}"
 
     - name: Full integration test
       run: |
-        ./runkmd.sh \
-            ci/${RELEASE} \
-            ci/repository.yml \
+        py_version_number=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
+        kmd \
+            ci/${{ env.RELEASE_NAME }}-py$py_version_number-rhel7.yml \
+            ci/${{env.REPOSITORY}} \
             --workspace ${{ runner.temp }}/kmd-ws \
-            --cache ${{ runner.temp }}/kmd-cache \
-            --prefix ${{ runner.temp }}/pfx \
+            --prefix ${{ runner.temp }}/prefix \
             --release ci \
-            --locations-config $(realpath ci/locations.yml) \
 
     - name: Build libkmd.so (a dummy C library) for testing
       run: |
-        ci/build_lib.sh ${{ runner.temp }}/pfx/ci
+        set -e
 
-        source ${{ runner.temp }}/pfx/ci/enable
+        mkdir ${{ runner.temp }}/tmplib
+        echo 'char* foo() { return "bar"; }' > ${{ runner.temp }}/tmplib/lib.c
+        cc -shared -o${{ runner.temp }}/tmplib/libkmd.so -fPIC ${{ runner.temp }}/tmplib/lib.c
+
+        # Deploy directly into the above built komodo release
+        cp ${{ runner.temp }}/tmplib/libkmd.so ${{ runner.temp }}/prefix/ci/root/lib
+
+        source ${{ runner.temp }}/prefix/ci/enable
         which python
         python --version
         python -c "import numpy;print(numpy.__file__)"
@@ -65,11 +80,11 @@ jobs:
 
     - name: Test enable script
       run: |
-        source ${{ runner.temp }}/pfx/ci/enable
-        [[ "$(which python)" == "${{ runner.temp }}/pfx/ci/root/bin/python" ]]
+        source ${{ runner.temp }}/prefix/ci/enable
+        [[ "$(which python)" == "${{ runner.temp }}/prefix/ci/root/bin/python" ]]
 
     - name: Test Python version
       run: |
-        source ${{ runner.temp }}/pfx/ci/enable
+        source ${{ runner.temp }}/prefix/ci/enable
         pyver=$(python -c 'from sys import version_info as v;print(f"{v[0]}.{v[1]}")')
         [[ "${pyver}" == "${{ matrix.python-version }}" ]]
