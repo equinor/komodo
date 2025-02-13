@@ -128,7 +128,7 @@ def download_packages(
     repository_file_content: Mapping[str, Mapping[str, Union[str, Sequence[str]]]],
     download_destination: str,
     pip_executable: str = "pip",
-) -> Dict[str, str]:
+):
     """Downloads all PyPI packages to destination. Tries to download other
         packages to destination too.
     Git packages are collected, and a dict of all git hashes is returned.
@@ -147,14 +147,14 @@ def download_packages(
     --
     Dict of git hashes found
     """
-    git_hashes = fetch(
+    git_hashes, pypi_packages = fetch(
         release_file_content,
         repository_file_content,
         outdir=download_destination,
         pip=pip_executable,
     )
 
-    return git_hashes
+    return git_hashes, pypi_packages
 
 
 @profile_time("Building non-pip part of komodo in workspace")
@@ -264,34 +264,20 @@ def apply_fallback_tmpdir_for_pip_if_set(tmp_dir: Optional[str] = None):
 
 @profile_time("pip install to final destination")
 def install_previously_downloaded_pip_packages(
-    release_file_content: Mapping[str, str],
-    repository_file_content: Mapping[str, Mapping[str, Union[str, Sequence[str]]]],
-    downloads_directory: str,
-    pip_executable: str,
+    pypi_packages: list[str],
     release_root: Path,
 ) -> None:
-    for pkg, ver in release_file_content.items():
-        current = repository_file_content[pkg][ver]
-        if current["make"] != "pip":
-            continue
+    shell_input = [
+        "uv pip",
+        "install",
+        f"--python {str(release_root / 'bin' / 'python')}",
+        "--no-deps",
+        "--no-cache",
+        "--reinstall",
+        " ".join(pypi_packages),
+    ]
 
-        package_name = current.get("pypi_package_name", pkg)
-        shell_input = [
-            pip_executable,
-            f"install {package_name}=={strip_version(ver)}",
-            "--prefix",
-            str(release_root),
-            "--no-index",
-            "--no-deps",
-            "--ignore-installed",
-            "--no-compile",
-            # assuming fetch.py has done "pip download" to this directory:
-            f"--cache-dir {downloads_directory}",
-            f"--find-links {downloads_directory}",
-        ]
-        shell_input.append(current.get("makeopts"))
-
-        print(shell(shell_input))
+    print(shell(shell_input))
 
 
 def run_post_installation_scripts_if_set(
@@ -341,7 +327,7 @@ def _main(args: KomodoNamespace) -> None:
     data = Data(extra_data_dirs=args.extra_data_dirs)
     git_hashes = None
     if args.download or (not args.build and not args.install):
-        git_hashes = download_packages(
+        git_hashes, pypi_packages = download_packages(
             args.pkgs.content,
             args.repo.content,
             download_destination=args.downloads,
@@ -383,10 +369,7 @@ def _main(args: KomodoNamespace) -> None:
     apply_fallback_tmpdir_for_pip_if_set(args.tmp)
 
     install_previously_downloaded_pip_packages(
-        args.pkgs.content,
-        args.repo.content,
-        downloads_directory=args.downloads,
-        pip_executable=args.pip,
+        pypi_packages,
         release_root=release_root,
     )
     fixup_python_shebangs(args.prefix, args.release)
