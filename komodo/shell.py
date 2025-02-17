@@ -2,6 +2,7 @@ import contextlib
 import os
 import subprocess
 import sys
+from typing import List, Optional, Union
 
 
 @contextlib.contextmanager
@@ -15,7 +16,7 @@ def pushd(path):
     os.chdir(prev)
 
 
-def shell(cmd: str, allow_failure=False) -> bytes:
+def shell(cmd: Union[str, List[Optional[str]]], allow_failure: bool = False) -> bytes:
     try:
         cmdlist = cmd.split(" ")
     except AttributeError:
