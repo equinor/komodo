@@ -1,13 +1,14 @@
 import sys
 from contextlib import contextmanager
 from os.path import abspath, dirname
+from pathlib import Path
 from typing import List
 
 import pytest
 
 from komodo.release_transpiler import main as release_transpiler_main
 
-VALID_RELEASE_FOLDER = abspath(dirname(__file__) + "/data/test_releases")
+OUTPUT_RELEASE_FOLDER = "test_releases"
 VALID_RELEASE_BASE = "2020.01.a1"
 VALID_OVERRIDE_MAPPING_FILE = abspath(
     dirname(dirname(__file__)) + "/examples/stable.yml",
@@ -72,11 +73,13 @@ def does_not_raise():
         ),
     ],
 )
-def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch):
+def test_transpile_py_matrix_file_type(
+    tmpdir, args: List[str], expectation, monkeypatch
+):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["", "transpile", "--output-folder", VALID_RELEASE_FOLDER, *args],
+        ["", "transpile", "--output-folder", str(tmpdir), *args],
     )
     with expectation:
         release_transpiler_main()
@@ -88,7 +91,7 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         (
             [
                 "--output-folder",
-                VALID_RELEASE_FOLDER,
+                OUTPUT_RELEASE_FOLDER,
                 "--matrix-coordinates",
                 VALID_MATRIX_COORDINATES,
             ],
@@ -97,14 +100,14 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         (
             [
                 "--output-folder",
-                VALID_RELEASE_FOLDER,
+                OUTPUT_RELEASE_FOLDER,
             ],
             does_not_raise(),
         ),
         (
             [
                 "--output-folder",
-                f"{VALID_RELEASE_FOLDER}/does_not_exist",
+                f"{OUTPUT_RELEASE_FOLDER}/does_not_exist",
             ],
             pytest.raises(NotADirectoryError),
         ),
@@ -131,14 +134,18 @@ def test_transpile_py_matrix_file_type(args: List[str], expectation, monkeypatch
         ),
     ],
 )
-def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypatch):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        ["", "transpile", "--matrix-file", VALID_MATRIX_FILE, *args],
-    )
-    with expectation:
-        release_transpiler_main()
+def test_transpile_py_output_folder_type(
+    tmpdir, args: List[str], expectation, monkeypatch
+):
+    with tmpdir.as_cwd():
+        Path(OUTPUT_RELEASE_FOLDER).mkdir()
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            ["", "transpile", "--matrix-file", VALID_MATRIX_FILE, *args],
+        )
+        with expectation:
+            release_transpiler_main()
 
 
 @pytest.mark.parametrize(
@@ -179,6 +186,7 @@ def test_transpile_py_output_folder_type(args: List[str], expectation, monkeypat
     ],
 )
 def test_transpile_py_matrix_coordinates_type(
+    tmpdir,
     args: List[str],
     expectation,
     monkeypatch,
@@ -192,7 +200,7 @@ def test_transpile_py_matrix_coordinates_type(
             "--matrix-file",
             VALID_MATRIX_FILE,
             "--output-folder",
-            VALID_RELEASE_FOLDER,
+            str(tmpdir),
             *args,
         ],
     )
