@@ -19,6 +19,10 @@ from komodo.shebang import fixup_python_shebangs
 from komodo.shell import pushd, shell
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
+# If this package is included in a build, it will always
+# be installed as the last pip package
+LAST_PIP_PACKAGE_TO_INSTALL = "komodo-shims"
+
 
 class KomodoNamespace(argparse.Namespace):
     """
@@ -288,7 +292,12 @@ def install_previously_downloaded_pip_packages(
             makeopts,
         ]
 
+    komodo_shims: Optional[Tuple[str, str]] = None
     for pkg, ver in release_file_content.items():
+        if pkg == LAST_PIP_PACKAGE_TO_INSTALL:
+            # This is a magic package name that will always be installed after all other pip packages if found.
+            komodo_shims = (pkg, ver)
+            continue
         pkg_data = repository_file_content[pkg][ver]
         if pkg_data["make"] != "pip":
             continue
@@ -297,6 +306,9 @@ def install_previously_downloaded_pip_packages(
             pkg_data.get("pypi_package_name", pkg), ver, pkg_data.get("makeopts")
         )
         print(shell(shell_input))
+
+    if komodo_shims is not None:
+        print(shell(pip_shell_command(komodo_shims[0], komodo_shims[1], None)))
 
 
 def run_post_installation_scripts_if_set(
