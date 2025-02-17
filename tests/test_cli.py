@@ -2,9 +2,12 @@ import os
 import shutil
 import sys
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pytest
+import yaml
 
+from komodo import cli
 from komodo.cli import cli_main
 from tests import _get_test_root
 
@@ -234,3 +237,54 @@ def test_bleeding_builds_marked_for_deletion_are_removed(tmpdir):
     assert count_release_folders_to_be_deleted() == len(test_dirs)
     cli_main()
     assert count_release_folders_to_be_deleted() == 0
+
+
+def test_komodo_shims_is_installed_at_the_end(tmpdir):
+    (Path(tmpdir) / "release.yml").write_text(
+        "komodo-shims: 1.0.0\npython: 3-builtin\ntreelib: 1.7.0", encoding="utf-8"
+    )
+    repo = {
+        "python": {
+            "3-builtin": {
+                "make": "pip",  # because why not
+                "maintainer": "foo",
+            }
+        },
+        "treelib": {
+            "1.7.0": {
+                "source": "pypi",
+                "make": "pip",
+                "maintainer": "bar",
+                "depends": ["python"],
+            }
+        },
+        "komodo-shims": {
+            "1.0.0": {"source": "pypi", "make": "pip", "maintainer": "com"}
+        },
+    }
+    (Path(tmpdir) / "repository.yml").write_text(yaml.dump(repo), encoding="utf-8")
+    sys.argv = [
+        "kmd",
+        "--workspace",
+        str(tmpdir),
+        str(tmpdir / "release.yml"),
+        str(tmpdir / "repository.yml"),
+        "--release",
+        "a_komodo_release_with_shims",
+        "--prefix",
+        str(tmpdir),
+    ]
+
+    mocked_shell = Mock(return_value=b"")
+    mocked_fetch = Mock(return_value={})
+    with patch.object(cli, "shell", mocked_shell), patch.object(
+        cli, "fetch", mocked_fetch
+    ):
+        cli_main()
+    pip_install_calls = [
+        shell_call
+        for shell_call in mocked_shell.mock_calls
+        if "'pip', 'install " in str(shell_call.args[0])
+    ]
+    assert len(pip_install_calls) == 3
+    assert "komodo-shims" in str(pip_install_calls[-1])
