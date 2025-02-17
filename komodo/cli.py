@@ -270,13 +270,10 @@ def install_previously_downloaded_pip_packages(
     pip_executable: str,
     release_root: Path,
 ) -> None:
-    for pkg, ver in release_file_content.items():
-        current = repository_file_content[pkg][ver]
-        if current["make"] != "pip":
-            continue
-
-        package_name = current.get("pypi_package_name", pkg)
-        shell_input = [
+    def pip_shell_command(
+        package_name: str, ver: str, makeopts: Optional[str]
+    ) -> List[Optional[str]]:
+        return [
             pip_executable,
             f"install {package_name}=={strip_version(ver)}",
             "--prefix",
@@ -288,9 +285,17 @@ def install_previously_downloaded_pip_packages(
             # assuming fetch.py has done "pip download" to this directory:
             f"--cache-dir {downloads_directory}",
             f"--find-links {downloads_directory}",
+            makeopts,
         ]
-        shell_input.append(current.get("makeopts"))
 
+    for pkg, ver in release_file_content.items():
+        pkg_data = repository_file_content[pkg][ver]
+        if pkg_data["make"] != "pip":
+            continue
+
+        shell_input = pip_shell_command(
+            pkg_data.get("pypi_package_name", pkg), ver, pkg_data.get("makeopts")
+        )
         print(shell(shell_input))
 
 
