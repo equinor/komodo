@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 import pytest
 import yaml
 
-from komodo import cli
+from komodo import build, cli
 from komodo.cli import cli_main
 from tests import _get_test_root
 
@@ -259,10 +259,21 @@ def test_komodo_shims_is_installed_at_the_end(tmpdir):
             }
         },
         "komodo-shims": {
-            "1.0.0": {"source": "pypi", "make": "pip", "maintainer": "com"}
+            "1.0.0": {
+                "source": "https://mykey@githøbb.com",
+                "fetch": "git",
+                "make": "sh",
+                "maintainer": "com",
+                "makefile": "setup-py.sh",
+            }
         },
     }
     (Path(tmpdir) / "repository.yml").write_text(yaml.dump(repo), encoding="utf-8")
+
+    # Since we are mocking the shell command to a no-op, we need to mkdir here:
+    (Path(tmpdir) / "downloads" / "komodo-shims-1.0.0").mkdir(parents=True)
+    (Path(tmpdir) / "a_komodo_release_with_shims").mkdir()
+
     sys.argv = [
         "kmd",
         "--workspace",
@@ -271,15 +282,16 @@ def test_komodo_shims_is_installed_at_the_end(tmpdir):
         str(tmpdir / "repository.yml"),
         "--release",
         "a_komodo_release_with_shims",
+        "--overwrite",  # Since we have mkdir()'ed
         "--prefix",
         str(tmpdir),
     ]
 
     mocked_shell = Mock(return_value=b"")
-    mocked_fetch = Mock(return_value={})
+    mocked_fetch = Mock(return_value={"komodo-shims": "main"})
     with patch.object(cli, "shell", mocked_shell), patch.object(
         cli, "fetch", mocked_fetch
-    ):
+    ), patch.object(build, "shell", mocked_shell):
         cli_main()
     pip_install_calls = [
         shell_call
