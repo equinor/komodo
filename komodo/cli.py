@@ -20,8 +20,8 @@ from komodo.shell import pushd, shell
 from komodo.yaml_file_types import ReleaseFile, RepositoryFile
 
 # If this package is included in a build, it will always
-# be installed as the last pip package
-LAST_PIP_PACKAGE_TO_INSTALL = "komodo-shims"
+# be installed as the last package, and directly from downloaded source code
+LAST_PACKAGE_TO_INSTALL = "komodo-shims"
 
 
 class KomodoNamespace(argparse.Namespace):
@@ -266,6 +266,29 @@ def apply_fallback_tmpdir_for_pip_if_set(tmp_dir: Optional[str] = None):
         os.environ["TMPDIR"] = tmp_dir
 
 
+@profile_time("pip install komodo-shims")
+def install_komodo_shims(
+    komodo_shims_name: str,
+    komodo_shims_version: str,
+    downloads_directory: str,
+    pip_executable: str,
+    release_root: Path,
+) -> None:
+    cmd = [
+        pip_executable,
+        (
+            f"install {downloads_directory}/{komodo_shims_name}-"
+            f"{strip_version(komodo_shims_version)}"
+        ),
+        "--prefix",
+        str(release_root),
+        "--no-deps",
+        "--ignore-installed",
+        "--no-compile",
+    ]
+    print(shell(cmd))
+
+
 @profile_time("pip install to final destination")
 def install_previously_downloaded_pip_packages(
     release_file_content: Mapping[str, str],
@@ -292,11 +315,9 @@ def install_previously_downloaded_pip_packages(
             makeopts,
         ]
 
-    komodo_shims: Optional[Tuple[str, str]] = None
     for pkg, ver in release_file_content.items():
-        if pkg == LAST_PIP_PACKAGE_TO_INSTALL:
+        if pkg == LAST_PACKAGE_TO_INSTALL:
             # This is a magic package name that will always be installed after all other pip packages if found.
-            komodo_shims = (pkg, ver)
             continue
         pkg_data = repository_file_content[pkg][ver]
         if pkg_data["make"] != "pip":
@@ -306,9 +327,6 @@ def install_previously_downloaded_pip_packages(
             pkg_data.get("pypi_package_name", pkg), ver, pkg_data.get("makeopts")
         )
         print(shell(shell_input))
-
-    if komodo_shims is not None:
-        print(shell(pip_shell_command(komodo_shims[0], komodo_shims[1], None)))
 
 
 def run_post_installation_scripts_if_set(
@@ -406,6 +424,25 @@ def _main(args: KomodoNamespace) -> None:
         pip_executable=args.pip,
         release_root=release_root,
     )
+
+    komodo_shims_version = args.pkgs.content.get(LAST_PACKAGE_TO_INSTALL)
+    if komodo_shims_version:
+        assert (
+            args.repo.content[LAST_PACKAGE_TO_INSTALL][komodo_shims_version]["fetch"]
+            == "git"
+        ), "komodo-shims install is only supported with git as fetch method"
+        assert (
+            args.repo.content[LAST_PACKAGE_TO_INSTALL][komodo_shims_version]["make"]
+            == "sh"
+        ), "komodo-shims install is only supported with sh as make method"
+        install_komodo_shims(
+            LAST_PACKAGE_TO_INSTALL,
+            komodo_shims_version,
+            downloads_directory=args.downloads,
+            pip_executable=args.pip,
+            release_root=release_root,
+        )
+
     fixup_python_shebangs(args.prefix, args.release)
 
     komodo.switch.create_activator_switch(data, args.prefix, args.release)
