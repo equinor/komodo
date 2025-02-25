@@ -17,21 +17,21 @@ komodo.symlink.create\_links module
 
 .. automodule:: komodo.symlink.create_links
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 komodo.symlink.sanity\_check module
 -----------------------------------
 
 .. automodule:: komodo.symlink.sanity_check
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: komodo.symlink
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
