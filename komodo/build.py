@@ -248,8 +248,6 @@ def make(
             msg = "pypi_package_name is only valid when building with pip"
             raise ValueError(msg)
 
-        package_name = current.get("pypi_package_name", package_name)
-
         makeopts = current.get("makeopts", "")
         if extra_makeopts:
             makeopts = f"{makeopts} {extra_makeopts}"
