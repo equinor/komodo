@@ -93,7 +93,6 @@ ignore = [
     "PLR0912",  # Too many branches
     "PLR0913",  # too-many-arguments
     "PLR0915",  # Too many statements
-    "PLW2901",  # for loop variable overwritten
 ]
 
 [tool.ruff.lint.isort]
