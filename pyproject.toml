@@ -118,14 +118,14 @@ src = ["src"]
 line-length = 88
 [tool.ruff.lint]
 select = [
-  "W",   # pycodestyle
-  "I",   # isort
-  "B",   # flake-8-bugbear
-  "SIM", # flake-8-simplify
-  "F",   # pyflakes
-  "UP",  # pyupgrade
-  "PERF",  # perflint
-  "C4",  # flake8-comprehensions
+  "B",    # flake-8-bugbear
+  "C4",   # flake8-comprehensions
+  "F",    # pyflakes
+  "I",    # isort
+  "PERF", # perflint
+  "SIM",  # flake-8-simplify
+  "UP",   # pyupgrade
+  "W",    # pycodestyle
 ]
 
 ignore = ["PERF203"]
