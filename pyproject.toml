@@ -40,7 +40,6 @@ dependencies = [
 dev = [
     "furo",
     "myst_parser",
-    "pylint",
     "pytest",
     "ruff",
     "sphinx",
@@ -74,45 +73,6 @@ komodo-suggest-symlinks = "komodo.symlink.suggester.cli:main"
 komodo-transpiler = "komodo.release_transpiler:main"
 komodo-check-unused = "komodo.check_unused_package:main"
 
-[tool.pylint.messages_control]
-disable = [
-    "bad-inline-option",
-    "consider-using-sys-exit",
-    "deprecated-pragma",
-    "duplicate-code",
-    "file-ignored",
-    "fixme",
-    "line-too-long",
-    "locally-disabled",
-    "logging-not-lazy",
-    "logging-fstring-interpolation", # Do not remove; it greatly decreases readability
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "missing-module-docstring",
-    "no-else-return",
-    "protected-access",
-    "raise-missing-from",
-    "raw-checker-failed",
-    "redefined-outer-name",
-    "suppressed-message",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-locals",
-    "too-many-statements",
-    "use-a-generator",
-    "use-implicit-booleaness-not-comparison",
-    "use-symbolic-message-instead",
-    "useless-object-inheritance",
-    "too-many-lines",
-    "too-many-positional-arguments",
-]
-
-[tool.pylint.MASTER]
-ignore-paths = [
-    '^.*\\_version.py'
-]
-
 [tool.ruff]
 src = ["src"]
 line-length = 88
@@ -123,12 +83,26 @@ select = [
   "F",    # pyflakes
   "I",    # isort
   "PERF", # perflint
+  "PL",   # pylint
   "SIM",  # flake-8-simplify
   "UP",   # pyupgrade
   "W",    # pycodestyle
 ]
-
-ignore = ["PERF203"]
+ignore = [
+    "PERF203",  # try-except-in-loop
+    "PLR0912",  # Too many branches
+    "PLR0913",  # too-many-arguments
+    "PLR0915",  # Too many statements
+    "PLR1722",  # use sys.exit
+    "PLR2004",  # Magic value used in comparison
+    "PLR5501",  # use elif instead of else then if
+    "PLW2901",  # for loop variable overwritten
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["komodo"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"docs/conf.py" = [
+    "PLR1711",  # useless return statement
+]
