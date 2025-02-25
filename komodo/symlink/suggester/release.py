@@ -43,7 +43,7 @@ class Release:
             raise ValueError(msg) from exc
         except AttributeError:
             # In the case that this is a monthly alias without postfix, assume 3.8
-            if len(repr(self)) == 7:
+            if len(repr(self)) == len("2022.01"):
                 return "py38"
 
             raise
