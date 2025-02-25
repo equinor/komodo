@@ -1,4 +1,3 @@
-# pylint: disable=too-many-lines
 import functools
 import os
 import pathlib

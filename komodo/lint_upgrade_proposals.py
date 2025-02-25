@@ -22,7 +22,6 @@ def verify_package_versions_exist(
                 package_versions = []
                 if isinstance(nested_package_version, dict):
                     for nested_packages in nested_package_version.values():
-                        # pylint: disable=cell-var-from-loop
                         package_versions.extend(extract_versions(nested_packages))
                 else:
                     package_versions.append(nested_package_version)

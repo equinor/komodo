@@ -52,7 +52,7 @@ def cmake(
     Path(bdir).mkdir(parents=True, exist_ok=True)
     with pushd(bdir):
         os.environ["LD_LIBRARY_PATH"] = ld_lib_path
-        _pre_PATH = os.environ["PATH"]  # pylint: disable=invalid-name
+        _pre_PATH = os.environ["PATH"]
         os.environ["PATH"] = bin_path
 
         print(f"Installing {package_name} ({ver}) from source with cmake")
@@ -79,7 +79,7 @@ def sh(
     jobs=None,
     cmake=None,
     makeopts=None,
-):  # pylint: disable=invalid-name
+):
     makefile = data.get(makefile)
 
     with pushd(pkgpath):
