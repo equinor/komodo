@@ -292,11 +292,9 @@ def install_previously_downloaded_pip_packages(
             makeopts,
         ]
 
-    komodo_shims: Optional[Tuple[str, str]] = None
     for pkg, ver in release_file_content.items():
         if pkg == LAST_PIP_PACKAGE_TO_INSTALL:
             # This is a magic package name that will always be installed after all other pip packages if found.
-            komodo_shims = (pkg, ver)
             continue
         pkg_data = repository_file_content[pkg][ver]
         if pkg_data["make"] != "pip":
@@ -306,9 +304,6 @@ def install_previously_downloaded_pip_packages(
             pkg_data.get("pypi_package_name", pkg), ver, pkg_data.get("makeopts")
         )
         print(shell(shell_input))
-
-    if komodo_shims is not None:
-        print(shell(pip_shell_command(komodo_shims[0], komodo_shims[1], None)))
 
 
 def run_post_installation_scripts_if_set(
