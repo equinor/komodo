@@ -52,7 +52,6 @@ def version_list_to_requirements(
     ]
 
 
-# pylint: disable=too-many-instance-attributes
 class PypiDependencies:
     def __init__(
         self,

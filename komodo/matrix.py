@@ -23,7 +23,7 @@ def get_matrix(
     if custom_coordinate:
         if len(custom_coordinate) != 1:
             raise ValueError("custom_coordinate must contain exactly one item")
-        component_name, component_seq = next(iter(custom_coordinate.items()))  # pylint: disable=stop-iteration-return
+        component_name, component_seq = next(iter(custom_coordinate.items()))
 
     for product in itertools.product(rhel_versions, py_versions, component_seq):
         rh_ver, py_ver, other_ver = product

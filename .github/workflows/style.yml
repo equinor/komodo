@@ -31,12 +31,8 @@ jobs:
 
     - name: Lint with ruff
       run: |
-        ruff check komodo tests
+        ruff check .
     
-    - name: Format with ruff
+    - name: Verify formatting with ruff
       run: |
-        ruff format komodo tests --check
-
-    - name: pylint
-      run: |
-        pylint komodo tests
+        ruff format --diff .
