@@ -136,7 +136,7 @@ def download(package_name, ver, prefix, url, hash_str, fakeroot, destination):
     session.mount("https://", requests.adapters.HTTPAdapter(max_retries=20))
     response = session.get(url, stream=True)
 
-    if response.status_code != 200:
+    if response.status_code != requests.codes.ok:
         msg = f"GET request to {url} returned status code {response.status_code}"
         raise RuntimeError(
             msg,

@@ -21,8 +21,8 @@ class Configuration:
         return release
 
     def update(self, release, mode, python_versions: List[str]):
-        for python_version in python_versions:
-            python_version = python_version.strip()
+        for _python_version in python_versions:
+            python_version = _python_version.strip()
             release.set_python_version(python_version)
 
             link = f"{mode}-{python_version}"

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from dataclasses import dataclass
 from typing import Any
 
@@ -146,7 +147,7 @@ def main():
         args.release_file, package_status, args.repo, builtin_python_versions
     )
     print(result.message)
-    exit(result.exitcode)
+    sys.exit(result.exitcode)
 
 
 if __name__ == "__main__":

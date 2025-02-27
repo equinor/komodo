@@ -218,12 +218,11 @@ def generate_release_manifest(
         for package, version in release_file_content.items():
             entry: Dict[str, str] = repository_file_content[package][version]
             maintainer = repository_file_content[package][version]["maintainer"]
+            release[package] = {"maintainer": maintainer}
             if entry.get("fetch") == "git":
-                version = git_hashes[package]
-            release[package] = {
-                "version": version,
-                "maintainer": maintainer,
-            }
+                release[package] = {"version": git_hashes[package]}
+            else:
+                release[package] = {"version": version}
         yaml = YAML()
         yaml.dump(release, filehandle)
 

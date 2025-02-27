@@ -319,11 +319,10 @@ class PypiDependencies:
         satisfied, transient_requirements = self._satisfied([requirement])
         if satisfied:
             self._satisfied_requirements.add(requirement)
+        elif requirement in self._failed_requirements:
+            self._failed_requirements[requirement] += f", {package_name}"
         else:
-            if requirement in self._failed_requirements:
-                self._failed_requirements[requirement] += f", {package_name}"
-            else:
-                self._failed_requirements[requirement] = package_name
+            self._failed_requirements[requirement] = package_name
         return satisfied and all(
             self.satisfied(transient, package_name, extra)
             for (transients, extra) in transient_requirements
